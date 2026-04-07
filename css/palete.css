@@ -1,0 +1,313 @@
+/* ============================================
+   SPALVŲ PALETĖ — palete.css
+   ============================================ */
+
+/* ---- Hero ---- */
+.palette-hero {
+  background: var(--light-gray);
+  padding: 120px 0 60px;
+  text-align: center;
+}
+
+.palette-hero h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--black);
+  margin-bottom: 12px;
+}
+
+.palette-hero h1 .highlight {
+  color: var(--magenta);
+}
+
+.palette-hero .hero-subtitle {
+  font-size: 1.1rem;
+  color: var(--dark-gray);
+  max-width: 560px;
+  margin: 0 auto 28px;
+}
+
+.palette-stats {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.palette-stats .stat {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--black);
+}
+
+.palette-stats .stat span {
+  color: var(--magenta);
+  font-weight: 800;
+}
+
+/* ---- Breadcrumb ---- */
+.breadcrumb {
+  padding: 16px 0 0;
+  font-size: 0.85rem;
+  color: var(--dark-gray);
+}
+
+.breadcrumb a {
+  color: var(--dark-gray);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.breadcrumb a:hover {
+  color: var(--magenta);
+}
+
+.breadcrumb span {
+  margin: 0 6px;
+}
+
+/* ---- Search ---- */
+.palette-search {
+  max-width: 500px;
+  margin: 0 auto 28px;
+  position: relative;
+}
+
+.palette-search input {
+  width: 100%;
+  padding: 14px 20px 14px 48px;
+  font-size: 1rem;
+  border: 2px solid var(--border);
+  border-radius: 50px;
+  outline: none;
+  background: var(--white);
+  font-family: inherit;
+  transition: border-color var(--transition);
+}
+
+.palette-search input:focus {
+  border-color: var(--magenta);
+}
+
+.palette-search .search-icon {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.15rem;
+  color: var(--dark-gray);
+  pointer-events: none;
+}
+
+/* ---- Filter Buttons ---- */
+.palette-filters {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+  padding: 0 16px;
+}
+
+.palette-filters .filter-btn {
+  padding: 8px 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 50px;
+  background: var(--white);
+  color: var(--dark-gray);
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.palette-filters .filter-btn:hover {
+  border-color: var(--magenta);
+  color: var(--magenta);
+}
+
+.palette-filters .filter-btn.active {
+  background: var(--magenta);
+  border-color: var(--magenta);
+  color: var(--white);
+}
+
+/* ---- Color Grid ---- */
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  margin-bottom: 60px;
+}
+
+.shade-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition);
+  text-decoration: none;
+  display: block;
+  color: inherit;
+}
+
+.shade-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+}
+
+.shade-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.shade-number {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--black);
+  margin-bottom: 4px;
+}
+
+.shade-name {
+  font-size: 0.85rem;
+  color: var(--dark-gray);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.shade-category {
+  font-size: 0.75rem;
+  color: #A0A0A0;
+  margin-bottom: 10px;
+}
+
+.shade-link {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--magenta);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.shade-link:hover {
+  color: var(--blue);
+}
+
+/* ---- No Results ---- */
+.palette-no-results {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--dark-gray);
+  font-size: 1rem;
+  display: none;
+}
+
+.palette-no-results.visible {
+  display: block;
+}
+
+/* ---- CTA Section ---- */
+.palette-cta {
+  text-align: center;
+  padding: 60px 0;
+  background: var(--light-gray);
+  border-radius: var(--radius);
+  margin-bottom: 60px;
+}
+
+.palette-cta h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--black);
+  margin-bottom: 12px;
+}
+
+.palette-cta p {
+  color: var(--dark-gray);
+  font-size: 1rem;
+  margin-bottom: 24px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 1024px) {
+  .palette-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .palette-hero {
+    padding: 100px 0 40px;
+  }
+
+  .palette-hero h1 {
+    font-size: 1.8rem;
+  }
+
+  .palette-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .shade-card {
+    padding: 18px 14px;
+  }
+
+  .shade-circle {
+    width: 64px;
+    height: 64px;
+  }
+
+  .palette-filters {
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+  }
+
+  .palette-filters::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .palette-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .shade-card {
+    padding: 16px 10px;
+  }
+
+  .shade-circle {
+    width: 56px;
+    height: 56px;
+  }
+
+  .shade-number {
+    font-size: 1rem;
+  }
+
+  .shade-name {
+    font-size: 0.8rem;
+  }
+
+  .palette-stats {
+    gap: 16px;
+  }
+
+  .palette-hero h1 {
+    font-size: 1.5rem;
+  }
+}

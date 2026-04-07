@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kain&#371; skai&#269;iuokl&#279; &mdash; Da&#382;ai Kirp&#279;jams | Suskai&#269;iuokite sutaupym&#261;</title>
+  <meta name="description" content="Suskai&#269;iuokite, kiek sutaupysite rinktdamiesi Color SHOCK 180 ml profesionalius da&#382;us. Kaina per ml, m&#279;nesinis ir metinis sutaupymas.">
+  <meta name="keywords" content="da&#382;&#371; kaina per ml, da&#382;&#371; palyginimas, ekonomi&#353;ki da&#382;ai salonams, 180 ml da&#382;&#371; sutaupymas, Color SHOCK skai&#269;iuokl&#279;">
+
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Dažai Kirpėjams">
+  <link rel="canonical" href="https://www.dazaikirpejams.lt/skaiciuokle.html">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Kainų skaičiuoklė | Dažai Kirpėjams">
+  <meta property="og:description" content="Suskaičiuokite realų sutaupymą rinkdamiesi 180 ml Color SHOCK profesionalius dažus. Kaina per ml, mėnesinis ir metinis sutaupymas.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.dazaikirpejams.lt/skaiciuokle.html">
+  <meta property="og:image" content="https://www.dazaikirpejams.lt/img/og-image.jpg">
+  <meta property="og:site_name" content="Dažai Kirpėjams">
+  <meta property="og:locale" content="lt_LT">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/skaiciuokle.css">
+
+  <!-- Fade-in animations -->
+</head>
+<body>
+
+  <!-- ============================================
+       HEADER
+       ============================================ -->
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <img src="img/logo-colorshock.jpg" alt="Color SHOCK" class="logo-img">
+      </a>
+      <nav class="nav-links">
+        <a href="category.html">Produktai</a>
+        <a href="palete.html">Spalvų paletė</a>
+        <a href="b2b.html">Salonams</a>
+        <a href="blogas.html">Blogas</a>
+        <a href="apie.html">Apie mus</a>
+        <a href="kontaktai.html">Kontaktai</a>
+      </nav>
+      <div class="nav-right">
+        <div class="nav-lang">
+          <a href="#" class="active">LT</a><span>|</span><a href="#">EN</a><span>|</span><a href="#">RU</a>
+        </div>
+        <a href="krepselis.html" class="nav-cart">&#128722;<span class="nav-cart-count">0</span></a>
+      </div>
+      <div class="burger"><span></span><span></span><span></span></div>
+    </div>
+  </header>
+
+  <!-- ============================================
+       BREADCRUMB
+       ============================================ -->
+  <div class="breadcrumb">
+    <div class="container">
+      <a href="index.html">Pradžia</a>
+      <span>/</span>
+      <span class="current">Kainų skaičiuoklė</span>
+    </div>
+  </div>
+
+  <!-- ============================================
+       1. HERO
+       ============================================ -->
+  <section class="calc-hero fade-in">
+    <div class="container">
+      <span class="section-label">Sutaupykite su 180 ml</span>
+      <h1>Kainų <span class="highlight">skaičiuoklė</span></h1>
+      <p class="calc-hero-subtitle">Suskaičiuokite, kiek Jūsų salonas sutaupo rinktdamasis Color SHOCK 180 ml pakuotę vietoj standartinės. Įveskite savo duomenis ir pamatykite realų skirtumą.</p>
+    </div>
+  </section>
+
+  <!-- ============================================
+       2. CALCULATOR
+       ============================================ -->
+  <section class="calc-section">
+    <div class="container">
+      <div class="calc-card fade-in">
+
+        <div class="calc-grid">
+          <!-- Left: Inputs -->
+          <div class="calc-inputs">
+            <h2>Jūsų salono duomenys</h2>
+
+            <div class="calc-input-grid">
+              <div class="calc-field">
+                <label for="dyeingsPerWeek">Kiek dažymų atliekate per savaitę?</label>
+                <input type="number" id="dyeingsPerWeek" value="15" min="1" max="200" step="1">
+              </div>
+
+              <div class="calc-field">
+                <label for="mlPerDyeing">Vidutinis dažų kiekis vienam dažymui (ml)</label>
+                <input type="number" id="mlPerDyeing" value="60" min="10" max="500" step="5">
+              </div>
+
+              <div class="calc-field">
+                <label for="competitorPrice">Dabartinė dažų kaina (&euro;)</label>
+                <input type="number" id="competitorPrice" value="10.00" min="0.01" max="100" step="0.01">
+              </div>
+
+              <div class="calc-field">
+                <label for="competitorVolume">Dabartinė dažų talpa (ml)</label>
+                <input type="number" id="competitorVolume" value="60" min="10" max="500" step="5">
+              </div>
+            </div>
+
+            <div class="calc-our-product">
+              <div class="calc-our-product-badge">Mūsų pasiūlymas</div>
+              <strong>Color SHOCK 180 ml</strong> &mdash; <span class="calc-our-price">&euro;7,99</span>
+            </div>
+
+            <button id="calcButton" class="btn btn-primary btn-lg">Skaičiuoti</button>
+          </div>
+
+          <!-- Right: Results -->
+          <div class="calc-results" id="calcResults">
+            <h2>Rezultatai</h2>
+
+            <div class="calc-result-item">
+              <span class="calc-result-label">Kaina per ml (konkurentas)</span>
+              <span class="calc-result-value" id="resultCompetitorPerMl">&euro;0,167</span>
+            </div>
+
+            <div class="calc-result-item">
+              <span class="calc-result-label">Kaina per ml (Color SHOCK)</span>
+              <span class="calc-result-value calc-result-highlight" id="resultOurPerMl">&euro;0,044</span>
+            </div>
+
+            <div class="calc-result-divider"></div>
+
+            <div class="calc-result-item calc-result-big">
+              <span class="calc-result-label">Sutaupymas per mėnesį</span>
+              <span class="calc-result-value calc-result-highlight" id="resultMonthly">&euro;0,00</span>
+            </div>
+
+            <div class="calc-result-item calc-result-big">
+              <span class="calc-result-label">Sutaupymas per metus</span>
+              <span class="calc-result-value calc-result-highlight" id="resultYearly">&euro;0,00</span>
+            </div>
+
+            <div class="calc-result-divider"></div>
+
+            <div class="calc-result-item">
+              <span class="calc-result-label">Pakuočių sumažėjimas per mėnesį</span>
+              <span class="calc-result-value" id="resultPackages">0</span>
+            </div>
+
+            <div class="calc-result-note">
+              * Skaičiavimai yra orientaciniai ir priklauso nuo faktinių kainų bei naudojimo įpročių.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       3. VISUAL COMPARISON
+       ============================================ -->
+  <section class="calc-comparison fade-in">
+    <div class="container">
+      <span class="section-label">Palyginimas</span>
+      <h2 class="section-title">Standartinė pakuotė <span class="vs">vs</span> Color SHOCK</h2>
+      <p class="section-subtitle">Pamatykite skirtumą — skaičiai kalba patys.</p>
+
+      <div class="comparison-table-wrap">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Standartinė pakuotė</th>
+              <th class="comparison-highlight-col">Color SHOCK</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="comparison-label">Talpa</td>
+              <td>60 ml</td>
+              <td class="comparison-highlight-col"><strong>180 ml</strong></td>
+            </tr>
+            <tr>
+              <td class="comparison-label">Kaina</td>
+              <td>~&euro;10,00</td>
+              <td class="comparison-highlight-col"><strong>&euro;7,99</strong></td>
+            </tr>
+            <tr>
+              <td class="comparison-label">Kaina per ml</td>
+              <td>~&euro;0,167</td>
+              <td class="comparison-highlight-col"><strong>&euro;0,044</strong></td>
+            </tr>
+            <tr>
+              <td class="comparison-label">Pakuočių per mėnesį*</td>
+              <td>~60 vnt.</td>
+              <td class="comparison-highlight-col"><strong>~20 vnt. (3x mažiau)</strong></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="comparison-footnote">* Skaičiuojant 15 dažymų per savaitę, 60 ml vienam dažymui.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       4. BENEFITS
+       ============================================ -->
+  <section class="calc-benefits fade-in">
+    <div class="container">
+      <span class="section-label">Kodėl verta</span>
+      <h2 class="section-title">Trys priežastys rinktis 180 ml</h2>
+
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">&#128176;</div>
+          <h3>Mažesnė savikaina</h3>
+          <p>Kaina per ml yra iki 3,7 karto mažesnė nei standartinės pakuotės. Tai reiškia realų sutaupymą kiekvieną dieną.</p>
+        </div>
+
+        <div class="benefit-card">
+          <div class="benefit-icon">&#128230;</div>
+          <h3>Mažiau pakuočių</h3>
+          <p>Su 180 ml pakuote Jums reikia 3 kartus mažiau vienetų tam pačiam darbui atlikti. Mažiau užsakymų, mažiau atliekų.</p>
+        </div>
+
+        <div class="benefit-card">
+          <div class="benefit-icon">&#128200;</div>
+          <h3>Didesnis pelningumas</h3>
+          <p>Sutaupytos lėšos tiesiogiai didina Jūsų salono pelningumą. Per metus tai gali siekti šimtus eurų.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       5. CTA
+       ============================================ -->
+  <section class="calc-cta fade-in">
+    <div class="container">
+      <div class="calc-cta-card">
+        <h2>Išbandykite patys</h2>
+        <p>Peržiūrėkite Color SHOCK produktų asortimentą ir įsitikinkite 180 ml pranašumu savo salone.</p>
+        <div class="calc-cta-buttons">
+          <a href="category.html" class="btn btn-primary btn-lg">Peržiūrėti produktus</a>
+          <a href="b2b.html" class="btn btn-secondary btn-lg">Gauti pasiūlymą salonui</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       FOOTER
+       ============================================ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo" style="color: #fff;">
+            Da&#382;ai <span>Kirp&#279;jams</span>
+          </a>
+          <p>Profesional&#363;s plauk&#371; da&#382;ai ir priemon&#279;s kirp&#279;jams. Didesn&#279; 180 ml talpa &mdash; daugiau vert&#279;s darbui salone.</p>
+          <div class="footer-social">
+            <a href="#" title="Facebook">f</a>
+            <a href="#" title="Instagram">ig</a>
+            <a href="#" title="LinkedIn">in</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Produktai</h4>
+          <a href="category.html">Plauk&#371; da&#382;ai</a>
+          <a href="#">Oksidantai</a>
+          <a href="#">&#352;amp&#363;nai ir prie&#382;i&#363;ra</a>
+          <a href="#">Pagalbin&#279;s priemon&#279;s</a>
+          <a href="palete.html">Spalvų paletė</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Informacija</h4>
+          <a href="apie.html">Apie mus</a>
+          <a href="blogas.html">Blogas</a>
+          <a href="b2b.html">Bendradarbiavimas</a>
+          <a href="duk.html">DUK</a>
+          <a href="pristatymas.html">Pristatymas ir gr&#261;&#382;inimas</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Kontaktai</h4>
+          <div class="footer-contact-item">
+            &#9993; info@dazaikirpejams.lt
+          </div>
+          <div class="footer-contact-item">
+            &#9742; +370 600 00000
+          </div>
+          <div class="footer-contact-item">
+            &#128205; Kaunas, Lietuva
+          </div>
+          <div class="footer-contact-item" style="margin-top: 8px;">
+            <small>I&ndash;V: 9:00 &ndash; 18:00</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>&copy; 2026 Da&#382;ai Kirp&#279;jams. Visos teis&#279;s saugomos.</span>
+        <div>
+          <a href="privatumas.html">Privatumo politika</a> &nbsp;&bull;&nbsp;
+          <a href="salygos.html">Pirkimo sąlygos</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/products-data.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/main.js"></script>
+
+  <!-- Calculator logic -->
+  <script>
+    (function() {
+      const OUR_PRICE = 7.99;
+      const OUR_VOLUME = 180;
+
+      const dyeingsInput = document.getElementById('dyeingsPerWeek');
+      const mlInput = document.getElementById('mlPerDyeing');
+      const priceInput = document.getElementById('competitorPrice');
+      const volumeInput = document.getElementById('competitorVolume');
+      const calcButton = document.getElementById('calcButton');
+
+      const resultCompetitorPerMl = document.getElementById('resultCompetitorPerMl');
+      const resultOurPerMl = document.getElementById('resultOurPerMl');
+      const resultMonthly = document.getElementById('resultMonthly');
+      const resultYearly = document.getElementById('resultYearly');
+      const resultPackages = document.getElementById('resultPackages');
+
+      function formatEur(value) {
+        return '\u20AC' + value.toFixed(2).replace('.', ',');
+      }
+
+      function calculate() {
+        var dyeingsPerWeek = parseFloat(dyeingsInput.value) || 0;
+        var mlPerDyeing = parseFloat(mlInput.value) || 0;
+        var competitorPrice = parseFloat(priceInput.value) || 0;
+        var competitorVolume = parseFloat(volumeInput.value) || 1;
+
+        // Price per ml
+        var competitorPerMl = competitorPrice / competitorVolume;
+        var ourPerMl = OUR_PRICE / OUR_VOLUME;
+
+        // Monthly usage
+        var dyeingsPerMonth = dyeingsPerWeek * 4.33;
+        var mlPerMonth = dyeingsPerMonth * mlPerDyeing;
+
+        // Monthly cost
+        var competitorMonthly = (mlPerMonth / competitorVolume) * competitorPrice;
+        var ourMonthly = (mlPerMonth / OUR_VOLUME) * OUR_PRICE;
+
+        // Savings
+        var savingsMonthly = competitorMonthly - ourMonthly;
+        var savingsYearly = savingsMonthly * 12;
+
+        // Packages per month
+        var competitorPackages = Math.ceil(mlPerMonth / competitorVolume);
+        var ourPackages = Math.ceil(mlPerMonth / OUR_VOLUME);
+        var packagesSaved = competitorPackages - ourPackages;
+
+        // Update UI
+        resultCompetitorPerMl.textContent = formatEur(competitorPerMl);
+        resultOurPerMl.textContent = formatEur(ourPerMl);
+        resultMonthly.textContent = formatEur(Math.max(0, savingsMonthly));
+        resultYearly.textContent = formatEur(Math.max(0, savingsYearly));
+
+        if (packagesSaved > 0) {
+          resultPackages.textContent = '-' + packagesSaved + ' vnt. (' + ourPackages + ' vietoj ' + competitorPackages + ')';
+        } else {
+          resultPackages.textContent = ourPackages + ' vnt. (vietoj ' + competitorPackages + ')';
+        }
+      }
+
+      // Live calculation on input change
+      dyeingsInput.addEventListener('input', calculate);
+      mlInput.addEventListener('input', calculate);
+      priceInput.addEventListener('input', calculate);
+      volumeInput.addEventListener('input', calculate);
+      calcButton.addEventListener('click', calculate);
+
+      // Initial calculation
+      calculate();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,729 @@
+/* ============================================
+   B2B / BENDRADARBIAVIMAS SALONAMS
+   ============================================ */
+
+/* Breadcrumb */
+.breadcrumb {
+  padding: 90px 0 12px;
+  font-size: 0.85rem;
+  color: var(--dark-gray);
+}
+.breadcrumb a { color: var(--dark-gray); }
+.breadcrumb a:hover { color: var(--magenta); }
+.breadcrumb span { margin: 0 8px; color: var(--border); }
+.breadcrumb .current { color: var(--black); font-weight: 500; }
+
+/* Active nav link */
+.nav-active {
+  color: var(--magenta) !important;
+}
+
+/* ============================================
+   1. HERO
+   ============================================ */
+.b2b-hero {
+  padding: 32px 0 72px;
+  background: linear-gradient(135deg, var(--white) 0%, var(--light-gray) 100%);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.b2b-hero::before {
+  content: '';
+  position: absolute;
+  top: -120px;
+  right: -120px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(233,30,140,0.06) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.b2b-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -80px;
+  left: -80px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(43,53,175,0.05) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.b2b-hero .section-label {
+  color: var(--blue);
+}
+
+.b2b-hero h1 {
+  margin-bottom: 20px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.b2b-hero h1 .highlight {
+  color: var(--magenta);
+}
+
+.b2b-hero-subtitle {
+  font-size: 1.15rem;
+  color: var(--dark-gray);
+  max-width: 560px;
+  margin: 0 auto 36px;
+  line-height: 1.7;
+}
+
+/* ============================================
+   2. B2B ADVANTAGES (6 cards)
+   ============================================ */
+.b2b-advantages {
+  padding: var(--section-padding);
+  background: var(--white);
+}
+
+.b2b-advantages-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin-top: 48px;
+}
+
+.b2b-adv-card {
+  background: var(--light-gray);
+  border-radius: var(--radius);
+  padding: 36px 28px;
+  transition: all var(--transition);
+  border: 1px solid transparent;
+  text-align: center;
+}
+
+.b2b-adv-card:hover {
+  border-color: var(--border);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-4px);
+}
+
+.b2b-adv-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  margin: 0 auto 20px;
+  box-shadow: var(--shadow);
+}
+
+.b2b-adv-card h4 {
+  margin-bottom: 10px;
+  font-size: 1.05rem;
+}
+
+.b2b-adv-card p {
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+/* ============================================
+   3. HOW IT WORKS — 3 steps
+   ============================================ */
+.b2b-steps {
+  padding: var(--section-padding);
+  background: var(--light-gray);
+}
+
+.b2b-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  margin-top: 48px;
+  position: relative;
+}
+
+/* Visual connector line between steps */
+.b2b-steps-grid::before {
+  content: '';
+  position: absolute;
+  top: 52px;
+  left: calc(16.66% + 32px);
+  right: calc(16.66% + 32px);
+  height: 2px;
+  background: var(--border);
+  z-index: 0;
+}
+
+.b2b-step {
+  text-align: center;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.b2b-step-number {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--magenta);
+  color: var(--white);
+  font-weight: 800;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  box-shadow: 0 4px 16px rgba(233, 30, 140, 0.25);
+  position: relative;
+  z-index: 2;
+}
+
+.b2b-step h4 {
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.b2b-step p {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   4. 180 ML ADVANTAGE — Economic benefit
+   ============================================ */
+.b2b-economy {
+  padding: var(--section-padding);
+  background: var(--black);
+  color: var(--white);
+  position: relative;
+  overflow: hidden;
+}
+
+.b2b-economy h2,
+.b2b-economy h3,
+.b2b-economy h4 {
+  color: var(--white);
+}
+
+.b2b-economy p {
+  color: rgba(255,255,255,0.75);
+}
+
+.b2b-economy-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 48px;
+  align-items: start;
+  margin-top: 48px;
+}
+
+/* Comparison table */
+.b2b-compare {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius);
+  overflow: hidden;
+  min-width: 0;
+}
+
+.b2b-compare-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.b2b-compare-row:last-child {
+  border-bottom: none;
+}
+
+.b2b-compare-row.header {
+  background: rgba(255,255,255,0.08);
+}
+
+.b2b-compare-cell {
+  padding: 14px 16px;
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.75);
+}
+
+.b2b-compare-row.header .b2b-compare-cell {
+  font-weight: 700;
+  color: var(--white);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.b2b-compare-cell.highlight-cell {
+  color: var(--magenta);
+  font-weight: 700;
+}
+
+/* Stats row */
+.b2b-economy-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.b2b-eco-stat {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  padding: 28px 20px;
+  text-align: center;
+}
+
+.b2b-eco-stat .stat-number {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--magenta);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.b2b-eco-stat .stat-label {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.4;
+}
+
+/* ============================================
+   5. B2B INQUIRY FORM
+   ============================================ */
+.b2b-form-section {
+  padding: var(--section-padding);
+  background: var(--white);
+}
+
+.b2b-form-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 60px;
+  align-items: start;
+}
+
+.b2b-form-info h2 {
+  margin-bottom: 16px;
+}
+
+.b2b-form-info > p {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.b2b-form-perks {
+  display: grid;
+  gap: 16px;
+}
+
+.b2b-form-perk {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.95rem;
+  color: var(--black);
+  font-weight: 500;
+}
+
+.b2b-form-perk-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(233, 30, 140, 0.08);
+  color: var(--magenta);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Form card */
+.b2b-form-card {
+  background: var(--light-gray);
+  border-radius: var(--radius);
+  padding: 40px;
+  border: 1px solid var(--border);
+}
+
+.b2b-form-card h3 {
+  margin-bottom: 8px;
+}
+
+.b2b-form-card > p {
+  font-size: 0.9rem;
+  color: var(--dark-gray);
+  margin-bottom: 28px;
+}
+
+.b2b-inquiry-form .form-group {
+  margin-bottom: 20px;
+}
+
+.b2b-inquiry-form label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--black);
+  margin-bottom: 8px;
+}
+
+.b2b-inquiry-form label .required {
+  color: var(--magenta);
+}
+
+.b2b-inquiry-form input,
+.b2b-inquiry-form select,
+.b2b-inquiry-form textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  color: var(--black);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border var(--transition), box-shadow var(--transition);
+}
+
+.b2b-inquiry-form input::placeholder,
+.b2b-inquiry-form textarea::placeholder {
+  color: #B0B0B0;
+}
+
+.b2b-inquiry-form input:focus,
+.b2b-inquiry-form select:focus,
+.b2b-inquiry-form textarea:focus {
+  outline: none;
+  border-color: var(--magenta);
+  box-shadow: 0 0 0 3px rgba(233, 30, 140, 0.1);
+}
+
+.b2b-inquiry-form select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236B6B6B' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+.b2b-inquiry-form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.b2b-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.btn-b2b-submit {
+  width: 100%;
+  padding: 16px 32px;
+  font-size: 1.05rem;
+  margin-top: 4px;
+}
+
+/* Success message */
+.b2b-form-success {
+  display: none;
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.b2b-form-success.visible {
+  display: block;
+}
+
+.b2b-form-success-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(233, 30, 140, 0.1);
+  color: var(--magenta);
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.b2b-form-success h3 {
+  margin-bottom: 12px;
+}
+
+.b2b-form-success p {
+  font-size: 0.95rem;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   6. PARTNER TESTIMONIALS
+   ============================================ */
+.b2b-testimonials {
+  padding: var(--section-padding);
+  background: var(--light-gray);
+}
+
+.b2b-testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin-top: 48px;
+}
+
+.b2b-testimonial-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 36px 32px;
+  border: 1px solid var(--border);
+  transition: all var(--transition);
+  position: relative;
+}
+
+.b2b-testimonial-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-4px);
+}
+
+.b2b-testimonial-card::before {
+  content: '\201C';
+  position: absolute;
+  top: 20px;
+  right: 28px;
+  font-size: 4rem;
+  line-height: 1;
+  color: rgba(233, 30, 140, 0.1);
+  font-family: Georgia, serif;
+}
+
+.b2b-testimonial-stars {
+  color: #F5A623;
+  font-size: 1rem;
+  margin-bottom: 16px;
+  letter-spacing: 2px;
+}
+
+.b2b-testimonial-text {
+  font-size: 0.95rem;
+  color: var(--black);
+  font-style: italic;
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+
+.b2b-testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.b2b-testimonial-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--magenta), var(--blue));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--white);
+}
+
+.b2b-testimonial-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--black);
+}
+
+.b2b-testimonial-role {
+  font-size: 0.82rem;
+  color: var(--dark-gray);
+}
+
+/* ============================================
+   7. FINAL CTA
+   ============================================ */
+.b2b-final-cta {
+  padding: var(--section-padding);
+  background: linear-gradient(135deg, var(--blue) 0%, #1e2780 100%);
+  color: var(--white);
+  text-align: center;
+}
+
+.b2b-final-cta h2 {
+  color: var(--white);
+  margin-bottom: 16px;
+}
+
+.b2b-final-cta p {
+  color: rgba(255,255,255,0.8);
+  font-size: 1.1rem;
+  max-width: 560px;
+  margin: 0 auto 36px;
+}
+
+.b2b-final-cta-options {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.b2b-cta-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius-sm);
+  padding: 20px 28px;
+  color: var(--white);
+  text-decoration: none;
+  transition: all var(--transition);
+  font-weight: 500;
+}
+
+.b2b-cta-option:hover {
+  background: rgba(255,255,255,0.18);
+  transform: translateY(-2px);
+  color: var(--white);
+}
+
+.b2b-cta-option-icon {
+  font-size: 1.4rem;
+}
+
+.b2b-cta-option span {
+  font-size: 0.95rem;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .b2b-advantages-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .b2b-economy-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .b2b-economy-stats {
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .b2b-form-wrapper {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .b2b-testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .b2b-hero {
+    padding: 24px 0 48px;
+  }
+
+  .b2b-advantages-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .b2b-adv-card {
+    padding: 28px 20px;
+  }
+
+  .b2b-steps-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .b2b-steps-grid::before {
+    display: none;
+  }
+
+  .b2b-economy-stats {
+    grid-template-columns: 1fr;
+    max-width: 320px;
+  }
+
+  .b2b-compare {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .b2b-compare-cell {
+    padding: 10px 10px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .b2b-form-card {
+    padding: 28px 24px;
+  }
+
+  .b2b-form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .b2b-final-cta-options {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .b2b-cta-option {
+    width: 100%;
+    max-width: 340px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .b2b-hero h1 {
+    font-size: 1.75rem;
+  }
+
+  .b2b-advantages-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .b2b-adv-card {
+    padding: 28px 20px;
+  }
+
+  .b2b-economy-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .b2b-form-card {
+    padding: 24px 20px;
+  }
+
+  .b2b-eco-stat .stat-number {
+    font-size: 1.8rem;
+  }
+}

@@ -1,0 +1,2561 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Dazai Kirpejams</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="js/products-data.js"></script>
+    <style>
+        /* ====== RESET & BASE ====== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F5F5F7;
+            color: #1A1A1A;
+            min-height: 100vh;
+            display: flex;
+        }
+        a { text-decoration: none; color: inherit; }
+        button { font-family: 'Inter', sans-serif; cursor: pointer; }
+        input, select, textarea { font-family: 'Inter', sans-serif; }
+
+        /* ====== SIDEBAR ====== */
+        .sidebar {
+            width: 260px;
+            min-height: 100vh;
+            background: #1A1A1A;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            z-index: 100;
+            transition: transform 0.3s;
+        }
+        .sidebar-logo {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .sidebar-logo h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #E91E8C;
+        }
+        .sidebar-logo span {
+            font-size: 11px;
+            color: #6B6B6B;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .sidebar-nav {
+            flex: 1;
+            padding: 12px 0;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #999;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .nav-item:hover { color: #fff; background: rgba(255,255,255,0.04); }
+        .nav-item.active {
+            color: #fff;
+            background: rgba(233,30,140,0.1);
+            border-left-color: #E91E8C;
+        }
+        .nav-item .icon { font-size: 18px; width: 24px; text-align: center; }
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .sidebar-footer .nav-item { padding: 8px 0; border-left: none; color: #EF4444; }
+        .sidebar-footer .nav-item:hover { color: #f87171; background: transparent; }
+
+        /* ====== MAIN ====== */
+        .main {
+            flex: 1;
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+        .topbar {
+            background: #fff;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .topbar h1 { font-size: 20px; font-weight: 700; }
+        .topbar-right { display: flex; align-items: center; gap: 16px; }
+        .topbar-right .bell { font-size: 20px; cursor: pointer; position: relative; }
+        .topbar-right .bell .badge-dot {
+            position: absolute; top: -2px; right: -2px;
+            width: 8px; height: 8px; background: #EF4444; border-radius: 50%;
+        }
+        .admin-name { font-size: 13px; color: #6B6B6B; font-weight: 500; }
+        .content { padding: 32px; }
+
+        /* ====== HAMBURGER (mobile) ====== */
+        .hamburger {
+            display: none;
+            background: none; border: none; font-size: 24px; color: #1A1A1A;
+            padding: 4px;
+        }
+        .overlay {
+            display: none;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 90;
+        }
+
+        /* ====== STAT CARDS ====== */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .stat-card .label { font-size: 13px; color: #6B6B6B; font-weight: 500; }
+        .stat-card .value { font-size: 28px; font-weight: 800; margin: 6px 0 4px; }
+        .stat-card .change { font-size: 12px; font-weight: 600; }
+        .stat-card .change.up { color: #22C55E; }
+        .stat-card .change.down { color: #EF4444; }
+
+        /* ====== CARDS / PANELS ====== */
+        .panel {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+        }
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .panel-header h3 { font-size: 16px; font-weight: 700; }
+
+        /* ====== CHART ====== */
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            height: 180px;
+            padding: 16px 0;
+        }
+        .chart-bar-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            height: 100%;
+            justify-content: flex-end;
+        }
+        .chart-bar {
+            width: 100%;
+            max-width: 48px;
+            background: linear-gradient(180deg, #E91E8C, #2B35AF);
+            border-radius: 6px 6px 0 0;
+            min-height: 8px;
+            transition: height 0.3s;
+        }
+        .chart-label { font-size: 11px; color: #6B6B6B; }
+        .chart-value { font-size: 11px; font-weight: 600; color: #1A1A1A; }
+
+        /* ====== TABLES ====== */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th {
+            text-align: left;
+            padding: 10px 12px;
+            font-weight: 600;
+            color: #6B6B6B;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #eee;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+        th:hover { color: #1A1A1A; }
+        th .sort-arrow { font-size: 10px; margin-left: 4px; }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+        }
+        tr:hover td { background: #FAFAFA; }
+
+        /* ====== BADGES ====== */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-blue { background: #DBEAFE; color: #2563EB; }
+        .badge-orange { background: #FEF3C7; color: #D97706; }
+        .badge-purple { background: #EDE9FE; color: #7C3AED; }
+        .badge-green { background: #DCFCE7; color: #16A34A; }
+        .badge-red { background: #FEE2E2; color: #DC2626; }
+        .badge-b2c { background: #DBEAFE; color: #2563EB; }
+        .badge-b2b { background: #F3E8FF; color: #7C3AED; }
+
+        /* ====== BUTTONS ====== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #E91E8C; color: #fff; }
+        .btn-primary:hover { background: #d11a7d; }
+        .btn-secondary { background: #F5F5F7; color: #1A1A1A; border: 1px solid #ddd; }
+        .btn-secondary:hover { background: #eee; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; }
+        .btn-danger { background: #FEE2E2; color: #DC2626; }
+        .btn-danger:hover { background: #FECACA; }
+
+        /* ====== FORMS ====== */
+        .form-row { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+        .form-group { flex: 1; min-width: 200px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 600; color: #6B6B6B; margin-bottom: 4px; }
+        .form-input {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            background: #F5F5F7;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus { border-color: #E91E8C; background: #fff; }
+        select.form-input { cursor: pointer; }
+
+        /* ====== FILTER BAR ====== */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 9px 12px 9px 36px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            background: #F5F5F7;
+        }
+        .search-box input:focus { border-color: #E91E8C; background: #fff; }
+        .search-box::before {
+            content: "\1F50D";
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+        }
+
+        /* ====== INLINE EDIT ====== */
+        .inline-edit {
+            background: transparent;
+            border: 1px solid transparent;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            width: 70px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .inline-edit:hover { border-color: #ddd; background: #F5F5F7; }
+        .inline-edit:focus { border-color: #E91E8C; background: #fff; outline: none; }
+
+        /* ====== TABS ====== */
+        .tabs { display: flex; gap: 0; border-bottom: 2px solid #eee; margin-bottom: 20px; }
+        .tab {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6B6B6B;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        .tab:hover { color: #1A1A1A; }
+        .tab.active { color: #E91E8C; border-bottom-color: #E91E8C; }
+
+        /* ====== PAGINATION ====== */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        .pagination button {
+            padding: 6px 14px;
+            border: 1px solid #ddd;
+            background: #fff;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .pagination button:hover { background: #F5F5F7; }
+        .pagination button:disabled { opacity: 0.4; cursor: default; }
+        .pagination .page-info { font-size: 13px; color: #6B6B6B; }
+
+        /* ====== ORDER DETAILS ====== */
+        .order-details {
+            display: none;
+            background: #FAFAFA;
+            padding: 16px 20px;
+        }
+        .order-details.open { display: table-row; }
+        .order-detail-inner {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .order-detail-inner .col { flex: 1; min-width: 200px; }
+        .order-detail-inner .col h4 { font-size: 12px; color: #6B6B6B; text-transform: uppercase; margin-bottom: 8px; }
+        .order-detail-inner .col p { font-size: 13px; margin-bottom: 4px; }
+
+        /* ====== LOW STOCK ALERT ====== */
+        .low-stock-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .low-stock-item:last-child { border-bottom: none; }
+        .low-stock-name { font-size: 13px; font-weight: 500; }
+        .low-stock-qty { font-size: 13px; font-weight: 700; }
+        .low-stock-qty.zero { color: #EF4444; }
+        .low-stock-qty.low { color: #F59E0B; }
+
+        /* ====== COLOR SWATCH ====== */
+        .color-swatch {
+            display: inline-block;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            border: 2px solid #eee;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        /* ====== MODAL ====== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+        .modal .form-group { margin-bottom: 14px; min-width: 0; }
+        .modal-actions { display: flex; gap: 12px; margin-top: 20px; justify-content: flex-end; }
+
+        /* ====== TOGGLE ====== */
+        .toggle {
+            width: 40px; height: 22px;
+            background: #ddd;
+            border-radius: 11px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .toggle.active { background: #22C55E; }
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 18px; height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px; left: 2px;
+            transition: left 0.2s;
+        }
+        .toggle.active::after { left: 20px; }
+
+        /* ====== SECTIONS ====== */
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* ====== TWO COLUMN LAYOUT ====== */
+        .two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+
+        /* ====== RESPONSIVE ====== */
+        @media (max-width: 1200px) {
+            .stat-grid { grid-template-columns: repeat(2, 1fr); }
+            .two-col { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .overlay.open { display: block; }
+            .main { margin-left: 0; }
+            .hamburger { display: block; }
+            .stat-grid { grid-template-columns: 1fr 1fr; }
+            .content { padding: 16px; }
+            .topbar { padding: 12px 16px; }
+        }
+        @media (max-width: 480px) {
+            .stat-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ====== CHECKBOX ====== */
+        .checkbox-cell { width: 36px; }
+        .checkbox-cell input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: #E91E8C; }
+
+        /* ====== REPORT CHART ====== */
+        .report-chart-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 220px;
+            padding: 16px 0;
+            overflow-x: auto;
+        }
+        .report-bar-wrap {
+            flex: 1;
+            min-width: 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            height: 100%;
+            justify-content: flex-end;
+        }
+        .report-bar {
+            width: 100%;
+            max-width: 40px;
+            background: #E91E8C;
+            border-radius: 4px 4px 0 0;
+            min-height: 4px;
+            position: relative;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .report-bar:hover { opacity: 0.8; }
+        .report-bar .bar-tooltip {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1A1A1A;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            margin-bottom: 4px;
+        }
+        .report-bar:hover .bar-tooltip { display: block; }
+        .report-bar-label { font-size: 10px; color: #6B6B6B; }
+
+        /* ====== PIE CHART ====== */
+        .pie-chart {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            position: relative;
+        }
+        .pie-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .pie-legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        /* ====== B2B EXPAND ROW ====== */
+        .b2b-detail-row {
+            display: none;
+            background: #FAFAFA;
+        }
+        .b2b-detail-row.open { display: table-row; }
+        .b2b-note-item {
+            padding: 6px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+        }
+        .b2b-note-item:last-child { border-bottom: none; }
+        .b2b-note-date { font-size: 11px; color: #6B6B6B; }
+
+        /* ====== TOAST ====== */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: #1A1A1A;
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            z-index: 300;
+            animation: toastIn 0.3s ease-out, toastOut 0.3s 2.7s ease-in forwards;
+        }
+        @keyframes toastIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
+
+        /* ====== PRINT STYLES ====== */
+        @media print {
+            .sidebar, .topbar, .hamburger, .overlay, .btn, .filter-bar, .report-period-btn { display: none !important; }
+            .main { margin-left: 0 !important; }
+            .section { display: none !important; }
+            #sec-reports { display: block !important; }
+            .panel { box-shadow: none; border: 1px solid #eee; break-inside: avoid; }
+            .stat-card { box-shadow: none; border: 1px solid #eee; }
+            body { background: #fff; }
+            .content { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- OVERLAY for mobile -->
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <h2>DK Admin</h2>
+            <span>Valdymo panele</span>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-item active" data-section="overview" onclick="switchSection('overview', this)">
+                <span class="icon">&#x1F4CA;</span> Apzvalga
+            </div>
+            <div class="nav-item" data-section="orders" onclick="switchSection('orders', this)">
+                <span class="icon">&#x1F4E6;</span> Uzsakymai
+            </div>
+            <div class="nav-item" data-section="inventory" onclick="switchSection('inventory', this)">
+                <span class="icon">&#x1F4CB;</span> Sandelis
+            </div>
+            <div class="nav-item" data-section="customers" onclick="switchSection('customers', this)">
+                <span class="icon">&#x1F465;</span> Klientai
+            </div>
+            <div class="nav-item" data-section="pricing" onclick="switchSection('pricing', this)">
+                <span class="icon">&#x1F4B0;</span> Kainos ir nuolaidos
+            </div>
+            <div class="nav-item" data-section="settings" onclick="switchSection('settings', this)">
+                <span class="icon">&#x2699;</span> Nustatymai
+            </div>
+            <div class="nav-item" data-section="reports" onclick="switchSection('reports', this)">
+                <span class="icon">&#x1F4C8;</span> Ataskaitos
+            </div>
+            <div class="nav-item" data-section="blog" onclick="switchSection('blog', this)">
+                <span class="icon">&#x270F;</span> Blogas
+            </div>
+            <div class="nav-item" data-section="banners" onclick="switchSection('banners', this)">
+                <span class="icon">&#x1F5BC;</span> Baneriai
+            </div>
+            <div class="nav-item" data-section="b2b" onclick="switchSection('b2b', this)">
+                <span class="icon">&#x1F91D;</span> B2B uzklausos
+            </div>
+            <div class="nav-item" data-section="newsletter" onclick="switchSection('newsletter', this)">
+                <span class="icon">&#x1F4E7;</span> Naujienlaikiai
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="nav-item" onclick="logout()">
+                <span class="icon">&#x1F6AA;</span> Atsijungti
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+        <div class="topbar">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button class="hamburger" onclick="toggleSidebar()">&#9776;</button>
+                <h1 id="pageTitle">Apzvalga</h1>
+            </div>
+            <div class="topbar-right">
+                <div class="bell">&#x1F514;<span class="badge-dot"></span></div>
+                <span class="admin-name" id="adminEmail">admin@dazaikirpejams.lt</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- ==================== OVERVIEW ==================== -->
+            <div class="section active" id="sec-overview">
+                <div class="stat-grid" id="statCards"></div>
+                <div class="two-col">
+                    <div>
+                        <div class="panel">
+                            <div class="panel-header">
+                                <h3>Pajamos (paskutines 7 dienos)</h3>
+                            </div>
+                            <div class="chart-bars" id="revenueChart"></div>
+                        </div>
+                        <div class="panel">
+                            <div class="panel-header">
+                                <h3>Paskutiniai uzsakymai</h3>
+                                <button class="btn btn-secondary btn-sm" onclick="switchSection('orders', document.querySelector('[data-section=orders]'))">Visi uzsakymai</button>
+                            </div>
+                            <div class="table-wrap">
+                                <table id="recentOrdersTable">
+                                    <thead><tr><th>ID</th><th>Data</th><th>Klientas</th><th>Suma</th><th>Statusas</th></tr></thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="panel">
+                            <div class="panel-header">
+                                <h3>Mazas likutis sandelyje</h3>
+                            </div>
+                            <div id="lowStockList"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== ORDERS ==================== -->
+            <div class="section" id="sec-orders">
+                <div class="filter-bar">
+                    <select class="form-input" id="orderStatusFilter" onchange="renderOrders()" style="width:180px;flex:none;">
+                        <option value="all">Visi statusai</option>
+                        <option value="Naujas">Naujas</option>
+                        <option value="Apmoketas">Apmoketas</option>
+                        <option value="Issiunstas">Issiunstas</option>
+                        <option value="Ivykdytas">Ivykdytas</option>
+                        <option value="Atsauktas">Atsauktas</option>
+                    </select>
+                    <input type="date" class="form-input" id="orderDateFrom" onchange="renderOrders()" style="width:150px;flex:none;" placeholder="Nuo">
+                    <input type="date" class="form-input" id="orderDateTo" onchange="renderOrders()" style="width:150px;flex:none;" placeholder="Iki">
+                    <div style="flex:1;"></div>
+                    <button class="btn btn-secondary btn-sm" onclick="exportOrdersCSV()">Eksportuoti CSV</button>
+                </div>
+                <div class="panel" style="padding:0;">
+                    <div class="table-wrap">
+                        <table id="ordersTable">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortOrders('id')">ID <span class="sort-arrow"></span></th>
+                                    <th onclick="sortOrders('date')">Data <span class="sort-arrow"></span></th>
+                                    <th onclick="sortOrders('customer')">Klientas <span class="sort-arrow"></span></th>
+                                    <th>El. pastas</th>
+                                    <th>Produktai</th>
+                                    <th onclick="sortOrders('total')">Suma <span class="sort-arrow"></span></th>
+                                    <th onclick="sortOrders('status')">Statusas <span class="sort-arrow"></span></th>
+                                    <th>Veiksmai</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="ordersPagination"></div>
+                </div>
+            </div>
+
+            <!-- ==================== INVENTORY ==================== -->
+            <div class="section" id="sec-inventory">
+                <div class="filter-bar">
+                    <div class="search-box">
+                        <input type="text" id="inventorySearch" placeholder="Ieskoti produkto..." oninput="renderInventory()">
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="alert('Produkto pridejimo forma (demo)')">+ Prideti produkta</button>
+                </div>
+                <div class="panel" style="padding:0;">
+                    <div class="table-wrap">
+                        <table id="inventoryTable">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px;">Spalva</th>
+                                    <th onclick="sortInventory('number')">Numeris <span class="sort-arrow"></span></th>
+                                    <th onclick="sortInventory('name')">Pavadinimas <span class="sort-arrow"></span></th>
+                                    <th>Kategorija</th>
+                                    <th onclick="sortInventory('price')">Kaina <span class="sort-arrow"></span></th>
+                                    <th onclick="sortInventory('stock')">Kiekis <span class="sort-arrow"></span></th>
+                                    <th>Statusas</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== CUSTOMERS ==================== -->
+            <div class="section" id="sec-customers">
+                <div class="filter-bar">
+                    <div class="search-box">
+                        <input type="text" id="customerSearch" placeholder="Ieskoti pagal varda arba el. pasta..." oninput="renderCustomers()">
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="exportCustomersCSV()">Eksportuoti CSV</button>
+                </div>
+                <div class="panel" style="padding:0;">
+                    <div class="table-wrap">
+                        <table id="customersTable">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortCustomers('name')">Vardas <span class="sort-arrow"></span></th>
+                                    <th onclick="sortCustomers('email')">El. pastas <span class="sort-arrow"></span></th>
+                                    <th>Telefonas</th>
+                                    <th onclick="sortCustomers('orders')">Uzsakymu sk. <span class="sort-arrow"></span></th>
+                                    <th onclick="sortCustomers('spent')">Viso isleista <span class="sort-arrow"></span></th>
+                                    <th onclick="sortCustomers('lastOrder')">Paskutinis uzsakymas <span class="sort-arrow"></span></th>
+                                    <th>Tipas</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Customer detail panel -->
+                <div class="panel" id="customerDetail" style="display:none;margin-top:16px;">
+                    <div class="panel-header">
+                        <h3 id="customerDetailName">Kliento detales</h3>
+                        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('customerDetail').style.display='none'">Uzdaryti</button>
+                    </div>
+                    <div id="customerDetailContent"></div>
+                </div>
+            </div>
+
+            <!-- ==================== PRICING ==================== -->
+            <div class="section" id="sec-pricing">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchPricingTab('prices', this)">Kainos</div>
+                    <div class="tab" onclick="switchPricingTab('discounts', this)">Nuolaidu kodai</div>
+                </div>
+                <!-- Prices tab -->
+                <div id="tab-prices">
+                    <div class="filter-bar">
+                        <div class="search-box">
+                            <input type="text" id="pricingSearch" placeholder="Ieskoti produkto..." oninput="renderPricing()">
+                        </div>
+                        <button class="btn btn-secondary btn-sm" id="bulkPriceBtn" style="display:none;" onclick="showBulkPriceModal()">Keisti pasirinktu kainas</button>
+                    </div>
+                    <div class="panel" style="padding:0;">
+                        <div class="table-wrap">
+                            <table id="pricingTable">
+                                <thead>
+                                    <tr>
+                                        <th class="checkbox-cell"><input type="checkbox" onchange="toggleAllPricing(this)"></th>
+                                        <th>Produktas</th>
+                                        <th>Dabartine kaina</th>
+                                        <th>Senoji kaina</th>
+                                        <th>Marza</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- Discounts tab -->
+                <div id="tab-discounts" style="display:none;">
+                    <div class="filter-bar">
+                        <div style="flex:1;"></div>
+                        <button class="btn btn-primary btn-sm" onclick="showDiscountModal()">+ Sukurti nuolaida</button>
+                    </div>
+                    <div class="panel" style="padding:0;">
+                        <div class="table-wrap">
+                            <table id="discountsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Kodas</th>
+                                        <th>Nuolaida</th>
+                                        <th>Galioja iki</th>
+                                        <th>Panaudojimu sk.</th>
+                                        <th>Statusas</th>
+                                        <th>Veiksmai</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== SETTINGS ==================== -->
+            <div class="section" id="sec-settings">
+                <div class="panel">
+                    <h3 style="margin-bottom:20px;">Parduotuves nustatymai</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Parduotuves pavadinimas</label>
+                            <input class="form-input" id="settingName" value="Dazai Kirpejams">
+                        </div>
+                        <div class="form-group">
+                            <label>El. pastas</label>
+                            <input class="form-input" id="settingEmail" value="info@dazaikirpejams.lt">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Telefonas</label>
+                            <input class="form-input" id="settingPhone" value="+370 600 00000">
+                        </div>
+                        <div class="form-group">
+                            <label>Adresas</label>
+                            <input class="form-input" id="settingAddress" value="Vilnius, Lietuva">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nemokamo pristatymo riba (EUR)</label>
+                            <input class="form-input" id="settingFreeShipping" type="number" value="50">
+                        </div>
+                        <div class="form-group">
+                            <label>Pristatymo kaina (EUR)</label>
+                            <input class="form-input" id="settingShippingPrice" type="number" step="0.01" value="3.99">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSettings()">Issaugoti nustatymus</button>
+                </div>
+            </div>
+
+            <!-- ==================== REPORTS ==================== -->
+            <div class="section" id="sec-reports">
+                <!-- Period selector -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Laikotarpis</h3>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                        <button class="btn btn-primary btn-sm report-period-btn" data-days="7" onclick="setReportPeriod(7, this)">7 dienos</button>
+                        <button class="btn btn-secondary btn-sm report-period-btn" data-days="30" onclick="setReportPeriod(30, this)">30 dienu</button>
+                        <button class="btn btn-secondary btn-sm report-period-btn" data-days="90" onclick="setReportPeriod(90, this)">90 dienu</button>
+                        <button class="btn btn-secondary btn-sm report-period-btn" data-days="0" onclick="setReportPeriod(0, this)">Visi</button>
+                        <span style="color:#6B6B6B;font-size:13px;margin-left:12px;">arba:</span>
+                        <input type="date" class="form-input" id="reportDateFrom" style="width:150px;" onchange="renderReportsCustom()">
+                        <span style="color:#6B6B6B;font-size:13px;">—</span>
+                        <input type="date" class="form-input" id="reportDateTo" style="width:150px;" onchange="renderReportsCustom()">
+                    </div>
+                </div>
+
+                <!-- Key metrics -->
+                <div class="stat-grid" id="reportMetrics"></div>
+
+                <!-- Revenue chart -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Pajamu grafikas</h3>
+                        <button class="btn btn-secondary btn-sm" onclick="exportReport()">Eksportuoti ataskaita</button>
+                    </div>
+                    <div class="report-chart-bars" id="reportRevenueChart"></div>
+                </div>
+
+                <!-- Top 10 products -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Top 10 produktu</h3>
+                    </div>
+                    <div class="table-wrap">
+                        <table id="reportTopProducts">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Produktas</th>
+                                    <th>Uzsakyta kartu</th>
+                                    <th>Pajamos</th>
+                                    <th>% nuo viso</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Sales by status pie -->
+                <div class="two-col">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Pardavimai pagal statusa</h3>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:32px;flex-wrap:wrap;">
+                            <div class="pie-chart" id="reportPieChart"></div>
+                            <div id="reportPieLegend"></div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Uzsakymu suvestine</h3>
+                        </div>
+                        <div id="reportStatusSummary"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== BLOG ==================== -->
+            <div class="section" id="sec-blog">
+                <div id="blogListView">
+                    <div class="filter-bar">
+                        <div style="flex:1;"></div>
+                        <button class="btn btn-primary btn-sm" onclick="showBlogEditor()">+ Naujas straipsnis</button>
+                    </div>
+                    <div class="panel" style="padding:0;">
+                        <div class="table-wrap">
+                            <table id="blogTable">
+                                <thead>
+                                    <tr>
+                                        <th>Pavadinimas</th>
+                                        <th>Kategorija</th>
+                                        <th>Data</th>
+                                        <th>Statusas</th>
+                                        <th>Veiksmai</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="blogEditorView" style="display:none;">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3 id="blogEditorTitle">Naujas straipsnis</h3>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Pavadinimas</label>
+                                <input class="form-input" id="blogPostTitle" placeholder="Straipsnio pavadinimas">
+                            </div>
+                            <div class="form-group" style="max-width:200px;">
+                                <label>Kategorija</label>
+                                <select class="form-input" id="blogPostCategory">
+                                    <option value="Patarimai">Patarimai</option>
+                                    <option value="Produktai">Produktai</option>
+                                    <option value="Tendencijos">Tendencijos</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom:16px;">
+                            <label>Turinys</label>
+                            <textarea class="form-input" id="blogPostContent" style="height:300px;resize:vertical;" placeholder="Straipsnio turinys..."></textarea>
+                        </div>
+                        <div class="form-group" style="margin-bottom:16px;">
+                            <label>Statusas</label>
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <div class="toggle" id="blogStatusToggle" onclick="toggleBlogStatus()"></div>
+                                <span id="blogStatusLabel" style="font-size:13px;color:#6B6B6B;">Juodrastis</span>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:12px;">
+                            <button class="btn btn-primary" onclick="saveBlogPost()">Issaugoti</button>
+                            <button class="btn btn-secondary" onclick="cancelBlogEditor()">Atsaukti</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== BANNERS ==================== -->
+            <div class="section" id="sec-banners">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Dabartinis baneris (Hero blokas)</h3>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Antraste</label>
+                            <input class="form-input" id="bannerHeading" value="Profesionalus plauku dazai kirpejams">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Paantraste</label>
+                            <input class="form-input" id="bannerSubheading" value="Didesne 180 ml talpa. Daugiau vertes darbui salone.">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>CTA tekstas</label>
+                            <input class="form-input" id="bannerCtaText" value="Perziureti produktus">
+                        </div>
+                        <div class="form-group">
+                            <label>CTA nuoroda</label>
+                            <input class="form-input" id="bannerCtaUrl" value="category.html">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Antrinis CTA tekstas</label>
+                            <input class="form-input" id="bannerCta2Text" value="Pasiulymas salonams">
+                        </div>
+                        <div class="form-group">
+                            <label>Antrinis CTA nuoroda</label>
+                            <input class="form-input" id="bannerCta2Url" value="b2b.html">
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:12px;">
+                        <button class="btn btn-primary" onclick="saveBannerSettings()">Issaugoti</button>
+                        <button class="btn btn-secondary" onclick="resetBannerDefaults()">Atstatyti numatytuosius</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Akciju juosta</h3>
+                    </div>
+                    <div class="form-group" style="margin-bottom:16px;">
+                        <label>Rodyti akciju juosta</label>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div class="toggle" id="promoBarToggle" onclick="togglePromoBar()"></div>
+                            <span id="promoBarLabel" style="font-size:13px;color:#6B6B6B;">Isungta</span>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tekstas</label>
+                            <input class="form-input" id="promoBarText" value="Nemokamas pristatymas nuo €50!">
+                        </div>
+                        <div class="form-group" style="max-width:180px;">
+                            <label>Fono spalva</label>
+                            <input type="color" class="form-input" id="promoBarColor" value="#E91E8C" style="height:38px;padding:4px;">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="savePromoBar()">Issaugoti akciju juosta</button>
+                </div>
+
+                <!-- Banner preview -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Perziura</h3>
+                    </div>
+                    <div id="bannerPreview" style="background:#1A1A1A;border-radius:8px;padding:40px 32px;text-align:center;color:#fff;">
+                        <h2 id="bannerPreviewHeading" style="font-size:24px;font-weight:800;margin-bottom:8px;"></h2>
+                        <p id="bannerPreviewSub" style="font-size:14px;color:#ccc;margin-bottom:20px;"></p>
+                        <div style="display:flex;gap:12px;justify-content:center;">
+                            <span class="btn btn-primary" id="bannerPreviewCta"></span>
+                            <span class="btn btn-secondary" style="color:#fff;border-color:rgba(255,255,255,0.3);" id="bannerPreviewCta2"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== B2B ==================== -->
+            <div class="section" id="sec-b2b">
+                <div class="stat-grid" id="b2bStats"></div>
+
+                <div class="panel" style="padding:0;">
+                    <div class="table-wrap">
+                        <table id="b2bTable">
+                            <thead>
+                                <tr>
+                                    <th>Salonas</th>
+                                    <th>Kontaktinis asmuo</th>
+                                    <th>El. pastas</th>
+                                    <th>Telefonas</th>
+                                    <th>Menesinis poreikis</th>
+                                    <th>Data</th>
+                                    <th>Statusas</th>
+                                    <th>Veiksmai</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== NEWSLETTER ==================== -->
+            <div class="section" id="sec-newsletter">
+                <div class="stat-grid" id="newsletterStats"></div>
+
+                <div class="two-col">
+                    <div>
+                        <div class="panel">
+                            <div class="panel-header">
+                                <h3>Prenumeratoriu sarasas</h3>
+                                <button class="btn btn-secondary btn-sm" onclick="exportNewsletterCSV()">Eksportuoti CSV</button>
+                            </div>
+                            <div class="table-wrap">
+                                <table id="newsletterTable">
+                                    <thead>
+                                        <tr>
+                                            <th>El. pastas</th>
+                                            <th>Prenumeratos data</th>
+                                            <th>Statusas</th>
+                                            <th>Veiksmai</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="panel">
+                            <div class="panel-header">
+                                <h3>Siusti naujienlaiskei</h3>
+                            </div>
+                            <div class="form-group" style="margin-bottom:12px;">
+                                <label>Tema</label>
+                                <input class="form-input" id="nlSubject" placeholder="Naujienlaiksio tema...">
+                            </div>
+                            <div class="form-group" style="margin-bottom:12px;">
+                                <label>Turinys</label>
+                                <textarea class="form-input" id="nlContent" style="height:150px;resize:vertical;" placeholder="Naujienlaiksio turinys..."></textarea>
+                            </div>
+                            <button class="btn btn-primary" onclick="sendNewsletter()">Siusti visiems aktyviems</button>
+                        </div>
+                        <div class="panel">
+                            <div class="panel-header">
+                                <h3>Siuntimo istorija</h3>
+                            </div>
+                            <div class="table-wrap">
+                                <table id="nlHistoryTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Tema</th>
+                                            <th>Issiusta</th>
+                                            <th>Atidarymo %</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ==================== DISCOUNT MODAL ==================== -->
+    <div class="modal-overlay" id="discountModal">
+        <div class="modal">
+            <h3>Sukurti nuolaidos koda</h3>
+            <div class="form-group">
+                <label>Kodas</label>
+                <div style="display:flex;gap:8px;">
+                    <input class="form-input" id="discountCode" placeholder="pvz. SALON20">
+                    <button class="btn btn-secondary btn-sm" onclick="generateCode()">Generuoti</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Nuolaidos tipas</label>
+                <select class="form-input" id="discountType">
+                    <option value="percent">Procentine (%)</option>
+                    <option value="fixed">Fiksuota (EUR)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Reiksme</label>
+                <input class="form-input" id="discountValue" type="number" min="0" step="0.01" placeholder="pvz. 10">
+            </div>
+            <div class="form-group">
+                <label>Galiojimo data</label>
+                <input class="form-input" id="discountExpiry" type="date">
+            </div>
+            <div class="form-group">
+                <label>Min. uzsakymo suma (EUR)</label>
+                <input class="form-input" id="discountMinOrder" type="number" min="0" step="0.01" placeholder="0.00">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeDiscountModal()">Atsaukti</button>
+                <button class="btn btn-primary" onclick="saveDiscount()">Issaugoti</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== BULK PRICE MODAL ==================== -->
+    <div class="modal-overlay" id="bulkPriceModal">
+        <div class="modal">
+            <h3>Masinis kainu keitimas</h3>
+            <div class="form-group">
+                <label>Nauja kaina (EUR)</label>
+                <input class="form-input" id="bulkNewPrice" type="number" step="0.01" placeholder="pvz. 7.99">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeBulkPriceModal()">Atsaukti</button>
+                <button class="btn btn-primary" onclick="applyBulkPrice()">Taikyti</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    /* ============================================================
+       AUTH CHECK
+       ============================================================ */
+    if (sessionStorage.getItem('dk_admin_logged_in') !== 'true') {
+        window.location.href = 'admin.html';
+    }
+    document.getElementById('adminEmail').textContent = sessionStorage.getItem('dk_admin_email') || 'admin@dazaikirpejams.lt';
+
+    /* ============================================================
+       DATA GENERATION
+       ============================================================ */
+    const STATUSES = ['Naujas', 'Apmoketas', 'Issiunstas', 'Ivykdytas', 'Atsauktas'];
+    const STATUS_BADGES = {
+        'Naujas': 'badge-blue',
+        'Apmoketas': 'badge-orange',
+        'Issiunstas': 'badge-purple',
+        'Ivykdytas': 'badge-green',
+        'Atsauktas': 'badge-red'
+    };
+
+    const LITH_FIRST = ['Jonas','Petras','Marius','Tomas','Andrius','Rima','Jurgita','Asta','Neringa','Egle','Ieva','Monika','Simona','Laura','Giedre'];
+    const LITH_LAST = ['Kazlauskaite','Jonaitis','Petrauskas','Balciunaite','Stankeviciute','Ramonas','Vilkaite','Grinius','Urboniene','Savickas','Paulauskaite','Morkus','Kubiliene','Zilinskas','Daugirdaite'];
+    const CITIES = ['Vilnius','Kaunas','Klaipeda','Siauliai','Panevezys','Alytus','Marijampole'];
+
+    function generateSampleData() {
+        if (localStorage.getItem('dk_data_init')) return;
+
+        const productKeys = Object.keys(PRODUCTS);
+
+        // Generate stock
+        const stock = {};
+        productKeys.forEach(k => { stock[k] = Math.floor(Math.random() * 101); });
+        localStorage.setItem('dk_stock', JSON.stringify(stock));
+
+        // Generate customers
+        const customers = [];
+        for (let i = 0; i < 15; i++) {
+            const first = LITH_FIRST[i % LITH_FIRST.length];
+            const last = LITH_LAST[i % LITH_LAST.length];
+            customers.push({
+                id: i + 1,
+                name: first + ' ' + last,
+                email: first.toLowerCase() + '.' + last.toLowerCase() + '@gmail.com',
+                phone: '+370 6' + String(Math.floor(Math.random() * 10000000)).padStart(7, '0'),
+                city: CITIES[Math.floor(Math.random() * CITIES.length)],
+                type: i < 5 ? 'B2B' : 'B2C',
+                totalOrders: 0,
+                totalSpent: 0,
+                lastOrder: ''
+            });
+        }
+
+        // Generate orders
+        const orders = [];
+        const now = Date.now();
+        for (let i = 0; i < 25; i++) {
+            const daysAgo = Math.floor(Math.random() * 30);
+            const date = new Date(now - daysAgo * 86400000);
+            const customer = customers[Math.floor(Math.random() * customers.length)];
+            const numProducts = 1 + Math.floor(Math.random() * 4);
+            const items = [];
+            let total = 0;
+            for (let j = 0; j < numProducts; j++) {
+                const pk = productKeys[Math.floor(Math.random() * productKeys.length)];
+                const qty = 1 + Math.floor(Math.random() * 5);
+                const p = PRODUCTS[pk];
+                items.push({ id: pk, name: p.name, qty: qty, price: p.price });
+                total += p.price * qty;
+            }
+            orders.push({
+                id: 'DK-' + String(1000 + i),
+                date: date.toISOString().split('T')[0],
+                customerId: customer.id,
+                customer: customer.name,
+                email: customer.email,
+                items: items,
+                total: Math.round(total * 100) / 100,
+                status: STATUSES[Math.floor(Math.random() * STATUSES.length)],
+                address: customer.city
+            });
+            customer.totalOrders++;
+            customer.totalSpent = Math.round((customer.totalSpent + total) * 100) / 100;
+            customer.lastOrder = date.toISOString().split('T')[0];
+        }
+        orders.sort((a, b) => b.date.localeCompare(a.date));
+        localStorage.setItem('dk_orders', JSON.stringify(orders));
+        localStorage.setItem('dk_customers', JSON.stringify(customers));
+
+        // Generate discounts
+        const discounts = [
+            { code: 'SALON20', type: 'percent', value: 20, expiry: '2026-06-30', uses: 12, active: true, minOrder: 30 },
+            { code: 'PIRMAS10', type: 'percent', value: 10, expiry: '2026-05-15', uses: 45, active: true, minOrder: 0 },
+            { code: 'VASARA15', type: 'percent', value: 15, expiry: '2026-08-31', uses: 3, active: true, minOrder: 20 },
+            { code: 'MINKAINA', type: 'fixed', value: 5, expiry: '2026-04-30', uses: 8, active: false, minOrder: 25 },
+            { code: 'VIP50', type: 'fixed', value: 50, expiry: '2026-12-31', uses: 1, active: true, minOrder: 100 }
+        ];
+        localStorage.setItem('dk_discounts', JSON.stringify(discounts));
+
+        // Settings
+        localStorage.setItem('dk_settings', JSON.stringify({
+            name: 'Dazai Kirpejams',
+            email: 'info@dazaikirpejams.lt',
+            phone: '+370 600 00000',
+            address: 'Vilnius, Lietuva',
+            freeShipping: 50,
+            shippingPrice: 3.99
+        }));
+
+        localStorage.setItem('dk_data_init', '1');
+    }
+    generateSampleData();
+
+    /* ============================================================
+       DATA ACCESSORS
+       ============================================================ */
+    function getOrders() { return JSON.parse(localStorage.getItem('dk_orders') || '[]'); }
+    function saveOrders(o) { localStorage.setItem('dk_orders', JSON.stringify(o)); }
+    function getCustomers() { return JSON.parse(localStorage.getItem('dk_customers') || '[]'); }
+    function saveCustomers(c) { localStorage.setItem('dk_customers', JSON.stringify(c)); }
+    function getStock() { return JSON.parse(localStorage.getItem('dk_stock') || '{}'); }
+    function saveStock(s) { localStorage.setItem('dk_stock', JSON.stringify(s)); }
+    function getDiscounts() { return JSON.parse(localStorage.getItem('dk_discounts') || '[]'); }
+    function saveDiscounts(d) { localStorage.setItem('dk_discounts', JSON.stringify(d)); }
+    function getSettings() { return JSON.parse(localStorage.getItem('dk_settings') || '{}'); }
+
+    /* ============================================================
+       NAVIGATION
+       ============================================================ */
+    const sectionTitles = {
+        overview: 'Apzvalga',
+        orders: 'Uzsakymai',
+        inventory: 'Sandelis',
+        customers: 'Klientai',
+        pricing: 'Kainos ir nuolaidos',
+        settings: 'Nustatymai',
+        reports: 'Ataskaitos',
+        blog: 'Blogas',
+        banners: 'Baneriai',
+        b2b: 'B2B uzklausos',
+        newsletter: 'Naujienlaikiai'
+    };
+
+    function switchSection(section, navEl) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('sec-' + section).classList.add('active');
+        if (navEl) navEl.classList.add('active');
+        document.getElementById('pageTitle').textContent = sectionTitles[section] || section;
+
+        // Render on switch
+        if (section === 'overview') renderOverview();
+        if (section === 'orders') renderOrders();
+        if (section === 'inventory') renderInventory();
+        if (section === 'customers') renderCustomers();
+        if (section === 'pricing') { renderPricing(); renderDiscounts(); }
+        if (section === 'settings') loadSettings();
+        if (section === 'reports') renderReports();
+        if (section === 'blog') renderBlog();
+        if (section === 'banners') { loadBannerSettings(); updateBannerPreview(); }
+        if (section === 'b2b') renderB2b();
+        if (section === 'newsletter') renderNewsletter();
+
+        // Close sidebar on mobile
+        if (window.innerWidth <= 768) toggleSidebar();
+    }
+
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('overlay').classList.toggle('open');
+    }
+
+    function logout() {
+        sessionStorage.removeItem('dk_admin_logged_in');
+        sessionStorage.removeItem('dk_admin_email');
+        window.location.href = 'admin.html';
+    }
+
+    /* ============================================================
+       OVERVIEW
+       ============================================================ */
+    function renderOverview() {
+        const orders = getOrders();
+        const customers = getCustomers();
+        const stock = getStock();
+        const today = new Date().toISOString().split('T')[0];
+
+        const todayOrders = orders.filter(o => o.date === today);
+        const todaySales = todayOrders.reduce((s, o) => s + o.total, 0);
+        const totalProducts = Object.keys(stock).length;
+
+        const stats = [
+            { label: 'Siandienos pardavimai', value: '\u20AC' + todaySales.toFixed(2), change: '+12.5%', up: true },
+            { label: 'Uzsakymai siandien', value: todayOrders.length, change: '+3', up: true },
+            { label: 'Viso klientu', value: customers.length, change: '+2', up: true },
+            { label: 'Produktu sandelyje', value: totalProducts, change: '', up: true }
+        ];
+
+        document.getElementById('statCards').innerHTML = stats.map(s => `
+            <div class="stat-card">
+                <div class="label">${s.label}</div>
+                <div class="value">${s.value}</div>
+                ${s.change ? `<div class="change ${s.up ? 'up' : 'down'}">${s.change}</div>` : ''}
+            </div>
+        `).join('');
+
+        // Revenue chart - last 7 days
+        const chartData = [];
+        const dayNames = ['Sek','Pir','Ant','Tre','Ket','Pen','Ses'];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(Date.now() - i * 86400000);
+            const ds = d.toISOString().split('T')[0];
+            const dayTotal = orders.filter(o => o.date === ds).reduce((s, o) => s + o.total, 0);
+            chartData.push({ label: dayNames[d.getDay()], value: dayTotal });
+        }
+        const maxVal = Math.max(...chartData.map(d => d.value), 1);
+        document.getElementById('revenueChart').innerHTML = chartData.map(d => {
+            const h = Math.max((d.value / maxVal) * 150, 8);
+            return `<div class="chart-bar-wrap">
+                <div class="chart-value">\u20AC${d.value.toFixed(0)}</div>
+                <div class="chart-bar" style="height:${h}px;"></div>
+                <div class="chart-label">${d.label}</div>
+            </div>`;
+        }).join('');
+
+        // Recent orders
+        const recent = orders.slice(0, 5);
+        document.querySelector('#recentOrdersTable tbody').innerHTML = recent.map(o => `
+            <tr>
+                <td><strong>${o.id}</strong></td>
+                <td>${o.date}</td>
+                <td>${o.customer}</td>
+                <td>\u20AC${o.total.toFixed(2)}</td>
+                <td><span class="badge ${STATUS_BADGES[o.status]}">${o.status}</span></td>
+            </tr>
+        `).join('');
+
+        // Low stock
+        const lowItems = [];
+        for (const [k, qty] of Object.entries(stock)) {
+            if (qty < 10 && PRODUCTS[k]) lowItems.push({ id: k, name: PRODUCTS[k].name, qty: qty });
+        }
+        lowItems.sort((a, b) => a.qty - b.qty);
+        document.getElementById('lowStockList').innerHTML = lowItems.length === 0
+            ? '<p style="color:#6B6B6B;font-size:13px;">Visi produktai turi pakankama likuti.</p>'
+            : lowItems.slice(0, 10).map(i => `
+                <div class="low-stock-item">
+                    <span class="low-stock-name">${i.name}</span>
+                    <span class="low-stock-qty ${i.qty === 0 ? 'zero' : 'low'}">${i.qty} vnt.</span>
+                </div>
+            `).join('');
+    }
+
+    /* ============================================================
+       ORDERS
+       ============================================================ */
+    let orderSort = { key: 'date', dir: -1 };
+    let ordersPage = 1;
+    const ordersPerPage = 8;
+
+    function sortOrders(key) {
+        if (orderSort.key === key) orderSort.dir *= -1;
+        else { orderSort.key = key; orderSort.dir = -1; }
+        renderOrders();
+    }
+
+    function renderOrders() {
+        let orders = getOrders();
+        const statusFilter = document.getElementById('orderStatusFilter').value;
+        const dateFrom = document.getElementById('orderDateFrom').value;
+        const dateTo = document.getElementById('orderDateTo').value;
+
+        if (statusFilter !== 'all') orders = orders.filter(o => o.status === statusFilter);
+        if (dateFrom) orders = orders.filter(o => o.date >= dateFrom);
+        if (dateTo) orders = orders.filter(o => o.date <= dateTo);
+
+        // Sort
+        orders.sort((a, b) => {
+            let va = a[orderSort.key], vb = b[orderSort.key];
+            if (orderSort.key === 'total') { va = +va; vb = +vb; }
+            if (va < vb) return -orderSort.dir;
+            if (va > vb) return orderSort.dir;
+            return 0;
+        });
+
+        const totalPages = Math.max(1, Math.ceil(orders.length / ordersPerPage));
+        if (ordersPage > totalPages) ordersPage = totalPages;
+        const start = (ordersPage - 1) * ordersPerPage;
+        const pageOrders = orders.slice(start, start + ordersPerPage);
+
+        const tbody = document.querySelector('#ordersTable tbody');
+        tbody.innerHTML = pageOrders.map(o => `
+            <tr>
+                <td><strong>${o.id}</strong></td>
+                <td>${o.date}</td>
+                <td>${o.customer}</td>
+                <td>${o.email}</td>
+                <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${o.items.map(i => i.name + ' x' + i.qty).join(', ')}</td>
+                <td>\u20AC${o.total.toFixed(2)}</td>
+                <td>
+                    <select class="form-input" style="width:130px;padding:4px 8px;font-size:12px;" onchange="changeOrderStatus('${o.id}', this.value)">
+                        ${STATUSES.map(s => `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+                    </select>
+                </td>
+                <td>
+                    <button class="btn btn-secondary btn-sm" onclick="toggleOrderDetail('${o.id}')">Detales</button>
+                </td>
+            </tr>
+            <tr class="order-details" id="detail-${o.id}">
+                <td colspan="8">
+                    <div class="order-detail-inner">
+                        <div class="col">
+                            <h4>Produktai</h4>
+                            ${o.items.map(i => `<p>${i.name} x${i.qty} - \u20AC${(i.price * i.qty).toFixed(2)}</p>`).join('')}
+                        </div>
+                        <div class="col">
+                            <h4>Pristatymas</h4>
+                            <p>${o.address}</p>
+                            <p>Statusas: <span class="badge ${STATUS_BADGES[o.status]}">${o.status}</span></p>
+                        </div>
+                        <div class="col">
+                            <h4>Klientas</h4>
+                            <p>${o.customer}</p>
+                            <p>${o.email}</p>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+
+        document.getElementById('ordersPagination').innerHTML = `
+            <button ${ordersPage <= 1 ? 'disabled' : ''} onclick="ordersPage--;renderOrders();">&#8592; Ankstesnis</button>
+            <span class="page-info">${ordersPage} / ${totalPages}</span>
+            <button ${ordersPage >= totalPages ? 'disabled' : ''} onclick="ordersPage++;renderOrders();">Kitas &#8594;</button>
+        `;
+    }
+
+    function changeOrderStatus(orderId, newStatus) {
+        const orders = getOrders();
+        const o = orders.find(x => x.id === orderId);
+        if (o) { o.status = newStatus; saveOrders(orders); }
+    }
+
+    function toggleOrderDetail(orderId) {
+        const row = document.getElementById('detail-' + orderId);
+        if (row) row.classList.toggle('open');
+    }
+
+    function exportOrdersCSV() {
+        const orders = getOrders();
+        let csv = 'ID,Data,Klientas,El. pastas,Suma,Statusas\n';
+        orders.forEach(o => {
+            csv += `${o.id},${o.date},"${o.customer}",${o.email},${o.total.toFixed(2)},${o.status}\n`;
+        });
+        downloadCSV(csv, 'uzsakymai.csv');
+    }
+
+    /* ============================================================
+       INVENTORY
+       ============================================================ */
+    let invSort = { key: 'number', dir: 1 };
+
+    function sortInventory(key) {
+        if (invSort.key === key) invSort.dir *= -1;
+        else { invSort.key = key; invSort.dir = 1; }
+        renderInventory();
+    }
+
+    function renderInventory() {
+        const stock = getStock();
+        const search = (document.getElementById('inventorySearch').value || '').toLowerCase();
+
+        let items = Object.entries(PRODUCTS).map(([id, p]) => ({
+            id, ...p, stock: stock[id] !== undefined ? stock[id] : 0
+        }));
+
+        if (search) {
+            items = items.filter(i =>
+                i.name.toLowerCase().includes(search) ||
+                i.id.toLowerCase().includes(search) ||
+                i.shade.toLowerCase().includes(search)
+            );
+        }
+
+        items.sort((a, b) => {
+            let va, vb;
+            switch (invSort.key) {
+                case 'number': va = a.id; vb = b.id; break;
+                case 'name': va = a.name; vb = b.name; break;
+                case 'price': va = a.price; vb = b.price; break;
+                case 'stock': va = a.stock; vb = b.stock; break;
+                default: va = a.id; vb = b.id;
+            }
+            if (typeof va === 'string') {
+                return invSort.dir * va.localeCompare(vb, 'lt', { numeric: true });
+            }
+            return invSort.dir * (va - vb);
+        });
+
+        document.querySelector('#inventoryTable tbody').innerHTML = items.map(i => {
+            let statusClass, statusText;
+            if (i.stock === 0) { statusClass = 'badge-red'; statusText = 'Nera'; }
+            else if (i.stock <= 10) { statusClass = 'badge-orange'; statusText = 'Mazai'; }
+            else { statusClass = 'badge-green'; statusText = 'Yra'; }
+
+            return `<tr>
+                <td><span class="color-swatch" style="background:${i.color};"></span></td>
+                <td>${i.id}</td>
+                <td>${i.name}<br><small style="color:#6B6B6B;">${i.shade}</small></td>
+                <td><small style="color:#6B6B6B;">${i.category}</small></td>
+                <td>\u20AC${i.price.toFixed(2)}</td>
+                <td><input class="inline-edit" type="number" min="0" value="${i.stock}" onchange="updateStock('${i.id}', this.value)"></td>
+                <td><span class="badge ${statusClass}">${statusText}</span></td>
+            </tr>`;
+        }).join('');
+    }
+
+    function updateStock(productId, newQty) {
+        const stock = getStock();
+        stock[productId] = Math.max(0, parseInt(newQty) || 0);
+        saveStock(stock);
+        renderInventory();
+    }
+
+    /* ============================================================
+       CUSTOMERS
+       ============================================================ */
+    let custSort = { key: 'name', dir: 1 };
+
+    function sortCustomers(key) {
+        if (custSort.key === key) custSort.dir *= -1;
+        else { custSort.key = key; custSort.dir = 1; }
+        renderCustomers();
+    }
+
+    function renderCustomers() {
+        let customers = getCustomers();
+        const search = (document.getElementById('customerSearch').value || '').toLowerCase();
+
+        if (search) {
+            customers = customers.filter(c =>
+                c.name.toLowerCase().includes(search) ||
+                c.email.toLowerCase().includes(search)
+            );
+        }
+
+        customers.sort((a, b) => {
+            let va, vb;
+            switch (custSort.key) {
+                case 'name': va = a.name; vb = b.name; break;
+                case 'email': va = a.email; vb = b.email; break;
+                case 'orders': va = a.totalOrders; vb = b.totalOrders; break;
+                case 'spent': va = a.totalSpent; vb = b.totalSpent; break;
+                case 'lastOrder': va = a.lastOrder; vb = b.lastOrder; break;
+                default: va = a.name; vb = b.name;
+            }
+            if (typeof va === 'string') return custSort.dir * va.localeCompare(vb, 'lt');
+            return custSort.dir * (va - vb);
+        });
+
+        document.querySelector('#customersTable tbody').innerHTML = customers.map(c => `
+            <tr style="cursor:pointer;" onclick="showCustomerDetail(${c.id})">
+                <td><strong>${c.name}</strong></td>
+                <td>${c.email}</td>
+                <td>${c.phone}</td>
+                <td>${c.totalOrders}</td>
+                <td>\u20AC${c.totalSpent.toFixed(2)}</td>
+                <td>${c.lastOrder || '-'}</td>
+                <td><span class="badge badge-${c.type.toLowerCase()}">${c.type}</span></td>
+            </tr>
+        `).join('');
+    }
+
+    function showCustomerDetail(customerId) {
+        const customers = getCustomers();
+        const customer = customers.find(c => c.id === customerId);
+        if (!customer) return;
+
+        const orders = getOrders().filter(o => o.customerId === customerId);
+
+        document.getElementById('customerDetailName').textContent = customer.name;
+        document.getElementById('customerDetail').style.display = 'block';
+        document.getElementById('customerDetailContent').innerHTML = `
+            <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:16px;">
+                <div><strong>El. pastas:</strong> ${customer.email}</div>
+                <div><strong>Telefonas:</strong> ${customer.phone}</div>
+                <div><strong>Miestas:</strong> ${customer.city}</div>
+                <div><strong>Tipas:</strong> <span class="badge badge-${customer.type.toLowerCase()}">${customer.type}</span></div>
+            </div>
+            <h4 style="font-size:14px;margin-bottom:8px;">Uzsakymu istorija (${orders.length})</h4>
+            ${orders.length === 0 ? '<p style="color:#6B6B6B;font-size:13px;">Uzsakymu nera.</p>' : `
+            <table>
+                <thead><tr><th>ID</th><th>Data</th><th>Produktai</th><th>Suma</th><th>Statusas</th></tr></thead>
+                <tbody>
+                    ${orders.map(o => `<tr>
+                        <td>${o.id}</td>
+                        <td>${o.date}</td>
+                        <td>${o.items.map(i => i.name + ' x' + i.qty).join(', ')}</td>
+                        <td>\u20AC${o.total.toFixed(2)}</td>
+                        <td><span class="badge ${STATUS_BADGES[o.status]}">${o.status}</span></td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>`}
+        `;
+    }
+
+    function exportCustomersCSV() {
+        const customers = getCustomers();
+        let csv = 'Vardas,El. pastas,Telefonas,Miestas,Tipas,Uzsakymu sk.,Viso isleista,Paskutinis uzsakymas\n';
+        customers.forEach(c => {
+            csv += `"${c.name}",${c.email},${c.phone},${c.city},${c.type},${c.totalOrders},${c.totalSpent.toFixed(2)},${c.lastOrder}\n`;
+        });
+        downloadCSV(csv, 'klientai.csv');
+    }
+
+    /* ============================================================
+       PRICING
+       ============================================================ */
+    let selectedPricingIds = new Set();
+
+    function renderPricing() {
+        const search = (document.getElementById('pricingSearch').value || '').toLowerCase();
+        let items = Object.entries(PRODUCTS).map(([id, p]) => ({ id, ...p }));
+
+        if (search) {
+            items = items.filter(i => i.name.toLowerCase().includes(search) || i.id.includes(search));
+        }
+
+        const prices = JSON.parse(localStorage.getItem('dk_prices') || '{}');
+
+        document.querySelector('#pricingTable tbody').innerHTML = items.map(i => {
+            const currentPrice = prices[i.id] !== undefined ? prices[i.id] : i.price;
+            const margin = i.oldPrice > 0 ? ((1 - currentPrice / i.oldPrice) * 100).toFixed(1) : '0.0';
+            const checked = selectedPricingIds.has(i.id) ? 'checked' : '';
+            return `<tr>
+                <td class="checkbox-cell"><input type="checkbox" ${checked} onchange="togglePricingSelect('${i.id}', this.checked)"></td>
+                <td>${i.name}</td>
+                <td><input class="inline-edit" type="number" step="0.01" value="${currentPrice.toFixed(2)}" onchange="updatePrice('${i.id}', this.value)"></td>
+                <td style="color:#6B6B6B;">\u20AC${i.oldPrice.toFixed(2)}</td>
+                <td>${margin}%</td>
+            </tr>`;
+        }).join('');
+
+        document.getElementById('bulkPriceBtn').style.display = selectedPricingIds.size > 0 ? 'inline-flex' : 'none';
+    }
+
+    function updatePrice(productId, newPrice) {
+        const prices = JSON.parse(localStorage.getItem('dk_prices') || '{}');
+        prices[productId] = Math.max(0, parseFloat(newPrice) || 0);
+        localStorage.setItem('dk_prices', JSON.stringify(prices));
+        renderPricing();
+    }
+
+    function togglePricingSelect(id, checked) {
+        if (checked) selectedPricingIds.add(id);
+        else selectedPricingIds.delete(id);
+        document.getElementById('bulkPriceBtn').style.display = selectedPricingIds.size > 0 ? 'inline-flex' : 'none';
+    }
+
+    function toggleAllPricing(cb) {
+        const checkboxes = document.querySelectorAll('#pricingTable tbody input[type="checkbox"]');
+        selectedPricingIds.clear();
+        checkboxes.forEach(c => {
+            c.checked = cb.checked;
+            if (cb.checked) {
+                const row = c.closest('tr');
+                const name = row.children[1].textContent;
+                const product = Object.entries(PRODUCTS).find(([id, p]) => p.name === name);
+                if (product) selectedPricingIds.add(product[0]);
+            }
+        });
+        document.getElementById('bulkPriceBtn').style.display = selectedPricingIds.size > 0 ? 'inline-flex' : 'none';
+    }
+
+    function showBulkPriceModal() { document.getElementById('bulkPriceModal').classList.add('open'); }
+    function closeBulkPriceModal() { document.getElementById('bulkPriceModal').classList.remove('open'); }
+
+    function applyBulkPrice() {
+        const newPrice = parseFloat(document.getElementById('bulkNewPrice').value);
+        if (isNaN(newPrice) || newPrice <= 0) { alert('Iveskite teisinga kaina'); return; }
+        const prices = JSON.parse(localStorage.getItem('dk_prices') || '{}');
+        selectedPricingIds.forEach(id => { prices[id] = newPrice; });
+        localStorage.setItem('dk_prices', JSON.stringify(prices));
+        selectedPricingIds.clear();
+        closeBulkPriceModal();
+        renderPricing();
+    }
+
+    /* ============================================================
+       DISCOUNTS
+       ============================================================ */
+    function switchPricingTab(tab, el) {
+        document.querySelectorAll('#sec-pricing .tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('tab-prices').style.display = tab === 'prices' ? 'block' : 'none';
+        document.getElementById('tab-discounts').style.display = tab === 'discounts' ? 'block' : 'none';
+    }
+
+    function renderDiscounts() {
+        const discounts = getDiscounts();
+        document.querySelector('#discountsTable tbody').innerHTML = discounts.map((d, idx) => `
+            <tr>
+                <td><strong style="font-family:monospace;letter-spacing:1px;">${d.code}</strong></td>
+                <td>${d.type === 'percent' ? d.value + '%' : '\u20AC' + d.value.toFixed(2)}</td>
+                <td>${d.expiry}</td>
+                <td>${d.uses}</td>
+                <td><span class="badge ${d.active ? 'badge-green' : 'badge-red'}">${d.active ? 'Aktyvus' : 'Neaktyvus'}</span></td>
+                <td>
+                    <button class="btn btn-sm ${d.active ? 'btn-danger' : 'btn-primary'}" onclick="toggleDiscount(${idx})">${d.active ? 'Isjungti' : 'Ijungti'}</button>
+                    <button class="btn btn-sm btn-secondary" onclick="deleteDiscount(${idx})">Istrinti</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function toggleDiscount(idx) {
+        const discounts = getDiscounts();
+        discounts[idx].active = !discounts[idx].active;
+        saveDiscounts(discounts);
+        renderDiscounts();
+    }
+
+    function deleteDiscount(idx) {
+        if (!confirm('Ar tikrai norite istrinti si nuolaidos koda?')) return;
+        const discounts = getDiscounts();
+        discounts.splice(idx, 1);
+        saveDiscounts(discounts);
+        renderDiscounts();
+    }
+
+    function showDiscountModal() {
+        document.getElementById('discountCode').value = '';
+        document.getElementById('discountType').value = 'percent';
+        document.getElementById('discountValue').value = '';
+        document.getElementById('discountExpiry').value = '';
+        document.getElementById('discountMinOrder').value = '';
+        document.getElementById('discountModal').classList.add('open');
+    }
+
+    function closeDiscountModal() { document.getElementById('discountModal').classList.remove('open'); }
+
+    function generateCode() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let code = '';
+        for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+        document.getElementById('discountCode').value = code;
+    }
+
+    function saveDiscount() {
+        const code = document.getElementById('discountCode').value.trim().toUpperCase();
+        const type = document.getElementById('discountType').value;
+        const value = parseFloat(document.getElementById('discountValue').value);
+        const expiry = document.getElementById('discountExpiry').value;
+        const minOrder = parseFloat(document.getElementById('discountMinOrder').value) || 0;
+
+        if (!code || isNaN(value) || value <= 0 || !expiry) {
+            alert('Uzpildykite visus laukus teisingai');
+            return;
+        }
+
+        const discounts = getDiscounts();
+        discounts.push({ code, type, value, expiry, uses: 0, active: true, minOrder });
+        saveDiscounts(discounts);
+        closeDiscountModal();
+        renderDiscounts();
+    }
+
+    /* ============================================================
+       SETTINGS
+       ============================================================ */
+    function loadSettings() {
+        const s = getSettings();
+        document.getElementById('settingName').value = s.name || '';
+        document.getElementById('settingEmail').value = s.email || '';
+        document.getElementById('settingPhone').value = s.phone || '';
+        document.getElementById('settingAddress').value = s.address || '';
+        document.getElementById('settingFreeShipping').value = s.freeShipping || 50;
+        document.getElementById('settingShippingPrice').value = s.shippingPrice || 3.99;
+    }
+
+    function saveSettings() {
+        const s = {
+            name: document.getElementById('settingName').value,
+            email: document.getElementById('settingEmail').value,
+            phone: document.getElementById('settingPhone').value,
+            address: document.getElementById('settingAddress').value,
+            freeShipping: parseFloat(document.getElementById('settingFreeShipping').value) || 50,
+            shippingPrice: parseFloat(document.getElementById('settingShippingPrice').value) || 3.99
+        };
+        localStorage.setItem('dk_settings', JSON.stringify(s));
+        alert('Nustatymai issaugoti!');
+    }
+
+    /* ============================================================
+       REPORTS
+       ============================================================ */
+    let reportDays = 7;
+
+    function setReportPeriod(days, btn) {
+        reportDays = days;
+        document.querySelectorAll('.report-period-btn').forEach(b => { b.className = 'btn btn-secondary btn-sm report-period-btn'; });
+        btn.className = 'btn btn-primary btn-sm report-period-btn';
+        document.getElementById('reportDateFrom').value = '';
+        document.getElementById('reportDateTo').value = '';
+        renderReports();
+    }
+
+    function renderReportsCustom() {
+        const from = document.getElementById('reportDateFrom').value;
+        const to = document.getElementById('reportDateTo').value;
+        if (from && to) {
+            reportDays = -1;
+            document.querySelectorAll('.report-period-btn').forEach(b => { b.className = 'btn btn-secondary btn-sm report-period-btn'; });
+            renderReports();
+        }
+    }
+
+    function getReportOrders() {
+        let orders = getOrders();
+        if (reportDays === -1) {
+            const from = document.getElementById('reportDateFrom').value;
+            const to = document.getElementById('reportDateTo').value;
+            if (from) orders = orders.filter(o => o.date >= from);
+            if (to) orders = orders.filter(o => o.date <= to);
+        } else if (reportDays > 0) {
+            const cutoff = new Date(Date.now() - reportDays * 86400000).toISOString().split('T')[0];
+            orders = orders.filter(o => o.date >= cutoff);
+        }
+        return orders;
+    }
+
+    function renderReports() {
+        const orders = getReportOrders();
+        const allOrders = getOrders();
+        const customers = getCustomers();
+        const totalRevenue = orders.reduce((s, o) => s + o.total, 0);
+        const avgOrder = orders.length > 0 ? totalRevenue / orders.length : 0;
+
+        // Count returning customers
+        const customerOrderCounts = {};
+        allOrders.forEach(o => { customerOrderCounts[o.customerId] = (customerOrderCounts[o.customerId] || 0) + 1; });
+        const returning = Object.values(customerOrderCounts).filter(c => c > 1).length;
+        const returningPct = customers.length > 0 ? ((returning / customers.length) * 100).toFixed(1) : '0.0';
+
+        // Popular category
+        const catCount = {};
+        orders.forEach(o => o.items.forEach(i => {
+            const pk = i.id || i.name;
+            const prod = PRODUCTS[pk];
+            const cat = prod ? prod.category : 'Kita';
+            catCount[cat] = (catCount[cat] || 0) + 1;
+        }));
+        const topCat = Object.entries(catCount).sort((a, b) => b[1] - a[1])[0];
+
+        // Metrics
+        document.getElementById('reportMetrics').innerHTML = [
+            { label: 'Vidutinis uzsakymas', value: '\u20AC' + avgOrder.toFixed(2) },
+            { label: 'Konversijos rodiklis', value: '3.2%' },
+            { label: 'Pakartotiniai klientai', value: returningPct + '%' },
+            { label: 'Populiariausia kategorija', value: topCat ? topCat[0] : '-' }
+        ].map(s => `<div class="stat-card"><div class="label">${s.label}</div><div class="value" style="font-size:22px;">${s.value}</div></div>`).join('');
+
+        // Revenue chart
+        const dayMap = {};
+        orders.forEach(o => { dayMap[o.date] = (dayMap[o.date] || 0) + o.total; });
+        const dates = Object.keys(dayMap).sort();
+        const maxRev = Math.max(...Object.values(dayMap), 1);
+        const dayNames = ['Sek','Pir','Ant','Tre','Ket','Pen','Ses'];
+
+        document.getElementById('reportRevenueChart').innerHTML = dates.length === 0
+            ? '<p style="color:#6B6B6B;font-size:13px;padding:20px;">Nera duomenu pasirinktam laikotarpiui.</p>'
+            : dates.map(d => {
+                const h = Math.max((dayMap[d] / maxRev) * 180, 4);
+                const dn = dayNames[new Date(d).getDay()];
+                return `<div class="report-bar-wrap">
+                    <div class="report-bar" style="height:${h}px;">
+                        <div class="bar-tooltip">${d}: \u20AC${dayMap[d].toFixed(2)}</div>
+                    </div>
+                    <div class="report-bar-label">${d.slice(5)}</div>
+                </div>`;
+            }).join('');
+
+        // Top 10 products
+        const prodRevenue = {};
+        const prodCount = {};
+        orders.forEach(o => o.items.forEach(i => {
+            const key = i.name;
+            prodRevenue[key] = (prodRevenue[key] || 0) + (i.price * i.qty);
+            prodCount[key] = (prodCount[key] || 0) + i.qty;
+        }));
+        const topProducts = Object.entries(prodRevenue)
+            .map(([name, rev]) => ({ name, rev, count: prodCount[name] || 0 }))
+            .sort((a, b) => b.rev - a.rev)
+            .slice(0, 10);
+
+        document.querySelector('#reportTopProducts tbody').innerHTML = topProducts.map((p, idx) => `
+            <tr>
+                <td>${idx + 1}</td>
+                <td><strong>${p.name}</strong></td>
+                <td>${p.count}</td>
+                <td>\u20AC${p.rev.toFixed(2)}</td>
+                <td>${totalRevenue > 0 ? ((p.rev / totalRevenue) * 100).toFixed(1) : '0.0'}%</td>
+            </tr>
+        `).join('');
+
+        // Pie chart
+        const statusColors = {
+            'Naujas': '#3B82F6',
+            'Apmoketas': '#F59E0B',
+            'Issiunstas': '#8B5CF6',
+            'Ivykdytas': '#22C55E',
+            'Atsauktas': '#EF4444'
+        };
+        const statusCounts = {};
+        orders.forEach(o => { statusCounts[o.status] = (statusCounts[o.status] || 0) + 1; });
+        const total = orders.length || 1;
+        let gradientParts = [];
+        let cumulative = 0;
+        const legendItems = [];
+        STATUSES.forEach(s => {
+            const count = statusCounts[s] || 0;
+            const pct = (count / total) * 100;
+            gradientParts.push(`${statusColors[s]} ${cumulative}% ${cumulative + pct}%`);
+            cumulative += pct;
+            legendItems.push({ status: s, color: statusColors[s], count, pct: pct.toFixed(1) });
+        });
+
+        document.getElementById('reportPieChart').style.background = `conic-gradient(${gradientParts.join(', ')})`;
+        document.getElementById('reportPieLegend').innerHTML = legendItems.map(l =>
+            `<div class="pie-legend-item">
+                <div class="pie-legend-dot" style="background:${l.color};"></div>
+                <span>${l.status}: ${l.count} (${l.pct}%)</span>
+            </div>`
+        ).join('');
+
+        // Status summary
+        document.getElementById('reportStatusSummary').innerHTML = legendItems.map(l =>
+            `<div class="low-stock-item">
+                <span class="low-stock-name"><span class="badge ${STATUS_BADGES[l.status]}">${l.status}</span></span>
+                <span style="font-size:13px;font-weight:700;">${l.count}</span>
+            </div>`
+        ).join('');
+    }
+
+    function exportReport() {
+        window.print();
+    }
+
+    /* ============================================================
+       BLOG
+       ============================================================ */
+    let editingBlogIdx = -1;
+    let blogStatusPublished = false;
+
+    function initBlogData() {
+        if (localStorage.getItem('adminBlogPosts')) return;
+        const posts = [
+            { title: 'Kaip pasirinkti tinkama oksidanta', category: 'Patarimai', date: '2026-03-20', status: 'Paskelbtas', content: 'Oksidanto pasirinkimas yra svarbus zingsnis profesionaliame dazyme...' },
+            { title: '180 ml vs 60 ml: kuo skiriasi?', category: 'Produktai', date: '2026-03-15', status: 'Paskelbtas', content: 'Didesne talpa reiskia daugiau vertes kiekvienoje pakuoteje...' },
+            { title: 'Dazymo technikos profesionalams', category: 'Patarimai', date: '2026-03-10', status: 'Paskelbtas', content: 'Profesionalios dazymo technikos, kurios padeda pasiekti geriausius rezultatus...' },
+            { title: 'Spalvu tendencijos 2026 metams', category: 'Tendencijos', date: '2026-03-05', status: 'Paskelbtas', content: 'Sis sezonas diktuoja naturalius tonus su siltais atspalviais...' },
+            { title: 'Kaip sumazinti dazu sanaudas salone', category: 'Produktai', date: '2026-02-28', status: 'Juodrastis', content: 'Ekonomiskas dazu naudojimas prasideda nuo tinkamos talpos pasirinkimo...' },
+            { title: 'Plauku prieziura po dazymo', category: 'Patarimai', date: '2026-02-20', status: 'Paskelbtas', content: 'Tinkama prieziura po dazymo uztikrina ilgalaikei spalvos issaugojima...' }
+        ];
+        localStorage.setItem('adminBlogPosts', JSON.stringify(posts));
+    }
+
+    function getBlogPosts() { return JSON.parse(localStorage.getItem('adminBlogPosts') || '[]'); }
+    function saveBlogPosts(p) { localStorage.setItem('adminBlogPosts', JSON.stringify(p)); }
+
+    function renderBlog() {
+        initBlogData();
+        const posts = getBlogPosts();
+        document.querySelector('#blogTable tbody').innerHTML = posts.map((p, idx) => `
+            <tr>
+                <td><strong>${p.title}</strong></td>
+                <td>${p.category}</td>
+                <td>${p.date}</td>
+                <td><span class="badge ${p.status === 'Paskelbtas' ? 'badge-green' : 'badge-orange'}">${p.status}</span></td>
+                <td>
+                    <button class="btn btn-secondary btn-sm" onclick="editBlogPost(${idx})">Redaguoti</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteBlogPost(${idx})">Trinti</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function showBlogEditor(idx) {
+        editingBlogIdx = typeof idx === 'number' ? idx : -1;
+        document.getElementById('blogListView').style.display = 'none';
+        document.getElementById('blogEditorView').style.display = 'block';
+        document.getElementById('blogEditorTitle').textContent = editingBlogIdx >= 0 ? 'Redaguoti straipsni' : 'Naujas straipsnis';
+
+        if (editingBlogIdx >= 0) {
+            const posts = getBlogPosts();
+            const p = posts[editingBlogIdx];
+            document.getElementById('blogPostTitle').value = p.title;
+            document.getElementById('blogPostCategory').value = p.category;
+            document.getElementById('blogPostContent').value = p.content;
+            blogStatusPublished = p.status === 'Paskelbtas';
+        } else {
+            document.getElementById('blogPostTitle').value = '';
+            document.getElementById('blogPostCategory').value = 'Patarimai';
+            document.getElementById('blogPostContent').value = '';
+            blogStatusPublished = false;
+        }
+        updateBlogStatusUI();
+    }
+
+    function editBlogPost(idx) { showBlogEditor(idx); }
+
+    function cancelBlogEditor() {
+        document.getElementById('blogListView').style.display = 'block';
+        document.getElementById('blogEditorView').style.display = 'none';
+        editingBlogIdx = -1;
+    }
+
+    function toggleBlogStatus() {
+        blogStatusPublished = !blogStatusPublished;
+        updateBlogStatusUI();
+    }
+
+    function updateBlogStatusUI() {
+        const toggle = document.getElementById('blogStatusToggle');
+        const label = document.getElementById('blogStatusLabel');
+        if (blogStatusPublished) {
+            toggle.classList.add('active');
+            label.textContent = 'Paskelbtas';
+        } else {
+            toggle.classList.remove('active');
+            label.textContent = 'Juodrastis';
+        }
+    }
+
+    function saveBlogPost() {
+        const title = document.getElementById('blogPostTitle').value.trim();
+        const category = document.getElementById('blogPostCategory').value;
+        const content = document.getElementById('blogPostContent').value.trim();
+        if (!title) { alert('Iveskite pavadinima'); return; }
+
+        const posts = getBlogPosts();
+        const post = {
+            title,
+            category,
+            content,
+            date: new Date().toISOString().split('T')[0],
+            status: blogStatusPublished ? 'Paskelbtas' : 'Juodrastis'
+        };
+
+        if (editingBlogIdx >= 0) {
+            post.date = posts[editingBlogIdx].date;
+            posts[editingBlogIdx] = post;
+        } else {
+            posts.unshift(post);
+        }
+
+        saveBlogPosts(posts);
+        cancelBlogEditor();
+        renderBlog();
+    }
+
+    function deleteBlogPost(idx) {
+        if (!confirm('Ar tikrai norite istrinti si straipsni?')) return;
+        const posts = getBlogPosts();
+        posts.splice(idx, 1);
+        saveBlogPosts(posts);
+        renderBlog();
+    }
+
+    /* ============================================================
+       BANNERS
+       ============================================================ */
+    const bannerDefaults = {
+        heading: 'Profesionalus plauku dazai kirpejams',
+        subheading: 'Didesne 180 ml talpa. Daugiau vertes darbui salone.',
+        ctaText: 'Perziureti produktus',
+        ctaUrl: 'category.html',
+        cta2Text: 'Pasiulymas salonams',
+        cta2Url: 'b2b.html'
+    };
+
+    const promoDefaults = {
+        active: false,
+        text: 'Nemokamas pristatymas nuo \u20AC50!',
+        color: '#E91E8C'
+    };
+
+    function getBannerSettings() {
+        return JSON.parse(localStorage.getItem('adminBanners') || JSON.stringify(bannerDefaults));
+    }
+
+    function getPromoSettings() {
+        return JSON.parse(localStorage.getItem('adminPromoBar') || JSON.stringify(promoDefaults));
+    }
+
+    function loadBannerSettings() {
+        const b = getBannerSettings();
+        document.getElementById('bannerHeading').value = b.heading || bannerDefaults.heading;
+        document.getElementById('bannerSubheading').value = b.subheading || bannerDefaults.subheading;
+        document.getElementById('bannerCtaText').value = b.ctaText || bannerDefaults.ctaText;
+        document.getElementById('bannerCtaUrl').value = b.ctaUrl || bannerDefaults.ctaUrl;
+        document.getElementById('bannerCta2Text').value = b.cta2Text || bannerDefaults.cta2Text;
+        document.getElementById('bannerCta2Url').value = b.cta2Url || bannerDefaults.cta2Url;
+
+        const p = getPromoSettings();
+        document.getElementById('promoBarText').value = p.text || promoDefaults.text;
+        document.getElementById('promoBarColor').value = p.color || promoDefaults.color;
+        const toggle = document.getElementById('promoBarToggle');
+        const label = document.getElementById('promoBarLabel');
+        if (p.active) { toggle.classList.add('active'); label.textContent = 'Ijungta'; }
+        else { toggle.classList.remove('active'); label.textContent = 'Isungta'; }
+    }
+
+    function saveBannerSettings() {
+        const b = {
+            heading: document.getElementById('bannerHeading').value,
+            subheading: document.getElementById('bannerSubheading').value,
+            ctaText: document.getElementById('bannerCtaText').value,
+            ctaUrl: document.getElementById('bannerCtaUrl').value,
+            cta2Text: document.getElementById('bannerCta2Text').value,
+            cta2Url: document.getElementById('bannerCta2Url').value
+        };
+        localStorage.setItem('adminBanners', JSON.stringify(b));
+        updateBannerPreview();
+        showToast('Banerio nustatymai issaugoti!');
+    }
+
+    function resetBannerDefaults() {
+        localStorage.setItem('adminBanners', JSON.stringify(bannerDefaults));
+        loadBannerSettings();
+        updateBannerPreview();
+        showToast('Atstatyti numatytieji nustatymai');
+    }
+
+    function updateBannerPreview() {
+        const b = getBannerSettings();
+        document.getElementById('bannerPreviewHeading').textContent = b.heading || bannerDefaults.heading;
+        document.getElementById('bannerPreviewSub').textContent = b.subheading || bannerDefaults.subheading;
+        document.getElementById('bannerPreviewCta').textContent = b.ctaText || bannerDefaults.ctaText;
+        document.getElementById('bannerPreviewCta2').textContent = b.cta2Text || bannerDefaults.cta2Text;
+    }
+
+    function togglePromoBar() {
+        const toggle = document.getElementById('promoBarToggle');
+        const label = document.getElementById('promoBarLabel');
+        toggle.classList.toggle('active');
+        label.textContent = toggle.classList.contains('active') ? 'Ijungta' : 'Isungta';
+    }
+
+    function savePromoBar() {
+        const p = {
+            active: document.getElementById('promoBarToggle').classList.contains('active'),
+            text: document.getElementById('promoBarText').value,
+            color: document.getElementById('promoBarColor').value
+        };
+        localStorage.setItem('adminPromoBar', JSON.stringify(p));
+        showToast('Akciju juosta issaugota!');
+    }
+
+    /* ============================================================
+       B2B
+       ============================================================ */
+    function initB2bData() {
+        if (localStorage.getItem('adminB2bInquiries')) return;
+        const inquiries = [
+            { id: 1, salon: 'Grozio studija Aura', contact: 'Asta Vilkaite', email: 'info@aura-studija.lt', phone: '+370 612 34567', city: 'Vilnius', address: 'Gedimino pr. 22, Vilnius', need: '~50 vnt./men.', date: '2026-04-05', status: 'Nauja', notes: [] },
+            { id: 2, salon: 'Salon Elite', contact: 'Marius Petrauskas', email: 'salon.elite@gmail.com', phone: '+370 698 76543', city: 'Kaunas', address: 'Laisves al. 45, Kaunas', need: '~80 vnt./men.', date: '2026-04-03', status: 'Atsakyta', notes: [{ text: 'Issiustas kainynas', date: '2026-04-04' }] },
+            { id: 3, salon: 'Kirpykla Stilius', contact: 'Neringa Balciunaite', email: 'stilius@inbox.lt', phone: '+370 655 11223', city: 'Klaipeda', address: 'H. Manto g. 15, Klaipeda', need: '~120 vnt./men.', date: '2026-03-28', status: 'Sutarta', notes: [{ text: 'Pasirasytas tiekimo susitarimas', date: '2026-04-01' }] },
+            { id: 4, salon: 'Beauty Box', contact: 'Simona Daugirdaite', email: 'beautybox.vln@gmail.com', phone: '+370 677 44556', city: 'Vilnius', address: 'Ozo g. 18, Vilnius', need: '~30 vnt./men.', date: '2026-04-06', status: 'Nauja', notes: [] },
+            { id: 5, salon: 'Plauku meistrai', contact: 'Tomas Ramonas', email: 'meistrai@gmail.com', phone: '+370 611 99887', city: 'Kaunas', address: 'Savanoriu pr. 100, Kaunas', need: '~60 vnt./men.', date: '2026-04-01', status: 'Perziureta', notes: [{ text: 'Paskambinta, laukia pasiulymo', date: '2026-04-02' }] },
+            { id: 6, salon: 'Salon de Paris', contact: 'Laura Paulauskaite', email: 'salondeparis@gmail.com', phone: '+370 688 22334', city: 'Vilnius', address: 'Pylimo g. 8, Vilnius', need: '~90 vnt./men.', date: '2026-03-25', status: 'Atsakyta', notes: [{ text: 'Pateiktas individualus pasiulymas', date: '2026-03-27' }] },
+            { id: 7, salon: 'Grozio namai', contact: 'Egle Stankeviciute', email: 'grozionamai@inbox.lt', phone: '+370 644 55667', city: 'Siauliai', address: 'Vilniaus g. 50, Siauliai', need: '~40 vnt./men.', date: '2026-04-07', status: 'Nauja', notes: [] },
+            { id: 8, salon: 'Kirpykla Elegancija', contact: 'Jurgita Kubiliene', email: 'elegancija@gmail.com', phone: '+370 622 88990', city: 'Panevezys', address: 'Respublikos g. 33, Panevezys', need: '~25 vnt./men.', date: '2026-03-20', status: 'Atmesta', notes: [{ text: 'Nesudomino kainos', date: '2026-03-22' }] }
+        ];
+        localStorage.setItem('adminB2bInquiries', JSON.stringify(inquiries));
+    }
+
+    function getB2b() { return JSON.parse(localStorage.getItem('adminB2bInquiries') || '[]'); }
+    function saveB2b(d) { localStorage.setItem('adminB2bInquiries', JSON.stringify(d)); }
+
+    const B2B_STATUS_BADGES = {
+        'Nauja': 'badge-blue',
+        'Perziureta': 'badge-orange',
+        'Atsakyta': 'badge-purple',
+        'Sutarta': 'badge-green',
+        'Atmesta': 'badge-red'
+    };
+
+    function renderB2b() {
+        initB2bData();
+        const inquiries = getB2b();
+
+        // Stats
+        const counts = { total: inquiries.length, new: 0, answered: 0, agreed: 0 };
+        inquiries.forEach(i => {
+            if (i.status === 'Nauja') counts.new++;
+            if (i.status === 'Atsakyta') counts.answered++;
+            if (i.status === 'Sutarta') counts.agreed++;
+        });
+
+        document.getElementById('b2bStats').innerHTML = [
+            { label: 'Visos uzklausos', value: counts.total },
+            { label: 'Naujos', value: counts.new },
+            { label: 'Atsakytos', value: counts.answered },
+            { label: 'Sutarta', value: counts.agreed }
+        ].map(s => `<div class="stat-card"><div class="label">${s.label}</div><div class="value">${s.value}</div></div>`).join('');
+
+        // Table
+        document.querySelector('#b2bTable tbody').innerHTML = inquiries.map((inq, idx) => `
+            <tr>
+                <td><strong>${inq.salon}</strong><br><small style="color:#6B6B6B;">${inq.city}</small></td>
+                <td>${inq.contact}</td>
+                <td>${inq.email}</td>
+                <td>${inq.phone}</td>
+                <td>${inq.need}</td>
+                <td>${inq.date}</td>
+                <td>
+                    <select class="form-input" style="width:130px;padding:4px 8px;font-size:12px;" onchange="changeB2bStatus(${idx}, this.value)">
+                        ${['Nauja','Perziureta','Atsakyta','Sutarta','Atmesta'].map(s => `<option value="${s}" ${inq.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+                    </select>
+                </td>
+                <td>
+                    <button class="btn btn-secondary btn-sm" onclick="toggleB2bDetail(${idx})">Detales</button>
+                </td>
+            </tr>
+            <tr class="b2b-detail-row" id="b2b-detail-${idx}">
+                <td colspan="8" style="padding:16px 20px;">
+                    <div style="display:flex;gap:24px;flex-wrap:wrap;">
+                        <div style="flex:1;min-width:200px;">
+                            <h4 style="font-size:12px;color:#6B6B6B;text-transform:uppercase;margin-bottom:8px;">Informacija</h4>
+                            <p style="font-size:13px;margin-bottom:4px;"><strong>Adresas:</strong> ${inq.address}</p>
+                            <p style="font-size:13px;margin-bottom:4px;"><strong>Menesinis poreikis:</strong> ${inq.need}</p>
+                        </div>
+                        <div style="flex:1;min-width:200px;">
+                            <h4 style="font-size:12px;color:#6B6B6B;text-transform:uppercase;margin-bottom:8px;">Pastabos</h4>
+                            <div id="b2b-notes-${idx}">
+                                ${(inq.notes || []).map(n => `<div class="b2b-note-item"><span class="b2b-note-date">${n.date}</span> — ${n.text}</div>`).join('') || '<p style="color:#6B6B6B;font-size:13px;">Pastabui nera.</p>'}
+                            </div>
+                            <div style="display:flex;gap:8px;margin-top:8px;">
+                                <input class="form-input" id="b2b-note-input-${idx}" placeholder="Nauja pastaba..." style="flex:1;">
+                                <button class="btn btn-primary btn-sm" onclick="addB2bNote(${idx})">Prideti</button>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function changeB2bStatus(idx, newStatus) {
+        const data = getB2b();
+        data[idx].status = newStatus;
+        saveB2b(data);
+        renderB2b();
+    }
+
+    function toggleB2bDetail(idx) {
+        document.getElementById('b2b-detail-' + idx).classList.toggle('open');
+    }
+
+    function addB2bNote(idx) {
+        const input = document.getElementById('b2b-note-input-' + idx);
+        const text = input.value.trim();
+        if (!text) return;
+        const data = getB2b();
+        if (!data[idx].notes) data[idx].notes = [];
+        data[idx].notes.push({ text, date: new Date().toISOString().split('T')[0] });
+        saveB2b(data);
+        renderB2b();
+        // Re-open the detail row
+        document.getElementById('b2b-detail-' + idx).classList.add('open');
+    }
+
+    /* ============================================================
+       NEWSLETTER
+       ============================================================ */
+    function initNewsletterData() {
+        if (localStorage.getItem('adminNewsletter')) return;
+
+        const subscribers = [
+            { email: 'jonas.kazlauskas@gmail.com', date: '2026-01-15', status: 'Aktyvus' },
+            { email: 'rima.petrauskiene@inbox.lt', date: '2026-01-20', status: 'Aktyvus' },
+            { email: 'marius.jonaitis@gmail.com', date: '2026-02-01', status: 'Aktyvus' },
+            { email: 'asta.vilkaite@gmail.com', date: '2026-02-05', status: 'Aktyvus' },
+            { email: 'neringa.balciunaite@inbox.lt', date: '2026-02-10', status: 'Atsisakes' },
+            { email: 'egle.stankeviciute@gmail.com', date: '2026-02-15', status: 'Aktyvus' },
+            { email: 'ieva.grinaite@inbox.lt', date: '2026-02-20', status: 'Aktyvus' },
+            { email: 'monika.urboniene@gmail.com', date: '2026-02-25', status: 'Aktyvus' },
+            { email: 'simona.savickaite@gmail.com', date: '2026-03-01', status: 'Aktyvus' },
+            { email: 'laura.paulauskaite@inbox.lt', date: '2026-03-03', status: 'Atsisakes' },
+            { email: 'giedre.daugirdaite@gmail.com', date: '2026-03-05', status: 'Aktyvus' },
+            { email: 'tomas.ramonas@gmail.com', date: '2026-03-08', status: 'Aktyvus' },
+            { email: 'andrius.zilinskas@inbox.lt', date: '2026-03-10', status: 'Aktyvus' },
+            { email: 'petras.morkus@gmail.com', date: '2026-03-12', status: 'Aktyvus' },
+            { email: 'jurgita.kubiliene@gmail.com', date: '2026-03-15', status: 'Aktyvus' },
+            { email: 'salon.elite@gmail.com', date: '2026-03-18', status: 'Aktyvus' },
+            { email: 'grozio.studija@inbox.lt', date: '2026-03-20', status: 'Aktyvus' },
+            { email: 'kirpykla.stilius@gmail.com', date: '2026-03-22', status: 'Atsisakes' },
+            { email: 'beautybox.vln@gmail.com', date: '2026-03-25', status: 'Aktyvus' },
+            { email: 'info@plauku-meistrai.lt', date: '2026-04-01', status: 'Aktyvus' }
+        ];
+
+        const history = [
+            { date: '2026-03-25', subject: 'Nauji Color SHOCK atspalviai jau sandelyje!', sent: 17, openRate: 38.2 },
+            { date: '2026-03-10', subject: 'Specialus pasiulymas salonams — kovo menesi', sent: 15, openRate: 42.5 },
+            { date: '2026-02-20', subject: 'Kaip sumazinti dazu sanaudas salone?', sent: 12, openRate: 29.8 }
+        ];
+
+        localStorage.setItem('adminNewsletter', JSON.stringify({ subscribers, history }));
+    }
+
+    function getNewsletter() { return JSON.parse(localStorage.getItem('adminNewsletter') || '{"subscribers":[],"history":[]}'); }
+    function saveNewsletter(d) { localStorage.setItem('adminNewsletter', JSON.stringify(d)); }
+
+    function renderNewsletter() {
+        initNewsletterData();
+        const data = getNewsletter();
+        const subs = data.subscribers;
+        const history = data.history;
+
+        const active = subs.filter(s => s.status === 'Aktyvus').length;
+        const thisMonth = subs.filter(s => s.date >= '2026-04-01').length;
+        const unsubscribed = subs.filter(s => s.status === 'Atsisakes').length;
+
+        // Stats
+        document.getElementById('newsletterStats').innerHTML = [
+            { label: 'Viso prenumeratoriu', value: subs.length },
+            { label: 'Nauji si menesi', value: thisMonth },
+            { label: 'Atsisake', value: unsubscribed }
+        ].map(s => `<div class="stat-card"><div class="label">${s.label}</div><div class="value">${s.value}</div></div>`).join('');
+
+        // Subscribers table
+        document.querySelector('#newsletterTable tbody').innerHTML = subs.map((s, idx) => `
+            <tr>
+                <td>${s.email}</td>
+                <td>${s.date}</td>
+                <td><span class="badge ${s.status === 'Aktyvus' ? 'badge-green' : 'badge-red'}">${s.status}</span></td>
+                <td><button class="btn btn-danger btn-sm" onclick="removeSubscriber(${idx})">Pasalinti</button></td>
+            </tr>
+        `).join('');
+
+        // Sending history
+        document.querySelector('#nlHistoryTable tbody').innerHTML = history.map(h => `
+            <tr>
+                <td>${h.date}</td>
+                <td>${h.subject}</td>
+                <td>${h.sent}</td>
+                <td>${h.openRate}%</td>
+            </tr>
+        `).join('');
+    }
+
+    function removeSubscriber(idx) {
+        if (!confirm('Ar tikrai norite pasalinti si prenumeratoriu?')) return;
+        const data = getNewsletter();
+        data.subscribers.splice(idx, 1);
+        saveNewsletter(data);
+        renderNewsletter();
+    }
+
+    function exportNewsletterCSV() {
+        const data = getNewsletter();
+        let csv = 'El. pastas,Prenumeratos data,Statusas\n';
+        data.subscribers.forEach(s => {
+            csv += `${s.email},${s.date},${s.status}\n`;
+        });
+        downloadCSV(csv, 'prenumeratoriai.csv');
+    }
+
+    function sendNewsletter() {
+        const subject = document.getElementById('nlSubject').value.trim();
+        const content = document.getElementById('nlContent').value.trim();
+        if (!subject || !content) { alert('Uzpildykite tema ir turini'); return; }
+
+        const data = getNewsletter();
+        const activeCount = data.subscribers.filter(s => s.status === 'Aktyvus').length;
+
+        if (!confirm('Siusti naujienlaiskei ' + activeCount + ' aktyviems prenumeratoriams?')) return;
+
+        const openRate = (25 + Math.random() * 20).toFixed(1);
+        data.history.unshift({
+            date: new Date().toISOString().split('T')[0],
+            subject,
+            sent: activeCount,
+            openRate: parseFloat(openRate)
+        });
+        saveNewsletter(data);
+
+        document.getElementById('nlSubject').value = '';
+        document.getElementById('nlContent').value = '';
+        renderNewsletter();
+        showToast('Naujienlaiksis issiustas ' + activeCount + ' prenumeratoriams');
+    }
+
+    /* ============================================================
+       TOAST HELPER
+       ============================================================ */
+    function showToast(message) {
+        const existing = document.querySelector('.toast');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3000);
+    }
+
+    /* ============================================================
+       UTILITY
+       ============================================================ */
+    function downloadCSV(csvContent, filename) {
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+
+    /* ============================================================
+       INIT
+       ============================================================ */
+    renderOverview();
+    </script>
+    <script src="js/dashboard-extra.js"></script>
+</body>
+</html>

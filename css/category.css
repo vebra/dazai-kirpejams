@@ -1,0 +1,207 @@
+/* ============================================
+   KATEGORIJŲ PUSLAPIS
+   ============================================ */
+
+/* Breadcrumb */
+.breadcrumb {
+  padding: 90px 0 12px;
+  font-size: 0.85rem;
+  color: var(--dark-gray);
+}
+.breadcrumb a { color: var(--dark-gray); }
+.breadcrumb a:hover { color: var(--magenta); }
+.breadcrumb span { margin: 0 8px; color: var(--border); }
+.breadcrumb .current { color: var(--black); font-weight: 500; }
+
+/* Category Hero */
+.cat-hero {
+  padding: 32px 0 40px;
+  background: var(--white);
+}
+
+.cat-hero h1 {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  margin-bottom: 12px;
+}
+
+.cat-hero-desc {
+  max-width: 650px;
+  color: var(--dark-gray);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+
+.cat-stats {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.cat-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.95rem;
+  color: var(--dark-gray);
+  padding: 8px 20px;
+  background: var(--light-gray);
+  border-radius: 50px;
+}
+
+.cat-stat strong {
+  color: var(--magenta);
+  font-weight: 700;
+}
+
+/* Filters */
+.cat-filters {
+  padding: 20px 0;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 72px;
+  z-index: 100;
+}
+
+.filters-bar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--black);
+}
+
+.filter-group select {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: var(--white);
+  cursor: pointer;
+  color: var(--black);
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: var(--magenta);
+}
+
+.filter-results {
+  margin-left: auto;
+  font-size: 0.85rem;
+  color: var(--dark-gray);
+}
+
+/* Products section */
+.cat-products {
+  padding: 40px 0 60px;
+  background: var(--light-gray);
+}
+
+/* Color groups */
+.color-group {
+  margin-bottom: 48px;
+}
+
+.group-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+}
+
+.group-badge {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--white);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  flex-shrink: 0;
+}
+
+/* Shade preview in product cards */
+.shade-preview {
+  width: 60px;
+  height: 120px;
+  border-radius: 6px 6px 30px 30px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.product-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+/* Category advantage bar */
+.cat-advantage {
+  padding: 40px 0;
+  background: var(--black);
+}
+
+.cat-advantage-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  text-align: center;
+}
+
+.cat-advantage-item strong {
+  display: block;
+  color: var(--magenta);
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.cat-advantage-item span {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.6);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .filters-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-results {
+    margin-left: 0;
+  }
+
+  .cat-stats {
+    gap: 12px;
+  }
+
+  .cat-advantage-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cat-advantage-grid {
+    grid-template-columns: 1fr;
+  }
+}

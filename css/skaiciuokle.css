@@ -1,0 +1,513 @@
+/* ============================================
+   KAINŲ SKAIČIUOKLĖ
+   ============================================ */
+
+/* Breadcrumb */
+.breadcrumb {
+  padding: 90px 0 12px;
+  font-size: 0.85rem;
+  color: var(--dark-gray);
+}
+.breadcrumb a { color: var(--dark-gray); }
+.breadcrumb a:hover { color: var(--magenta); }
+.breadcrumb span { margin: 0 8px; color: var(--border); }
+.breadcrumb .current { color: var(--black); font-weight: 500; }
+
+/* ============================================
+   1. HERO
+   ============================================ */
+.calc-hero {
+  padding: 32px 0 64px;
+  background: linear-gradient(135deg, var(--white) 0%, var(--light-gray) 100%);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.calc-hero::before {
+  content: '';
+  position: absolute;
+  top: -120px;
+  right: -120px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(233,30,140,0.06) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.calc-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -80px;
+  left: -80px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(43,53,175,0.05) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.calc-hero .section-label {
+  color: var(--blue);
+}
+
+.calc-hero h1 {
+  margin-bottom: 20px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.calc-hero h1 .highlight {
+  color: var(--magenta);
+}
+
+.calc-hero-subtitle {
+  font-size: 1.1rem;
+  color: var(--dark-gray);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* ============================================
+   2. CALCULATOR
+   ============================================ */
+.calc-section {
+  padding: var(--section-padding);
+  background: var(--light-gray);
+}
+
+.calc-card {
+  max-width: 960px;
+  margin: 0 auto;
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 48px;
+}
+
+.calc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+/* Inputs */
+.calc-inputs h2,
+.calc-results h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 28px;
+  color: var(--black);
+}
+
+.calc-input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.calc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.calc-field label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--dark-gray);
+  line-height: 1.4;
+}
+
+.calc-field input {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--black);
+  background: var(--white);
+  transition: border-color var(--transition), box-shadow var(--transition);
+  -moz-appearance: textfield;
+}
+
+.calc-field input::-webkit-outer-spin-button,
+.calc-field input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.calc-field input:focus {
+  outline: none;
+  border-color: var(--magenta);
+  box-shadow: 0 0 0 3px rgba(233, 30, 140, 0.1);
+}
+
+/* Our product badge */
+.calc-our-product {
+  background: linear-gradient(135deg, rgba(233,30,140,0.06) 0%, rgba(43,53,175,0.04) 100%);
+  border: 1.5px solid rgba(233,30,140,0.15);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  font-size: 1rem;
+  color: var(--black);
+  position: relative;
+}
+
+.calc-our-product-badge {
+  display: inline-block;
+  background: var(--magenta);
+  color: var(--white);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 10px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.calc-our-price {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--magenta);
+}
+
+/* Button */
+.calc-section .btn {
+  width: 100%;
+  text-align: center;
+  justify-content: center;
+}
+
+/* Results */
+.calc-results {
+  background: var(--light-gray);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  position: relative;
+}
+
+.calc-result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+}
+
+.calc-result-label {
+  font-size: 0.9rem;
+  color: var(--dark-gray);
+  font-weight: 500;
+}
+
+.calc-result-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--black);
+  text-align: right;
+}
+
+.calc-result-highlight {
+  color: var(--magenta);
+  font-weight: 700;
+}
+
+.calc-result-big .calc-result-label {
+  font-size: 1rem;
+  color: var(--black);
+  font-weight: 600;
+}
+
+.calc-result-big .calc-result-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.calc-result-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 0;
+}
+
+.calc-result-note {
+  margin-top: 20px;
+  font-size: 0.78rem;
+  color: var(--dark-gray);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* ============================================
+   3. COMPARISON TABLE
+   ============================================ */
+.calc-comparison {
+  padding: var(--section-padding);
+  background: var(--white);
+}
+
+.calc-comparison .section-title {
+  margin-bottom: 8px;
+}
+
+.calc-comparison .section-subtitle {
+  margin-bottom: 48px;
+}
+
+.vs {
+  color: var(--dark-gray);
+  font-weight: 400;
+  font-size: 0.85em;
+}
+
+.comparison-table-wrap {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.comparison-table thead th {
+  background: var(--black);
+  color: var(--white);
+  padding: 18px 24px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.comparison-table thead th:first-child {
+  text-align: left;
+  background: var(--black);
+}
+
+.comparison-table thead th.comparison-highlight-col {
+  background: var(--magenta);
+}
+
+.comparison-table tbody td {
+  padding: 16px 24px;
+  font-size: 0.95rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  color: var(--dark-gray);
+}
+
+.comparison-table tbody tr:nth-child(even) td {
+  background: var(--light-gray);
+}
+
+.comparison-table tbody tr:nth-child(odd) td {
+  background: var(--white);
+}
+
+.comparison-table tbody td.comparison-label {
+  text-align: left;
+  font-weight: 600;
+  color: var(--black);
+}
+
+.comparison-table tbody td.comparison-highlight-col {
+  color: var(--black);
+  background: rgba(233, 30, 140, 0.04);
+  font-weight: 500;
+}
+
+.comparison-table tbody tr:nth-child(even) td.comparison-highlight-col {
+  background: rgba(233, 30, 140, 0.08);
+}
+
+.comparison-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparison-footnote {
+  margin-top: 16px;
+  font-size: 0.8rem;
+  color: var(--dark-gray);
+  text-align: center;
+  font-style: italic;
+}
+
+/* ============================================
+   4. BENEFITS
+   ============================================ */
+.calc-benefits {
+  padding: var(--section-padding);
+  background: var(--light-gray);
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 48px;
+}
+
+.benefit-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 36px 28px;
+  box-shadow: var(--shadow);
+  text-align: center;
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+
+.benefit-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-4px);
+}
+
+.benefit-icon {
+  font-size: 2.4rem;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.benefit-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--black);
+}
+
+.benefit-card p {
+  font-size: 0.9rem;
+  color: var(--dark-gray);
+  line-height: 1.6;
+}
+
+/* ============================================
+   5. CTA
+   ============================================ */
+.calc-cta {
+  padding: var(--section-padding);
+  background: var(--white);
+}
+
+.calc-cta-card {
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+  background: linear-gradient(135deg, var(--black) 0%, #2a2a2a 100%);
+  color: var(--white);
+  border-radius: var(--radius);
+  padding: 56px 48px;
+  box-shadow: var(--shadow-hover);
+}
+
+.calc-cta-card h2 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  color: var(--white);
+}
+
+.calc-cta-card p {
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.calc-cta-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ============================================
+   6. RESPONSIVE
+   ============================================ */
+@media (max-width: 900px) {
+  .calc-card {
+    padding: 32px 24px;
+  }
+
+  .calc-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .calc-input-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .calc-hero {
+    padding: 24px 0 48px;
+  }
+
+  .calc-hero h1 {
+    font-size: 1.75rem;
+  }
+
+  .calc-hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .benefits-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .comparison-table thead th,
+  .comparison-table tbody td {
+    padding: 12px 14px;
+    font-size: 0.85rem;
+  }
+
+  .calc-cta-card {
+    padding: 40px 24px;
+  }
+
+  .calc-cta-card h2 {
+    font-size: 1.4rem;
+  }
+
+  .calc-cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .calc-cta-buttons .btn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .calc-result-big .calc-result-value {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .calc-card {
+    padding: 24px 16px;
+  }
+
+  .calc-results {
+    padding: 24px 16px;
+  }
+
+  .comparison-table thead th,
+  .comparison-table tbody td {
+    padding: 10px 10px;
+    font-size: 0.8rem;
+  }
+}

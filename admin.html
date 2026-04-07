@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administravimas | Dazai Kirpejams</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #1A1A1A;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1A1A1A;
+            letter-spacing: -0.5px;
+        }
+        .logo p {
+            font-size: 14px;
+            color: #6B6B6B;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 6px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s;
+            outline: none;
+            background: #F5F5F7;
+        }
+        .form-group input:focus {
+            border-color: #E91E8C;
+            background: #fff;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: #E91E8C;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 8px;
+        }
+        .btn-login:hover { background: #d11a7d; }
+        .btn-login:active { transform: scale(0.98); }
+        .error-msg {
+            display: none;
+            background: #FEF2F2;
+            color: #EF4444;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            border: 1px solid #FECACA;
+        }
+        .error-msg.visible { display: block; }
+        .divider {
+            height: 1px;
+            background: #eee;
+            margin: 24px 0 16px;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            color: #6B6B6B;
+            font-size: 13px;
+            text-decoration: none;
+        }
+        .back-link:hover { color: #E91E8C; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="logo">
+            <h1>Dazai Kirpejams</h1>
+            <p>Administravimas</p>
+        </div>
+        <div class="error-msg" id="errorMsg">Neteisingas el. pastas arba slaptazodis</div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">El. pastas</label>
+                <input type="email" id="email" placeholder="admin@dazaikirpejams.lt" required autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="password">Slaptazodis</label>
+                <input type="password" id="password" placeholder="Slaptazodis" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn-login">Prisijungti</button>
+        </form>
+        <div class="divider"></div>
+        <a href="index.html" class="back-link">Grizti i svetaine</a>
+    </div>
+
+    <script>
+        // Auto-redirect if already logged in
+        if (sessionStorage.getItem('dk_admin_logged_in') === 'true') {
+            window.location.href = 'dashboard.html';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (password === 'admin123') {
+                sessionStorage.setItem('dk_admin_logged_in', 'true');
+                sessionStorage.setItem('dk_admin_email', document.getElementById('email').value);
+                window.location.href = 'dashboard.html';
+            } else {
+                errorMsg.classList.add('visible');
+                setTimeout(() => errorMsg.classList.remove('visible'), 3000);
+            }
+        });
+    </script>
+</body>
+</html>

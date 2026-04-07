@@ -1,0 +1,461 @@
+/* ============================================
+   PRISTATYMAS IR GRAZINIMAS — Page Styles
+   ============================================ */
+
+/* --- Breadcrumb --- */
+.breadcrumb {
+  padding: 100px 0 0;
+  background: var(--light-gray);
+}
+
+.breadcrumb-list {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--dark-gray);
+}
+
+.breadcrumb-list a {
+  color: var(--dark-gray);
+  font-weight: 500;
+}
+
+.breadcrumb-list a:hover {
+  color: var(--magenta);
+}
+
+.breadcrumb-list .separator {
+  color: var(--border);
+}
+
+.breadcrumb-list .current {
+  color: var(--black);
+  font-weight: 600;
+}
+
+/* --- Page Hero --- */
+.page-hero {
+  padding: 40px 0 60px;
+  background: var(--light-gray);
+  text-align: center;
+}
+
+.page-hero h1 {
+  margin-bottom: 16px;
+}
+
+.page-hero h1 .highlight {
+  color: var(--magenta);
+}
+
+.page-hero-subtitle {
+  font-size: 1.1rem;
+  color: var(--dark-gray);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* --- Shipping Section --- */
+.shipping-section {
+  padding: var(--section-padding);
+  background: var(--white);
+}
+
+.shipping-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin-top: 48px;
+}
+
+.shipping-card {
+  background: var(--light-gray);
+  border-radius: var(--radius);
+  padding: 36px 28px;
+  text-align: center;
+  transition: all var(--transition);
+  border: 1px solid transparent;
+}
+
+.shipping-card:hover {
+  border-color: var(--border);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-4px);
+}
+
+.shipping-card-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  margin: 0 auto 20px;
+}
+
+.shipping-card h4 {
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+
+.shipping-card p {
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.shipping-card .delivery-time {
+  display: inline-block;
+  margin-top: 12px;
+  background: rgba(233, 30, 140, 0.08);
+  color: var(--magenta);
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* --- Shipping Table --- */
+.shipping-table-wrapper {
+  margin-top: 48px;
+}
+
+.shipping-table-wrapper h3 {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.shipping-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.shipping-table thead th {
+  background: var(--black);
+  color: var(--white);
+  padding: 16px 24px;
+  text-align: left;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.shipping-table tbody td {
+  padding: 16px 24px;
+  font-size: 0.92rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--dark-gray);
+}
+
+.shipping-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.shipping-table tbody tr:nth-child(even) {
+  background: var(--light-gray);
+}
+
+.shipping-table tbody tr:hover {
+  background: rgba(233, 30, 140, 0.04);
+}
+
+/* --- Free Shipping Banner --- */
+.free-shipping-banner {
+  margin-top: 48px;
+  background: linear-gradient(135deg, var(--blue) 0%, #1e2780 100%);
+  border-radius: var(--radius);
+  padding: 36px 40px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  color: var(--white);
+}
+
+.free-shipping-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+}
+
+.free-shipping-text h4 {
+  color: var(--white);
+  font-size: 1.15rem;
+  margin-bottom: 6px;
+}
+
+.free-shipping-text p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+}
+
+/* --- Returns Section --- */
+.returns-section {
+  padding: var(--section-padding);
+  background: var(--light-gray);
+}
+
+.returns-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-top: 48px;
+}
+
+.return-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 28px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  border: 1px solid var(--border);
+  transition: all var(--transition);
+}
+
+.return-card:hover {
+  box-shadow: var(--shadow);
+  border-color: var(--magenta);
+}
+
+.return-card-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: var(--light-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.return-card-content h4 {
+  margin-bottom: 6px;
+  font-size: 1rem;
+}
+
+.return-card-content p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* --- Steps Section --- */
+.steps-section {
+  padding: var(--section-padding);
+  background: var(--white);
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  margin-top: 48px;
+  position: relative;
+}
+
+.steps-grid::before {
+  content: '';
+  position: absolute;
+  top: 44px;
+  left: 12.5%;
+  right: 12.5%;
+  height: 2px;
+  background: var(--border);
+  z-index: 0;
+}
+
+.step-card {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.step-number {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--magenta);
+  color: var(--white);
+  font-size: 1.3rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  box-shadow: 0 4px 16px rgba(233, 30, 140, 0.3);
+}
+
+.step-icon {
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+}
+
+.step-card h4 {
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.step-card p {
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+/* --- Contact Section --- */
+.returns-contact {
+  padding: 60px 0;
+  background: var(--light-gray);
+}
+
+.returns-contact-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+
+.contact-method {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.contact-method-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  box-shadow: var(--shadow);
+}
+
+.contact-method-text .label {
+  font-size: 0.8rem;
+  color: var(--dark-gray);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.contact-method-text .value {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--black);
+}
+
+.contact-method-text .value a {
+  color: var(--black);
+}
+
+.contact-method-text .value a:hover {
+  color: var(--magenta);
+}
+
+/* --- CTA Section --- */
+.page-cta {
+  padding: var(--section-padding);
+  background: var(--white);
+  text-align: center;
+}
+
+.page-cta h2 {
+  margin-bottom: 16px;
+}
+
+.page-cta p {
+  margin-bottom: 32px;
+  font-size: 1.1rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* --- Territory Note --- */
+.territory-note {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--dark-gray);
+}
+
+.territory-note strong {
+  color: var(--black);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .shipping-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .returns-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .steps-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+  }
+
+  .steps-grid::before {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .breadcrumb {
+    padding: 84px 0 0;
+  }
+
+  .page-hero {
+    padding: 30px 0 48px;
+  }
+
+  .shipping-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .shipping-table thead th,
+  .shipping-table tbody td {
+    padding: 12px 16px;
+    font-size: 0.85rem;
+  }
+
+  .free-shipping-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 28px 24px;
+  }
+
+  .returns-contact-inner {
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .steps-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .shipping-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .return-card {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+}

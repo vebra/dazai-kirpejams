@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spalvų paletė — Color SHOCK 50 atspalvių | Dažai Kirpėjams</title>
+  <meta name="description" content="Naršykite Color SHOCK profesionalių plaukų dažų spalvų paletę. 50 atspalvių, 180 ml talpa. Raskite tobulą spalvą savo klientams.">
+  <meta name="keywords" content="plaukų dažų spalvų paletė, profesionalių dažų spalvos, Color SHOCK paletė, dažai kirpėjams spalvos">
+
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Dažai Kirpėjams">
+  <link rel="canonical" href="https://www.dazaikirpejams.lt/palete.html">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Spalvų paletė — Color SHOCK 50 atspalvių | Dažai Kirpėjams">
+  <meta property="og:description" content="Naršykite Color SHOCK profesionalių plaukų dažų spalvų paletę. 50 atspalvių, 180 ml talpa. Raskite tobulą spalvą savo klientams.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.dazaikirpejams.lt/palete.html">
+  <meta property="og:image" content="https://www.dazaikirpejams.lt/img/og-image.jpg">
+  <meta property="og:site_name" content="Dažai Kirpėjams">
+  <meta property="og:locale" content="lt_LT">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/palete.css">
+</head>
+<body>
+
+  <!-- ============================================
+       HEADER
+       ============================================ -->
+  <header class="header">
+    <div class="container header-inner">
+      <a href="/" class="logo">
+        <img src="img/logo-colorshock.jpg" alt="Color SHOCK" class="logo-img">
+      </a>
+
+      <nav class="nav-links">
+        <a href="category.html">Produktai</a>
+        <a href="palete.html" class="nav-active">Spalvų paletė</a>
+        <a href="b2b.html">Salonams</a>
+        <a href="blogas.html">Blogas</a>
+        <a href="apie.html">Apie mus</a>
+        <a href="kontaktai.html">Kontaktai</a>
+      </nav>
+
+      <div class="nav-right">
+        <div class="nav-lang">
+          <a href="#" class="active">LT</a>
+          <span>|</span>
+          <a href="#">EN</a>
+          <span>|</span>
+          <a href="#">RU</a>
+        </div>
+        <a href="krepselis.html" class="nav-cart">
+          &#128722;
+          <span class="nav-cart-count">0</span>
+        </a>
+      </div>
+
+      <div class="burger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================
+       HERO
+       ============================================ -->
+  <section class="palette-hero">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="index.html">Pradžia</a>
+        <span>&#8250;</span>
+        Spalvų paletė
+      </div>
+
+      <h1 style="margin-top: 24px;"><span class="highlight">Color SHOCK</span> spalvų paletė</h1>
+      <p class="hero-subtitle">Raskite tobulą spalvą iš 50 profesionalių atspalvių. Kiekvienas atspalvis — 180 ml profesionali pakuotė.</p>
+
+      <div class="palette-stats">
+        <div class="stat"><span>50</span> spalvų</div>
+        <div class="stat">|</div>
+        <div class="stat"><span>180</span> ml</div>
+        <div class="stat">|</div>
+        <div class="stat">Nuo <span>&euro;7.99</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       SEARCH & FILTERS
+       ============================================ -->
+  <section class="palette-content" style="padding: 40px 0 60px;">
+    <div class="container">
+
+      <!-- Search -->
+      <div class="palette-search">
+        <span class="search-icon">&#128269;</span>
+        <input type="text" id="paletteSearch" placeholder="Ieškoti pagal spalvos numerį arba pavadinimą...">
+      </div>
+
+      <!-- Filter Buttons -->
+      <div class="palette-filters" id="paletteFilters">
+        <button class="filter-btn active" data-filter="all">Visi</button>
+        <button class="filter-btn" data-filter="Natural">Natūralūs</button>
+        <button class="filter-btn" data-filter="Ash">Pelenų</button>
+        <button class="filter-btn" data-filter="Golden">Auksiniai</button>
+        <button class="filter-btn" data-filter="Copper">Variniai</button>
+        <button class="filter-btn" data-filter="Red">Raudoni</button>
+        <button class="filter-btn" data-filter="Chocolate">Šokoladiniai</button>
+        <button class="filter-btn" data-filter="Superlift">Superlift</button>
+        <button class="filter-btn" data-filter="Toner">Toneriai</button>
+      </div>
+
+      <!-- Color Grid -->
+      <div class="palette-grid" id="paletteGrid">
+        <!-- Dynamically generated -->
+      </div>
+
+      <!-- No Results -->
+      <div class="palette-no-results" id="paletteNoResults">
+        Nerasta jokių atspalvių pagal Jūsų paiešką. Pabandykite kitą užklausą.
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================
+       CTA
+       ============================================ -->
+  <section style="padding: 0 0 60px;">
+    <div class="container">
+      <div class="palette-cta">
+        <h2>Radote savo spalvą?</h2>
+        <p>Užsisakykite profesionalius Color SHOCK dažus su 180 ml talpa ir gaukite daugiau vertės kiekvienam dažymui.</p>
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+          <a href="category.html" class="btn btn-primary">Pirkti dabar &#8594;</a>
+          <a href="b2b.html" class="btn btn-secondary">Pasiūlymas salonams</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       NAUJIENLAIŠKIS
+       ============================================ -->
+  <section class="newsletter">
+    <div class="container">
+      <div class="newsletter-inner">
+        <div>
+          <h3>Gaukite specialius pasiūlymus</h3>
+          <p>Naujienos, akcijos ir patarimai profesionalams — tiesiai į Jūsų paštą.</p>
+        </div>
+        <form class="newsletter-form">
+          <input type="email" placeholder="Jūsų el. paštas" required>
+          <button type="submit" class="btn btn-primary">Prenumeruoti</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       FOOTER
+       ============================================ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="logo" style="color: #fff;">
+            Dažai <span>Kirpėjams</span>
+          </a>
+          <p>Profesionalūs plaukų dažai ir priemonės kirpėjams. Didesnė 180 ml talpa — daugiau vertės darbui salone.</p>
+          <div class="footer-social">
+            <a href="#" title="Facebook">f</a>
+            <a href="#" title="Instagram">ig</a>
+            <a href="#" title="LinkedIn">in</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Produktai</h4>
+          <a href="category.html">Plaukų dažai</a>
+          <a href="category.html">Oksidantai</a>
+          <a href="category.html">Šampūnai ir priežiūra</a>
+          <a href="category.html">Pagalbinės priemonės</a>
+          <a href="palete.html">Spalvų paletė</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Informacija</h4>
+          <a href="apie.html">Apie mus</a>
+          <a href="blogas.html">Blogas</a>
+          <a href="b2b.html">Bendradarbiavimas</a>
+          <a href="duk.html">DUK</a>
+          <a href="pristatymas.html">Pristatymas ir grąžinimas</a>
+          <a href="skaiciuokle.html">Kainų skaičiuoklė</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Kontaktai</h4>
+          <div class="footer-contact-item">
+            &#9993; info@dazaikirpejams.lt
+          </div>
+          <div class="footer-contact-item">
+            &#9742; +370 600 00000
+          </div>
+          <div class="footer-contact-item">
+            &#128205; Kaunas, Lietuva
+          </div>
+          <div class="footer-contact-item" style="margin-top: 8px;">
+            <small>I&ndash;V: 9:00 &ndash; 18:00</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>&copy; 2026 Dažai Kirpėjams. Visos teisės saugomos.</span>
+        <div>
+          <a href="privatumas.html">Privatumo politika</a> &nbsp;&bull;&nbsp;
+          <a href="salygos.html">Pirkimo sąlygos</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/products-data.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/main.js"></script>
+
+  <script>
+    (function() {
+      // Category mapping for filter buttons
+      const CATEGORY_FILTERS = {
+        'all': null,
+        'Natural': ['Natural'],
+        'Ash': ['Ash', 'Ash Pearl'],
+        'Golden': ['Golden', 'Warm Beige'],
+        'Copper': ['Copper'],
+        'Red': ['Red', 'Mahogany', 'Violet', 'Violet Gold'],
+        'Chocolate': ['Chocolate', 'Icy Chocolate'],
+        'Superlift': ['Superlift'],
+        'Toner': ['Toner & Correctors']
+      };
+
+      // Category display names in Lithuanian
+      const CATEGORY_NAMES_LT = {
+        'Natural': 'Natūralūs',
+        'Ash': 'Pelenų',
+        'Ash Pearl': 'Pelenų perliniai',
+        'Icy Chocolate': 'Ledinis šokoladas',
+        'Golden': 'Auksiniai',
+        'Warm Beige': 'Šiltai bežiniai',
+        'Copper': 'Variniai',
+        'Mahogany': 'Raudonmedžio',
+        'Red': 'Raudoni',
+        'Chocolate': 'Šokoladiniai',
+        'Violet': 'Violetiniai',
+        'Violet Gold': 'Violetiniai auksiniai',
+        'Superlift': 'Superlift',
+        'Toner & Correctors': 'Toneriai ir korektoriai'
+      };
+
+      const grid = document.getElementById('paletteGrid');
+      const searchInput = document.getElementById('paletteSearch');
+      const filtersContainer = document.getElementById('paletteFilters');
+      const noResults = document.getElementById('paletteNoResults');
+
+      let activeFilter = 'all';
+      let searchQuery = '';
+      let cards = [];
+
+      // Build all cards
+      function buildCards() {
+        grid.innerHTML = '';
+        cards = [];
+
+        for (const [shadeId, product] of Object.entries(PRODUCTS)) {
+          const card = document.createElement('a');
+          card.href = 'product.html?shade=' + encodeURIComponent(shadeId);
+          card.className = 'shade-card';
+          card.dataset.category = product.category;
+          card.dataset.shade = shadeId.toLowerCase();
+          card.dataset.name = product.shade.toLowerCase();
+
+          const categoryLt = CATEGORY_NAMES_LT[product.category] || product.category;
+
+          card.innerHTML =
+            '<div class="shade-circle" style="background-color: ' + product.color + ';"></div>' +
+            '<div class="shade-number">' + shadeId + '</div>' +
+            '<div class="shade-name">' + product.shade + '</div>' +
+            '<div class="shade-category">' + categoryLt + '</div>' +
+            '<span class="shade-link">Peržiūrėti &#8594;</span>';
+
+          grid.appendChild(card);
+          cards.push(card);
+        }
+      }
+
+      // Filter and search
+      function applyFilters() {
+        var visibleCount = 0;
+        var filterCategories = CATEGORY_FILTERS[activeFilter];
+
+        for (var i = 0; i < cards.length; i++) {
+          var card = cards[i];
+          var categoryMatch = !filterCategories || filterCategories.indexOf(card.dataset.category) !== -1;
+          var searchMatch = !searchQuery ||
+            card.dataset.shade.indexOf(searchQuery) !== -1 ||
+            card.dataset.name.indexOf(searchQuery) !== -1;
+
+          if (categoryMatch && searchMatch) {
+            card.style.display = '';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        }
+
+        if (visibleCount === 0) {
+          noResults.classList.add('visible');
+        } else {
+          noResults.classList.remove('visible');
+        }
+      }
+
+      // Filter button clicks
+      filtersContainer.addEventListener('click', function(e) {
+        var btn = e.target.closest('.filter-btn');
+        if (!btn) return;
+
+        var allBtns = filtersContainer.querySelectorAll('.filter-btn');
+        for (var i = 0; i < allBtns.length; i++) {
+          allBtns[i].classList.remove('active');
+        }
+        btn.classList.add('active');
+
+        activeFilter = btn.dataset.filter;
+        applyFilters();
+      });
+
+      // Search input
+      searchInput.addEventListener('input', function() {
+        searchQuery = this.value.trim().toLowerCase();
+        applyFilters();
+      });
+
+      // Init
+      buildCards();
+    })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Krepšelis | Dažai Kirpėjams</title>
+  <meta name="description" content="Jūsų pirkinių krepšelis — profesionalūs plaukų dažai ir priemonės kirpėjams. Dažai Kirpėjams.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="author" content="Dažai Kirpėjams">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/krepselis.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <img src="img/logo-colorshock.jpg" alt="Color SHOCK" class="logo-img">
+      </a>
+
+      <nav class="nav-links">
+        <a href="category.html">Produktai</a>
+        <a href="category.html">Spalvų paletė</a>
+        <a href="b2b.html">Salonams</a>
+        <a href="blogas.html">Blogas</a>
+        <a href="apie.html">Apie mus</a>
+        <a href="kontaktai.html">Kontaktai</a>
+      </nav>
+
+      <div class="nav-right">
+        <div class="nav-lang">
+          <a href="#" class="active">LT</a>
+          <span>|</span>
+          <a href="#">EN</a>
+          <span>|</span>
+          <a href="#">RU</a>
+        </div>
+        <a href="krepselis.html" class="nav-cart">
+          &#128722;
+          <span class="nav-cart-count">0</span>
+        </a>
+      </div>
+
+      <div class="burger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- BREADCRUMB -->
+  <section class="breadcrumb">
+    <div class="container">
+      <a href="index.html">Pradžia</a>
+      <span>/</span>
+      <span class="current">Krepšelis</span>
+    </div>
+  </section>
+
+  <!-- CART PAGE -->
+  <section class="cart-page">
+    <div class="container">
+      <h1 style="font-size: 1.8rem; margin-bottom: 32px;">Krepšelis</h1>
+      <div id="cartContent">
+        <!-- Rendered dynamically by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo" style="color: #fff;">
+            Dažai <span>Kirpėjams</span>
+          </a>
+          <p>Profesionalūs plaukų dažai ir priemonės kirpėjams. Didesnė 180 ml talpa — daugiau vertės darbui salone.</p>
+          <div class="footer-social">
+            <a href="#" title="Facebook">f</a>
+            <a href="#" title="Instagram">ig</a>
+            <a href="#" title="LinkedIn">in</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Produktai</h4>
+          <a href="category.html">Plaukų dažai</a>
+          <a href="category.html">Oksidantai</a>
+          <a href="category.html">Šampūnai ir priežiūra</a>
+          <a href="category.html">Pagalbinės priemonės</a>
+          <a href="category.html">Spalvų paletė</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Informacija</h4>
+          <a href="apie.html">Apie mus</a>
+          <a href="blogas.html">Blogas</a>
+          <a href="b2b.html">Bendradarbiavimas</a>
+          <a href="duk.html">DUK</a>
+          <a href="pristatymas.html">Pristatymas ir grąžinimas</a>
+          <a href="skaiciuokle.html">Kainų skaičiuoklė</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Kontaktai</h4>
+          <div class="footer-contact-item">&#9993; info@dazaikirpejams.lt</div>
+          <div class="footer-contact-item">&#9742; +370 600 00000</div>
+          <div class="footer-contact-item">&#128205; Kaunas, Lietuva</div>
+          <div class="footer-contact-item" style="margin-top: 8px;">
+            <small>I&ndash;V: 9:00 &ndash; 18:00</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>&copy; 2026 Dažai Kirpėjams. Visos teisės saugomos.</span>
+        <div>
+          <a href="privatumas.html">Privatumo politika</a> &nbsp;&bull;&nbsp;
+          <a href="salygos.html">Pirkimo sąlygos</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/products-data.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    (function() {
+      var container = document.getElementById('cartContent');
+      var FREE_SHIPPING = Cart.getFreeShippingThreshold();
+
+      function render() {
+        var items = Cart.getItems();
+
+        if (items.length === 0) {
+          container.innerHTML =
+            '<div class="cart-empty">' +
+              '<div class="cart-empty-icon">&#128722;</div>' +
+              '<h2>Jūsų krepšelis tuščias</h2>' +
+              '<p>Peržiūrėkite mūsų profesionalius plaukų dažus ir priemones.</p>' +
+              '<a href="category.html" class="btn btn-primary btn-lg">Peržiūrėti produktus</a>' +
+            '</div>';
+          return;
+        }
+
+        var total = Cart.getTotal();
+        var shippingCost = total >= FREE_SHIPPING ? 0 : 3.99;
+        var grandTotal = total + shippingCost;
+
+        var html = '<div class="cart-layout">';
+
+        // Items column
+        html += '<div class="cart-items">';
+        html += '<div class="cart-items-header">' +
+          '<span>Produktas</span>' +
+          '<span>Kaina</span>' +
+          '<span>Kiekis</span>' +
+          '<span>Suma</span>' +
+          '<span></span>' +
+        '</div>';
+
+        items.forEach(function(item) {
+          var lineTotal = (item.price * item.quantity).toFixed(2);
+          html += '<div class="cart-item" data-shade-id="' + item.shadeId + '">' +
+            '<div class="cart-item-product">' +
+              '<div class="cart-item-swatch" style="background:' + item.hex + ';"></div>' +
+              '<div class="cart-item-details">' +
+                '<div class="cart-item-name">' + item.name + '</div>' +
+                '<div class="cart-item-shade">' + item.shade + '</div>' +
+                '<div class="cart-item-ml">180 ml</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="cart-item-price">&euro;' + item.price.toFixed(2) + '</div>' +
+            '<div class="cart-qty">' +
+              '<button class="cart-qty-btn" data-action="minus" data-id="' + item.shadeId + '">&minus;</button>' +
+              '<div class="cart-qty-value">' + item.quantity + '</div>' +
+              '<button class="cart-qty-btn" data-action="plus" data-id="' + item.shadeId + '">+</button>' +
+            '</div>' +
+            '<div class="cart-item-total">&euro;' + lineTotal + '</div>' +
+            '<button class="cart-item-remove" data-id="' + item.shadeId + '" title="Pašalinti">&times;</button>' +
+          '</div>';
+        });
+
+        html += '<button class="cart-clear-btn" id="cartClear">Išvalyti krepšelį</button>';
+        html += '</div>';
+
+        // Summary sidebar
+        html += '<div class="cart-summary">';
+        html += '<h3>Užsakymo suvestinė</h3>';
+
+        html += '<div class="cart-summary-row"><span>Tarpinė suma</span><span>&euro;' + total.toFixed(2) + '</span></div>';
+
+        if (shippingCost === 0) {
+          html += '<div class="cart-summary-row"><span>Pristatymas</span><span class="cart-shipping-free">Nemokamas</span></div>';
+        } else {
+          html += '<div class="cart-summary-row"><span>Pristatymas</span><span>&euro;' + shippingCost.toFixed(2) + '</span></div>';
+        }
+
+        html += '<hr class="cart-summary-divider">';
+        html += '<div class="cart-summary-total"><span>Viso</span><span>&euro;' + grandTotal.toFixed(2) + '</span></div>';
+
+        if (shippingCost > 0) {
+          var remaining = (FREE_SHIPPING - total).toFixed(2);
+          html += '<div class="cart-shipping-progress">Dar <strong>&euro;' + remaining + '</strong> iki nemokamo pristatymo</div>';
+        } else {
+          html += '<div class="cart-shipping-note cart-shipping-free">Nemokamas pristatymas nuo &euro;' + FREE_SHIPPING + '</div>';
+        }
+
+        html += '<div class="cart-summary-actions">';
+        html += '<button class="cart-checkout-btn" id="cartCheckout">Pateikti užsakymą</button>';
+        html += '<a href="category.html" class="cart-continue-link">Tęsti apsipirkimą</a>';
+        html += '</div>';
+
+        html += '</div>';
+
+        html += '</div>';
+        container.innerHTML = html;
+
+        // Bind events
+        bindEvents();
+      }
+
+      function bindEvents() {
+        // Quantity buttons
+        container.querySelectorAll('.cart-qty-btn').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var id = this.dataset.id;
+            var action = this.dataset.action;
+            var items = Cart.getItems();
+            var item = items.find(function(i) { return i.shadeId === id; });
+            if (!item) return;
+
+            if (action === 'plus') {
+              Cart.updateQuantity(id, item.quantity + 1);
+            } else if (action === 'minus') {
+              Cart.updateQuantity(id, item.quantity - 1);
+            }
+            render();
+          });
+        });
+
+        // Remove buttons
+        container.querySelectorAll('.cart-item-remove').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            Cart.removeItem(this.dataset.id);
+            render();
+          });
+        });
+
+        // Clear cart
+        var clearBtn = document.getElementById('cartClear');
+        if (clearBtn) {
+          clearBtn.addEventListener('click', function() {
+            Cart.clear();
+            render();
+          });
+        }
+
+        // Checkout button
+        var checkoutBtn = document.getElementById('cartCheckout');
+        if (checkoutBtn) {
+          checkoutBtn.addEventListener('click', function() {
+            alert('Ačiū! Užsakymo funkcija bus pridėta netrukus.');
+          });
+        }
+      }
+
+      render();
+
+      // Re-render on cart-updated from other tabs
+      window.addEventListener('cart-updated', render);
+    })();
+  </script>
+</body>
+</html>
