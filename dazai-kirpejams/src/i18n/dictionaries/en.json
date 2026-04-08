@@ -1,0 +1,219 @@
+{
+  "meta": {
+    "title": "Dažai Kirpėjams — Professional Hair Dyes for Hairdressers",
+    "description": "Professional hair dyes and products for hairdressers, colorists and beauty salons. 180 ml volume — more value for salon work."
+  },
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "colorPalette": "Color Palette",
+    "forSalons": "For Salons",
+    "blog": "Blog",
+    "about": "About Us",
+    "contact": "Contact",
+    "cart": "Cart",
+    "allProducts": "All Products",
+    "hairDyes": "Hair Dyes",
+    "oxidants": "Oxidants",
+    "shampoos": "Shampoos & Care",
+    "accessories": "Accessories"
+  },
+  "hero": {
+    "title": "Professional Hair Dyes for Hairdressers",
+    "subtitle": "Larger 180 ml volume. More value for salon work.",
+    "cta": "View Products",
+    "ctaSecondary": "Get a Salon Quote"
+  },
+  "trust": {
+    "volume": "180 ml Volume",
+    "formula": "Professional Formula",
+    "delivery": "Fast Delivery",
+    "salons": "Special Salon Pricing"
+  },
+  "advantages": {
+    "title": "Why Choose Us",
+    "volume": {
+      "title": "180 ml Volume",
+      "desc": "2x more than standard packaging — fewer orders, more work done"
+    },
+    "formula": {
+      "title": "Professional Formula",
+      "desc": "High-quality ingredients ensuring stable and long-lasting color results"
+    },
+    "economy": {
+      "title": "More Economical",
+      "desc": "Lower cost per application — save every working day"
+    },
+    "palette": {
+      "title": "Wide Color Palette",
+      "desc": "Extensive color selection for every client request"
+    },
+    "convenient": {
+      "title": "Convenient Ordering",
+      "desc": "Fast delivery by courier or to parcel lockers across Lithuania"
+    },
+    "b2b": {
+      "title": "Special B2B Terms",
+      "desc": "Individual pricing and terms for regular salons and business clients"
+    }
+  },
+  "categories": {
+    "title": "Product Categories",
+    "hairDyes": "Hair Dyes",
+    "hairDyesDesc": "Color SHOCK professional hair dyes",
+    "oxidants": "Oxidants",
+    "oxidantsDesc": "Professional oxidants for coloring",
+    "shampoos": "Shampoos & Care",
+    "shampoosDesc": "Hair care products after coloring",
+    "accessories": "Accessories",
+    "accessoriesDesc": "Professional work tools"
+  },
+  "comparison": {
+    "title": "Why Does 180 ml Change the Game?",
+    "ourProduct": "Color SHOCK 180 ml",
+    "standard": "Standard 60 ml",
+    "volume": "Volume",
+    "pricePerMl": "Price per ml",
+    "sessionsPerTube": "Sessions per tube",
+    "packagesPerMonth": "Packages per month",
+    "cta": "Calculate Your Savings",
+    "less": "less",
+    "more": "more"
+  },
+  "popular": {
+    "title": "Most Popular Products",
+    "addToCart": "Add to Cart",
+    "added": "Added",
+    "viewAll": "View All"
+  },
+  "audience": {
+    "title": "Who Is It For",
+    "hairdressers": {
+      "title": "Hairdressers",
+      "desc": "Reliable tools for everyday use in the salon"
+    },
+    "colorists": {
+      "title": "Colorists",
+      "desc": "Wide color palette and stable formula for precise color results"
+    },
+    "salons": {
+      "title": "Beauty Salons",
+      "desc": "Economical solution with B2B terms and regular supply"
+    },
+    "professionals": {
+      "title": "Professionals",
+      "desc": "For specialists who work daily and value quality and price"
+    }
+  },
+  "testimonials": {
+    "title": "What Professionals Say"
+  },
+  "b2b": {
+    "title": "Work at a Salon? Get a Special Offer",
+    "desc": "Individual pricing, regular supply and a personal manager — everything your salon needs.",
+    "cta": "Submit Inquiry"
+  },
+  "newsletter": {
+    "title": "Get Special Offers and News for Professionals",
+    "placeholder": "Your email",
+    "cta": "Subscribe",
+    "consent": "I agree to receive newsletters. You can unsubscribe at any time."
+  },
+  "finalCta": {
+    "title": "Ready to Try?",
+    "cta": "Shop Now",
+    "ctaSecondary": "Contact Us"
+  },
+  "footer": {
+    "products": "Products",
+    "information": "Information",
+    "help": "Help",
+    "contacts": "Contact",
+    "faq": "FAQ",
+    "delivery": "Delivery & Returns",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy",
+    "collaboration": "Collaboration",
+    "rights": "All rights reserved."
+  },
+  "cart": {
+    "title": "Your Cart",
+    "empty": "Your cart is empty",
+    "emptyDesc": "You haven't added any products yet. Browse our catalog.",
+    "continueShopping": "Continue Shopping",
+    "product": "Product",
+    "price": "Price",
+    "quantity": "Quantity",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "shippingCalculatedAtCheckout": "Calculated at checkout",
+    "freeShipping": "Free shipping",
+    "freeShippingProgress": "Add {amount} more for free shipping",
+    "freeShippingUnlocked": "You've unlocked free shipping!",
+    "minOrder": "Minimum order: {amount}",
+    "minOrderWarning": "Add {amount} more to reach the minimum order",
+    "remove": "Remove",
+    "proceedToCheckout": "Proceed to Checkout",
+    "clearCart": "Clear Cart",
+    "itemCount": "{count} item(s)"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "backToCart": "Back to Cart",
+    "contactInfo": "Contact Information",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "phone": "Phone number",
+    "isCompany": "I am buying on behalf of a company (invoice required)",
+    "companyName": "Company name",
+    "companyCode": "Company code",
+    "vatCode": "VAT number (optional)",
+    "deliveryMethod": "Delivery Method",
+    "courier": "Courier",
+    "courierDesc": "Delivery to the specified address within 1–3 business days",
+    "parcelLocker": "Parcel locker",
+    "parcelLockerDesc": "Delivery to your chosen parcel locker within 1–2 business days",
+    "pickup": "Pickup in Vilnius",
+    "pickupDesc": "Free pickup from our warehouse",
+    "deliveryAddress": "Delivery address",
+    "address": "Address",
+    "city": "City",
+    "postalCode": "Postal code",
+    "parcelLockerSelect": "Parcel locker address",
+    "parcelLockerPlaceholder": "e.g. Vilnius, Gedimino ave. 9, LP EXPRESS",
+    "paymentMethod": "Payment Method",
+    "bankTransfer": "Bank transfer",
+    "bankTransferDesc": "You will receive an invoice with payment details by email.",
+    "paysera": "Paysera (e-banking, card)",
+    "payseraDesc": "Secure payment via Paysera",
+    "notes": "Additional notes (optional)",
+    "orderSummary": "Order Summary",
+    "placeOrder": "Place Order",
+    "processing": "Processing...",
+    "vat": "VAT (21%, included)",
+    "agreeTerms": "I agree to the terms and privacy policy",
+    "requiredField": "Required field"
+  },
+  "order": {
+    "confirmationTitle": "Thank you for your order!",
+    "confirmationDesc": "Your order has been received. We've sent a confirmation by email.",
+    "orderNumber": "Order number",
+    "orderDate": "Date",
+    "status": "Status",
+    "statusPending": "Awaiting payment",
+    "statusPaid": "Paid",
+    "statusProcessing": "Preparing",
+    "bankTransferInstructions": "Bank Transfer Instructions",
+    "bankTransferDesc": "Please transfer the amount below. We will start preparing your order once payment is received.",
+    "recipient": "Recipient",
+    "iban": "Account number (IBAN)",
+    "amount": "Amount",
+    "reference": "Payment reference",
+    "itemsTitle": "Items Ordered",
+    "deliveryTitle": "Delivery",
+    "contactTitle": "Contact Details",
+    "continueShopping": "Back to Shop"
+  }
+}

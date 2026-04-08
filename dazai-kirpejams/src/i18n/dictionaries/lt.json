@@ -1,0 +1,219 @@
+{
+  "meta": {
+    "title": "Dažai Kirpėjams — Profesionalūs plaukų dažai kirpėjams",
+    "description": "Profesionalūs plaukų dažai ir priemonės kirpėjams, koloristams ir grožio salonams. 180 ml talpa — daugiau vertės darbui salone."
+  },
+  "nav": {
+    "home": "Pradžia",
+    "products": "Produktai",
+    "colorPalette": "Spalvų paletė",
+    "forSalons": "Salonams",
+    "blog": "Blogas",
+    "about": "Apie mus",
+    "contact": "Kontaktai",
+    "cart": "Krepšelis",
+    "allProducts": "Visi produktai",
+    "hairDyes": "Plaukų dažai",
+    "oxidants": "Oksidantai",
+    "shampoos": "Šampūnai ir priežiūra",
+    "accessories": "Pagalbinės priemonės"
+  },
+  "hero": {
+    "title": "Profesionalūs plaukų dažai kirpėjams",
+    "subtitle": "Didesnė 180 ml talpa. Daugiau vertės darbui salone.",
+    "cta": "Peržiūrėti produktus",
+    "ctaSecondary": "Gauti pasiūlymą salonui"
+  },
+  "trust": {
+    "volume": "180 ml talpa",
+    "formula": "Profesionali formulė",
+    "delivery": "Greitas pristatymas",
+    "salons": "Specialios kainos salonams"
+  },
+  "advantages": {
+    "title": "Kodėl rinktis mus",
+    "volume": {
+      "title": "180 ml talpa",
+      "desc": "2x daugiau nei standartinė pakuotė — mažiau užsakymų, daugiau darbo"
+    },
+    "formula": {
+      "title": "Profesionali formulė",
+      "desc": "Aukštos kokybės ingredientai, užtikrinantys stabilų ir ilgalaikį spalvos rezultatą"
+    },
+    "economy": {
+      "title": "Ekonomiškesnis naudojimas",
+      "desc": "Mažesnė savikaina vienam dažymui — taupote kiekvieną darbo dieną"
+    },
+    "palette": {
+      "title": "Plati spalvų paletė",
+      "desc": "Platus spalvų pasirinkimas kiekvienam kliento pageidavimui"
+    },
+    "convenient": {
+      "title": "Patogus užsakymas",
+      "desc": "Greitas pristatymas kurjeriu arba į paštomatą visoje Lietuvoje"
+    },
+    "b2b": {
+      "title": "Specialios B2B sąlygos",
+      "desc": "Individualios kainos ir sąlygos nuolatiniams salonams ir verslo klientams"
+    }
+  },
+  "categories": {
+    "title": "Produktų kategorijos",
+    "hairDyes": "Plaukų dažai",
+    "hairDyesDesc": "Color SHOCK profesionalūs plaukų dažai",
+    "oxidants": "Oksidantai",
+    "oxidantsDesc": "Profesionalūs oksidantai dažymui",
+    "shampoos": "Šampūnai ir priežiūra",
+    "shampoosDesc": "Plaukų priežiūros priemonės po dažymo",
+    "accessories": "Pagalbinės priemonės",
+    "accessoriesDesc": "Darbo įrankiai profesionalui"
+  },
+  "comparison": {
+    "title": "Kodėl 180 ml keičia žaidimo taisykles?",
+    "ourProduct": "Color SHOCK 180 ml",
+    "standard": "Standartinė 60 ml",
+    "volume": "Talpa",
+    "pricePerMl": "Kaina per ml",
+    "sessionsPerTube": "Dažymų skaičius",
+    "packagesPerMonth": "Pakuočių per mėnesį",
+    "cta": "Suskaičiuokite savo sutaupymą",
+    "less": "mažiau",
+    "more": "daugiau"
+  },
+  "popular": {
+    "title": "Populiariausi produktai",
+    "addToCart": "Į krepšelį",
+    "added": "Pridėta",
+    "viewAll": "Peržiūrėti visus"
+  },
+  "audience": {
+    "title": "Kam skirta",
+    "hairdressers": {
+      "title": "Kirpėjams",
+      "desc": "Patikimi darbo įrankiai kasdieniam naudojimui salone"
+    },
+    "colorists": {
+      "title": "Koloristams",
+      "desc": "Plati spalvų paletė ir stabili formulė tiksliam spalvos rezultatui"
+    },
+    "salons": {
+      "title": "Grožio salonams",
+      "desc": "Ekonomiškas sprendimas su B2B sąlygomis ir reguliariu tiekimu"
+    },
+    "professionals": {
+      "title": "Profesionalams",
+      "desc": "Kasdien dirbantiems specialistams, vertanantiems kokybę ir kainą"
+    }
+  },
+  "testimonials": {
+    "title": "Ką sako profesionalai"
+  },
+  "b2b": {
+    "title": "Dirbate salone? Gaukite specialų pasiūlymą",
+    "desc": "Individualios kainos, reguliarus tiekimas ir asmeninis vadybininkas — viskas, ko reikia Jūsų salonui.",
+    "cta": "Pateikti užklausą"
+  },
+  "newsletter": {
+    "title": "Gaukite specialius pasiūlymus ir naujienas profesionalams",
+    "placeholder": "Jūsų el. paštas",
+    "cta": "Prenumeruoti",
+    "consent": "Sutinku gauti naujienlaiškius. Galėsite atsisakyti bet kada."
+  },
+  "finalCta": {
+    "title": "Pasiruošę išbandyti?",
+    "cta": "Pirkti dabar",
+    "ctaSecondary": "Susisiekti"
+  },
+  "footer": {
+    "products": "Produktai",
+    "information": "Informacija",
+    "help": "Pagalba",
+    "contacts": "Kontaktai",
+    "faq": "DUK",
+    "delivery": "Pristatymas ir grąžinimas",
+    "terms": "Pirkimo sąlygos",
+    "privacy": "Privatumo politika",
+    "collaboration": "Bendradarbiavimas",
+    "rights": "Visos teisės saugomos."
+  },
+  "cart": {
+    "title": "Jūsų krepšelis",
+    "empty": "Krepšelis tuščias",
+    "emptyDesc": "Dar nepridėjote nė vieno produkto. Peržiūrėkite mūsų asortimentą.",
+    "continueShopping": "Tęsti pirkimą",
+    "product": "Produktas",
+    "price": "Kaina",
+    "quantity": "Kiekis",
+    "total": "Iš viso",
+    "subtotal": "Tarpinė suma",
+    "shipping": "Pristatymas",
+    "shippingCalculatedAtCheckout": "Skaičiuojama apmokėjimo žingsnyje",
+    "freeShipping": "Nemokamas pristatymas",
+    "freeShippingProgress": "Iki nemokamo pristatymo liko {amount}",
+    "freeShippingUnlocked": "Pasiekėte nemokamą pristatymą!",
+    "minOrder": "Minimali užsakymo suma: {amount}",
+    "minOrderWarning": "Iki minimalios užsakymo sumos trūksta {amount}",
+    "remove": "Pašalinti",
+    "proceedToCheckout": "Pereiti prie apmokėjimo",
+    "clearCart": "Išvalyti krepšelį",
+    "itemCount": "{count} prekė(s)"
+  },
+  "checkout": {
+    "title": "Apmokėjimas",
+    "backToCart": "Grįžti į krepšelį",
+    "contactInfo": "Kontaktinė informacija",
+    "firstName": "Vardas",
+    "lastName": "Pavardė",
+    "email": "El. paštas",
+    "phone": "Telefono numeris",
+    "isCompany": "Perku įmonės vardu (reikalinga sąskaita faktūra)",
+    "companyName": "Įmonės pavadinimas",
+    "companyCode": "Įmonės kodas",
+    "vatCode": "PVM mokėtojo kodas (neprivaloma)",
+    "deliveryMethod": "Pristatymo būdas",
+    "courier": "Kurjeris",
+    "courierDesc": "Pristatymas į nurodytą adresą per 1–3 d.d.",
+    "parcelLocker": "Paštomatas",
+    "parcelLockerDesc": "Pristatymas į pasirinktą paštomatą per 1–2 d.d.",
+    "pickup": "Atsiėmimas Vilniuje",
+    "pickupDesc": "Nemokamas atsiėmimas iš mūsų sandėlio",
+    "deliveryAddress": "Pristatymo adresas",
+    "address": "Adresas",
+    "city": "Miestas",
+    "postalCode": "Pašto kodas",
+    "parcelLockerSelect": "Paštomato adresas",
+    "parcelLockerPlaceholder": "Pvz. Vilnius, Gedimino pr. 9, LP EXPRESS",
+    "paymentMethod": "Mokėjimo būdas",
+    "bankTransfer": "Banko pavedimas",
+    "bankTransferDesc": "Gausite sąskaitą faktūrą el. paštu, mokėjimo duomenis.",
+    "paysera": "Paysera (el. bankininkystė, kortelė)",
+    "payseraDesc": "Saugus apmokėjimas per Paysera sistemą",
+    "notes": "Papildoma žinutė užsakymui (neprivaloma)",
+    "orderSummary": "Užsakymo suvestinė",
+    "placeOrder": "Pateikti užsakymą",
+    "processing": "Apdorojama...",
+    "vat": "PVM (21%, įskaičiuotas)",
+    "agreeTerms": "Sutinku su pirkimo sąlygomis ir privatumo politika",
+    "requiredField": "Privalomas laukas"
+  },
+  "order": {
+    "confirmationTitle": "Ačiū už užsakymą!",
+    "confirmationDesc": "Jūsų užsakymas priimtas. Išsiuntėme patvirtinimą el. paštu.",
+    "orderNumber": "Užsakymo numeris",
+    "orderDate": "Data",
+    "status": "Statusas",
+    "statusPending": "Laukia apmokėjimo",
+    "statusPaid": "Apmokėta",
+    "statusProcessing": "Ruošiamas",
+    "bankTransferInstructions": "Banko pavedimo instrukcijos",
+    "bankTransferDesc": "Prašome atlikti pavedimą pagal žemiau pateiktus duomenis. Užsakymą pradėsime ruošti gavus mokėjimą.",
+    "recipient": "Gavėjas",
+    "iban": "Sąskaitos numeris (IBAN)",
+    "amount": "Suma",
+    "reference": "Mokėjimo paskirtis",
+    "itemsTitle": "Užsakytos prekės",
+    "deliveryTitle": "Pristatymas",
+    "contactTitle": "Kontaktiniai duomenys",
+    "continueShopping": "Grįžti į parduotuvę"
+  }
+}

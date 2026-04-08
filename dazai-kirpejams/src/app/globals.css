@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+:root {
+  /* Brand pagrindas */
+  --color-white: #ffffff;
+  --color-gray-50: #f5f5f7;
+  --color-gray-500: #6b6b6b;
+  --color-gray-900: #1a1a1a;
+
+  /* Brand akcentai */
+  --color-magenta: #e91e8c;
+  --color-magenta-dark: #c41876;
+  --color-blue: #2b35af;
+  --color-blue-dark: #222a8c;
+
+  /* Sistema */
+  --background: var(--color-white);
+  --foreground: var(--color-gray-900);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-brand-white: var(--color-white);
+  --color-brand-gray-50: var(--color-gray-50);
+  --color-brand-gray-500: var(--color-gray-500);
+  --color-brand-gray-900: var(--color-gray-900);
+  --color-brand-magenta: var(--color-magenta);
+  --color-brand-magenta-dark: var(--color-magenta-dark);
+  --color-brand-blue: var(--color-blue);
+  --color-brand-blue-dark: var(--color-blue-dark);
+
+  --font-sans: var(--font-inter);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tipografija */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--color-gray-900);
+}
+
+/* Skaitomumo pagerinimas */
+::selection {
+  background: var(--color-magenta);
+  color: white;
+}

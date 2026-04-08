@@ -1,0 +1,476 @@
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import Link from 'next/link'
+import Image from 'next/image'
+import { getDictionary, hasLocale } from '@/i18n/dictionaries'
+import {
+  getProductBySlug,
+  getRelatedProducts,
+  getCategoryBySlug,
+  getProducts,
+  getCategories,
+} from '@/lib/data/queries'
+import {
+  getProductName,
+  getProductDescription,
+  getCategoryName,
+  localizedField,
+} from '@/lib/types'
+import { formatPrice } from '@/lib/utils'
+import { Container } from '@/components/ui/Container'
+import { ProductCard } from '@/components/products/ProductCard'
+import { AddToCartButton } from '@/components/commerce/AddToCartButton'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { productSchema, breadcrumbSchema } from '@/lib/schema'
+import { buildCanonicalUrl, buildLanguageAlternates, SITE_URL } from '@/lib/seo'
+import { locales } from '@/i18n/config'
+
+export async function generateMetadata({
+  params,
+}: PageProps<'/[lang]/produktai/[category]/[slug]'>): Promise<Metadata> {
+  const { lang, category: categorySlug, slug } = await params
+  if (!hasLocale(lang)) return {}
+
+  const product = await getProductBySlug(slug)
+  const category = await getCategoryBySlug(categorySlug)
+  if (!product || !category) return {}
+
+  const name = getProductName(product, lang)
+  const description = getProductDescription(product, lang)
+  const path = `/produktai/${categorySlug}/${slug}`
+  const canonical = buildCanonicalUrl(lang, path)
+
+  return {
+    title: name,
+    description: description || `${name} — profesionalūs plaukų dažai kirpėjams`,
+    alternates: {
+      canonical,
+      languages: buildLanguageAlternates(path),
+    },
+    openGraph: {
+      title: name,
+      description: description || undefined,
+      url: canonical,
+      type: 'website',
+    },
+  }
+}
+
+export async function generateStaticParams() {
+  const params: { lang: string; category: string; slug: string }[] = []
+  const products = await getProducts()
+  const categories = await getCategories()
+
+  for (const lang of locales) {
+    for (const p of products) {
+      const cat = categories.find((c) => c.id === p.category_id)
+      if (cat) {
+        params.push({ lang, category: cat.slug, slug: p.slug })
+      }
+    }
+  }
+  return params
+}
+
+export default async function ProductPage({
+  params,
+}: PageProps<'/[lang]/produktai/[category]/[slug]'>) {
+  const { lang, category: categorySlug, slug } = await params
+  if (!hasLocale(lang)) notFound()
+
+  const product = await getProductBySlug(slug)
+  if (!product) notFound()
+
+  const category = await getCategoryBySlug(categorySlug)
+  if (!category || category.id !== product.category_id) notFound()
+
+  const dict = await getDictionary(lang)
+  const relatedProducts = await getRelatedProducts(product, 4)
+
+  const name = getProductName(product, lang)
+  const description = getProductDescription(product, lang)
+  const ingredients = localizedField(product, 'ingredients', lang)
+  const usage = localizedField(product, 'usage', lang)
+
+  const price = product.price_cents / 100
+  const comparePrice = product.compare_price_cents
+    ? product.compare_price_cents / 100
+    : null
+  const savings = comparePrice ? comparePrice - price : null
+  const pricePerMl = product.volume_ml
+    ? (price / product.volume_ml).toFixed(3)
+    : null
+
+  const productUrl = `${SITE_URL}/${lang}/produktai/${categorySlug}/${slug}`
+  const productJsonLd = productSchema(product, category, lang, productUrl)
+  const breadcrumbJsonLd = breadcrumbSchema([
+    { name: dict.nav.home, url: `${SITE_URL}/${lang}` },
+    { name: dict.nav.products, url: `${SITE_URL}/${lang}/produktai` },
+    {
+      name: getCategoryName(category, lang),
+      url: `${SITE_URL}/${lang}/produktai/${categorySlug}`,
+    },
+    { name, url: productUrl },
+  ])
+
+  const images =
+    product.image_urls && product.image_urls.length > 0
+      ? product.image_urls
+      : []
+
+  return (
+    <>
+      <JsonLd data={productJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
+
+      {/* Breadcrumb */}
+      <section className="py-3 text-[0.85rem] text-brand-gray-500">
+        <Container>
+          <Link
+            href={`/${lang}`}
+            className="hover:text-brand-magenta transition-colors"
+          >
+            Pradžia
+          </Link>
+          <span className="mx-2 text-[#E0E0E0]">/</span>
+          <Link
+            href={`/${lang}/produktai/${categorySlug}`}
+            className="hover:text-brand-magenta transition-colors"
+          >
+            {getCategoryName(category, lang)}
+          </Link>
+          <span className="mx-2 text-[#E0E0E0]">/</span>
+          <span className="text-brand-gray-900 font-medium">{name}</span>
+        </Container>
+      </section>
+
+      {/* Product main */}
+      <section className="py-8 lg:py-12 bg-white">
+        <Container>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14">
+            {/* Gallery */}
+            <div>
+              <div className="relative aspect-square bg-brand-gray-50 rounded-2xl overflow-hidden border border-[#E0E0E0]">
+                {product.volume_ml === 180 && (
+                  <span className="absolute top-5 left-5 z-10 px-4 py-1.5 bg-brand-magenta text-white text-[0.78rem] font-bold uppercase tracking-wider rounded-full">
+                    180 ml
+                  </span>
+                )}
+                {images[0] ? (
+                  <Image
+                    src={images[0]}
+                    alt={name}
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover"
+                  />
+                ) : product.color_hex ? (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div
+                      className="w-[140px] h-[260px] rounded-t-lg rounded-b-[60px] shadow-[0_10px_30px_rgba(0,0,0,0.2)]"
+                      style={{ backgroundColor: product.color_hex }}
+                    />
+                  </div>
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-brand-gray-500 text-sm uppercase tracking-wider">
+                    {product.sku}
+                  </div>
+                )}
+              </div>
+
+              {images.length > 1 && (
+                <div className="grid grid-cols-4 gap-3 mt-4">
+                  {images.slice(0, 4).map((src, idx) => (
+                    <div
+                      key={src}
+                      className="relative aspect-square rounded-xl overflow-hidden bg-brand-gray-50 border border-[#E0E0E0]"
+                    >
+                      <Image
+                        src={src}
+                        alt={`${name} — ${idx + 1}`}
+                        fill
+                        sizes="12vw"
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Details */}
+            <div>
+              <div className="text-[0.78rem] font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
+                Color SHOCK • RosaNera Cosmetics
+              </div>
+              <h1 className="text-[clamp(1.75rem,3.5vw,2.5rem)] font-bold text-brand-gray-900 mb-4 leading-[1.2]">
+                {name}
+              </h1>
+
+              {/* Rating placeholder */}
+              <div className="flex items-center gap-2 mb-5">
+                <span className="text-[#F5A623] text-[1rem]" aria-hidden>
+                  ★★★★★
+                </span>
+                <span className="text-[0.85rem] text-brand-gray-500">
+                  4.9 (27 atsiliepimai)
+                </span>
+              </div>
+
+              {/* 180 ml badge row */}
+              {product.volume_ml === 180 && (
+                <div className="flex flex-wrap items-center gap-4 mb-6 p-4 bg-brand-gray-50 rounded-xl border border-[#E0E0E0]">
+                  <div className="flex items-center gap-3">
+                    <div className="px-3 py-1.5 bg-brand-magenta text-white text-[0.85rem] font-bold rounded-lg">
+                      180 ml
+                    </div>
+                    <div className="text-[0.82rem] text-brand-gray-500 leading-snug">
+                      2× daugiau nei standartinė
+                      <br />
+                      pakuotė
+                    </div>
+                  </div>
+                  {pricePerMl && (
+                    <div className="text-[0.88rem] text-brand-gray-900 ml-auto">
+                      Kaina per ml:{' '}
+                      <strong className="text-brand-magenta">
+                        €{pricePerMl}
+                      </strong>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Price */}
+              <div className="flex items-baseline flex-wrap gap-3 mb-5">
+                {comparePrice && (
+                  <span className="text-[1.1rem] text-brand-gray-500 line-through">
+                    {formatPrice(comparePrice, lang)}
+                  </span>
+                )}
+                <span className="text-[2.25rem] font-extrabold text-brand-magenta leading-none">
+                  {formatPrice(price, lang)}
+                </span>
+                {savings && savings > 0 && (
+                  <span className="px-3 py-1 bg-brand-magenta/10 text-brand-magenta text-[0.78rem] font-bold rounded-full">
+                    Sutaupote {formatPrice(savings, lang)}
+                  </span>
+                )}
+              </div>
+
+              {/* Description */}
+              {description && (
+                <p className="text-[0.95rem] text-brand-gray-500 leading-[1.7] mb-7">
+                  {description}
+                </p>
+              )}
+
+              {/* CTA */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-8">
+                <AddToCartButton
+                  variant="large"
+                  className="flex-1 !px-10 !py-[18px] !rounded-lg !text-[1.05rem]"
+                  label={dict.popular.addToCart}
+                  labelAdded={dict.popular.added ?? 'Pridėta į krepšelį'}
+                  item={{
+                    productId: product.id,
+                    slug: product.slug,
+                    categorySlug,
+                    sku: product.sku,
+                    name,
+                    priceCents: product.price_cents,
+                    volumeMl: product.volume_ml,
+                    imageUrl: images[0] ?? null,
+                    colorHex: product.color_hex,
+                    colorNumber: product.color_number,
+                  }}
+                />
+                <Link
+                  href={`/${lang}/salonams`}
+                  className="inline-flex items-center justify-center px-8 py-[18px] border-2 border-brand-magenta text-brand-magenta rounded-lg font-semibold hover:bg-brand-magenta hover:text-white transition-all"
+                >
+                  B2B kaina
+                </Link>
+              </div>
+
+              {/* Meta */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-[#E0E0E0]">
+                <MetaItem icon="🚚" text="Pristatymas per 1–3 d.d." />
+                <MetaItem icon="📦" text="Nemokamas nuo €50" />
+                <MetaItem icon="🔄" text="Grąžinimas per 14 d." />
+              </div>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* Detailed sections */}
+      <section className="py-16 bg-brand-gray-50">
+        <Container>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0]">
+              <h2 className="text-[1.35rem] font-bold text-brand-gray-900 mb-4 leading-tight">
+                Aprašymas
+              </h2>
+              {description ? (
+                <p className="text-[0.95rem] text-brand-gray-500 leading-[1.7] mb-4">
+                  {description}
+                </p>
+              ) : null}
+              <ul className="space-y-2.5 text-[0.92rem] text-brand-gray-500 leading-[1.6]">
+                <li>
+                  <strong className="text-brand-gray-900">180 ml talpa</strong>{' '}
+                  — dvigubai daugiau nei standartinė pakuotė
+                </li>
+                <li>
+                  <strong className="text-brand-gray-900">
+                    Argan &amp; Jojoba aliejus
+                  </strong>{' '}
+                  — maitina ir apsaugo plaukus
+                </li>
+                <li>
+                  <strong className="text-brand-gray-900">
+                    Rožių ekstraktas
+                  </strong>{' '}
+                  — suteikia blizgesio
+                </li>
+                <li>
+                  <strong className="text-brand-gray-900">
+                    100% pilkų plaukų padengimas
+                  </strong>{' '}
+                  — patikimas rezultatas
+                </li>
+                <li>
+                  <strong className="text-brand-gray-900">
+                    Ilgai išliekanti spalva
+                  </strong>{' '}
+                  — iki 6–8 savaičių
+                </li>
+              </ul>
+            </div>
+
+            {usage && (
+              <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0]">
+                <h2 className="text-[1.35rem] font-bold text-brand-gray-900 mb-4 leading-tight">
+                  Naudojimo instrukcija
+                </h2>
+                <p className="text-[0.95rem] text-brand-gray-500 leading-[1.7] whitespace-pre-line">
+                  {usage}
+                </p>
+              </div>
+            )}
+
+            {ingredients && (
+              <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0] lg:col-span-2">
+                <h2 className="text-[1.35rem] font-bold text-brand-gray-900 mb-4 leading-tight">
+                  Sudėtis
+                </h2>
+                <p className="text-[0.85rem] text-brand-gray-500 leading-[1.7]">
+                  {ingredients}
+                </p>
+              </div>
+            )}
+
+            <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0] lg:col-span-2">
+              <h2 className="text-[1.35rem] font-bold text-brand-gray-900 mb-4 leading-tight">
+                Papildoma informacija
+              </h2>
+              <table className="w-full text-[0.92rem]">
+                <tbody>
+                  {[
+                    [
+                      'Prekės ženklas',
+                      'Color SHOCK / RosaNera Cosmetics',
+                    ],
+                    [
+                      'Talpa',
+                      product.volume_ml ? `${product.volume_ml} ml` : '—',
+                    ],
+                    ['Tipas', 'Kreminiai plaukų dažai'],
+                    ['Maišymo santykis', '1+2'],
+                    ['Galiojimo laikas', '36 mėnesiai (neatidaryta)'],
+                    ['Kilmės šalis', 'Italija'],
+                  ].map(([label, value]) => (
+                    <tr
+                      key={label}
+                      className="border-b border-[#E0E0E0] last:border-b-0"
+                    >
+                      <td className="py-3 pr-4 text-brand-gray-500 w-[40%]">
+                        {label}
+                      </td>
+                      <td className="py-3 text-brand-gray-900 font-semibold">
+                        {value}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* Related */}
+      {relatedProducts.length > 0 && (
+        <section className="py-16 bg-white">
+          <Container>
+            <div className="text-center max-w-[720px] mx-auto mb-10">
+              <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
+                Rekomenduojama kartu
+              </span>
+              <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 leading-tight">
+                Tinka prie šio produkto
+              </h2>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 lg:gap-6">
+              {relatedProducts.map((p) => (
+                <ProductCard
+                  key={p.id}
+                  product={p}
+                  lang={lang}
+                  categorySlug={categorySlug}
+                  dict={dict}
+                />
+              ))}
+            </div>
+          </Container>
+        </section>
+      )}
+
+      {/* CTA */}
+      <section className="pb-20 bg-white">
+        <Container>
+          <div className="bg-brand-gray-900 rounded-2xl p-10 lg:p-14 text-center">
+            <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-white mb-4 leading-tight">
+              Dirbate salone? Gaukite specialų pasiūlymą
+            </h2>
+            <p className="text-[1.05rem] text-white/75 mb-8 max-w-[600px] mx-auto leading-[1.7]">
+              Individualios kainos, reguliarus tiekimas ir asmeninis
+              vadybininkas.
+            </p>
+            <Link
+              href={`/${lang}/salonams`}
+              className="inline-flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
+            >
+              Gauti pasiūlymą →
+            </Link>
+          </div>
+        </Container>
+      </section>
+    </>
+  )
+}
+
+function MetaItem({ icon, text }: { icon: string; text: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-[1.15rem]" aria-hidden>
+        {icon}
+      </span>
+      <span className="text-[0.85rem] text-brand-gray-900 font-medium leading-snug">
+        {text}
+      </span>
+    </div>
+  )
+}
