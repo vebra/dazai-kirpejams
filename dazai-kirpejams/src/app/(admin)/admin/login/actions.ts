@@ -2,16 +2,21 @@
 
 import { redirect } from 'next/navigation'
 import { createServerSupabase } from '@/lib/supabase/ssr'
-import { isAdminEmail } from '@/lib/admin/auth'
+import { verifyAdminAfterLogin } from '@/lib/admin/auth'
 
 export type LoginState = {
   error?: string
 }
 
 /**
- * Server Action prisijungimui. Validuoja email+slaptažodį per Supabase Auth,
- * patikrina ar vartotojas yra admin allow-list'e (ADMIN_EMAILS env var),
- * ir nukreipia į /admin po sėkmingo prisijungimo.
+ * Server Action prisijungimui:
+ *  1. Validuoja email+slaptažodį per Supabase Auth
+ *  2. Po sėkmingo signIn tikrina, ar vartotojas yra `admin_users` lentelėje
+ *  3. Jei ne admin — atsijungia ir grąžina bendrą klaidą (be info leakage)
+ *  4. Jei admin — redirect į /admin
+ *
+ * Klaida visais atvejais ta pati („Neteisingas email arba slaptažodis"),
+ * kad neišduotume allow-list'o informacijos per klaidos skirtumus.
  */
 export async function loginAction(
   _prev: LoginState,
@@ -24,16 +29,20 @@ export async function loginAction(
     return { error: 'Įveskite el. paštą ir slaptažodį.' }
   }
 
-  if (!isAdminEmail(email)) {
-    // Grąžinam bendrą klaidą — nerodom, ar email'as leidžiamas, kad
-    // neišduotume informacijos apie allow-list'ą.
+  const supabase = await createServerSupabase()
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  })
+
+  if (error || !data.user) {
     return { error: 'Neteisingas el. paštas arba slaptažodis.' }
   }
 
-  const supabase = await createServerSupabase()
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
-
-  if (error) {
+  const isAdmin = await verifyAdminAfterLogin(supabase, data.user.id)
+  if (!isAdmin) {
+    // signOut'intas viduje verifyAdminAfterLogin — grąžinam bendrą klaidą
     return { error: 'Neteisingas el. paštas arba slaptažodis.' }
   }
 

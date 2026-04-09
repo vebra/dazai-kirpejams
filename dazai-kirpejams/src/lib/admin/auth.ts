@@ -1,38 +1,48 @@
 import 'server-only'
 import { redirect } from 'next/navigation'
 import { createServerSupabase } from '@/lib/supabase/ssr'
-import type { User } from '@supabase/supabase-js'
+import type { SupabaseClient, User } from '@supabase/supabase-js'
 
 /**
- * Admin'o allow-list iš env var `ADMIN_EMAILS` (kableliais atskirti email'ai).
- * Jei env tuščia — niekas nėra admin (saugesnis default nei atvirkščiai).
+ * Admin'ų allow-list'as laikomas DB `admin_users` lentelėje, o prieigą
+ * užtikrina Postgres RLS politikos + `is_admin()` function'as (žr.
+ * supabase/migrations/004_admin_access.sql).
  *
- * Pavyzdys: ADMIN_EMAILS=info@dazaikirpejams.lt,labora@dazaikirpejams.lt
+ * App lygmenyje čia dubliuojame patikrą dėl dviejų priežasčių:
+ *  1. Norim anksti atlikti redirect į /admin/login (nelaukiam RLS `permission
+ *     denied` iš kiekvienos užklausos).
+ *  2. getAdminUser() naudoja layout'as sprendžiant ar rodyti sidebar'ą.
  */
-function getAdminEmails(): Set<string> {
-  const raw = process.env.ADMIN_EMAILS ?? ''
-  return new Set(
-    raw
-      .split(',')
-      .map((s) => s.trim().toLowerCase())
-      .filter(Boolean)
-  )
-}
 
-export function isAdminEmail(email: string | null | undefined): boolean {
-  if (!email) return false
-  return getAdminEmails().has(email.toLowerCase())
+/**
+ * Patikrina ar dabartinio Supabase client'o vartotojas yra admin_users lentelėje.
+ * RLS politika "Users can read own admin row" leidžia autentifikuotam vartotojui
+ * matyti SAVO eilutę — todėl užklausa grąžina vieną arba nulį eilučių.
+ */
+async function isCurrentUserAdmin(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('admin_users')
+    .select('id')
+    .eq('id', userId)
+    .maybeSingle()
+
+  if (error) {
+    // PostgREST grąžina klaidą jei RLS blokuoja SELECT'ą arba lentelė neegzistuoja.
+    // Abiem atvejais saugiausia laikyti, kad vartotojas NĖRA admin.
+    console.error('[admin/auth] admin_users lookup error:', error.message)
+    return false
+  }
+  return data !== null
 }
 
 /**
  * Grąžina prisijungusį admin'o `User` arba redirect'ina į /admin/login.
  *
- * Patikrinimai:
- *  1. Yra galiojanti Supabase Auth sesija (getUser() per JWT validaciją)
- *  2. Vartotojo email yra `ADMIN_EMAILS` allow-list'e
- *
- * Naudoti KIEKVIENAME admin puslapyje ir Server Action'e — proxy tikrinimas
- * yra tik optimistinis (kad išvengtume nereikalingo RSC renderinimo).
+ * Naudoti KIEKVIENAME protected admin puslapyje ir Server Action'e — proxy
+ * tikrinimas yra tik optimistinis (tik session cookie egzistavimas).
  */
 export async function requireAdmin(): Promise<User> {
   const supabase = await createServerSupabase()
@@ -44,7 +54,8 @@ export async function requireAdmin(): Promise<User> {
     redirect('/admin/login')
   }
 
-  if (!isAdminEmail(user.email)) {
+  const isAdmin = await isCurrentUserAdmin(supabase, user.id)
+  if (!isAdmin) {
     // Prisijungęs, bet ne admin — iš karto atsijungiam ir atgal į login
     await supabase.auth.signOut()
     redirect('/admin/login?error=forbidden')
@@ -53,12 +64,31 @@ export async function requireAdmin(): Promise<User> {
   return user
 }
 
-/** Kaip requireAdmin, bet grąžina null vietoj redirect'o — naudinga layout'ams */
+/** Kaip requireAdmin, bet grąžina null vietoj redirect'o — naudinga layout'ams. */
 export async function getAdminUser(): Promise<User | null> {
   const supabase = await createServerSupabase()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user || !isAdminEmail(user.email)) return null
+  if (!user) return null
+
+  const isAdmin = await isCurrentUserAdmin(supabase, user.id)
+  if (!isAdmin) return null
+
   return user
+}
+
+/**
+ * Po `signInWithPassword` patikrina, ar vartotojas yra admin. Jei ne —
+ * atsijungia ir grąžina false. Naudojama login Server Action'e.
+ */
+export async function verifyAdminAfterLogin(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<boolean> {
+  const isAdmin = await isCurrentUserAdmin(supabase, userId)
+  if (!isAdmin) {
+    await supabase.auth.signOut()
+  }
+  return isAdmin
 }

@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createServerSupabase } from '@/lib/supabase/ssr'
-import { isAdminEmail } from '@/lib/admin/auth'
+import { getAdminUser } from '@/lib/admin/auth'
 import { LoginForm } from './LoginForm'
 
 export const metadata = {
@@ -14,12 +13,8 @@ export const metadata = {
 export default async function AdminLoginPage({
   searchParams,
 }: PageProps<'/admin/login'>) {
-  const supabase = await createServerSupabase()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (user && isAdminEmail(user.email)) {
+  const adminUser = await getAdminUser()
+  if (adminUser) {
     redirect('/admin')
   }
 

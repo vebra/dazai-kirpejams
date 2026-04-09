@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:seed": "tsx scripts/seed.ts"
+    "db:seed": "tsx scripts/seed.ts",
+    "admin:create": "tsx scripts/create-admin.ts",
+    "import:supplier": "tsx scripts/import-supplier-csv.ts"
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.8.2",
@@ -18,6 +20,7 @@
     "next": "16.2.2",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "resend": "^6.10.0",
     "server-only": "^0.0.1",
     "zustand": "^5.0.12"
   },

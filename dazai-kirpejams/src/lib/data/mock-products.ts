@@ -124,7 +124,7 @@ function makeProduct(p: Partial<Product>): Product {
  *    Ash/Violet/Superlift=šalta, Copper/Red/Warm Beige/Chocolate=šilta).
  *  - Toneriai (be numerio) — vidutinė/šviesi pagal vizualinį tamsumą.
  */
-type DyeColor = {
+export type DyeColor = {
   /** HTML originalo identifikatorius (pvz. '1.00', '7.444', 'silver-grey') */
   key: string
   /** Atvaizduojamas spalvos numeris (toneriams — null) */
@@ -139,7 +139,7 @@ type DyeColor = {
   name_ru: string
 }
 
-const hairDyeColors: DyeColor[] = [
+export const hairDyeColors: DyeColor[] = [
   // NATURAL — neutrali
   { key: '1.00',  num: '1.00',  slug: 'color-shock-1-00',  family: 'tamsi',    tone: 'neutrali', hex: '#1A1A1A', name_lt: 'Juoda',                          name_en: 'Black',                          name_ru: 'Чёрный' },
   { key: '3.00',  num: '3.00',  slug: 'color-shock-3-00',  family: 'tamsi',    tone: 'neutrali', hex: '#3B2314', name_lt: 'Tamsiai kaštoninė',              name_en: 'Dark Chestnut',                  name_ru: 'Тёмно-каштановый' },
