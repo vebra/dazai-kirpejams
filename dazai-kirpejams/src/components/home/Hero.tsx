@@ -32,7 +32,7 @@ export async function Hero({ lang, dict }: HeroProps) {
   const ctaSecondaryUrl = banner?.ctaSecondaryUrl
     ? `${langPrefix(lang)}${banner.ctaSecondaryUrl}`
     : `${langPrefix(lang)}/salonams`
-  const imageUrl = banner?.imageUrl ?? '/color-shock-hero.png'
+  const imageUrl = banner?.imageUrl ?? '/color-shock-hero.jpg'
 
   return (
     <section className="relative overflow-hidden bg-[linear-gradient(135deg,#ffffff_0%,#f5f5f7_100%)] py-16 lg:py-20">
