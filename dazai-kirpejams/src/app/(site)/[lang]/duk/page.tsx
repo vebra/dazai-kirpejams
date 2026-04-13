@@ -455,7 +455,7 @@ export default async function FaqPage({ params }: PageProps<'/[lang]/duk'>) {
       {/* CTA Banner */}
       <section className="py-20 bg-brand-gray-50">
         <Container>
-          <div className="bg-brand-gray-900 rounded-2xl p-10 lg:p-14 text-center max-w-[860px] mx-auto">
+          <div className="bg-brand-gray-900 text-white rounded-2xl p-10 lg:p-14 text-center max-w-[860px] mx-auto">
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-white mb-4 leading-tight">
               Neradote atsakymo?
             </h2>

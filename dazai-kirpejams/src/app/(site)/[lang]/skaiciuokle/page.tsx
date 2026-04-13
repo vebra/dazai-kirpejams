@@ -193,7 +193,7 @@ export default async function CalculatorPage({
       {/* CTA */}
       <section className="pb-20 bg-white">
         <Container>
-          <div className="bg-brand-gray-900 rounded-2xl p-10 lg:p-16 text-center">
+          <div className="bg-brand-gray-900 text-white rounded-2xl p-10 lg:p-16 text-center">
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-white mb-4 leading-tight">
               Išbandykite patys
             </h2>

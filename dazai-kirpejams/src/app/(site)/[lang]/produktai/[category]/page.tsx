@@ -287,7 +287,7 @@ export default async function CategoryPage({
       </section>
 
       {/* Advantage bar */}
-      <section className="py-10 bg-brand-gray-900">
+      <section className="py-10 bg-brand-gray-900 text-white">
         <Container>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
             <div>

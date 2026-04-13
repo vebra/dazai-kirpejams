@@ -477,7 +477,7 @@ export default async function ProductPage({
       {/* CTA */}
       <section className="pb-20 bg-white">
         <Container>
-          <div className="bg-brand-gray-900 rounded-2xl p-10 lg:p-14 text-center">
+          <div className="bg-brand-gray-900 text-white rounded-2xl p-10 lg:p-14 text-center">
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-white mb-4 leading-tight">
               Dirbate salone? Gaukite specialų pasiūlymą
             </h2>

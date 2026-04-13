@@ -438,7 +438,7 @@ export default async function B2BPage({
       </section>
 
       {/* 7. Final CTA — juodas blokas */}
-      <section className="py-20 bg-brand-gray-900 text-center">
+      <section className="py-20 bg-brand-gray-900 text-white text-center">
         <Container>
           <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-white/60 mb-3">
             Pradėkite dabar
