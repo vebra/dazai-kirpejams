@@ -1,3 +1,4 @@
+import Script from 'next/script'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { notFound } from 'next/navigation'
@@ -93,6 +94,20 @@ export default async function RootLayout({
 
   return (
     <html lang={lang} className={`${inter.variable} h-full`}>
+      <head>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-DS608JQ7CV"
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-DS608JQ7CV');
+          `}
+        </Script>
+      </head>
       <body className="min-h-full flex flex-col antialiased">
         <JsonLd data={organizationSchema()} />
         <JsonLd data={websiteSchema()} />
