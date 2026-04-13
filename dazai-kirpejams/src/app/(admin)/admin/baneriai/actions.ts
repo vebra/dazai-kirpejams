@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/admin/auth'
-import { createServerSupabase } from '@/lib/supabase/ssr'
+import { createServerClient } from '@/lib/supabase/server'
 
 export type BannerFormState = {
   error?: string
@@ -15,7 +15,7 @@ export async function saveBannerAction(
   formData: FormData
 ): Promise<BannerFormState> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = (formData.get('id') as string) || null
   const placement = (formData.get('placement') as string) || 'hero'
@@ -88,7 +88,7 @@ export async function saveBannerAction(
 
 export async function deleteBannerAction(formData: FormData): Promise<void> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = (formData.get('id') as string) ?? ''
   if (!id) redirect('/admin/baneriai?error=invalid-id')
@@ -111,7 +111,7 @@ export async function toggleBannerActiveAction(
   formData: FormData
 ): Promise<void> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = (formData.get('id') as string) ?? ''
   const activate = formData.get('activate') === 'true'

@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/admin/auth'
-import { createServerSupabase } from '@/lib/supabase/ssr'
+import { createServerClient } from '@/lib/supabase/server'
 import { ORDER_STATUSES, type OrderStatus } from '@/lib/admin/queries'
 import { sendEmail } from '@/lib/email/resend'
 import { buildStatusChangeEmail } from '@/lib/email/templates'
@@ -32,7 +32,7 @@ export async function updateOrderStatusAction(
   formData: FormData
 ): Promise<void> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = formData.get('id') as string | null
   const status = formData.get('status')
@@ -116,7 +116,7 @@ export async function updateOrderNotesAction(
   formData: FormData
 ): Promise<void> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = formData.get('id') as string | null
   const notes = (formData.get('notes') as string | null)?.trim() || null
@@ -150,7 +150,7 @@ export async function updateTrackingAction(
   formData: FormData
 ): Promise<void> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = formData.get('id') as string | null
   const trackingNumber =

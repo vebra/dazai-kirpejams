@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/admin/auth'
-import { createServerSupabase } from '@/lib/supabase/ssr'
+import { createServerClient } from '@/lib/supabase/server'
 
 /**
  * Visi „Kainos ir nuolaidos" sekcijos Server Action'ai.
@@ -51,7 +51,7 @@ export async function createDiscountCodeAction(
   formData: FormData
 ): Promise<CreateDiscountCodeState> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const code = ((formData.get('code') as string) ?? '').trim().toUpperCase()
   if (!code || !/^[A-Z0-9_-]{3,32}$/.test(code)) {
@@ -133,7 +133,7 @@ export async function toggleDiscountCodeAction(
   formData: FormData
 ): Promise<void> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = formData.get('id') as string
   const nextActive = formData.get('next_active') === 'true'
@@ -156,7 +156,7 @@ export async function deleteDiscountCodeAction(
   formData: FormData
 ): Promise<void> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = formData.get('id') as string
   if (!id) redirect('/admin/kainos?error=invalid-id')
@@ -185,7 +185,7 @@ export async function updateShopSettingsAction(
   formData: FormData
 ): Promise<UpdateSettingsState> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   type SettingInput = {
     key: string
@@ -290,7 +290,7 @@ export async function bulkUpdatePricesAction(
   formData: FormData
 ): Promise<BulkPriceUpdateState> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const field = formData.get('field')
   if (!isPriceField(field)) {

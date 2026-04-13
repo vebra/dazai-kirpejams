@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/admin/auth'
-import { createServerSupabase } from '@/lib/supabase/ssr'
+import { createServerClient } from '@/lib/supabase/server'
 
 const VALID_STATUSES = ['new', 'contacted', 'converted', 'closed'] as const
 
@@ -11,7 +11,7 @@ export async function updateB2bInquiryStatusAction(
   formData: FormData
 ): Promise<void> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = (formData.get('id') as string) ?? ''
   const status = (formData.get('status') as string) ?? ''
@@ -38,7 +38,7 @@ export async function deleteB2bInquiryAction(
   formData: FormData
 ): Promise<void> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = (formData.get('id') as string) ?? ''
   if (!id) redirect('/admin/b2b?error=invalid-id')

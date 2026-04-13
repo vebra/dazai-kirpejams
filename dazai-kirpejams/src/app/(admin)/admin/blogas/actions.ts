@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/admin/auth'
-import { createServerSupabase } from '@/lib/supabase/ssr'
+import { createServerClient } from '@/lib/supabase/server'
 
 function slugify(text: string): string {
   return text
@@ -29,7 +29,7 @@ export async function saveBlogPostAction(
   formData: FormData
 ): Promise<BlogFormState> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = (formData.get('id') as string) || null
   const titleLt = (formData.get('title_lt') as string)?.trim() ?? ''
@@ -105,7 +105,7 @@ export async function deleteBlogPostAction(
   formData: FormData
 ): Promise<void> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = (formData.get('id') as string) ?? ''
   if (!id) redirect('/admin/blogas?error=invalid-id')
@@ -128,7 +128,7 @@ export async function togglePublishAction(
   formData: FormData
 ): Promise<void> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = (formData.get('id') as string) ?? ''
   const publish = formData.get('publish') === 'true'

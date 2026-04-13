@@ -2,13 +2,13 @@
 
 import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/admin/auth'
-import { createServerSupabase } from '@/lib/supabase/ssr'
+import { createServerClient } from '@/lib/supabase/server'
 
 export async function deleteSubscriberAction(
   formData: FormData
 ): Promise<void> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = (formData.get('id') as string) ?? ''
   if (!id) return
@@ -29,7 +29,7 @@ export async function toggleSubscriberAction(
   formData: FormData
 ): Promise<void> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = (formData.get('id') as string) ?? ''
   const activate = formData.get('activate') === 'true'

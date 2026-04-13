@@ -3,7 +3,6 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/admin/auth'
-import { createServerSupabase } from '@/lib/supabase/ssr'
 import { createServerClient } from '@/lib/supabase/server'
 
 /**
@@ -45,7 +44,7 @@ export async function updateCompanyInfoAction(
   formData: FormData
 ): Promise<UpdateCompanyInfoState> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const fields = {
     company_legal_name: ((formData.get('legal_name') as string) ?? '').trim(),

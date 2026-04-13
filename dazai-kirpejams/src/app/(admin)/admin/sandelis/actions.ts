@@ -3,7 +3,6 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/admin/auth'
-import { createServerSupabase } from '@/lib/supabase/ssr'
 import { createServerClient } from '@/lib/supabase/server'
 
 /**
@@ -47,7 +46,7 @@ export async function updateProductAction(
   formData: FormData
 ): Promise<UpdateProductState> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = formData.get('id') as string
   if (!id) return { error: 'Trūksta produkto ID.' }
@@ -149,7 +148,7 @@ export async function updateProductAction(
 
 export async function quickUpdateStockAction(formData: FormData): Promise<void> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = formData.get('id') as string
   const stock = toInt((formData.get('stock_quantity') as string) ?? '')
@@ -185,7 +184,7 @@ export async function toggleProductActiveAction(
   formData: FormData
 ): Promise<void> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const id = formData.get('id') as string
   const nextActive = formData.get('next_active') === 'true'
@@ -223,7 +222,7 @@ export async function bulkActivateInactiveAction(
   formData: FormData
 ): Promise<void> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const stockRaw = (formData.get('stock_quantity') as string) ?? ''
   const stockTrimmed = stockRaw.trim()
@@ -545,7 +544,7 @@ export async function setPrimaryProductImageAction(
 
 export async function bulkDeactivateActiveAction(): Promise<void> {
   await requireAdmin()
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
 
   const { error, count } = await supabase
     .from('products')
