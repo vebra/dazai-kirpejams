@@ -66,7 +66,7 @@ export default async function ArticlePage({
           title: post.title,
           description: post.excerpt ?? '',
           url: postUrl,
-          imageUrl: post.coverImage,
+          imageUrl: post.coverImageUrl,
           datePublished: post.publishedAt ?? post.createdAt,
           author: post.author,
         })}
