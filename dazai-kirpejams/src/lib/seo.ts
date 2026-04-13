@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { locales, type Locale } from '@/i18n/config'
+import { locales, defaultLocale, type Locale } from '@/i18n/config'
 
 /**
  * Kanoninis svetainės URL. Gamybinėje aplinkoje — https://www.dazaikirpejams.lt
@@ -20,10 +20,14 @@ export function buildLanguageAlternates(
   const path = pathWithoutLocale === '/' ? '' : pathWithoutLocale
   const alternates: Record<string, string> = {}
   for (const loc of locales) {
-    alternates[loc] = `${SITE_URL}/${loc}${path}`
+    if (loc === defaultLocale) {
+      alternates[loc] = `${SITE_URL}${path || '/'}`
+    } else {
+      alternates[loc] = `${SITE_URL}/${loc}${path}`
+    }
   }
   // x-default — numatytasis (LT) crawler'iams, kurie neturi lokalės
-  alternates['x-default'] = `${SITE_URL}/lt${path}`
+  alternates['x-default'] = `${SITE_URL}${path || '/'}`
   return alternates
 }
 
@@ -32,6 +36,9 @@ export function buildLanguageAlternates(
  */
 export function buildCanonicalUrl(lang: Locale, pathWithoutLocale: string) {
   const path = pathWithoutLocale === '/' ? '' : pathWithoutLocale
+  if (lang === defaultLocale) {
+    return `${SITE_URL}${path || '/'}`
+  }
   return `${SITE_URL}/${lang}${path}`
 }
 

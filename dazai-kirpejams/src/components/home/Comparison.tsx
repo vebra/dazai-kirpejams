@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import type { Locale } from '@/i18n/config'
+import { langPrefix } from '@/lib/utils'
 
 type ComparisonProps = {
   lang: Locale
@@ -89,7 +90,7 @@ export function Comparison({ lang, dict: _dict }: ComparisonProps) {
             </div>
 
             <Link
-              href={`/${lang}/skaiciuokle`}
+              href={`${langPrefix(lang)}/skaiciuokle`}
               className="mt-8 inline-flex items-center justify-center gap-2 px-8 py-[14px] bg-brand-magenta text-white rounded-lg font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
             >
               Suskaičiuokite savo sutaupymą →

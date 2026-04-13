@@ -7,6 +7,7 @@ import { Section } from '@/components/ui/Section'
 import { CheckoutForm } from '@/components/commerce/CheckoutForm'
 import { buildPageMetadata } from '@/lib/seo'
 import { isUserVerified } from '@/lib/auth/verification'
+import { langPrefix } from '@/lib/utils'
 
 export async function generateMetadata({
   params,
@@ -32,7 +33,7 @@ export default async function CheckoutPage({
   if (!hasLocale(lang)) notFound()
 
   const verified = await isUserVerified()
-  if (!verified) redirect(`/${lang}/prisijungimas`)
+  if (!verified) redirect(`${langPrefix(lang)}/prisijungimas`)
 
   const dict = await getDictionary(lang)
 

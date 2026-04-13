@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { Container } from '@/components/ui/Container'
 import { getActiveBanners, type Banner } from '@/lib/data/queries'
 import type { Locale } from '@/i18n/config'
+import { langPrefix } from '@/lib/utils'
 
 type HeroProps = {
   lang: Locale
@@ -26,11 +27,11 @@ export async function Hero({ lang, dict }: HeroProps) {
     banner?.subtitle ??
     `${hero.subtitle} Profesionali formulė, plati spalvų paletė ir ekonomiška kaina — viskas, ko reikia Jūsų salonui.`
   const ctaText = banner?.ctaText ?? hero.cta
-  const ctaUrl = banner?.ctaUrl ? `/${lang}${banner.ctaUrl}` : `/${lang}/produktai`
+  const ctaUrl = banner?.ctaUrl ? `${langPrefix(lang)}${banner.ctaUrl}` : `${langPrefix(lang)}/produktai`
   const ctaSecondaryText = banner?.ctaSecondaryText ?? hero.ctaSecondary
   const ctaSecondaryUrl = banner?.ctaSecondaryUrl
-    ? `/${lang}${banner.ctaSecondaryUrl}`
-    : `/${lang}/salonams`
+    ? `${langPrefix(lang)}${banner.ctaSecondaryUrl}`
+    : `${langPrefix(lang)}/salonams`
   const imageUrl = banner?.imageUrl ?? '/color-shock-hero.png'
 
   return (

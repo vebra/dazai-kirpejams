@@ -76,15 +76,25 @@ export async function proxy(request: NextRequest) {
     return await checkAdminAuth(request, response)
   }
 
+  // Jei URL prasideda /lt arba /lt/... — nukreipiam į versiją be prefikso
+  // (lietuvių kalba veikia be prefikso)
+  if (pathname === `/${defaultLocale}` || pathname.startsWith(`/${defaultLocale}/`)) {
+    const newPath = pathname.replace(`/${defaultLocale}`, '') || '/'
+    const url = request.nextUrl.clone()
+    url.pathname = newPath
+    return NextResponse.redirect(url, 301)
+  }
+
+  // Jei URL turi kitą kalbos prefiksą (en, ru) — paliekam kaip yra
   const pathnameHasLocale = locales.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+    (locale) => locale !== defaultLocale && (pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`)
   )
 
   if (pathnameHasLocale) return
 
-  const locale = getLocale(request)
-  request.nextUrl.pathname = `/${locale}${pathname}`
-  return NextResponse.redirect(request.nextUrl)
+  // URL be kalbos prefikso — tai lietuvių kalba, rewrite į /lt/...
+  request.nextUrl.pathname = `/${defaultLocale}${pathname}`
+  return NextResponse.rewrite(request.nextUrl)
 }
 
 export const config = {

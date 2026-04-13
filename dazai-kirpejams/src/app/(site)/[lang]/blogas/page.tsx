@@ -8,6 +8,7 @@ import { Newsletter } from '@/components/home/Newsletter'
 import { buildPageMetadata } from '@/lib/seo'
 import { getBlogPosts } from '@/lib/data/queries'
 import { CATEGORY_STYLES, type ArticleCategory } from '@/lib/data/articles'
+import { langPrefix } from '@/lib/utils'
 
 export async function generateMetadata({
   params,
@@ -43,7 +44,7 @@ export default async function BlogPage({
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>
           <Link
-            href={`/${lang}`}
+            href={`${langPrefix(lang) || '/'}`}
             className="hover:text-brand-magenta transition-colors"
           >
             Pradžia
@@ -84,7 +85,7 @@ export default async function BlogPage({
                   className="group bg-white rounded-xl overflow-hidden border border-[#E0E0E0] hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 hover:border-brand-magenta transition-all flex flex-col"
                 >
                   <Link
-                    href={`/${lang}/blogas/${post.slug}`}
+                    href={`${langPrefix(lang)}/blogas/${post.slug}`}
                     className="relative aspect-[16/10] bg-[linear-gradient(135deg,#f5f5f7_0%,#e8e8ec_100%)] flex items-center justify-center overflow-hidden"
                     aria-label={post.title}
                   >
@@ -117,7 +118,7 @@ export default async function BlogPage({
                       </span>
                     )}
                     <h3 className="text-[1.15rem] font-bold text-brand-gray-900 mb-3 leading-snug group-hover:text-brand-magenta transition-colors">
-                      <Link href={`/${lang}/blogas/${post.slug}`}>
+                      <Link href={`${langPrefix(lang)}/blogas/${post.slug}`}>
                         {post.title}
                       </Link>
                     </h3>
@@ -129,7 +130,7 @@ export default async function BlogPage({
                         {(post.publishedAt ?? post.createdAt)?.substring(0, 10)}
                       </time>
                       <Link
-                        href={`/${lang}/blogas/${post.slug}`}
+                        href={`${langPrefix(lang)}/blogas/${post.slug}`}
                         className="text-[0.88rem] font-semibold text-brand-magenta group-hover:translate-x-1 transition-transform"
                       >
                         Skaityti daugiau →
@@ -158,7 +159,7 @@ export default async function BlogPage({
             kiekvienam dažymui.
           </p>
           <Link
-            href={`/${lang}/produktai`}
+            href={`${langPrefix(lang)}/produktai`}
             className="inline-flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
           >
             Peržiūrėti produktus →

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { loginAction, type LoginState } from './actions'
 import type { Locale } from '@/i18n/config'
+import { langPrefix } from '@/lib/utils'
 
 const initialState: LoginState = {}
 
@@ -17,7 +18,7 @@ export function LoginForm({ lang }: { lang: Locale }) {
 
   useEffect(() => {
     if (state.success) {
-      router.push(`/${lang}/produktai`)
+      router.push(`${langPrefix(lang)}/produktai`)
       router.refresh()
     }
   }, [state.success, lang, router])
@@ -67,7 +68,7 @@ export function LoginForm({ lang }: { lang: Locale }) {
       <p className="text-center text-xs text-brand-gray-500">
         Neturite paskyros?{' '}
         <Link
-          href={`/${lang}/registracija`}
+          href={`${langPrefix(lang)}/registracija`}
           className="text-brand-magenta font-semibold hover:underline"
         >
           Registruotis

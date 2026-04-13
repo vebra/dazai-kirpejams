@@ -5,6 +5,7 @@ import { LocaleSwitcher } from './LocaleSwitcher'
 import { MobileMenu } from './MobileMenu'
 import { HeaderCart } from './HeaderCart'
 import { HeaderAuth } from './HeaderAuth'
+import { langPrefix } from '@/lib/utils'
 import type { Locale } from '@/i18n/config'
 
 type HeaderProps = {
@@ -23,13 +24,14 @@ type HeaderProps = {
 export function Header({ lang, dict }: HeaderProps) {
   const nav = dict.nav
 
+  const p = langPrefix(lang)
   const links = [
-    { href: `/${lang}/produktai`, label: nav.products },
-    { href: `/${lang}/spalvu-palete`, label: nav.colorPalette },
-    { href: `/${lang}/salonams`, label: nav.forSalons },
-    { href: `/${lang}/blogas`, label: nav.blog },
-    { href: `/${lang}/apie-mus`, label: nav.about },
-    { href: `/${lang}/kontaktai`, label: nav.contact },
+    { href: `${p}/produktai`, label: nav.products },
+    { href: `${p}/spalvu-palete`, label: nav.colorPalette },
+    { href: `${p}/salonams`, label: nav.forSalons },
+    { href: `${p}/blogas`, label: nav.blog },
+    { href: `${p}/apie-mus`, label: nav.about },
+    { href: `${p}/kontaktai`, label: nav.contact },
   ]
 
   return (
@@ -38,7 +40,7 @@ export function Header({ lang, dict }: HeaderProps) {
         <div className="flex items-center justify-between h-[72px] lg:h-[100px]">
           {/* Logo */}
           <Link
-            href={`/${lang}`}
+            href={p || '/'}
             className="flex items-center gap-2.5 shrink-0"
             aria-label="Dažai Kirpėjams"
           >

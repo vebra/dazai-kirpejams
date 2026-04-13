@@ -17,6 +17,7 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { itemListSchema } from '@/lib/schema'
 import { buildCanonicalUrl, buildLanguageAlternates } from '@/lib/seo'
 import { locales } from '@/i18n/config'
+import { langPrefix } from '@/lib/utils'
 import {
   DYE_CATEGORIES,
   DYE_PALETTE_TARGET_COUNT,
@@ -148,14 +149,14 @@ export default async function CategoryPage({
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>
           <Link
-            href={`/${lang}`}
+            href={`${langPrefix(lang) || '/'}`}
             className="hover:text-brand-magenta transition-colors"
           >
             Pradžia
           </Link>
           <span className="mx-2 text-[#E0E0E0]">/</span>
           <Link
-            href={`/${lang}/produktai`}
+            href={`${langPrefix(lang)}/produktai`}
             className="hover:text-brand-magenta transition-colors"
           >
             Produktai
@@ -339,13 +340,13 @@ export default async function CategoryPage({
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href={`/${lang}/salonams`}
+              href={`${langPrefix(lang)}/salonams`}
               className="inline-flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
             >
               Gauti pasiūlymą →
             </Link>
             <Link
-              href={`/${lang}/kontaktai`}
+              href={`${langPrefix(lang)}/kontaktai`}
               className="inline-flex items-center justify-center gap-2 px-10 py-[18px] border-2 border-brand-gray-900 text-brand-gray-900 rounded-lg text-[1.1rem] font-semibold hover:bg-brand-gray-900 hover:text-white hover:-translate-y-0.5 transition-all"
             >
               Susisiekti

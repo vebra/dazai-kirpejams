@@ -6,6 +6,7 @@ import { Container } from '@/components/ui/Container'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { faqPageSchema } from '@/lib/schema'
 import { buildPageMetadata } from '@/lib/seo'
+import { langPrefix } from '@/lib/utils'
 
 export async function generateMetadata({
   params,
@@ -377,7 +378,7 @@ export default async function FaqPage({ params }: PageProps<'/[lang]/duk'>) {
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>
           <Link
-            href={`/${lang}`}
+            href={`${langPrefix(lang) || '/'}`}
             className="hover:text-brand-magenta transition-colors"
           >
             Pradžia
@@ -471,7 +472,7 @@ export default async function FaqPage({ params }: PageProps<'/[lang]/duk'>) {
                 Rašyti el. laišką →
               </a>
               <Link
-                href={`/${lang}/kontaktai`}
+                href={`${langPrefix(lang)}/kontaktai`}
                 className="inline-flex items-center justify-center gap-2 px-8 py-[14px] border-2 border-white/30 text-white rounded-lg text-[1rem] font-semibold hover:bg-white hover:text-brand-gray-900 hover:border-white hover:-translate-y-0.5 transition-all"
               >
                 Kontaktai

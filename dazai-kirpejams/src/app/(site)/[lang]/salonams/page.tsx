@@ -6,6 +6,7 @@ import { Container } from '@/components/ui/Container'
 import { buildPageMetadata } from '@/lib/seo'
 import { CONTACT, phoneHref } from '@/lib/site'
 import { B2bForm } from './B2bForm'
+import { langPrefix } from '@/lib/utils'
 
 export async function generateMetadata({
   params,
@@ -32,7 +33,7 @@ export default async function B2BPage({
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>
-          <Link href={`/${lang}`} className="hover:text-brand-magenta transition-colors">
+          <Link href={`${langPrefix(lang) || '/'}`} className="hover:text-brand-magenta transition-colors">
             Pradžia
           </Link>
           <span className="mx-2 text-[#E0E0E0]">/</span>

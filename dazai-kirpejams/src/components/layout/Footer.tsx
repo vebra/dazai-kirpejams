@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Container } from '@/components/ui/Container'
 import type { Locale } from '@/i18n/config'
+import { langPrefix } from '@/lib/utils'
 import { CONTACT, phoneHref } from '@/lib/site'
 
 type FooterProps = {
@@ -21,21 +22,22 @@ export function Footer({ lang, dict }: FooterProps) {
   const nav = dict.nav
   const footer = dict.footer
 
+  const p = langPrefix(lang)
   const products = [
-    { href: `/${lang}/produktai/dazai`, label: nav.hairDyes },
-    { href: `/${lang}/produktai/oksidantai`, label: nav.oxidants },
-    { href: `/${lang}/produktai/sampunai`, label: nav.shampoos },
-    { href: `/${lang}/produktai/priemones`, label: nav.accessories },
-    { href: `/${lang}/spalvu-palete`, label: nav.colorPalette },
+    { href: `${p}/produktai/dazai`, label: nav.hairDyes },
+    { href: `${p}/produktai/oksidantai`, label: nav.oxidants },
+    { href: `${p}/produktai/sampunai`, label: nav.shampoos },
+    { href: `${p}/produktai/priemones`, label: nav.accessories },
+    { href: `${p}/spalvu-palete`, label: nav.colorPalette },
   ]
 
   const information = [
-    { href: `/${lang}/apie-mus`, label: nav.about },
-    { href: `/${lang}/blogas`, label: nav.blog },
-    { href: `/${lang}/salonams`, label: footer.collaboration },
-    { href: `/${lang}/duk`, label: footer.faq },
-    { href: `/${lang}/pristatymas`, label: footer.delivery },
-    { href: `/${lang}/skaiciuokle`, label: 'Kainų skaičiuoklė' },
+    { href: `${p}/apie-mus`, label: nav.about },
+    { href: `${p}/blogas`, label: nav.blog },
+    { href: `${p}/salonams`, label: footer.collaboration },
+    { href: `${p}/duk`, label: footer.faq },
+    { href: `${p}/pristatymas`, label: footer.delivery },
+    { href: `${p}/skaiciuokle`, label: 'Kainų skaičiuoklė' },
   ]
 
   return (
@@ -46,7 +48,7 @@ export function Footer({ lang, dict }: FooterProps) {
           {/* Brand stulpelis */}
           <div>
             <Link
-              href={`/${lang}`}
+              href={p || '/'}
               className="inline-flex items-center"
               aria-label="Dažai Kirpėjams"
             >
@@ -163,14 +165,14 @@ export function Footer({ lang, dict }: FooterProps) {
           </span>
           <div className="flex items-center gap-3">
             <Link
-              href={`/${lang}/privatumo-politika`}
+              href={`${p}/privatumo-politika`}
               className="hover:text-brand-magenta transition-colors"
             >
               {footer.privacy}
             </Link>
             <span aria-hidden>•</span>
             <Link
-              href={`/${lang}/pirkimo-salygos`}
+              href={`${p}/pirkimo-salygos`}
               className="hover:text-brand-magenta transition-colors"
             >
               {footer.terms}

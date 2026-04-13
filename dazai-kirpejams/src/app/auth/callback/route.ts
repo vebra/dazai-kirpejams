@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createProxySupabase } from '@/lib/supabase/ssr'
 import { defaultLocale } from '@/i18n/config'
+import { langPrefix } from '@/lib/utils'
 
 /**
  * Supabase Auth email confirmation callback.
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const response = NextResponse.redirect(
-      new URL(`/${lang}/produktai`, request.url)
+      new URL(`${langPrefix(lang)}/produktai`, request.url)
     )
     const supabase = createProxySupabase(request, response)
     await supabase.auth.exchangeCodeForSession(code)
@@ -24,5 +25,5 @@ export async function GET(request: NextRequest) {
   }
 
   // No code — redirect to home
-  return NextResponse.redirect(new URL(`/${lang}`, request.url))
+  return NextResponse.redirect(new URL(`${langPrefix(lang) || '/'}`, request.url))
 }

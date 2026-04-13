@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import type { Locale } from '@/i18n/config'
+import { langPrefix } from '@/lib/utils'
 
 type CategoriesProps = {
   lang: Locale
@@ -15,25 +16,25 @@ type CategoriesProps = {
 export function Categories({ lang, dict: _dict }: CategoriesProps) {
   const categories = [
     {
-      href: `/${lang}/produktai/dazai`,
+      href: `${langPrefix(lang)}/produktai/dazai`,
       icon: '🎨',
       title: 'Plaukų dažai',
       count: 'Color SHOCK • 180 ml',
     },
     {
-      href: `/${lang}/produktai/oksidantai`,
+      href: `${langPrefix(lang)}/produktai/oksidantai`,
       icon: '⚗',
       title: 'Oksidantai',
       count: 'Profesionali linija',
     },
     {
-      href: `/${lang}/produktai/sampunai`,
+      href: `${langPrefix(lang)}/produktai/sampunai`,
       icon: '🧴',
       title: 'Šampūnai ir priežiūra',
       count: 'RosaNera Cosmetic',
     },
     {
-      href: `/${lang}/produktai/priemones`,
+      href: `${langPrefix(lang)}/produktai/priemones`,
       icon: '✂',
       title: 'Pagalbinės priemonės',
       count: 'Kirpėjams',

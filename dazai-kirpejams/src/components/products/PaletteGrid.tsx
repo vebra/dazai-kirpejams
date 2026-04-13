@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import type { Product } from '@/lib/types'
 import type { Locale } from '@/i18n/config'
+import { langPrefix } from '@/lib/utils'
 
 type PaletteGridProps = {
   products: Product[]
@@ -120,7 +121,7 @@ export function PaletteGrid({ products, lang }: PaletteGridProps) {
           {filtered.map((product) => (
             <Link
               key={product.id}
-              href={`/${lang}/produktai/dazai/${product.slug}`}
+              href={`${langPrefix(lang)}/produktai/dazai/${product.slug}`}
               className="group bg-brand-gray-50 rounded-xl p-5 text-center border border-transparent hover:border-brand-magenta hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
             >
               <div

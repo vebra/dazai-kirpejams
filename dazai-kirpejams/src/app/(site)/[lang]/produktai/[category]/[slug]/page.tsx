@@ -16,7 +16,7 @@ import {
   getCategoryName,
   localizedField,
 } from '@/lib/types'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice, langPrefix } from '@/lib/utils'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
 import { AddToCartButton } from '@/components/commerce/AddToCartButton'
@@ -131,14 +131,14 @@ export default async function ProductPage({
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>
           <Link
-            href={`/${lang}`}
+            href={`${langPrefix(lang) || '/'}`}
             className="hover:text-brand-magenta transition-colors"
           >
             Pradžia
           </Link>
           <span className="mx-2 text-[#E0E0E0]">/</span>
           <Link
-            href={`/${lang}/produktai/${categorySlug}`}
+            href={`${langPrefix(lang)}/produktai/${categorySlug}`}
             className="hover:text-brand-magenta transition-colors"
           >
             {getCategoryName(category, lang)}
@@ -269,7 +269,7 @@ export default async function ProductPage({
                     Kainos matomos tik patvirtintiems profesionalams.
                   </p>
                   <Link
-                    href={`/${lang}/prisijungimas`}
+                    href={`${langPrefix(lang)}/prisijungimas`}
                     className="text-brand-magenta font-semibold text-[0.92rem] hover:underline"
                   >
                     Prisijunkite arba registruokitės →
@@ -306,7 +306,7 @@ export default async function ProductPage({
                     }}
                   />
                   <Link
-                    href={`/${lang}/salonams`}
+                    href={`${langPrefix(lang)}/salonams`}
                     className="inline-flex items-center justify-center px-8 py-[18px] border-2 border-brand-magenta text-brand-magenta rounded-lg font-semibold hover:bg-brand-magenta hover:text-white transition-all"
                   >
                     B2B kaina
@@ -315,13 +315,13 @@ export default async function ProductPage({
               ) : (
                 <div className="flex flex-col sm:flex-row gap-3 mb-8">
                   <Link
-                    href={`/${lang}/registracija`}
+                    href={`${langPrefix(lang)}/registracija`}
                     className="flex-1 flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.05rem] font-semibold hover:bg-brand-magenta/90 transition-colors"
                   >
                     Registruotis kaip profesionalas
                   </Link>
                   <Link
-                    href={`/${lang}/salonams`}
+                    href={`${langPrefix(lang)}/salonams`}
                     className="inline-flex items-center justify-center px-8 py-[18px] border-2 border-brand-magenta text-brand-magenta rounded-lg font-semibold hover:bg-brand-magenta hover:text-white transition-all"
                   >
                     B2B kaina
@@ -486,7 +486,7 @@ export default async function ProductPage({
               vadybininkas.
             </p>
             <Link
-              href={`/${lang}/salonams`}
+              href={`${langPrefix(lang)}/salonams`}
               className="inline-flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
             >
               Gauti pasiūlymą →

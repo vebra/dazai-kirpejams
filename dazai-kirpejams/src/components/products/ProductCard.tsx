@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { getProductName, type Product } from '@/lib/types'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice, langPrefix } from '@/lib/utils'
 import type { Locale } from '@/i18n/config'
 import { AddToCartButton } from '@/components/commerce/AddToCartButton'
 
@@ -23,7 +23,7 @@ export function ProductCard({
   isVerified = false,
 }: ProductCardProps) {
   const name = getProductName(product, lang)
-  const href = `/${lang}/produktai/${categorySlug}/${product.slug}`
+  const href = `${langPrefix(lang)}/produktai/${categorySlug}/${product.slug}`
   const primaryImage = product.image_urls?.[0]
 
   return (
@@ -106,7 +106,7 @@ export function ProductCard({
         ) : (
           <div className="pt-1">
             <Link
-              href={`/${lang}/prisijungimas`}
+              href={`${langPrefix(lang)}/prisijungimas`}
               className="text-[0.78rem] font-semibold text-brand-magenta hover:underline"
             >
               Prisijunkite dėl kainos →

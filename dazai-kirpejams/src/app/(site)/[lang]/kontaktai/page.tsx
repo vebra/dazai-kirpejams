@@ -6,6 +6,7 @@ import { Container } from '@/components/ui/Container'
 import { buildPageMetadata } from '@/lib/seo'
 import { CONTACT, phoneHref } from '@/lib/site'
 import { ContactForm } from './ContactForm'
+import { langPrefix } from '@/lib/utils'
 
 export async function generateMetadata({
   params,
@@ -32,7 +33,7 @@ export default async function ContactPage({
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>
-          <Link href={`/${lang}`} className="hover:text-brand-magenta transition-colors">
+          <Link href={`${langPrefix(lang) || '/'}`} className="hover:text-brand-magenta transition-colors">
             Pradžia
           </Link>
           <span className="mx-2 text-[#E0E0E0]">/</span>
@@ -205,14 +206,14 @@ export default async function ContactPage({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               {
-                href: `/${lang}/duk`,
+                href: `${langPrefix(lang)}/duk`,
                 icon: '❓',
                 title: 'Populiariausi klausimai',
                 desc:
                   'Rasite atsakymus į dažniausiai užduodamus klausimus apie užsakymą, pristatymą ir produktus.',
               },
               {
-                href: `/${lang}/pristatymas`,
+                href: `${langPrefix(lang)}/pristatymas`,
                 icon: '🚚',
                 title: 'Pristatymo informacija',
                 desc:

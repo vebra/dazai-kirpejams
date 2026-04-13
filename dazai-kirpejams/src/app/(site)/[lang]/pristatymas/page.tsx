@@ -5,6 +5,7 @@ import { hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { buildPageMetadata } from '@/lib/seo'
 import { CONTACT, phoneHref } from '@/lib/site'
+import { langPrefix } from '@/lib/utils'
 
 export async function generateMetadata({
   params,
@@ -32,7 +33,7 @@ export default async function DeliveryPage({
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>
           <Link
-            href={`/${lang}`}
+            href={`${langPrefix(lang) || '/'}`}
             className="hover:text-brand-magenta transition-colors"
           >
             Pradžia
@@ -438,7 +439,7 @@ export default async function DeliveryPage({
             kuo greičiau.
           </p>
           <Link
-            href={`/${lang}/kontaktai`}
+            href={`${langPrefix(lang)}/kontaktai`}
             className="inline-flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
           >
             Susisiekti →

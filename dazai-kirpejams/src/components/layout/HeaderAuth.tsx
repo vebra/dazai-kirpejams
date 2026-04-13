@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { User } from 'lucide-react'
 import { createBrowserSupabase } from '@/lib/supabase/browser'
+import { langPrefix } from '@/lib/utils'
 
 type HeaderAuthProps = {
   lang: string
@@ -42,7 +43,7 @@ export function HeaderAuth({ lang }: HeaderAuthProps) {
   if (isLoggedIn) {
     return (
       <Link
-        href={`/${lang}/paskyra`}
+        href={`${langPrefix(lang)}/paskyra`}
         className="p-2 text-brand-gray-900 hover:text-brand-magenta transition-colors"
         aria-label="Mano paskyra"
       >
@@ -53,7 +54,7 @@ export function HeaderAuth({ lang }: HeaderAuthProps) {
 
   return (
     <Link
-      href={`/${lang}/prisijungimas`}
+      href={`${langPrefix(lang)}/prisijungimas`}
       className="hidden sm:inline-flex px-4 py-2 text-[0.85rem] font-semibold text-brand-magenta border border-brand-magenta rounded-lg hover:bg-brand-magenta hover:text-white transition-all"
     >
       Prisijungti

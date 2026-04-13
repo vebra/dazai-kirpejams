@@ -11,7 +11,7 @@ import {
   MIN_ORDER_CENTS,
   meetsMinimumOrder,
 } from '@/lib/commerce/constants'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice, langPrefix } from '@/lib/utils'
 import type { Locale } from '@/i18n/config'
 
 type CartViewProps = {
@@ -82,7 +82,7 @@ export function CartView({ lang, dict }: CartViewProps) {
                 {/* Prekė */}
                 <div className="flex items-center gap-4">
                   <Link
-                    href={`/${lang}/produktai/${item.categorySlug}/${item.slug}`}
+                    href={`${langPrefix(lang)}/produktai/${item.categorySlug}/${item.slug}`}
                     className="relative w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden bg-brand-gray-50 flex-shrink-0"
                     style={
                       !item.imageUrl && item.colorHex
@@ -107,7 +107,7 @@ export function CartView({ lang, dict }: CartViewProps) {
                       </div>
                     )}
                     <Link
-                      href={`/${lang}/produktai/${item.categorySlug}/${item.slug}`}
+                      href={`${langPrefix(lang)}/produktai/${item.categorySlug}/${item.slug}`}
                       className="text-sm font-semibold text-brand-gray-900 hover:text-brand-magenta transition-colors line-clamp-2"
                     >
                       {item.name}
@@ -169,7 +169,7 @@ export function CartView({ lang, dict }: CartViewProps) {
 
         <div className="flex flex-wrap items-center justify-between gap-4 mt-6">
           <Link
-            href={`/${lang}/produktai`}
+            href={`${langPrefix(lang)}/produktai`}
             className="text-sm font-medium text-brand-gray-500 hover:text-brand-gray-900 transition-colors"
           >
             ← {dict.cart.continueShopping}
@@ -257,14 +257,14 @@ export function CartView({ lang, dict }: CartViewProps) {
                 <>
                   Norėdami pirkti,{' '}
                   <Link
-                    href={`/${lang}/prisijungimas`}
+                    href={`${langPrefix(lang)}/prisijungimas`}
                     className="font-semibold text-brand-magenta hover:underline"
                   >
                     prisijunkite
                   </Link>{' '}
                   arba{' '}
                   <Link
-                    href={`/${lang}/registracija`}
+                    href={`${langPrefix(lang)}/registracija`}
                     className="font-semibold text-brand-magenta hover:underline"
                   >
                     registruokitės
@@ -277,7 +277,7 @@ export function CartView({ lang, dict }: CartViewProps) {
                 <>
                   Jūsų dokumentas buvo atmestas.{' '}
                   <Link
-                    href={`/${lang}/paskyra`}
+                    href={`${langPrefix(lang)}/paskyra`}
                     className="font-semibold text-brand-magenta hover:underline"
                   >
                     Įkelkite naują dokumentą
@@ -288,7 +288,7 @@ export function CartView({ lang, dict }: CartViewProps) {
                 <>
                   Norėdami pirkti,{' '}
                   <Link
-                    href={`/${lang}/prisijungimas`}
+                    href={`${langPrefix(lang)}/prisijungimas`}
                     className="font-semibold text-brand-magenta hover:underline"
                   >
                     prisijunkite
@@ -302,7 +302,7 @@ export function CartView({ lang, dict }: CartViewProps) {
           {/* CTA */}
           {isVerified ? (
             <Link
-              href={meetsMin ? `/${lang}/apmokejimas` : '#'}
+              href={meetsMin ? `${langPrefix(lang)}/apmokejimas` : '#'}
               aria-disabled={!meetsMin}
               onClick={(e) => {
                 if (!meetsMin) e.preventDefault()
@@ -339,7 +339,7 @@ function EmptyCart({ lang, dict }: { lang: Locale; dict: CartViewProps['dict'] }
       </h2>
       <p className="text-brand-gray-500 mb-8 max-w-md">{dict.cart.emptyDesc}</p>
       <Link
-        href={`/${lang}/produktai`}
+        href={`${langPrefix(lang)}/produktai`}
         className="inline-flex items-center gap-2 px-6 py-3 bg-brand-magenta text-white font-semibold rounded-xl hover:bg-brand-magenta/90 transition-colors"
       >
         {dict.cart.continueShopping}

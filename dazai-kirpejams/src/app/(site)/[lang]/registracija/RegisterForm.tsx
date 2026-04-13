@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react'
 import Link from 'next/link'
 import { registerAction, type RegisterState } from './actions'
 import type { Locale } from '@/i18n/config'
+import { langPrefix } from '@/lib/utils'
 
 const initialState: RegisterState = {}
 
@@ -35,7 +36,7 @@ export function RegisterForm({
           patvirtins paskyrą. Tai užtrunka iki 1 darbo dienos.
         </p>
         <Link
-          href={`/${lang}/prisijungimas`}
+          href={`${langPrefix(lang)}/prisijungimas`}
           className="inline-flex px-6 py-3 bg-brand-magenta text-white rounded-xl font-semibold hover:bg-brand-magenta/90 transition-colors"
         >
           Prisijungti
@@ -181,7 +182,7 @@ export function RegisterForm({
       <p className="text-center text-xs text-brand-gray-500">
         Jau turite paskyrą?{' '}
         <Link
-          href={`/${lang}/prisijungimas`}
+          href={`${langPrefix(lang)}/prisijungimas`}
           className="text-brand-magenta font-semibold hover:underline"
         >
           Prisijungti

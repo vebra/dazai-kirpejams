@@ -10,6 +10,7 @@ import { getBlogPostBySlug, getBlogPosts } from '@/lib/data/queries'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { blogPostingSchema, breadcrumbSchema } from '@/lib/schema'
 import { CATEGORY_STYLES, type ArticleCategory } from '@/lib/data/articles'
+import { langPrefix } from '@/lib/utils'
 
 const CATEGORY_LABELS: Record<string, string> = {
   patarimai: 'Patarimai',
@@ -83,14 +84,14 @@ export default async function ArticlePage({
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>
           <Link
-            href={`/${lang}`}
+            href={`${langPrefix(lang) || '/'}`}
             className="hover:text-brand-magenta transition-colors"
           >
             Pradžia
           </Link>
           <span className="mx-2 text-[#E0E0E0]">/</span>
           <Link
-            href={`/${lang}/blogas`}
+            href={`${langPrefix(lang)}/blogas`}
             className="hover:text-brand-magenta transition-colors"
           >
             Blogas
@@ -195,7 +196,7 @@ export default async function ArticlePage({
                 {related.map((rel) => (
                   <Link
                     key={rel.slug}
-                    href={`/${lang}/blogas/${rel.slug}`}
+                    href={`${langPrefix(lang)}/blogas/${rel.slug}`}
                     className="group block bg-white rounded-xl p-7 border border-[#E0E0E0] hover:border-brand-magenta hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
                   >
                     {rel.category && (
@@ -239,7 +240,7 @@ export default async function ArticlePage({
             ir įvertinkite skirtumą savo darbe — nuo pirmo dažymo.
           </p>
           <Link
-            href={`/${lang}/produktai`}
+            href={`${langPrefix(lang)}/produktai`}
             className="inline-flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
           >
             Peržiūrėti produktus →

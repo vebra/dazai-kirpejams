@@ -6,6 +6,7 @@ import {
   getCategoryName,
 } from '@/lib/types'
 import { SITE_URL, SITE_NAME } from '@/lib/seo'
+import { langPrefix } from '@/lib/utils'
 
 /**
  * Schema.org JSON-LD generatoriai. Visi tipai atitinka schema.org žodyną.
@@ -51,7 +52,7 @@ export function websiteSchema(): Record<string, unknown> {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${SITE_URL}/lt/produktai?q={search_term_string}`,
+        urlTemplate: `${SITE_URL}/produktai?q={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
@@ -130,7 +131,7 @@ export function itemListSchema(
     itemListElement: products.map((product, idx) => ({
       '@type': 'ListItem',
       position: idx + 1,
-      url: `${SITE_URL}/${lang}/produktai/${categorySlug}/${product.slug}`,
+      url: `${SITE_URL}${langPrefix(lang)}/produktai/${categorySlug}/${product.slug}`,
       name: getProductName(product, lang),
     })),
   }

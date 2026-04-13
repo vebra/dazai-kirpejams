@@ -2,6 +2,14 @@ export function cn(...classes: (string | undefined | false | null)[]): string {
   return classes.filter(Boolean).join(' ')
 }
 
+/**
+ * Grąžina URL prefiksą pagal kalbą.
+ * Lietuvių kalba (default) — be prefikso, kitos — su prefiksu.
+ */
+export function langPrefix(lang: string): string {
+  return lang === 'lt' ? '' : `/${lang}`
+}
+
 export function formatPrice(amount: number, locale: string = 'lt'): string {
   const localeMap: Record<string, string> = {
     lt: 'lt-LT',

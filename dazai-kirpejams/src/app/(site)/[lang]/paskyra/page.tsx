@@ -8,6 +8,7 @@ import { buildPageMetadata } from '@/lib/seo'
 import { createServerSupabase } from '@/lib/supabase/ssr'
 import { getVerificationStatus } from '@/lib/auth/verification'
 import { AccountView } from './AccountView'
+import { langPrefix } from '@/lib/utils'
 
 export async function generateMetadata({
   params,
@@ -36,7 +37,7 @@ export default async function AccountPage({
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) redirect(`/${lang}/prisijungimas`)
+  if (!user) redirect(`${langPrefix(lang)}/prisijungimas`)
 
   const status = await getVerificationStatus()
 

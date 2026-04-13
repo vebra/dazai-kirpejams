@@ -23,7 +23,7 @@ import {
   type DeliveryMethod,
   type PaymentMethod,
 } from '@/lib/commerce/constants'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice, langPrefix } from '@/lib/utils'
 import { createOrder } from '@/lib/commerce/order-actions'
 import { validateDiscountCodeAction } from '@/lib/commerce/discount-actions'
 import type { Locale } from '@/i18n/config'
@@ -77,7 +77,7 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
   // Jei krepšelis tuščias po hydration — redirect atgal į krepšelį
   useEffect(() => {
     if (mounted && items.length === 0) {
-      router.replace(`/${lang}/krepselis`)
+      router.replace(`${langPrefix(lang)}/krepselis`)
     }
   }, [mounted, items.length, lang, router])
 
@@ -224,7 +224,7 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
       {/* Kairė — formos laukai */}
       <div className="space-y-8">
         <Link
-          href={`/${lang}/krepselis`}
+          href={`${langPrefix(lang)}/krepselis`}
           className="inline-flex items-center gap-2 text-sm font-medium text-brand-gray-500 hover:text-brand-gray-900 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />

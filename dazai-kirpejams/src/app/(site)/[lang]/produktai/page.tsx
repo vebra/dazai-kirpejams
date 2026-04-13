@@ -14,6 +14,7 @@ import { Section } from '@/components/ui/Section'
 import { ProductCard } from '@/components/products/ProductCard'
 import { isUserVerified } from '@/lib/auth/verification'
 import { buildPageMetadata } from '@/lib/seo'
+import { langPrefix } from '@/lib/utils'
 
 export async function generateMetadata({
   params,
@@ -61,7 +62,7 @@ export default async function ProductsPage({
             {categories.map((category) => (
               <Link
                 key={category.id}
-                href={`/${lang}/produktai/${category.slug}`}
+                href={`${langPrefix(lang)}/produktai/${category.slug}`}
                 className="px-5 py-2 rounded-full bg-brand-gray-50 text-brand-gray-900 text-sm font-medium hover:bg-brand-gray-900 hover:text-white transition-colors"
               >
                 {getCategoryName(category, lang)}

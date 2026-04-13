@@ -4,6 +4,7 @@ import { ProductCard } from '@/components/products/ProductCard'
 import { getProducts, getCategories } from '@/lib/data/queries'
 import { isUserVerified } from '@/lib/auth/verification'
 import type { Locale } from '@/i18n/config'
+import { langPrefix } from '@/lib/utils'
 
 type FeaturedProductsProps = {
   lang: Locale
@@ -41,7 +42,7 @@ export async function FeaturedProducts({ lang, dict }: FeaturedProductsProps) {
             </h2>
           </div>
           <Link
-            href={`/${lang}/produktai`}
+            href={`${langPrefix(lang)}/produktai`}
             className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-brand-magenta text-brand-magenta rounded-lg text-[0.9rem] font-semibold hover:bg-brand-magenta hover:text-white transition-all"
           >
             Visi produktai →

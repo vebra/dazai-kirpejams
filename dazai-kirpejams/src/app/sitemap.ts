@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { locales } from '@/i18n/config'
+import { locales, defaultLocale } from '@/i18n/config'
 import { SITE_URL } from '@/lib/seo'
 import { getCategories, getProducts } from '@/lib/data/queries'
 
@@ -30,12 +30,19 @@ const STATIC_PATHS: Array<{
  * Suformuoja hreflang alternates žemėlapį vienam pathui.
  * Įtraukia visus locale'us + x-default (nukreipia į LT).
  */
+function locUrl(loc: string, pathWithoutLocale: string) {
+  if (loc === defaultLocale) {
+    return `${SITE_URL}${pathWithoutLocale || '/'}`
+  }
+  return `${SITE_URL}/${loc}${pathWithoutLocale}`
+}
+
 function buildAlternates(pathWithoutLocale: string) {
   const languages: Record<string, string> = {}
   for (const loc of locales) {
-    languages[loc] = `${SITE_URL}/${loc}${pathWithoutLocale}`
+    languages[loc] = locUrl(loc, pathWithoutLocale)
   }
-  languages['x-default'] = `${SITE_URL}/lt${pathWithoutLocale}`
+  languages['x-default'] = locUrl(defaultLocale, pathWithoutLocale)
   return { languages }
 }
 
@@ -51,7 +58,7 @@ function expandLocales(
 ): MetadataRoute.Sitemap {
   const alternates = buildAlternates(path)
   return locales.map((loc) => ({
-    url: `${SITE_URL}/${loc}${path}`,
+    url: locUrl(loc, path),
     lastModified,
     changeFrequency,
     priority,

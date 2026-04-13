@@ -7,7 +7,7 @@ import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Section } from '@/components/ui/Section'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice, langPrefix } from '@/lib/utils'
 import { buildPageMetadata } from '@/lib/seo'
 import {
   createServerClient,
@@ -296,7 +296,7 @@ export default async function OrderConfirmationPage({
 
           <div className="flex justify-center">
             <Link
-              href={`/${lang}/produktai`}
+              href={`${langPrefix(lang)}/produktai`}
               className="inline-flex items-center gap-2 px-6 py-3 bg-brand-magenta text-white font-semibold rounded-xl hover:bg-brand-magenta/90 transition-colors"
             >
               {dict.order.continueShopping}

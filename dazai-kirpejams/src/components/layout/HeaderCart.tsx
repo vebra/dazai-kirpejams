@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ShoppingCart } from 'lucide-react'
 import { useCartCount } from '@/lib/commerce/cart-store'
+import { langPrefix } from '@/lib/utils'
 
 type HeaderCartProps = {
   lang: string
@@ -14,7 +15,7 @@ export function HeaderCart({ lang, label }: HeaderCartProps) {
 
   return (
     <Link
-      href={`/${lang}/krepselis`}
+      href={`${langPrefix(lang)}/krepselis`}
       className="relative p-2 text-brand-gray-900 hover:text-brand-magenta transition-colors"
       aria-label={`${label}${count > 0 ? ` (${count})` : ''}`}
     >

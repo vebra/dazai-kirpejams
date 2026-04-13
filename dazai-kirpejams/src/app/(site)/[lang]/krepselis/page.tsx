@@ -5,6 +5,7 @@ import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { CartView } from '@/components/commerce/CartView'
 import { buildPageMetadata } from '@/lib/seo'
+import { langPrefix } from '@/lib/utils'
 
 export async function generateMetadata({
   params,
@@ -36,7 +37,7 @@ export default async function CartPage({
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>
           <Link
-            href={`/${lang}`}
+            href={`${langPrefix(lang) || '/'}`}
             className="hover:text-brand-magenta transition-colors"
           >
             Pradžia

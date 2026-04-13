@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Menu, X, User, LogIn } from 'lucide-react'
 import { createBrowserSupabase } from '@/lib/supabase/browser'
+import { langPrefix } from '@/lib/utils'
 import { LocaleSwitcher } from './LocaleSwitcher'
 import type { Locale } from '@/i18n/config'
 
@@ -78,7 +79,7 @@ export function MobileMenu({ lang, links }: MobileMenuProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 h-16 border-b border-brand-gray-50">
           <Link
-            href={`/${lang}`}
+            href={langPrefix(lang) || '/'}
             className="flex items-center gap-2 font-bold text-lg tracking-tight"
             onClick={() => setOpen(false)}
           >
@@ -101,7 +102,7 @@ export function MobileMenu({ lang, links }: MobileMenuProps) {
             {links.map((link) => {
               const isActive =
                 pathname === link.href ||
-                (link.href !== `/${lang}` && pathname.startsWith(link.href))
+                (link.href !== (langPrefix(lang) || '/') && pathname.startsWith(link.href))
               return (
                 <li key={link.href}>
                   <Link
@@ -124,7 +125,7 @@ export function MobileMenu({ lang, links }: MobileMenuProps) {
         <div className="px-6 py-4 border-t border-brand-gray-50">
           {isLoggedIn ? (
             <Link
-              href={`/${lang}/paskyra`}
+              href={`${langPrefix(lang)}/paskyra`}
               className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-brand-gray-900 hover:bg-brand-gray-50 transition-colors"
             >
               <User className="w-5 h-5" />
@@ -132,7 +133,7 @@ export function MobileMenu({ lang, links }: MobileMenuProps) {
             </Link>
           ) : (
             <Link
-              href={`/${lang}/prisijungimas`}
+              href={`${langPrefix(lang)}/prisijungimas`}
               className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold text-brand-magenta hover:bg-brand-magenta/10 transition-colors"
             >
               <LogIn className="w-5 h-5" />

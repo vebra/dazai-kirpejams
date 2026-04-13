@@ -7,6 +7,7 @@ import { Container } from '@/components/ui/Container'
 import { PaletteGrid } from '@/components/products/PaletteGrid'
 import { Newsletter } from '@/components/home/Newsletter'
 import { buildPageMetadata } from '@/lib/seo'
+import { langPrefix } from '@/lib/utils'
 
 export async function generateMetadata({
   params,
@@ -43,7 +44,7 @@ export default async function ColorPalettePage({
         <Container>
           <div className="text-[0.85rem] text-brand-gray-500 mb-5">
             <Link
-              href={`/${lang}`}
+              href={`${langPrefix(lang) || '/'}`}
               className="hover:text-brand-magenta transition-colors"
             >
               Pradžia
@@ -114,13 +115,13 @@ export default async function ColorPalettePage({
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
-                href={`/${lang}/produktai/dazai`}
+                href={`${langPrefix(lang)}/produktai/dazai`}
                 className="inline-flex items-center justify-center gap-2 px-8 py-[14px] bg-brand-magenta text-white rounded-lg text-[1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
               >
                 Pirkti dabar →
               </Link>
               <Link
-                href={`/${lang}/salonams`}
+                href={`${langPrefix(lang)}/salonams`}
                 className="inline-flex items-center justify-center gap-2 px-8 py-[14px] border-2 border-white/30 text-white rounded-lg text-[1rem] font-semibold hover:bg-white hover:text-brand-gray-900 hover:border-white hover:-translate-y-0.5 transition-all"
               >
                 Pasiūlymas salonams
