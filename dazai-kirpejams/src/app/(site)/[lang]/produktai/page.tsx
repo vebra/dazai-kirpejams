@@ -12,6 +12,7 @@ import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Section } from '@/components/ui/Section'
 import { ProductCard } from '@/components/products/ProductCard'
+import { isUserVerified } from '@/lib/auth/verification'
 import { buildPageMetadata } from '@/lib/seo'
 
 export async function generateMetadata({
@@ -35,8 +36,11 @@ export default async function ProductsPage({
   if (!hasLocale(lang)) notFound()
 
   const dict = await getDictionary(lang)
-  const categories = await getCategories()
-  const products = await getProducts()
+  const [categories, products, verified] = await Promise.all([
+    getCategories(),
+    getProducts(),
+    isUserVerified(),
+  ])
   const categorySlugMap = buildCategorySlugMap(categories)
 
   return (
@@ -77,6 +81,7 @@ export default async function ProductsPage({
                   product.category_id
                 )}
                 dict={dict}
+                isVerified={verified}
               />
             ))}
           </div>

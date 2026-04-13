@@ -1,26 +1,24 @@
 import { requireAdmin } from '@/lib/admin/auth'
-import { AdminPlaceholder } from '@/components/admin/AdminPlaceholder'
+import { getBanners } from '@/lib/admin/queries'
+import { BannersTable } from './BannersTable'
 
 export const metadata = {
   title: 'Baneriai',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminBannersPage() {
   await requireAdmin()
 
+  const banners = await getBanners()
+
   return (
-    <AdminPlaceholder
-      title="Baneriai"
-      description="Pagrindinio puslapio hero ir kampanijų baneriai — vizualai, tekstai, CTA nuorodos."
-      icon="🖼️"
-      plannedFeatures={[
-        'Hero slaiderių valdymas pagrindiniame puslapyje',
-        'Kampanijų baneriai kategorijų puslapiuose',
-        'Laikotarpio planavimas (pradžia / pabaiga)',
-        'A/B testavimas — dviejų variantų palyginimas',
-        'Multi-lang turinys (LT / EN / RU)',
-        'Paspaudimų statistika',
-      ]}
-    />
+    <div>
+      <h1 className="text-2xl font-bold text-brand-gray-900 mb-6">
+        Baneriai
+      </h1>
+      <BannersTable banners={banners} />
+    </div>
   )
 }

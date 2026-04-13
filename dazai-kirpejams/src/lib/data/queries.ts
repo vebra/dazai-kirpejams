@@ -285,6 +285,146 @@ function filterMockProducts(options?: GetProductsOptions): Product[] {
 }
 
 // ============================================
+// BANERIAI (public)
+// ============================================
+
+export type Banner = {
+  id: string
+  placement: string
+  title: string
+  subtitle: string | null
+  badge: string | null
+  ctaText: string | null
+  ctaUrl: string | null
+  ctaSecondaryText: string | null
+  ctaSecondaryUrl: string | null
+  imageUrl: string | null
+  backgroundColor: string | null
+  sortOrder: number
+}
+
+export async function getActiveBanners(
+  placement: string,
+  lang: 'lt' | 'en' | 'ru' = 'lt'
+): Promise<Banner[]> {
+  if (!isSupabaseConfigured) return []
+  const supabase = getSupabase()
+  if (!supabase) return []
+
+  const now = new Date().toISOString()
+  const { data, error } = await supabase
+    .from('banners')
+    .select('*')
+    .eq('is_active', true)
+    .eq('placement', placement)
+    .or(`starts_at.is.null,starts_at.lte.${now}`)
+    .or(`ends_at.is.null,ends_at.gte.${now}`)
+    .order('sort_order', { ascending: true })
+
+  if (error) {
+    console.error('[queries.getActiveBanners]', error)
+    return []
+  }
+
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    placement: r.placement,
+    title: lang === 'en' ? r.title_en : lang === 'ru' ? r.title_ru : r.title_lt,
+    subtitle: lang === 'en' ? r.subtitle_en : lang === 'ru' ? r.subtitle_ru : r.subtitle_lt,
+    badge: lang === 'en' ? r.badge_en : lang === 'ru' ? r.badge_ru : r.badge_lt,
+    ctaText: lang === 'en' ? r.cta_text_en : lang === 'ru' ? r.cta_text_ru : r.cta_text_lt,
+    ctaUrl: r.cta_url,
+    ctaSecondaryText: lang === 'en' ? r.cta_secondary_text_en : lang === 'ru' ? r.cta_secondary_text_ru : r.cta_secondary_text_lt,
+    ctaSecondaryUrl: r.cta_secondary_url,
+    imageUrl: r.image_url,
+    backgroundColor: r.background_color,
+    sortOrder: r.sort_order,
+  }))
+}
+
+// ============================================
+// BLOGAS (public)
+// ============================================
+
+export type BlogPost = {
+  id: string
+  slug: string
+  title: string
+  excerpt: string | null
+  content: string | null
+  coverImageUrl: string | null
+  author: string | null
+  category: string | null
+  publishedAt: string | null
+  createdAt: string
+}
+
+type Locale = 'lt' | 'en' | 'ru'
+
+function pickLang<T>(lt: T, en: T, ru: T, lang: Locale): T {
+  return lang === 'en' ? en : lang === 'ru' ? ru : lt
+}
+
+export async function getBlogPosts(lang: Locale = 'lt'): Promise<BlogPost[]> {
+  if (!isSupabaseConfigured) return []
+  const supabase = getSupabase()
+  if (!supabase) return []
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select('*')
+    .eq('is_published', true)
+    .order('published_at', { ascending: false })
+
+  if (error) {
+    console.error('[queries.getBlogPosts]', error)
+    return []
+  }
+
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    slug: r.slug,
+    title: pickLang(r.title_lt, r.title_en, r.title_ru, lang),
+    excerpt: pickLang(r.excerpt_lt, r.excerpt_en, r.excerpt_ru, lang),
+    content: pickLang(r.content_lt, r.content_en, r.content_ru, lang),
+    coverImageUrl: r.cover_image_url,
+    author: r.author,
+    category: r.category,
+    publishedAt: r.published_at,
+    createdAt: r.created_at,
+  }))
+}
+
+export async function getBlogPostBySlug(
+  slug: string,
+  lang: Locale = 'lt'
+): Promise<BlogPost | null> {
+  if (!isSupabaseConfigured) return null
+  const supabase = getSupabase()
+  if (!supabase) return null
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select('*')
+    .eq('slug', slug)
+    .eq('is_published', true)
+    .single()
+
+  if (error || !data) return null
+
+  return {
+    id: data.id,
+    slug: data.slug,
+    title: pickLang(data.title_lt, data.title_en, data.title_ru, lang),
+    excerpt: pickLang(data.excerpt_lt, data.excerpt_en, data.excerpt_ru, lang),
+    content: pickLang(data.content_lt, data.content_en, data.content_ru, lang),
+    coverImageUrl: data.cover_image_url,
+    author: data.author,
+    category: data.category,
+    publishedAt: data.published_at,
+    createdAt: data.created_at,
+  }
+}
+
+// ============================================
 // Info helper'is — ar DB prijungta
 // ============================================
 

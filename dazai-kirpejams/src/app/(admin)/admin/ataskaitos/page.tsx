@@ -1,26 +1,42 @@
 import { requireAdmin } from '@/lib/admin/auth'
-import { AdminPlaceholder } from '@/components/admin/AdminPlaceholder'
+import { getReportsData, type ReportPeriod } from '@/lib/admin/queries'
+import { ReportsDashboard } from './ReportsDashboard'
 
 export const metadata = {
   title: 'Ataskaitos',
 }
 
-export default async function AdminReportsPage() {
+export const dynamic = 'force-dynamic'
+
+const VALID_PERIODS = new Set<ReportPeriod>([
+  '7d',
+  '30d',
+  '90d',
+  '365d',
+  'all',
+])
+
+export default async function AdminReportsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ period?: string }>
+}) {
   await requireAdmin()
 
+  const sp = await searchParams
+  const period: ReportPeriod =
+    sp.period && VALID_PERIODS.has(sp.period as ReportPeriod)
+      ? (sp.period as ReportPeriod)
+      : '30d'
+
+  const data = await getReportsData(period)
+
   return (
-    <AdminPlaceholder
-      title="Ataskaitos"
-      description="Pardavimų ir veiklos analitika — pajamos, populiariausi produktai, klientų elgsena, konversijos."
-      icon="📈"
-      plannedFeatures={[
-        'Pardavimų ataskaita pagal laikotarpį (diena / savaitė / mėnuo / metai)',
-        'Produktų populiarumo reitingas',
-        'Spalvų populiarumas Color SHOCK paletėje',
-        'B2B vs B2C pajamų palyginimas',
-        'Klientų įsigijimo šaltiniai (Google, Facebook, tiesioginis)',
-        'CSV eksportas buhalteriui',
-      ]}
-    />
+    <div>
+      <h1 className="text-2xl font-bold text-brand-gray-900 mb-6">
+        Ataskaitos
+      </h1>
+      <ReportsDashboard data={data} currentPeriod={period} />
+    </div>
   )
 }

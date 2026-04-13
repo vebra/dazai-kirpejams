@@ -13,6 +13,7 @@ import {
   buildCustomerOrderEmail,
   buildAdminOrderEmail,
 } from '@/lib/email/templates'
+import { getCompanyInfo } from '@/lib/admin/queries'
 
 /**
  * Serializuota užsakymo prekė iš kliento (zustand store snapshot'o).
@@ -42,6 +43,9 @@ export type CreateOrderInput = {
   paymentMethod: PaymentMethod
   notes?: string
   locale: 'lt' | 'en' | 'ru'
+  // Neprivaloma — jei klientas įvedė kupono kodą, mes jį iš naujo
+  // validuojam server-side ir taikom atomiškai PRIEŠ užsakymo įrašą.
+  discountCode?: string
 }
 
 export type CreateOrderResult =
@@ -98,7 +102,6 @@ export async function createOrder(
     return { ok: false, error: 'Nepasiekta minimali užsakymo suma.' }
   }
 
-  const totals = calculateOrderTotals(subtotalCents, input.deliveryMethod)
   const orderNumber = generateOrderNumber()
 
   // Paysera kol kas nerealizuotas — visada bank_transfer flow
@@ -109,6 +112,13 @@ export async function createOrder(
   // Užsakymo DB ID — reikalingas admin email'o nuorodai. Lieka null jei
   // Supabase nesukonfigūruotas (dev aplinka).
   let orderDbId: string | null = null
+
+  // Kupono būsena — užpildoma žemiau, jei klientas pateikė kodą ir jis
+  // sėkmingai praėjo `apply_discount_code`. `appliedDiscountCode` reikalingas
+  // rollback'ui (jei order insert nepavyks po sėkmingo apply).
+  let discountCents = 0
+  let appliedDiscountCode: string | null = null
+  const normalizedInputCode = input.discountCode?.trim().toUpperCase() ?? ''
 
   // Įrašas į Supabase — jei sukonfigūruota.
   //
@@ -122,13 +132,73 @@ export async function createOrder(
   if (isSupabaseServerConfigured) {
     const supabase = createServerClient()
 
-    // Paruošiam RPC payload'ą — tik ID ir kiekis
+    // 1) Nuolaidos kodas — pirmas, nes pigiausias rollback'as
+    //
+    // Kviečiam `apply_discount_code` RPC'ą, kuris:
+    //   - atomiškai (FOR UPDATE) iš naujo validuoja kodą
+    //   - inkrementuoja `used_count`
+    //   - grąžina tikrą `discount_cents` (perskaičiuotą server-side)
+    //
+    // Jei klientas manė, kad nuolaida vienokia, o serveryje paaiškėjo kitokia
+    // (pvz. tarp request'ų buvo išjungtas kuponas), pasirenkam server'io
+    // tiesą. Jei kuponas atmestas — grąžinam klaidą ir user'is gauna kita
+    // dar nekeistų duomenų būseną.
+    if (normalizedInputCode) {
+      const { data: discountResult, error: discountError } = await supabase.rpc(
+        'apply_discount_code',
+        {
+          p_code: normalizedInputCode,
+          p_cart_subtotal_cents: subtotalCents,
+        }
+      )
+
+      if (discountError) {
+        console.error('[order] apply_discount_code error:', discountError)
+        return {
+          ok: false,
+          error: 'Nepavyko pritaikyti kupono. Bandykite dar kartą.',
+        }
+      }
+
+      const dr = discountResult as {
+        ok?: boolean
+        reason?: string
+        code?: string
+        discount_cents?: number
+        min_order_cents?: number
+      } | null
+
+      if (!dr || !dr.ok) {
+        // Gražinam user-friendly LT žinutę pagal reason kodą
+        const reasonMap: Record<string, string> = {
+          not_found: 'Toks kuponas neegzistuoja.',
+          inactive: 'Kuponas nebegalioja.',
+          too_early: 'Kuponas dar neaktyvus.',
+          expired: 'Kuponas nebegalioja — pasibaigė galiojimo laikas.',
+          max_uses_reached:
+            'Kuponas jau panaudotas maksimalų skaičių kartų.',
+          min_order_not_met: dr?.min_order_cents
+            ? `Kuponui reikia bent ${(dr.min_order_cents / 100)
+                .toFixed(2)
+                .replace('.', ',')} € užsakymo sumos.`
+            : 'Nepasiekta minimali kupono suma.',
+        }
+        return {
+          ok: false,
+          error: reasonMap[dr?.reason ?? ''] ?? 'Nepavyko pritaikyti kupono.',
+        }
+      }
+
+      discountCents = dr.discount_cents ?? 0
+      appliedDiscountCode = dr.code ?? normalizedInputCode
+    }
+
+    // 2) Atominiškai mažinam likučius
     const stockItems = input.items.map((i) => ({
       product_id: i.productId,
       quantity: i.quantity,
     }))
 
-    // 1) Atominiškai mažinam likučius
     const { error: stockError } = await supabase.rpc(
       'decrement_stock_for_order',
       { items: stockItems }
@@ -138,13 +208,27 @@ export async function createOrder(
       // Postgres exception'as iš plpgsql funkcijos — message'as jau LT
       // (pvz. "Nepakanka likučio: Juoda (yra 2, prašoma 5)")
       console.error('Stock decrement error:', stockError)
+      // Rollback'inam kuponą, jei jį jau pritaikėm
+      if (appliedDiscountCode) {
+        await supabase
+          .rpc('revert_discount_code', { p_code: appliedDiscountCode })
+          .then(() => {}, () => {})
+      }
       return {
         ok: false,
         error: stockError.message || 'Nepakanka likučio. Pabandykite vėliau.',
       }
     }
 
-    // 2) Insert'as į orders
+    // 3) Skaičiuojam galutinius totals SU nuolaida — serveris yra tiesos
+    //    šaltinis.
+    const computedTotals = calculateOrderTotals(
+      subtotalCents,
+      input.deliveryMethod,
+      discountCents
+    )
+
+    // 4) Insert'as į orders
     try {
       const { data: order, error: orderError } = await supabase
         .from('orders')
@@ -162,12 +246,14 @@ export async function createOrder(
           delivery_city: input.deliveryCity ?? null,
           delivery_postal_code: input.deliveryPostalCode ?? null,
           delivery_country: 'LT',
-          delivery_cost_cents: totals.shippingCents,
+          delivery_cost_cents: computedTotals.shippingCents,
           payment_method: effectivePayment,
           payment_status: 'pending',
-          subtotal_cents: totals.subtotalCents,
-          vat_cents: totals.vatCents,
-          total_cents: totals.totalCents,
+          subtotal_cents: computedTotals.subtotalCents,
+          discount_code: appliedDiscountCode,
+          discount_cents: computedTotals.discountCents,
+          vat_cents: computedTotals.vatCents,
+          total_cents: computedTotals.totalCents,
           status: 'pending',
           locale: input.locale,
           notes: input.notes ?? null,
@@ -177,15 +263,20 @@ export async function createOrder(
 
       if (orderError || !order) {
         console.error('Order insert error:', orderError)
-        // Rollback'inam likučius
+        // Rollback'inam likučius + kuponą
         await supabase.rpc('restore_stock_for_order', { items: stockItems })
+        if (appliedDiscountCode) {
+          await supabase
+            .rpc('revert_discount_code', { p_code: appliedDiscountCode })
+            .then(() => {}, () => {})
+        }
         return {
           ok: false,
           error: 'Nepavyko sukurti užsakymo. Bandykite dar kartą.',
         }
       }
 
-      // 3) Insert'as į order_items
+      // 5) Insert'as į order_items
       const { error: itemsError } = await supabase.from('order_items').insert(
         input.items.map((i) => ({
           order_id: order.id,
@@ -200,9 +291,14 @@ export async function createOrder(
 
       if (itemsError) {
         console.error('Order items insert error:', itemsError)
-        // Rollback'inam ir užsakymą, ir likučius
+        // Rollback'inam: užsakymą, likučius, kuponą
         await supabase.from('orders').delete().eq('id', order.id)
         await supabase.rpc('restore_stock_for_order', { items: stockItems })
+        if (appliedDiscountCode) {
+          await supabase
+            .rpc('revert_discount_code', { p_code: appliedDiscountCode })
+            .then(() => {}, () => {})
+        }
         return {
           ok: false,
           error: 'Nepavyko išsaugoti prekių. Bandykite dar kartą.',
@@ -212,13 +308,26 @@ export async function createOrder(
       orderDbId = order.id
     } catch (err) {
       console.error('Order creation failed:', err)
-      // Bandom rollback'inti likučius
+      // Bandom rollback'inti viską
       await supabase
         .rpc('restore_stock_for_order', { items: stockItems })
         .then(() => {}, () => {})
+      if (appliedDiscountCode) {
+        await supabase
+          .rpc('revert_discount_code', { p_code: appliedDiscountCode })
+          .then(() => {}, () => {})
+      }
       return { ok: false, error: 'Serverio klaida. Bandykite dar kartą.' }
     }
   }
+
+  // Server-side tiesa — totals perskaičiuojam, net jei Supabase'o nėra
+  // (dev aplinka be DB'o). Šie skaičiai eina į email'us ir cookie snapshot.
+  const totals = calculateOrderTotals(
+    subtotalCents,
+    input.deliveryMethod,
+    discountCents
+  )
 
   // ============================================
   // Email notifikacijos — klientui ir adminui
@@ -234,6 +343,19 @@ export async function createOrder(
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ||
     'https://www.dazaikirpejams.lt'
   const createdAtIso = new Date().toISOString()
+
+  // Įmonės rekvizitai iš Nustatymų — tiesos šaltinis banko pavedimo blokui.
+  // Jei DB nesukonfigūruota arba laukai tušti, template graceful'iai neparodys
+  // banko duomenų (vartotojui bus pranešta, kad instrukcijos ateis atskiru
+  // laišku).
+  let companyInfo: Awaited<ReturnType<typeof getCompanyInfo>> | null = null
+  if (isSupabaseServerConfigured) {
+    try {
+      companyInfo = await getCompanyInfo()
+    } catch (err) {
+      console.error('[order] getCompanyInfo failed (non-blocking):', err)
+    }
+  }
 
   try {
     const customerEmailPayload = buildCustomerOrderEmail({
@@ -253,11 +375,24 @@ export async function createOrder(
         unitPriceCents: i.priceCents,
       })),
       subtotalCents: totals.subtotalCents,
+      discountCode: appliedDiscountCode,
+      discountCents: totals.discountCents,
       shippingCents: totals.shippingCents,
       vatCents: totals.vatCents,
       totalCents: totals.totalCents,
       createdAt: createdAtIso,
       siteUrl,
+      company: companyInfo
+        ? {
+            legalName: companyInfo.legalName,
+            address: companyInfo.address,
+            email: companyInfo.email,
+            phone: companyInfo.phone,
+            bankRecipient: companyInfo.bankRecipient,
+            bankIban: companyInfo.bankIban,
+            bankName: companyInfo.bankName,
+          }
+        : undefined,
     })
 
     const adminEmailAddress = getAdminNotificationEmail()
@@ -322,6 +457,8 @@ export async function createOrder(
       paymentMethod: effectivePayment,
       items: input.items,
       subtotalCents: totals.subtotalCents,
+      discountCode: appliedDiscountCode,
+      discountCents: totals.discountCents,
       shippingCents: totals.shippingCents,
       vatCents: totals.vatCents,
       totalCents: totals.totalCents,

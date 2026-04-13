@@ -131,7 +131,7 @@ export default async function ColorPalettePage({
       </section>
 
       {/* Newsletter — atkurta iš palete.html:156-169 */}
-      <Newsletter dict={dict} />
+      <Newsletter lang={lang} />
     </>
   )
 }

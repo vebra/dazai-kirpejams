@@ -23,5 +23,6 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { href: '/admin/blogas', label: 'Blogas', icon: '✏️' },
   { href: '/admin/baneriai', label: 'Baneriai', icon: '🖼️' },
   { href: '/admin/b2b', label: 'B2B užklausos', icon: '🤝' },
+  { href: '/admin/verifikacija', label: 'Verifikacija', icon: '✅' },
   { href: '/admin/naujienlaiskiai', label: 'Naujienlaiškiai', icon: '📧' },
 ]

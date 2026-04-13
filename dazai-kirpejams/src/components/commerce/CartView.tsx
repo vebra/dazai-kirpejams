@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react'
 import { useCartStore } from '@/lib/commerce/cart-store'
+import { useVerifiedUser } from '@/lib/auth/useVerifiedUser'
 import {
   FREE_SHIPPING_THRESHOLD_CENTS,
   MIN_ORDER_CENTS,
@@ -29,6 +30,7 @@ export function CartView({ lang, dict }: CartViewProps) {
   const removeItem = useCartStore((s) => s.removeItem)
   const updateQuantity = useCartStore((s) => s.updateQuantity)
   const clear = useCartStore((s) => s.clear)
+  const { isVerified, isLoading: authLoading, user, status } = useVerifiedUser()
 
   useEffect(() => {
     setMounted(true)
@@ -248,22 +250,78 @@ export function CartView({ lang, dict }: CartViewProps) {
             </div>
           )}
 
+          {/* Auth/verification gate */}
+          {!authLoading && !isVerified && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
+              {!user ? (
+                <>
+                  Norėdami pirkti,{' '}
+                  <Link
+                    href={`/${lang}/prisijungimas`}
+                    className="font-semibold text-brand-magenta hover:underline"
+                  >
+                    prisijunkite
+                  </Link>{' '}
+                  arba{' '}
+                  <Link
+                    href={`/${lang}/registracija`}
+                    className="font-semibold text-brand-magenta hover:underline"
+                  >
+                    registruokitės
+                  </Link>
+                  .
+                </>
+              ) : status === 'pending' ? (
+                'Jūsų paskyra dar nepatvirtinta. Laukiame, kol administratorius peržiūrės dokumentą.'
+              ) : status === 'rejected' ? (
+                <>
+                  Jūsų dokumentas buvo atmestas.{' '}
+                  <Link
+                    href={`/${lang}/paskyra`}
+                    className="font-semibold text-brand-magenta hover:underline"
+                  >
+                    Įkelkite naują dokumentą
+                  </Link>
+                  .
+                </>
+              ) : (
+                <>
+                  Norėdami pirkti,{' '}
+                  <Link
+                    href={`/${lang}/prisijungimas`}
+                    className="font-semibold text-brand-magenta hover:underline"
+                  >
+                    prisijunkite
+                  </Link>
+                  .
+                </>
+              )}
+            </div>
+          )}
+
           {/* CTA */}
-          <Link
-            href={meetsMin ? `/${lang}/apmokejimas` : '#'}
-            aria-disabled={!meetsMin}
-            onClick={(e) => {
-              if (!meetsMin) e.preventDefault()
-            }}
-            className={`flex items-center justify-center gap-2 w-full px-6 py-4 font-semibold rounded-xl transition-colors ${
-              meetsMin
-                ? 'bg-brand-magenta text-white hover:bg-brand-magenta/90'
-                : 'bg-brand-gray-500/30 text-brand-gray-500 cursor-not-allowed'
-            }`}
-          >
-            {dict.cart.proceedToCheckout}
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+          {isVerified ? (
+            <Link
+              href={meetsMin ? `/${lang}/apmokejimas` : '#'}
+              aria-disabled={!meetsMin}
+              onClick={(e) => {
+                if (!meetsMin) e.preventDefault()
+              }}
+              className={`flex items-center justify-center gap-2 w-full px-6 py-4 font-semibold rounded-xl transition-colors ${
+                meetsMin
+                  ? 'bg-brand-magenta text-white hover:bg-brand-magenta/90'
+                  : 'bg-brand-gray-500/30 text-brand-gray-500 cursor-not-allowed'
+              }`}
+            >
+              {dict.cart.proceedToCheckout}
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          ) : (
+            <div className="flex items-center justify-center gap-2 w-full px-6 py-4 font-semibold rounded-xl bg-brand-gray-500/30 text-brand-gray-500 cursor-not-allowed">
+              {dict.cart.proceedToCheckout}
+              <ArrowRight className="w-4 h-4" />
+            </div>
+          )}
         </div>
       </aside>
     </div>

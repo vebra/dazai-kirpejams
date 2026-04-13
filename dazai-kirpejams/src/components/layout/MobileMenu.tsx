@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, User, LogIn } from 'lucide-react'
+import { createBrowserSupabase } from '@/lib/supabase/browser'
 import { LocaleSwitcher } from './LocaleSwitcher'
 import type { Locale } from '@/i18n/config'
 
@@ -14,6 +15,7 @@ type MobileMenuProps = {
 
 export function MobileMenu({ lang, links }: MobileMenuProps) {
   const [open, setOpen] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const pathname = usePathname()
 
   // Uždarom meniu kai pakeičiamas route'as
@@ -32,6 +34,14 @@ export function MobileMenu({ lang, links }: MobileMenuProps) {
       document.body.style.overflow = ''
     }
   }, [open])
+
+  // Auth state
+  useEffect(() => {
+    const supabase = createBrowserSupabase()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setIsLoggedIn(!!user)
+    })
+  }, [])
 
   // ESC klavišas uždarinimui
   useEffect(() => {
@@ -119,6 +129,27 @@ export function MobileMenu({ lang, links }: MobileMenuProps) {
             })}
           </ul>
         </nav>
+
+        {/* Auth link */}
+        <div className="px-6 py-4 border-t border-brand-gray-50">
+          {isLoggedIn ? (
+            <Link
+              href={`/${lang}/paskyra`}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-brand-gray-900 hover:bg-brand-gray-50 transition-colors"
+            >
+              <User className="w-5 h-5" />
+              Mano paskyra
+            </Link>
+          ) : (
+            <Link
+              href={`/${lang}/prisijungimas`}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold text-brand-magenta hover:bg-brand-magenta/10 transition-colors"
+            >
+              <LogIn className="w-5 h-5" />
+              Prisijungti
+            </Link>
+          )}
+        </div>
 
         {/* Footer — kalbos */}
         <div className="px-6 py-6 border-t border-brand-gray-50">

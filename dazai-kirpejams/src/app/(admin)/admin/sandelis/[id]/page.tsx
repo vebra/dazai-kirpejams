@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { requireAdmin } from '@/lib/admin/auth'
 import { getAdminProductById } from '@/lib/admin/queries'
 import { ProductEditForm } from './ProductEditForm'
+import { ProductImagesManager } from './ProductImagesManager'
 
 export const metadata = {
   title: 'Produkto redagavimas',
@@ -59,6 +60,11 @@ export default async function AdminProductEditPage({
           </div>
         </div>
       </div>
+
+      <ProductImagesManager
+        productId={product.id}
+        imageUrls={product.imageUrls}
+      />
 
       <ProductEditForm product={product} />
     </div>

@@ -5,6 +5,7 @@ import { hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { buildPageMetadata } from '@/lib/seo'
 import { CONTACT, phoneHref } from '@/lib/site'
+import { ContactForm } from './ContactForm'
 
 export async function generateMetadata({
   params,
@@ -173,49 +174,7 @@ export default async function ContactPage({
 
             {/* Form card */}
             <div className="bg-white rounded-xl p-8 lg:p-10 shadow-[0_2px_16px_rgba(0,0,0,0.07)] border border-[#E0E0E0]">
-              <form className="space-y-5">
-                <FormField label="Vardas" name="name" required placeholder="Jūsų vardas" />
-                <FormField
-                  label="El. paštas"
-                  name="email"
-                  type="email"
-                  required
-                  placeholder="jusu@pastas.lt"
-                />
-                <FormField label="Telefono numeris" name="phone" type="tel" placeholder="+370 ..." />
-                <div>
-                  <label className="block text-[0.9rem] font-semibold text-brand-gray-900 mb-2">
-                    Užklausos tipas
-                  </label>
-                  <select
-                    name="type"
-                    className="w-full px-4 py-[14px] border border-[#E0E0E0] rounded-lg bg-white text-brand-gray-900 text-[0.95rem] cursor-pointer focus:outline-none focus:border-brand-magenta focus:shadow-[0_0_0_3px_rgba(233,30,140,0.1)] transition-all"
-                  >
-                    <option value="bendras">Bendras klausimas</option>
-                    <option value="uzsakymas">Užsakymo klausimas</option>
-                    <option value="b2b">B2B bendradarbiavimas</option>
-                    <option value="kita">Kita</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[0.9rem] font-semibold text-brand-gray-900 mb-2">
-                    Žinutė <span className="text-brand-magenta">*</span>
-                  </label>
-                  <textarea
-                    name="message"
-                    rows={5}
-                    required
-                    placeholder="Jūsų žinutė..."
-                    className="w-full px-4 py-[14px] border border-[#E0E0E0] rounded-lg bg-white text-brand-gray-900 text-[0.95rem] resize-y min-h-[120px] focus:outline-none focus:border-brand-magenta focus:shadow-[0_0_0_3px_rgba(233,30,140,0.1)] transition-all"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full px-8 py-4 bg-brand-magenta text-white rounded-lg text-[1.05rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
-                >
-                  Siųsti žinutę →
-                </button>
-              </form>
+              <ContactForm lang={lang} />
             </div>
           </div>
         </Container>
@@ -291,36 +250,3 @@ export default async function ContactPage({
   )
 }
 
-function FormField({
-  label,
-  name,
-  type = 'text',
-  required = false,
-  placeholder,
-}: {
-  label: string
-  name: string
-  type?: string
-  required?: boolean
-  placeholder?: string
-}) {
-  return (
-    <div>
-      <label
-        htmlFor={`contact-${name}`}
-        className="block text-[0.9rem] font-semibold text-brand-gray-900 mb-2"
-      >
-        {label}
-        {required && <span className="text-brand-magenta ml-1">*</span>}
-      </label>
-      <input
-        id={`contact-${name}`}
-        type={type}
-        name={name}
-        required={required}
-        placeholder={placeholder}
-        className="w-full px-4 py-[14px] border border-[#E0E0E0] rounded-lg bg-white text-brand-gray-900 text-[0.95rem] placeholder:text-[#B0B0B0] focus:outline-none focus:border-brand-magenta focus:shadow-[0_0_0_3px_rgba(233,30,140,0.1)] transition-all"
-      />
-    </div>
-  )
-}

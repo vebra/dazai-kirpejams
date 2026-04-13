@@ -20,6 +20,7 @@ import { formatPrice } from '@/lib/utils'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
 import { AddToCartButton } from '@/components/commerce/AddToCartButton'
+import { isUserVerified } from '@/lib/auth/verification'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { productSchema, breadcrumbSchema } from '@/lib/schema'
 import { buildCanonicalUrl, buildLanguageAlternates, SITE_URL } from '@/lib/seo'
@@ -85,7 +86,10 @@ export default async function ProductPage({
   if (!category || category.id !== product.category_id) notFound()
 
   const dict = await getDictionary(lang)
-  const relatedProducts = await getRelatedProducts(product, 4)
+  const [relatedProducts, verified] = await Promise.all([
+    getRelatedProducts(product, 4),
+    isUserVerified(),
+  ])
 
   const name = getProductName(product, lang)
   const description = getProductDescription(product, lang)
@@ -231,7 +235,7 @@ export default async function ProductPage({
                       pakuotė
                     </div>
                   </div>
-                  {pricePerMl && (
+                  {pricePerMl && verified && (
                     <div className="text-[0.88rem] text-brand-gray-900 ml-auto">
                       Kaina per ml:{' '}
                       <strong className="text-brand-magenta">
@@ -243,21 +247,35 @@ export default async function ProductPage({
               )}
 
               {/* Price */}
-              <div className="flex items-baseline flex-wrap gap-3 mb-5">
-                {comparePrice && (
-                  <span className="text-[1.1rem] text-brand-gray-500 line-through">
-                    {formatPrice(comparePrice, lang)}
+              {verified ? (
+                <div className="flex items-baseline flex-wrap gap-3 mb-5">
+                  {comparePrice && (
+                    <span className="text-[1.1rem] text-brand-gray-500 line-through">
+                      {formatPrice(comparePrice, lang)}
+                    </span>
+                  )}
+                  <span className="text-[2.25rem] font-extrabold text-brand-magenta leading-none">
+                    {formatPrice(price, lang)}
                   </span>
-                )}
-                <span className="text-[2.25rem] font-extrabold text-brand-magenta leading-none">
-                  {formatPrice(price, lang)}
-                </span>
-                {savings && savings > 0 && (
-                  <span className="px-3 py-1 bg-brand-magenta/10 text-brand-magenta text-[0.78rem] font-bold rounded-full">
-                    Sutaupote {formatPrice(savings, lang)}
-                  </span>
-                )}
-              </div>
+                  {savings && savings > 0 && (
+                    <span className="px-3 py-1 bg-brand-magenta/10 text-brand-magenta text-[0.78rem] font-bold rounded-full">
+                      Sutaupote {formatPrice(savings, lang)}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <div className="mb-5 px-5 py-4 bg-brand-gray-50 rounded-xl border border-[#E0E0E0]">
+                  <p className="text-[0.92rem] text-brand-gray-500 mb-2">
+                    Kainos matomos tik patvirtintiems profesionalams.
+                  </p>
+                  <Link
+                    href={`/${lang}/prisijungimas`}
+                    className="text-brand-magenta font-semibold text-[0.92rem] hover:underline"
+                  >
+                    Prisijunkite arba registruokitės →
+                  </Link>
+                </div>
+              )}
 
               {/* Description */}
               {description && (
@@ -267,32 +285,49 @@ export default async function ProductPage({
               )}
 
               {/* CTA */}
-              <div className="flex flex-col sm:flex-row gap-3 mb-8">
-                <AddToCartButton
-                  variant="large"
-                  className="flex-1 !px-10 !py-[18px] !rounded-lg !text-[1.05rem]"
-                  label={dict.popular.addToCart}
-                  labelAdded={dict.popular.added ?? 'Pridėta į krepšelį'}
-                  item={{
-                    productId: product.id,
-                    slug: product.slug,
-                    categorySlug,
-                    sku: product.sku,
-                    name,
-                    priceCents: product.price_cents,
-                    volumeMl: product.volume_ml,
-                    imageUrl: images[0] ?? null,
-                    colorHex: product.color_hex,
-                    colorNumber: product.color_number,
-                  }}
-                />
-                <Link
-                  href={`/${lang}/salonams`}
-                  className="inline-flex items-center justify-center px-8 py-[18px] border-2 border-brand-magenta text-brand-magenta rounded-lg font-semibold hover:bg-brand-magenta hover:text-white transition-all"
-                >
-                  B2B kaina
-                </Link>
-              </div>
+              {verified ? (
+                <div className="flex flex-col sm:flex-row gap-3 mb-8">
+                  <AddToCartButton
+                    variant="large"
+                    className="flex-1 !px-10 !py-[18px] !rounded-lg !text-[1.05rem]"
+                    label={dict.popular.addToCart}
+                    labelAdded={dict.popular.added ?? 'Pridėta į krepšelį'}
+                    item={{
+                      productId: product.id,
+                      slug: product.slug,
+                      categorySlug,
+                      sku: product.sku,
+                      name,
+                      priceCents: product.price_cents,
+                      volumeMl: product.volume_ml,
+                      imageUrl: images[0] ?? null,
+                      colorHex: product.color_hex,
+                      colorNumber: product.color_number,
+                    }}
+                  />
+                  <Link
+                    href={`/${lang}/salonams`}
+                    className="inline-flex items-center justify-center px-8 py-[18px] border-2 border-brand-magenta text-brand-magenta rounded-lg font-semibold hover:bg-brand-magenta hover:text-white transition-all"
+                  >
+                    B2B kaina
+                  </Link>
+                </div>
+              ) : (
+                <div className="flex flex-col sm:flex-row gap-3 mb-8">
+                  <Link
+                    href={`/${lang}/registracija`}
+                    className="flex-1 flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.05rem] font-semibold hover:bg-brand-magenta/90 transition-colors"
+                  >
+                    Registruotis kaip profesionalas
+                  </Link>
+                  <Link
+                    href={`/${lang}/salonams`}
+                    className="inline-flex items-center justify-center px-8 py-[18px] border-2 border-brand-magenta text-brand-magenta rounded-lg font-semibold hover:bg-brand-magenta hover:text-white transition-all"
+                  >
+                    B2B kaina
+                  </Link>
+                </div>
+              )}
 
               {/* Meta */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-[#E0E0E0]">
@@ -431,6 +466,7 @@ export default async function ProductPage({
                   lang={lang}
                   categorySlug={categorySlug}
                   dict={dict}
+                  isVerified={verified}
                 />
               ))}
             </div>

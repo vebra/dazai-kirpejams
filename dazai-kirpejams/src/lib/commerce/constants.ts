@@ -46,19 +46,37 @@ export function calculateShippingCents(
 }
 
 /**
- * Apskaičiuoja užsakymo sumas (subtotal, PVM, pristatymas, total).
- * PVM skaičiuojamas nuo subtotal — kaina jau su PVM, tad tai yra
- * dalis nuo galutinės kainos (included VAT).
+ * Apskaičiuoja užsakymo sumas (subtotal, nuolaida, PVM, pristatymas, total).
+ *
+ * Nuolaida taikoma prekių sumai PRIEŠ pristatymą — klientas mato tiek pigesnes
+ * prekes, tiek (jei peržengė ribą) nemokamą pristatymą. Tačiau nemokamo
+ * pristatymo riba skaičiuojama nuo NE NUOLAIDOS sumos (subtotal), kad kuponas
+ * nepanaikintų kliento teisės į nemokamą pristatymą.
+ *
+ * PVM skaičiuojamas nuo galutinės sumos (kaina jau su PVM, tad tai yra
+ * įskaičiuoto PVM dalis).
  */
 export function calculateOrderTotals(
   subtotalCents: number,
-  deliveryMethod: DeliveryMethod
+  deliveryMethod: DeliveryMethod,
+  discountCents: number = 0
 ) {
   const shippingCents = calculateShippingCents(subtotalCents, deliveryMethod)
-  const totalCents = subtotalCents + shippingCents
+  // Saugumas: nuolaida niekada negali viršyti subtotal
+  const clampedDiscount = Math.max(
+    0,
+    Math.min(discountCents, subtotalCents)
+  )
+  const totalCents = subtotalCents - clampedDiscount + shippingCents
   // PVM dalis nuo galutinės kainos (kaina ir taip su PVM)
   const vatCents = Math.round(totalCents - totalCents / (1 + VAT_RATE))
-  return { subtotalCents, shippingCents, vatCents, totalCents }
+  return {
+    subtotalCents,
+    discountCents: clampedDiscount,
+    shippingCents,
+    vatCents,
+    totalCents,
+  }
 }
 
 /**

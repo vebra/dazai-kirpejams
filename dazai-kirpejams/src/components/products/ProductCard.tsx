@@ -11,6 +11,8 @@ type ProductCardProps = {
   categorySlug: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict: any
+  /** When false, price and cart button are hidden — user must be a verified professional */
+  isVerified?: boolean
 }
 
 export function ProductCard({
@@ -18,6 +20,7 @@ export function ProductCard({
   lang,
   categorySlug,
   dict,
+  isVerified = false,
 }: ProductCardProps) {
   const name = getProductName(product, lang)
   const href = `/${lang}/produktai/${categorySlug}/${product.slug}`
@@ -77,28 +80,39 @@ export function ProductCard({
           </div>
         )}
 
-        <div className="flex items-center justify-between">
-          <div className="text-[1.15rem] font-bold text-brand-gray-900">
-            {formatPrice(product.price_cents / 100, lang)}
+        {isVerified ? (
+          <div className="flex items-center justify-between">
+            <div className="text-[1.15rem] font-bold text-brand-gray-900">
+              {formatPrice(product.price_cents / 100, lang)}
+            </div>
+            <AddToCartButton
+              variant="icon"
+              label={dict.popular.addToCart}
+              labelAdded={dict.popular.added ?? 'Pridėta'}
+              item={{
+                productId: product.id,
+                slug: product.slug,
+                categorySlug,
+                sku: product.sku,
+                name,
+                priceCents: product.price_cents,
+                volumeMl: product.volume_ml,
+                imageUrl: primaryImage ?? null,
+                colorHex: product.color_hex,
+                colorNumber: product.color_number,
+              }}
+            />
           </div>
-          <AddToCartButton
-            variant="icon"
-            label={dict.popular.addToCart}
-            labelAdded={dict.popular.added ?? 'Pridėta'}
-            item={{
-              productId: product.id,
-              slug: product.slug,
-              categorySlug,
-              sku: product.sku,
-              name,
-              priceCents: product.price_cents,
-              volumeMl: product.volume_ml,
-              imageUrl: primaryImage ?? null,
-              colorHex: product.color_hex,
-              colorNumber: product.color_number,
-            }}
-          />
-        </div>
+        ) : (
+          <div className="pt-1">
+            <Link
+              href={`/${lang}/prisijungimas`}
+              className="text-[0.78rem] font-semibold text-brand-magenta hover:underline"
+            >
+              Prisijunkite dėl kainos →
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   )

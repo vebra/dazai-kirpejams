@@ -1,10 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
+import { Newsletter } from '@/components/home/Newsletter'
 import { buildPageMetadata } from '@/lib/seo'
-import { articles, CATEGORY_STYLES } from '@/lib/data/articles'
+import { getBlogPosts } from '@/lib/data/queries'
+import { CATEGORY_STYLES, type ArticleCategory } from '@/lib/data/articles'
 
 export async function generateMetadata({
   params,
@@ -20,11 +23,19 @@ export async function generateMetadata({
   })
 }
 
+const CATEGORY_LABELS: Record<string, string> = {
+  patarimai: 'Patarimai',
+  produktai: 'Produktai',
+  tendencijos: 'Tendencijos',
+}
+
 export default async function BlogPage({
   params,
 }: PageProps<'/[lang]/blogas'>) {
   const { lang } = await params
   if (!hasLocale(lang)) notFound()
+
+  const posts = await getBlogPosts(lang)
 
   return (
     <>
@@ -58,89 +69,81 @@ export default async function BlogPage({
         </Container>
       </section>
 
-      {/* Category filters */}
-      <section className="py-6 bg-white border-b border-[#E0E0E0]">
-        <Container>
-          <div className="flex flex-wrap gap-3 justify-center">
-            {[
-              { key: 'visi', label: 'Visi' },
-              { key: 'patarimai', label: 'Patarimai' },
-              { key: 'produktai', label: 'Produktai' },
-              { key: 'tendencijos', label: 'Tendencijos' },
-            ].map((filter, i) => (
-              <button
-                key={filter.key}
-                type="button"
-                className={`px-6 py-2.5 rounded-full text-[0.9rem] font-semibold border transition-all ${
-                  i === 0
-                    ? 'bg-brand-magenta text-white border-brand-magenta shadow-[0_4px_16px_rgba(233,30,140,0.3)]'
-                    : 'bg-white text-brand-gray-900 border-[#E0E0E0] hover:border-brand-magenta hover:text-brand-magenta'
-                }`}
-              >
-                {filter.label}
-              </button>
-            ))}
-          </div>
-        </Container>
-      </section>
-
       {/* Articles grid */}
       <section className="py-20 bg-white">
         <Container>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {articles.map((article) => (
-              <article
-                key={article.slug}
-                className="group bg-white rounded-xl overflow-hidden border border-[#E0E0E0] hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 hover:border-brand-magenta transition-all flex flex-col"
-              >
-                {/* Image placeholder */}
-                <Link
-                  href={`/${lang}/blogas/${article.slug}`}
-                  className="relative aspect-[16/10] bg-[linear-gradient(135deg,#f5f5f7_0%,#e8e8ec_100%)] flex items-center justify-center overflow-hidden"
-                  aria-label={article.title}
+          {posts.length === 0 ? (
+            <div className="text-center py-16 text-brand-gray-500">
+              Straipsnių kol kas nėra. Grįžkite netrukus!
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {posts.map((post) => (
+                <article
+                  key={post.slug}
+                  className="group bg-white rounded-xl overflow-hidden border border-[#E0E0E0] hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 hover:border-brand-magenta transition-all flex flex-col"
                 >
-                  <span
-                    className="text-[4rem] text-brand-magenta/30 group-hover:scale-110 transition-transform"
-                    aria-hidden
+                  <Link
+                    href={`/${lang}/blogas/${post.slug}`}
+                    className="relative aspect-[16/10] bg-[linear-gradient(135deg,#f5f5f7_0%,#e8e8ec_100%)] flex items-center justify-center overflow-hidden"
+                    aria-label={post.title}
                   >
-                    {article.icon}
-                  </span>
-                </Link>
-                <div className="p-7 flex flex-col flex-1">
-                  <span
-                    className={`inline-block self-start px-3 py-1 rounded-full text-[0.72rem] font-bold uppercase tracking-wider mb-4 ${
-                      CATEGORY_STYLES[article.category]
-                    }`}
-                  >
-                    {article.categoryLabel}
-                  </span>
-                  <h3 className="text-[1.15rem] font-bold text-brand-gray-900 mb-3 leading-snug group-hover:text-brand-magenta transition-colors">
-                    <Link href={`/${lang}/blogas/${article.slug}`}>
-                      {article.title}
-                    </Link>
-                  </h3>
-                  <p className="text-[0.92rem] text-brand-gray-500 leading-[1.6] mb-5 flex-1">
-                    {article.excerpt}
-                  </p>
-                  <div className="flex items-center justify-between pt-4 border-t border-[#E0E0E0]">
-                    <time className="text-[0.82rem] text-brand-gray-500">
-                      {article.date}
-                    </time>
-                    <Link
-                      href={`/${lang}/blogas/${article.slug}`}
-                      className="text-[0.88rem] font-semibold text-brand-magenta group-hover:translate-x-1 transition-transform"
-                    >
-                      Skaityti daugiau →
-                    </Link>
+                    {post.coverImageUrl ? (
+                      <Image
+                        src={post.coverImageUrl}
+                        alt={post.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <span
+                        className="text-[4rem] text-brand-magenta/30 group-hover:scale-110 transition-transform"
+                        aria-hidden
+                      >
+                        ✏
+                      </span>
+                    )}
+                  </Link>
+                  <div className="p-7 flex flex-col flex-1">
+                    {post.category && (
+                      <span
+                        className={`inline-block self-start px-3 py-1 rounded-full text-[0.72rem] font-bold uppercase tracking-wider mb-4 ${
+                          CATEGORY_STYLES[post.category as ArticleCategory] ??
+                          'bg-brand-gray-50 text-brand-gray-500'
+                        }`}
+                      >
+                        {CATEGORY_LABELS[post.category] ?? post.category}
+                      </span>
+                    )}
+                    <h3 className="text-[1.15rem] font-bold text-brand-gray-900 mb-3 leading-snug group-hover:text-brand-magenta transition-colors">
+                      <Link href={`/${lang}/blogas/${post.slug}`}>
+                        {post.title}
+                      </Link>
+                    </h3>
+                    <p className="text-[0.92rem] text-brand-gray-500 leading-[1.6] mb-5 flex-1 line-clamp-3">
+                      {post.excerpt}
+                    </p>
+                    <div className="flex items-center justify-between pt-4 border-t border-[#E0E0E0]">
+                      <time className="text-[0.82rem] text-brand-gray-500">
+                        {(post.publishedAt ?? post.createdAt)?.substring(0, 10)}
+                      </time>
+                      <Link
+                        href={`/${lang}/blogas/${post.slug}`}
+                        className="text-[0.88rem] font-semibold text-brand-magenta group-hover:translate-x-1 transition-transform"
+                      >
+                        Skaityti daugiau →
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              </article>
-            ))}
-          </div>
+                </article>
+              ))}
+            </div>
+          )}
         </Container>
       </section>
 
-      {/* CTA — juodas blokas */}
+      {/* CTA */}
       <section className="py-20 bg-brand-gray-900 text-center">
         <Container>
           <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-white/60 mb-3">
@@ -151,8 +154,8 @@ export default async function BlogPage({
           </h2>
           <p className="text-[1.05rem] text-white/75 mb-9 max-w-[620px] mx-auto leading-[1.7]">
             Straipsniai — tai teorija. O Jūsų rankose — profesionalūs įrankiai,
-            kurie kalba patys už save. 180 ml Color SHOCK dažai — daugiau
-            vertės kiekvienam dažymui.
+            kurie kalba patys už save. 180 ml Color SHOCK dažai — daugiau vertės
+            kiekvienam dažymui.
           </p>
           <Link
             href={`/${lang}/produktai`}
@@ -164,35 +167,7 @@ export default async function BlogPage({
       </section>
 
       {/* Newsletter */}
-      <section className="py-16 bg-brand-gray-50">
-        <Container>
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-8 max-w-[980px] mx-auto">
-            <div className="text-center lg:text-left lg:max-w-[440px]">
-              <h3 className="text-[1.35rem] font-bold text-brand-gray-900 mb-2 leading-tight">
-                Gaukite naujausių straipsnių ir pasiūlymų
-              </h3>
-              <p className="text-[0.95rem] text-brand-gray-500 leading-[1.6]">
-                Prenumeruokite naujienlaiškį ir gaukite profesionalius
-                patarimus bei specialius pasiūlymus tiesiai į el. paštą.
-              </p>
-            </div>
-            <form className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto lg:min-w-[440px]">
-              <input
-                type="email"
-                required
-                placeholder="Jūsų el. pašto adresas"
-                className="flex-1 px-5 py-[14px] border border-[#E0E0E0] rounded-lg bg-white text-brand-gray-900 text-[0.95rem] placeholder:text-[#B0B0B0] focus:outline-none focus:border-brand-magenta focus:shadow-[0_0_0_3px_rgba(233,30,140,0.1)] transition-all"
-              />
-              <button
-                type="submit"
-                className="px-7 py-[14px] bg-brand-magenta text-white rounded-lg text-[0.95rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all whitespace-nowrap"
-              >
-                Prenumeruoti
-              </button>
-            </form>
-          </div>
-        </Container>
-      </section>
+      <Newsletter lang={lang} />
     </>
   )
 }

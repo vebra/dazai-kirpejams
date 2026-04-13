@@ -4,6 +4,7 @@ import { Container } from '@/components/ui/Container'
 import { LocaleSwitcher } from './LocaleSwitcher'
 import { MobileMenu } from './MobileMenu'
 import { HeaderCart } from './HeaderCart'
+import { HeaderAuth } from './HeaderAuth'
 import type { Locale } from '@/i18n/config'
 
 type HeaderProps = {
@@ -65,8 +66,9 @@ export function Header({ lang, dict }: HeaderProps) {
           </nav>
 
           {/* Right side */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <LocaleSwitcher currentLocale={lang} />
+            <HeaderAuth lang={lang} />
             <HeaderCart lang={lang} label={nav.cart} />
             <MobileMenu lang={lang} links={links} />
           </div>

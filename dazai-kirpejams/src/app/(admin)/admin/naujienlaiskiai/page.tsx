@@ -1,26 +1,24 @@
 import { requireAdmin } from '@/lib/admin/auth'
-import { AdminPlaceholder } from '@/components/admin/AdminPlaceholder'
+import { getNewsletterSubscribers } from '@/lib/admin/queries'
+import { SubscribersTable } from './SubscribersTable'
 
 export const metadata = {
   title: 'Naujienlaiškiai',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminNewsletterPage() {
   await requireAdmin()
 
+  const subscribers = await getNewsletterSubscribers()
+
   return (
-    <AdminPlaceholder
-      title="Naujienlaiškiai"
-      description="Prenumeratorių valdymas ir kampanijų siuntimas — segmentavimas, šablonai, atidarymo statistika."
-      icon="📧"
-      plannedFeatures={[
-        'Prenumeratorių sąrašas su paieška ir eksportu',
-        'Segmentai (visi / B2C / B2B / aktyvūs pirkėjai)',
-        'Kampanijų kūrimas su drag-and-drop redaktoriumi',
-        'Siuntimo planavimas ir testiniai laiškai',
-        'Atidarymo / paspaudimų statistika',
-        'BDAR — automatinis unsubscribe handling',
-      ]}
-    />
+    <div>
+      <h1 className="text-2xl font-bold text-brand-gray-900 mb-6">
+        Naujienlaiškiai
+      </h1>
+      <SubscribersTable subscribers={subscribers} />
+    </div>
   )
 }

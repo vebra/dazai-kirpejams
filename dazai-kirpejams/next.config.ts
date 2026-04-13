@@ -17,6 +17,14 @@ function getSupabaseHost(): string | null {
 const supabaseHost = getSupabaseHost()
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // Default Server Action body limit = 1MB. Produktų nuotraukos gali
+    // siekti iki 10MB (taip nustatyta 'products' storage bucket'e).
+    // Paliekam 12MB kad telpa multipart overhead.
+    serverActions: {
+      bodySizeLimit: '12mb',
+    },
+  },
   images: {
     remotePatterns: [
       // Supabase Storage

@@ -3,7 +3,16 @@
 import { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Truck, Package, Building2, CreditCard, Banknote } from 'lucide-react'
+import {
+  ArrowLeft,
+  Truck,
+  Package,
+  Building2,
+  CreditCard,
+  Banknote,
+  Tag,
+  X,
+} from 'lucide-react'
 import { useCartStore } from '@/lib/commerce/cart-store'
 import {
   calculateOrderTotals,
@@ -16,6 +25,7 @@ import {
 } from '@/lib/commerce/constants'
 import { formatPrice } from '@/lib/utils'
 import { createOrder } from '@/lib/commerce/order-actions'
+import { validateDiscountCodeAction } from '@/lib/commerce/discount-actions'
 import type { Locale } from '@/i18n/config'
 
 type CheckoutFormProps = {
@@ -51,6 +61,15 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
   const [notes, setNotes] = useState('')
   const [agreed, setAgreed] = useState(false)
 
+  // Nuolaidų kodas
+  const [discountInput, setDiscountInput] = useState('')
+  const [discountValidating, setDiscountValidating] = useState(false)
+  const [discountError, setDiscountError] = useState<string | null>(null)
+  const [appliedDiscount, setAppliedDiscount] = useState<{
+    code: string
+    cents: number
+  } | null>(null)
+
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -74,7 +93,48 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
     (sum, i) => sum + i.priceCents * i.quantity,
     0
   )
-  const totals = calculateOrderTotals(subtotalCents, deliveryMethod)
+  // Nuolaidos rodymas UI — server flow vėl perskaičiuos tikrą sumą prieš insert'ą
+  const discountCents = appliedDiscount?.cents ?? 0
+  const totals = calculateOrderTotals(
+    subtotalCents,
+    deliveryMethod,
+    discountCents
+  )
+
+  const handleApplyDiscount = async () => {
+    setDiscountError(null)
+    const code = discountInput.trim().toUpperCase()
+    if (!code) {
+      setDiscountError('Įveskite kupono kodą.')
+      return
+    }
+    setDiscountValidating(true)
+    try {
+      const result = await validateDiscountCodeAction(code, subtotalCents)
+      if (!result.ok) {
+        setDiscountError(result.error)
+        setAppliedDiscount(null)
+        return
+      }
+      setAppliedDiscount({ code: result.code, cents: result.discountCents })
+      setDiscountInput('')
+    } finally {
+      setDiscountValidating(false)
+    }
+  }
+
+  const handleRemoveDiscount = () => {
+    setAppliedDiscount(null)
+    setDiscountError(null)
+  }
+
+  // Jei subtotal sumažėjo žemiau min_order po prekių pašalinimo — auto-nuimam kuponą
+  useEffect(() => {
+    if (!appliedDiscount) return
+    if (appliedDiscount.cents > subtotalCents) {
+      setAppliedDiscount(null)
+    }
+  }, [subtotalCents, appliedDiscount])
   const canSubmit =
     meetsMinimumOrder(subtotalCents) &&
     agreed &&
@@ -117,6 +177,7 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
         paymentMethod,
         notes: notes || undefined,
         locale: lang,
+        discountCode: appliedDiscount?.code,
       })
 
       if (result.ok) {
@@ -378,11 +439,79 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
             ))}
           </div>
 
+          {/* Nuolaidos kupono laukas */}
+          <div className="pt-4 border-t border-brand-gray-50/60">
+            {appliedDiscount ? (
+              <div className="flex items-center justify-between gap-3 p-3 bg-brand-magenta/5 border border-brand-magenta/20 rounded-xl">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Tag className="w-4 h-4 text-brand-magenta flex-shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold font-mono text-brand-magenta truncate">
+                      {appliedDiscount.code}
+                    </div>
+                    <div className="text-[11px] text-brand-gray-500">
+                      Nuolaida pritaikyta
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemoveDiscount}
+                  className="p-1.5 text-brand-gray-500 hover:text-brand-gray-900 transition-colors"
+                  aria-label="Pašalinti kuponą"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={discountInput}
+                    onChange={(e) => {
+                      setDiscountInput(e.target.value)
+                      setDiscountError(null)
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        handleApplyDiscount()
+                      }
+                    }}
+                    placeholder="Kupono kodas"
+                    className="flex-1 px-3 py-2 bg-white border border-brand-gray-50 rounded-lg text-sm font-mono uppercase focus:outline-none focus:border-brand-magenta transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyDiscount}
+                    disabled={discountValidating || !discountInput.trim()}
+                    className="px-4 py-2 bg-brand-gray-900 text-white rounded-lg text-xs font-semibold hover:bg-brand-gray-900/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
+                  >
+                    {discountValidating ? '…' : 'Pritaikyti'}
+                  </button>
+                </div>
+                {discountError && (
+                  <div className="mt-2 text-[11px] text-brand-magenta">
+                    {discountError}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           <div className="space-y-2 text-sm pt-4 border-t border-brand-gray-50/60">
             <Row
               label={dict.cart.subtotal}
               value={formatPrice(totals.subtotalCents / 100, lang)}
             />
+            {totals.discountCents > 0 && (
+              <Row
+                label={`Nuolaida${appliedDiscount ? ` (${appliedDiscount.code})` : ''}`}
+                value={`−${formatPrice(totals.discountCents / 100, lang)}`}
+                accent
+              />
+            )}
             <Row
               label={dict.cart.shipping}
               value={
@@ -536,17 +665,20 @@ function Row({
   label,
   value,
   muted,
+  accent,
 }: {
   label: string
   value: string
   muted?: boolean
+  accent?: boolean
 }) {
+  const colorClass = accent
+    ? 'text-brand-magenta'
+    : muted
+      ? 'text-brand-gray-500'
+      : 'text-brand-gray-900'
   return (
-    <div
-      className={`flex justify-between ${
-        muted ? 'text-brand-gray-500' : 'text-brand-gray-900'
-      }`}
-    >
+    <div className={`flex justify-between ${colorClass}`}>
       <span>{label}</span>
       <span className="font-semibold tabular-nums">{value}</span>
     </div>

@@ -1,26 +1,18 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { hasLocale } from '@/i18n/dictionaries'
-import { locales } from '@/i18n/config'
 import { Container } from '@/components/ui/Container'
+import { Newsletter } from '@/components/home/Newsletter'
 import { buildPageMetadata } from '@/lib/seo'
-import {
-  articles,
-  getArticleBySlug,
-  getRelatedArticles,
-  CATEGORY_STYLES,
-  type ArticleBlock,
-} from '@/lib/data/articles'
+import { getBlogPostBySlug, getBlogPosts } from '@/lib/data/queries'
+import { CATEGORY_STYLES, type ArticleCategory } from '@/lib/data/articles'
 
-export async function generateStaticParams() {
-  const params: { lang: string; slug: string }[] = []
-  for (const lang of locales) {
-    for (const article of articles) {
-      params.push({ lang, slug: article.slug })
-    }
-  }
-  return params
+const CATEGORY_LABELS: Record<string, string> = {
+  patarimai: 'Patarimai',
+  produktai: 'Produktai',
+  tendencijos: 'Tendencijos',
 }
 
 export async function generateMetadata({
@@ -29,106 +21,15 @@ export async function generateMetadata({
   const { lang, slug } = await params
   if (!hasLocale(lang)) return {}
 
-  const article = getArticleBySlug(slug)
-  if (!article) return {}
+  const post = await getBlogPostBySlug(slug, lang)
+  if (!post) return {}
 
   return buildPageMetadata({
     lang,
     path: `/blogas/${slug}`,
-    title: `${article.title} | Dažai Kirpėjams blogas`,
-    description: article.excerpt,
+    title: `${post.title} | Dažai Kirpėjams blogas`,
+    description: post.excerpt ?? '',
   })
-}
-
-function renderBlock(block: ArticleBlock, index: number) {
-  switch (block.type) {
-    case 'p':
-      return (
-        <p
-          key={index}
-          className="text-[1.05rem] leading-[1.85] text-brand-gray-700 mb-6"
-          dangerouslySetInnerHTML={{ __html: block.html }}
-        />
-      )
-    case 'h2':
-      return (
-        <h2
-          key={index}
-          className="text-[1.6rem] lg:text-[1.85rem] font-bold text-brand-gray-900 mt-10 mb-5 leading-tight"
-        >
-          {block.text}
-        </h2>
-      )
-    case 'h3':
-      return (
-        <h3
-          key={index}
-          className="text-[1.2rem] lg:text-[1.35rem] font-bold text-brand-gray-900 mt-8 mb-4 leading-tight"
-        >
-          {block.text}
-        </h3>
-      )
-    case 'ul':
-      return (
-        <ul
-          key={index}
-          className="list-disc pl-6 mb-6 space-y-2 text-[1.05rem] leading-[1.8] text-brand-gray-700 marker:text-brand-magenta"
-        >
-          {block.items.map((item, i) => (
-            <li key={i} dangerouslySetInnerHTML={{ __html: item }} />
-          ))}
-        </ul>
-      )
-    case 'blockquote':
-      return (
-        <blockquote
-          key={index}
-          className="my-8 border-l-4 border-brand-magenta bg-brand-gray-50 pl-6 pr-5 py-5 rounded-r-lg text-[1.05rem] leading-[1.75] text-brand-gray-900 italic"
-          dangerouslySetInnerHTML={{ __html: block.html }}
-        />
-      )
-    case 'table':
-      return (
-        <div
-          key={index}
-          className="my-8 overflow-x-auto rounded-xl border border-[#E0E0E0]"
-        >
-          <table className="w-full text-left text-[0.95rem]">
-            <thead className="bg-brand-gray-50">
-              <tr>
-                {block.headers.map((h, i) => (
-                  <th
-                    key={i}
-                    className="px-5 py-4 font-semibold text-brand-gray-900 border-b border-[#E0E0E0]"
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {block.rows.map((row, i) => (
-                <tr
-                  key={i}
-                  className="border-b border-[#E0E0E0] last:border-b-0"
-                >
-                  {row.map((cell, j) => (
-                    <td
-                      key={j}
-                      className="px-5 py-4 text-brand-gray-700 align-top"
-                    >
-                      {cell}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )
-    default:
-      return null
-  }
 }
 
 export default async function ArticlePage({
@@ -137,10 +38,22 @@ export default async function ArticlePage({
   const { lang, slug } = await params
   if (!hasLocale(lang)) notFound()
 
-  const article = getArticleBySlug(slug)
-  if (!article) notFound()
+  const post = await getBlogPostBySlug(slug, lang)
+  if (!post) notFound()
 
-  const related = getRelatedArticles(article)
+  // Related: other posts from same category, then any other
+  const allPosts = await getBlogPosts(lang)
+  const related = allPosts
+    .filter((p) => p.slug !== slug)
+    .sort((a, b) => {
+      // Same category first
+      if (a.category === post.category && b.category !== post.category)
+        return -1
+      if (b.category === post.category && a.category !== post.category)
+        return 1
+      return 0
+    })
+    .slice(0, 2)
 
   return (
     <>
@@ -161,7 +74,7 @@ export default async function ArticlePage({
             Blogas
           </Link>
           <span className="mx-2 text-[#E0E0E0]">/</span>
-          <span className="text-brand-gray-900 font-medium">{article.title}</span>
+          <span className="text-brand-gray-900 font-medium">{post.title}</span>
         </Container>
       </section>
 
@@ -169,31 +82,81 @@ export default async function ArticlePage({
       <section className="py-12 lg:py-16 bg-[linear-gradient(135deg,#ffffff_0%,#f5f5f7_100%)]">
         <Container>
           <div className="max-w-[820px] mx-auto text-center">
-            <span
-              className={`inline-block px-4 py-1.5 rounded-full text-[0.72rem] font-bold uppercase tracking-wider mb-5 ${CATEGORY_STYLES[article.category]}`}
-            >
-              {article.categoryLabel}
-            </span>
-            <h1 className="text-[clamp(1.85rem,4.5vw,2.85rem)] font-bold text-brand-gray-900 mb-5 leading-[1.2]">
-              {article.title}
-            </h1>
-            <div className="flex items-center justify-center gap-4 text-[0.9rem] text-brand-gray-500">
-              <time>{article.date}</time>
+            {post.category && (
               <span
-                className="inline-block w-1 h-1 rounded-full bg-[#D0D0D0]"
-                aria-hidden
-              />
-              <span>{article.readingMinutes} min. skaitymo</span>
-            </div>
+                className={`inline-block px-4 py-1.5 rounded-full text-[0.72rem] font-bold uppercase tracking-wider mb-5 ${
+                  CATEGORY_STYLES[post.category as ArticleCategory] ??
+                  'bg-brand-gray-50 text-brand-gray-500'
+                }`}
+              >
+                {CATEGORY_LABELS[post.category] ?? post.category}
+              </span>
+            )}
+            <h1 className="text-[clamp(1.85rem,4.5vw,2.85rem)] font-bold text-brand-gray-900 mb-5 leading-[1.2]">
+              {post.title}
+            </h1>
+            {post.publishedAt && (
+              <div className="text-[0.9rem] text-brand-gray-500">
+                <time>{post.publishedAt.substring(0, 10)}</time>
+                {post.author && (
+                  <>
+                    <span
+                      className="inline-block w-1 h-1 rounded-full bg-[#D0D0D0] mx-3 align-middle"
+                      aria-hidden
+                    />
+                    <span>{post.author}</span>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </Container>
       </section>
+
+      {/* Cover image */}
+      {post.coverImageUrl && (
+        <section className="bg-white">
+          <Container>
+            <div className="max-w-[820px] mx-auto -mt-4 mb-4">
+              <div className="relative aspect-[16/9] rounded-xl overflow-hidden">
+                <Image
+                  src={post.coverImageUrl}
+                  alt={post.title}
+                  fill
+                  sizes="(max-width: 820px) 100vw, 820px"
+                  className="object-cover"
+                  priority
+                />
+              </div>
+            </div>
+          </Container>
+        </section>
+      )}
 
       {/* Article body */}
       <section className="py-12 lg:py-16 bg-white">
         <Container>
           <div className="max-w-[760px] mx-auto">
-            {article.body.map((block, i) => renderBlock(block, i))}
+            {post.content ? (
+              <div
+                className="prose prose-lg prose-brand max-w-none
+                  [&_h2]:text-[1.6rem] [&_h2]:lg:text-[1.85rem] [&_h2]:font-bold [&_h2]:text-brand-gray-900 [&_h2]:mt-10 [&_h2]:mb-5
+                  [&_h3]:text-[1.2rem] [&_h3]:lg:text-[1.35rem] [&_h3]:font-bold [&_h3]:text-brand-gray-900 [&_h3]:mt-8 [&_h3]:mb-4
+                  [&_p]:text-[1.05rem] [&_p]:leading-[1.85] [&_p]:text-brand-gray-700 [&_p]:mb-6
+                  [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-6 [&_ul]:space-y-2 [&_li]:text-[1.05rem] [&_li]:leading-[1.8] [&_li]:text-brand-gray-700
+                  [&_blockquote]:my-8 [&_blockquote]:border-l-4 [&_blockquote]:border-brand-magenta [&_blockquote]:bg-brand-gray-50 [&_blockquote]:pl-6 [&_blockquote]:pr-5 [&_blockquote]:py-5 [&_blockquote]:rounded-r-lg [&_blockquote]:italic
+                  [&_table]:w-full [&_table]:my-8 [&_table]:border-collapse [&_table]:rounded-xl [&_table]:overflow-hidden [&_table]:border [&_table]:border-[#E0E0E0]
+                  [&_th]:px-5 [&_th]:py-4 [&_th]:bg-brand-gray-50 [&_th]:font-semibold [&_th]:text-brand-gray-900 [&_th]:text-left [&_th]:border-b [&_th]:border-[#E0E0E0]
+                  [&_td]:px-5 [&_td]:py-4 [&_td]:text-brand-gray-700 [&_td]:border-b [&_td]:border-[#E0E0E0]
+                  [&_a]:text-brand-magenta [&_a]:font-semibold [&_a]:hover:underline
+                  [&_strong]:text-brand-gray-900"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              />
+            ) : (
+              <p className="text-brand-gray-500">
+                Turinys ruošiamas...
+              </p>
+            )}
           </div>
         </Container>
       </section>
@@ -204,7 +167,7 @@ export default async function ArticlePage({
           <Container>
             <div className="max-w-[1100px] mx-auto">
               <h2 className="text-[clamp(1.4rem,3vw,2rem)] font-bold text-brand-gray-900 mb-8 text-center">
-                Susiję straipsniai
+                Kiti straipsniai
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {related.map((rel) => (
@@ -213,11 +176,16 @@ export default async function ArticlePage({
                     href={`/${lang}/blogas/${rel.slug}`}
                     className="group block bg-white rounded-xl p-7 border border-[#E0E0E0] hover:border-brand-magenta hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
                   >
-                    <span
-                      className={`inline-block px-3 py-1 rounded-full text-[0.7rem] font-bold uppercase tracking-wider mb-4 ${CATEGORY_STYLES[rel.category]}`}
-                    >
-                      {rel.categoryLabel}
-                    </span>
+                    {rel.category && (
+                      <span
+                        className={`inline-block px-3 py-1 rounded-full text-[0.7rem] font-bold uppercase tracking-wider mb-4 ${
+                          CATEGORY_STYLES[rel.category as ArticleCategory] ??
+                          'bg-brand-gray-50 text-brand-gray-500'
+                        }`}
+                      >
+                        {CATEGORY_LABELS[rel.category] ?? rel.category}
+                      </span>
+                    )}
                     <h3 className="text-[1.1rem] font-bold text-brand-gray-900 mb-3 leading-snug group-hover:text-brand-magenta transition-colors">
                       {rel.title}
                     </h3>
@@ -256,6 +224,9 @@ export default async function ArticlePage({
           </Link>
         </Container>
       </section>
+
+      {/* Newsletter */}
+      <Newsletter lang={lang} />
     </>
   )
 }

@@ -1,26 +1,24 @@
 import { requireAdmin } from '@/lib/admin/auth'
-import { AdminPlaceholder } from '@/components/admin/AdminPlaceholder'
+import { getBlogPosts } from '@/lib/admin/queries'
+import { BlogPostsTable } from './BlogPostsTable'
 
 export const metadata = {
   title: 'Blogas',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminBlogPage() {
   await requireAdmin()
 
+  const posts = await getBlogPosts()
+
   return (
-    <AdminPlaceholder
-      title="Blogas"
-      description="Straipsnių valdymas — SEO turinys kirpėjams, techninės instrukcijos, naujienos apie produktus."
-      icon="✏️"
-      plannedFeatures={[
-        'Straipsnių sąrašas (juodraščiai, publikuoti, suplanuoti)',
-        'Rich-text redaktorius su nuotraukų įkėlimu',
-        'Multi-lang turinys (LT / EN / RU)',
-        'SEO metaduomenys (title, description, og:image)',
-        'Automatinis susijusių produktų blokas straipsnio pabaigoje',
-        'Kategorijos ir žymos',
-      ]}
-    />
+    <div>
+      <h1 className="text-2xl font-bold text-brand-gray-900 mb-6">
+        Blogas
+      </h1>
+      <BlogPostsTable posts={posts} />
+    </div>
   )
 }

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
 import { getProducts, getCategories } from '@/lib/data/queries'
+import { isUserVerified } from '@/lib/auth/verification'
 import type { Locale } from '@/i18n/config'
 
 type FeaturedProductsProps = {
@@ -17,9 +18,10 @@ type FeaturedProductsProps = {
  *  - grid su 4 produktų kortelėmis (featured=true iš DB)
  */
 export async function FeaturedProducts({ lang, dict }: FeaturedProductsProps) {
-  const [products, categories] = await Promise.all([
+  const [products, categories, verified] = await Promise.all([
     getProducts({ featured: true, limit: 4 }),
     getCategories(),
+    isUserVerified(),
   ])
 
   if (products.length === 0) return null
@@ -56,6 +58,7 @@ export async function FeaturedProducts({ lang, dict }: FeaturedProductsProps) {
                 lang={lang}
                 categorySlug={categorySlug}
                 dict={dict}
+                isVerified={verified}
               />
             )
           })}

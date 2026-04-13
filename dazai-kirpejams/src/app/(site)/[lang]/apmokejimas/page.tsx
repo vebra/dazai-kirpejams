@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Section } from '@/components/ui/Section'
 import { CheckoutForm } from '@/components/commerce/CheckoutForm'
 import { buildPageMetadata } from '@/lib/seo'
+import { isUserVerified } from '@/lib/auth/verification'
 
 export async function generateMetadata({
   params,
@@ -29,6 +30,10 @@ export default async function CheckoutPage({
 }: PageProps<'/[lang]/apmokejimas'>) {
   const { lang } = await params
   if (!hasLocale(lang)) notFound()
+
+  const verified = await isUserVerified()
+  if (!verified) redirect(`/${lang}/prisijungimas`)
+
   const dict = await getDictionary(lang)
 
   return (

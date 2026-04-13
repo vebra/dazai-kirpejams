@@ -13,6 +13,7 @@ import {
   createServerClient,
   isSupabaseServerConfigured,
 } from '@/lib/supabase/server'
+import { getCompanyInfo } from '@/lib/admin/queries'
 import type { DeliveryMethod, PaymentMethod } from '@/lib/commerce/constants'
 
 export async function generateMetadata({
@@ -51,6 +52,8 @@ type OrderSnapshot = {
     quantity: number
   }[]
   subtotalCents: number
+  discountCode?: string | null
+  discountCents?: number
   shippingCents: number
   vatCents: number
   totalCents: number
@@ -100,6 +103,15 @@ export default async function OrderConfirmationPage({
   const order = await loadOrderSnapshot(orderNumber)
   if (!order) notFound()
 
+  // Įmonės rekvizitai iš Nustatymų — banko pavedimo instrukcijoms.
+  // Jei DB nėra arba laukai tušti, degraced'inam į laukimo žinutę.
+  const companyInfo = isSupabaseServerConfigured
+    ? await getCompanyInfo().catch(() => null)
+    : null
+  const hasBankInfo = Boolean(
+    companyInfo?.bankIban && companyInfo?.bankRecipient
+  )
+
   const deliveryIcon =
     order.deliveryMethod === 'courier'
       ? Truck
@@ -143,8 +155,8 @@ export default async function OrderConfirmationPage({
             </div>
           </div>
 
-          {/* Banko pavedimo instrukcijos */}
-          {order.paymentMethod === 'bank_transfer' && (
+          {/* Banko pavedimo instrukcijos — tik jei admin'as užpildė rekvizitus */}
+          {order.paymentMethod === 'bank_transfer' && hasBankInfo && (
             <div className="bg-brand-gray-900 text-white rounded-2xl p-8 mb-8">
               <h3 className="text-xl font-bold mb-2">
                 {dict.order.bankTransferInstructions}
@@ -153,12 +165,18 @@ export default async function OrderConfirmationPage({
                 {dict.order.bankTransferDesc}
               </p>
               <dl className="space-y-4 text-sm">
-                <BankRow label={dict.order.recipient} value="MB Dažai Kirpėjams" />
+                <BankRow
+                  label={dict.order.recipient}
+                  value={companyInfo!.bankRecipient}
+                />
                 <BankRow
                   label={dict.order.iban}
-                  value="LT00 0000 0000 0000 0000"
+                  value={companyInfo!.bankIban}
                   mono
                 />
+                {companyInfo!.bankName && (
+                  <BankRow label="Bankas" value={companyInfo!.bankName} />
+                )}
                 <BankRow
                   label={dict.order.amount}
                   value={formatPrice(order.totalCents / 100, lang)}
@@ -170,6 +188,15 @@ export default async function OrderConfirmationPage({
                   mono
                 />
               </dl>
+            </div>
+          )}
+          {/* Fallback: bank_transfer, bet rekvizitų dar nėra */}
+          {order.paymentMethod === 'bank_transfer' && !hasBankInfo && (
+            <div className="bg-brand-gray-50 border border-brand-gray-50 rounded-2xl p-6 mb-8">
+              <p className="text-sm text-brand-gray-900 leading-relaxed">
+                Mokėjimo instrukcijas atsiųsime atskiru laišku per artimiausią
+                darbo dieną.
+              </p>
             </div>
           )}
 
@@ -236,6 +263,13 @@ export default async function OrderConfirmationPage({
                 label={dict.cart.subtotal}
                 value={formatPrice(order.subtotalCents / 100, lang)}
               />
+              {order.discountCents && order.discountCents > 0 ? (
+                <SummaryRow
+                  label={`Nuolaida${order.discountCode ? ` (${order.discountCode})` : ''}`}
+                  value={`−${formatPrice(order.discountCents / 100, lang)}`}
+                  accent
+                />
+              ) : null}
               <SummaryRow
                 label={dict.cart.shipping}
                 value={
@@ -321,17 +355,20 @@ function SummaryRow({
   label,
   value,
   muted,
+  accent,
 }: {
   label: string
   value: string
   muted?: boolean
+  accent?: boolean
 }) {
+  const colorClass = accent
+    ? 'text-brand-magenta'
+    : muted
+      ? 'text-brand-gray-500'
+      : 'text-brand-gray-900'
   return (
-    <div
-      className={`flex justify-between ${
-        muted ? 'text-brand-gray-500' : 'text-brand-gray-900'
-      }`}
-    >
+    <div className={`flex justify-between ${colorClass}`}>
       <span>{label}</span>
       <span className="font-semibold tabular-nums">{value}</span>
     </div>

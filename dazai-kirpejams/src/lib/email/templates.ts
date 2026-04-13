@@ -49,6 +49,21 @@ type OrderItem = {
   unitPriceCents: number
 }
 
+/**
+ * Įmonės duomenys email šablonui — banko informacija + footer.
+ * Jei visi laukai tušti (admin'as dar neužpildė Nustatymų), banko blokas
+ * elgiasi degraced: nerodom IBAN instrukcijų arba rodom fallback placeholder'į.
+ */
+type CompanyInfoForEmail = {
+  legalName: string
+  address: string
+  email: string
+  phone: string
+  bankRecipient: string
+  bankIban: string
+  bankName: string
+}
+
 type CustomerOrderEmailInput = {
   orderNumber: string
   firstName: string
@@ -62,11 +77,14 @@ type CustomerOrderEmailInput = {
   paymentMethod: 'bank_transfer' | 'paysera' | 'stripe'
   items: OrderItem[]
   subtotalCents: number
+  discountCode?: string | null
+  discountCents?: number
   shippingCents: number
   vatCents: number
   totalCents: number
   createdAt: string
   siteUrl: string
+  company?: CompanyInfoForEmail
 }
 
 const DELIVERY_LT: Record<string, string> = {
@@ -114,8 +132,20 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
         ? `Paštomatas: ${escapeHtml(input.deliveryAddress)}`
         : 'Atsiėmimas vietoje'
 
+  // Banko pavedimo blokas rodomas tik jei:
+  //   - mokėjimo būdas = bank_transfer
+  //   - admin'as užpildė bent IBAN'ą ir gavėją Nustatymuose
+  // Jei nėra IBAN'o, rodom paprastesnę žinutę be rekvizitų — kad nesiųsti
+  // placeholder'ių klientams.
+  const hasBankInfo = Boolean(
+    input.company?.bankIban && input.company?.bankRecipient
+  )
+  const bankRecipient = input.company?.bankRecipient ?? ''
+  const bankIban = input.company?.bankIban ?? ''
+  const bankName = input.company?.bankName ?? ''
+
   const bankTransferBlock =
-    input.paymentMethod === 'bank_transfer'
+    input.paymentMethod === 'bank_transfer' && hasBankInfo
       ? `
       <tr>
         <td style="padding:0 20px;">
@@ -129,12 +159,20 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
             <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;">
               <tr>
                 <td style="padding:8px 0;color:rgba(255,255,255,0.6);">Gavėjas</td>
-                <td style="padding:8px 0;color:#ffffff;text-align:right;font-weight:600;">MB Dažai Kirpėjams</td>
+                <td style="padding:8px 0;color:#ffffff;text-align:right;font-weight:600;">${escapeHtml(bankRecipient)}</td>
               </tr>
               <tr>
                 <td style="padding:8px 0;color:rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.1);">IBAN</td>
-                <td style="padding:8px 0;color:#ffffff;text-align:right;font-family:monospace;border-top:1px solid rgba(255,255,255,0.1);">LT00 0000 0000 0000 0000</td>
+                <td style="padding:8px 0;color:#ffffff;text-align:right;font-family:monospace;border-top:1px solid rgba(255,255,255,0.1);">${escapeHtml(bankIban)}</td>
               </tr>
+              ${
+                bankName
+                  ? `<tr>
+                <td style="padding:8px 0;color:rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.1);">Bankas</td>
+                <td style="padding:8px 0;color:#ffffff;text-align:right;border-top:1px solid rgba(255,255,255,0.1);">${escapeHtml(bankName)}</td>
+              </tr>`
+                  : ''
+              }
               <tr>
                 <td style="padding:8px 0;color:rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.1);">Suma</td>
                 <td style="padding:8px 0;color:${BRAND_MAGENTA};text-align:right;font-weight:700;font-size:16px;border-top:1px solid rgba(255,255,255,0.1);">${formatEur(input.totalCents)}</td>
@@ -152,7 +190,19 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
           </div>
         </td>
       </tr>`
-      : ''
+      : input.paymentMethod === 'bank_transfer'
+        ? `
+      <tr>
+        <td style="padding:0 20px;">
+          <div style="background:${GRAY_50};border:1px solid ${BORDER};border-radius:12px;padding:20px;margin:24px 0;">
+            <div style="font-size:13px;color:${GRAY_900};line-height:1.6;">
+              Mokėjimo instrukcijas atsiųsime atskiru laišku per artimiausią
+              darbo dieną.
+            </div>
+          </div>
+        </td>
+      </tr>`
+        : ''
 
   const html = `<!doctype html>
 <html lang="lt">
@@ -223,6 +273,14 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
                       <td style="padding:2px 0;color:${GRAY_500};">Prekės</td>
                       <td style="padding:2px 0;color:${GRAY_900};text-align:right;">${formatEur(input.subtotalCents)}</td>
                     </tr>
+                    ${
+                      input.discountCents && input.discountCents > 0
+                        ? `<tr>
+                      <td style="padding:2px 0;color:${BRAND_MAGENTA};">Nuolaida${input.discountCode ? ` (${escapeHtml(input.discountCode)})` : ''}</td>
+                      <td style="padding:2px 0;color:${BRAND_MAGENTA};text-align:right;font-weight:600;">−${formatEur(input.discountCents)}</td>
+                    </tr>`
+                        : ''
+                    }
                     <tr>
                       <td style="padding:2px 0;color:${GRAY_500};">Pristatymas</td>
                       <td style="padding:2px 0;color:${GRAY_900};text-align:right;">${input.shippingCents === 0 ? 'Nemokamas' : formatEur(input.shippingCents)}</td>
@@ -279,8 +337,13 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
               arba parašykite mums el. paštu.
             </p>
             <p style="margin:0;font-size:12px;color:${GRAY_500};line-height:1.6;">
-              <strong style="color:${GRAY_900};">Dažai Kirpėjams</strong><br>
+              <strong style="color:${GRAY_900};">${escapeHtml(input.company?.legalName || 'Dažai Kirpėjams')}</strong><br>
               Profesionalūs plaukų dažai kirpėjams · 180 ml<br>
+              ${
+                input.company?.address
+                  ? `${escapeHtml(input.company.address)}<br>`
+                  : ''
+              }
               <a href="${input.siteUrl}" style="color:${BRAND_MAGENTA};text-decoration:none;">${input.siteUrl.replace(/^https?:\/\//, '')}</a>
             </p>
           </td>
@@ -311,7 +374,12 @@ Data: ${formatDate(input.createdAt)}
 UŽSAKYMAS
 ${itemsText}
 
-Prekės:     ${formatEur(input.subtotalCents)}
+Prekės:     ${formatEur(input.subtotalCents)}${
+    input.discountCents && input.discountCents > 0
+      ? `
+Nuolaida${input.discountCode ? ` (${input.discountCode})` : ''}: −${formatEur(input.discountCents)}`
+      : ''
+  }
 Pristatymas: ${input.shippingCents === 0 ? 'Nemokamas' : formatEur(input.shippingCents)}
 PVM (21%):  ${formatEur(input.vatCents)}
 IŠ VISO:    ${formatEur(input.totalCents)}
@@ -322,22 +390,26 @@ ${input.deliveryMethod === 'pickup' ? 'Atsiėmimas vietoje' : input.deliveryAddr
 ${input.deliveryCity ? `${input.deliveryCity} ${input.deliveryPostalCode ?? ''}` : ''}
 
 ${
-  input.paymentMethod === 'bank_transfer'
+  input.paymentMethod === 'bank_transfer' && hasBankInfo
     ? `
 APMOKĖJIMO INSTRUKCIJOS (Banko pavedimas)
-Gavėjas: MB Dažai Kirpėjams
-IBAN: LT00 0000 0000 0000 0000
+Gavėjas: ${bankRecipient}
+IBAN: ${bankIban}${bankName ? `\nBankas: ${bankName}` : ''}
 Suma: ${formatEur(input.totalCents)}
 Mokėjimo paskirtis: ${input.orderNumber}
 
 SVARBU: mokėjimo paskirtyje nurodykite tikslų užsakymo numerį.
 `
-    : ''
+    : input.paymentMethod === 'bank_transfer'
+      ? `
+Mokėjimo instrukcijas atsiųsime atskiru laišku per artimiausią darbo dieną.
+`
+      : ''
 }
 
 Jei turite klausimų — tiesiog atsakykite į šį laišką.
 
-Dažai Kirpėjams
+${input.company?.legalName || 'Dažai Kirpėjams'}
 ${input.siteUrl}
 `.trim()
 
