@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Menu, X, User, LogIn } from 'lucide-react'
@@ -53,19 +54,8 @@ export function MobileMenu({ lang, links }: MobileMenuProps) {
     return () => window.removeEventListener('keydown', handleKey)
   }, [open])
 
-  return (
+  const overlay = (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="lg:hidden p-2 text-brand-gray-900 hover:text-brand-magenta transition-colors"
-        aria-label="Atidaryti meniu"
-        aria-expanded={open}
-        aria-controls="mobile-menu"
-      >
-        <Menu className="w-6 h-6" />
-      </button>
-
       {/* Backdrop */}
       <div
         className={`lg:hidden fixed inset-0 z-[60] bg-brand-gray-900/60 backdrop-blur-sm transition-opacity duration-300 ${
@@ -159,6 +149,23 @@ export function MobileMenu({ lang, links }: MobileMenuProps) {
           <LocaleSwitcher currentLocale={lang} variant="mobile" />
         </div>
       </div>
+    </>
+  )
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="lg:hidden p-2 text-brand-gray-900 hover:text-brand-magenta transition-colors"
+        aria-label="Atidaryti meniu"
+        aria-expanded={open}
+        aria-controls="mobile-menu"
+      >
+        <Menu className="w-6 h-6" />
+      </button>
+
+      {typeof document !== 'undefined' && createPortal(overlay, document.body)}
     </>
   )
 }
