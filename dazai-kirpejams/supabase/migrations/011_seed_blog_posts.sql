@@ -20,7 +20,7 @@ SELECT 'kaip-pasirinkti-oksidanta',
 <h2>9% ir 12% oksidantas</h2>
 <p>Stipresnės koncentracijos naudojamos plaukų pašviesinimui 2–4 tonais arba balinimo procedūroms. Svarbu: kuo stipresnis oksidantas, tuo daugiau dėmesio plaukų būklei — visada įvertinkite porosity ir elastingumą prieš procedūrą.</p>
 <h2>Praktinės rekomendacijos</h2>
-<ul><li>Visada atlikite sruogelės testą prieš pirmą dažymą</li><li>Naudokite proporcijas pagal gamintojo nurodymus (Color SHOCK — 1:1,5)</li><li>Nenaudokite seno, atidaryto oksidanto — jis praranda aktyvumą</li><li>Saugokite oksidantą tamsioje, vėsioje vietoje</li></ul>
+<ul><li>Visada atlikite sruogelės testą prieš pirmą dažymą</li><li>Naudokite proporcijas pagal gamintojo nurodymus (Color SHOCK — 1:2)</li><li>Nenaudokite seno, atidaryto oksidanto — jis praranda aktyvumą</li><li>Saugokite oksidantą tamsioje, vėsioje vietoje</li></ul>
 <p>Teisingas oksidanto pasirinkimas — tai ne tik dažymo rezultatas, bet ir klientės plaukų sveikata ilgalaikėje perspektyvoje.</p>',
        '<p>Oksidanto koncentracija lemia, ar dažai tik dengia, ar šviesina plaukus. Neteisingas pasirinkimas — tai nenuspėjamas rezultatas, sausi plaukai ir nepatenkintas klientas. Šiame straipsnyje apžvelgsime, kada naudoti 3%, 6%, 9% ir 12% oksidantą bei kaip pasirinkti tinkamą koncentraciją pagal klientės plaukų būklę.</p>
 <h2>3% oksidantas (10 vol.)</h2>
@@ -30,7 +30,7 @@ SELECT 'kaip-pasirinkti-oksidanta',
 <h2>9% ir 12% oksidantas</h2>
 <p>Stipresnės koncentracijos naudojamos plaukų pašviesinimui 2–4 tonais arba balinimo procedūroms. Svarbu: kuo stipresnis oksidantas, tuo daugiau dėmesio plaukų būklei — visada įvertinkite porosity ir elastingumą prieš procedūrą.</p>
 <h2>Praktinės rekomendacijos</h2>
-<ul><li>Visada atlikite sruogelės testą prieš pirmą dažymą</li><li>Naudokite proporcijas pagal gamintojo nurodymus (Color SHOCK — 1:1,5)</li><li>Nenaudokite seno, atidaryto oksidanto — jis praranda aktyvumą</li><li>Saugokite oksidantą tamsioje, vėsioje vietoje</li></ul>
+<ul><li>Visada atlikite sruogelės testą prieš pirmą dažymą</li><li>Naudokite proporcijas pagal gamintojo nurodymus (Color SHOCK — 1:2)</li><li>Nenaudokite seno, atidaryto oksidanto — jis praranda aktyvumą</li><li>Saugokite oksidantą tamsioje, vėsioje vietoje</li></ul>
 <p>Teisingas oksidanto pasirinkimas — tai ne tik dažymo rezultatas, bet ir klientės plaukų sveikata ilgalaikėje perspektyvoje.</p>',
        '<p>Oksidanto koncentracija lemia, ar dažai tik dengia, ar šviesina plaukus. Neteisingas pasirinkimas — tai nenuspėjamas rezultatas, sausi plaukai ir nepatenkintas klientas. Šiame straipsnyje apžvelgsime, kada naudoti 3%, 6%, 9% ir 12% oksidantą bei kaip pasirinkti tinkamą koncentraciją pagal klientės plaukų būklę.</p>
 <h2>3% oksidantas (10 vol.)</h2>
@@ -40,7 +40,7 @@ SELECT 'kaip-pasirinkti-oksidanta',
 <h2>9% ir 12% oksidantas</h2>
 <p>Stipresnės koncentracijos naudojamos plaukų pašviesinimui 2–4 tonais arba balinimo procedūroms. Svarbu: kuo stipresnis oksidantas, tuo daugiau dėmesio plaukų būklei — visada įvertinkite porosity ir elastingumą prieš procedūrą.</p>
 <h2>Praktinės rekomendacijos</h2>
-<ul><li>Visada atlikite sruogelės testą prieš pirmą dažymą</li><li>Naudokite proporcijas pagal gamintojo nurodymus (Color SHOCK — 1:1,5)</li><li>Nenaudokite seno, atidaryto oksidanto — jis praranda aktyvumą</li><li>Saugokite oksidantą tamsioje, vėsioje vietoje</li></ul>
+<ul><li>Visada atlikite sruogelės testą prieš pirmą dažymą</li><li>Naudokite proporcijas pagal gamintojo nurodymus (Color SHOCK — 1:2)</li><li>Nenaudokite seno, atidaryto oksidanto — jis praranda aktyvumą</li><li>Saugokite oksidantą tamsioje, vėsioje vietoje</li></ul>
 <p>Teisingas oksidanto pasirinkimas — tai ne tik dažymo rezultatas, bet ir klientės plaukų sveikata ilgalaikėje perspektyvoje.</p>',
        NULL,
        'patarimai',

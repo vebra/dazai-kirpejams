@@ -251,11 +251,11 @@ const hairDyes: Product[] = hairDyeColors.map((c, idx) => {
     ingredients_ru:
       'Aqua, Cetearyl Alcohol, Propylene Glycol, Ammonium Hydroxide, Fragrance, Ascorbic Acid.',
     usage_lt:
-      'Maišykite 1:1 su pasirinktos koncentracijos oksidantu. Laikymo laikas: 30–35 min. Nuplaukite šampūnu.',
+      'Maišykite 1:2 su pasirinktos koncentracijos oksidantu. Laikymo laikas: 30–35 min. Nuplaukite šampūnu.',
     usage_en:
-      'Mix 1:1 with oxidant of chosen concentration. Development time: 30–35 min. Rinse with shampoo.',
+      'Mix 1:2 with oxidant of chosen concentration. Development time: 30–35 min. Rinse with shampoo.',
     usage_ru:
-      'Смешайте 1:1 с оксидантом выбранной концентрации. Время выдержки: 30–35 мин. Смойте шампунем.',
+      'Смешайте 1:2 с оксидантом выбранной концентрации. Время выдержки: 30–35 мин. Смойте шампунём.',
     price_cents: 799, // 7.99 € — kaip HTML duomenyse
     compare_price_cents: 1000, // 10.00 € senoji kaina (oldPrice iš HTML)
     volume_ml: 180,

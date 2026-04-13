@@ -86,7 +86,7 @@ export const articles: Article[] = [
         type: 'ul',
         items: [
           'Visada atlikite sruogelės testą prieš pirmą dažymą',
-          'Naudokite proporcijas pagal gamintojo nurodymus (Color SHOCK — 1:1,5)',
+          'Naudokite proporcijas pagal gamintojo nurodymus (Color SHOCK — 1:2)',
           'Nenaudokite seno, atidaryto oksidanto — jis praranda aktyvumą',
           'Saugokite oksidantą tamsioje, vėsioje vietoje',
         ],
