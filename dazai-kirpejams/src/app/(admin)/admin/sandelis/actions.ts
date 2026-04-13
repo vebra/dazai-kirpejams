@@ -362,13 +362,15 @@ export async function uploadProductImagesAction(
   const uploadResults = await Promise.all(
     files.map(async (file) => {
       const path = buildStoragePath(productId, file)
+      const buffer = Buffer.from(await file.arrayBuffer())
       const { error: uploadError } = await admin.storage
         .from(PRODUCTS_BUCKET)
-        .upload(path, file, {
+        .upload(path, buffer, {
           contentType: file.type,
-          upsert: false,
+          upsert: true,
         })
       if (uploadError) {
+        console.error('[upload] Storage error:', file.name, uploadError.message, uploadError)
         return { ok: false as const, fileName: file.name, message: uploadError.message }
       }
       const { data: publicData } = admin.storage
