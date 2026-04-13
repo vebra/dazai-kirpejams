@@ -5,8 +5,10 @@ import { notFound } from 'next/navigation'
 import { hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { Newsletter } from '@/components/home/Newsletter'
-import { buildPageMetadata } from '@/lib/seo'
+import { buildPageMetadata, SITE_URL } from '@/lib/seo'
 import { getBlogPostBySlug, getBlogPosts } from '@/lib/data/queries'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { blogPostingSchema, breadcrumbSchema } from '@/lib/schema'
 import { CATEGORY_STYLES, type ArticleCategory } from '@/lib/data/articles'
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -55,8 +57,28 @@ export default async function ArticlePage({
     })
     .slice(0, 2)
 
+  const postUrl = `${SITE_URL}/${lang}/blogas/${slug}`
+
   return (
     <>
+      <JsonLd
+        data={blogPostingSchema({
+          title: post.title,
+          description: post.excerpt ?? '',
+          url: postUrl,
+          imageUrl: post.coverImage,
+          datePublished: post.publishedAt ?? post.createdAt,
+          author: post.author,
+        })}
+      />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: 'Pradžia', url: `${SITE_URL}/${lang}` },
+          { name: 'Blogas', url: `${SITE_URL}/${lang}/blogas` },
+          { name: post.title, url: postUrl },
+        ])}
+      />
+
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>

@@ -25,7 +25,9 @@ export function organizationSchema(): Record<string, unknown> {
     description:
       'Profesionalūs plaukų dažai kirpėjams ir koloristams. Didesnė 180 ml talpa — daugiau vertės darbui salone.',
     sameAs: [
-      // TODO: pridėti Instagram/Facebook, kai bus oficialūs profiliai
+      // Pridėkite savo socialinių tinklų URL čia:
+      // 'https://www.instagram.com/dazaikirpejams',
+      // 'https://www.facebook.com/dazaikirpejams',
     ],
     contactPoint: {
       '@type': 'ContactPoint',
@@ -152,6 +154,47 @@ export function faqPageSchema(
         text: q.answer,
       },
     })),
+  }
+}
+
+/**
+ * BlogPosting schema — naudojama straipsnio puslapyje, kad Google galėtų
+ * rodyti rich result'us su straipsnio antrašte, autoriumi ir data.
+ */
+export function blogPostingSchema({
+  title,
+  description,
+  url,
+  imageUrl,
+  datePublished,
+  author,
+}: {
+  title: string
+  description: string
+  url: string
+  imageUrl?: string | null
+  datePublished: string
+  author?: string | null
+}): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: title,
+    description,
+    url,
+    image: imageUrl || `${SITE_URL}/og-image.jpg`,
+    datePublished,
+    dateModified: datePublished,
+    author: {
+      '@type': author ? 'Person' : 'Organization',
+      name: author || SITE_NAME,
+      ...(author ? {} : { '@id': `${SITE_URL}/#organization` }),
+    },
+    publisher: { '@id': `${SITE_URL}/#organization` },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': url,
+    },
   }
 }
 
