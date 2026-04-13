@@ -65,7 +65,7 @@ export function Advantages({ dict: _dict }: { dict: any }) {
           {cards.map((card) => (
             <div
               key={card.title}
-              className="bg-brand-gray-50 rounded-xl p-9 px-7 border border-transparent hover:border-[#E0E0E0] hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
+              className="bg-brand-gray-50 rounded-xl p-5 sm:p-9 sm:px-7 border border-transparent hover:border-[#E0E0E0] hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
             >
               <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center text-2xl mb-5">
                 <span aria-hidden>{card.icon}</span>

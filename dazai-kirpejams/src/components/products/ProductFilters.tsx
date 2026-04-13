@@ -56,7 +56,7 @@ export function ProductFilters({
 
   return (
     <div className="bg-white border border-brand-gray-50 rounded-2xl p-6 mb-8">
-      <div className="flex flex-wrap items-center gap-6 gap-y-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6 sm:gap-y-4">
         {showColorFilters && (
           <>
             <FilterGroup label="Tonas">
@@ -85,7 +85,7 @@ export function ProductFilters({
           </>
         )}
 
-        <FilterGroup label={sortLabel} className="ml-auto">
+        <FilterGroup label={sortLabel} className="sm:ml-auto">
           {SORT_OPTIONS.map((opt) => (
             <FilterChip
               key={opt.value}

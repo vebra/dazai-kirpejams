@@ -49,7 +49,7 @@ export function CategoryFiltersBar({
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-6">
+    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6">
       {showGroupFilter && groupOptions && (
         <div className="flex items-center gap-2">
           <label
@@ -95,7 +95,7 @@ export function CategoryFiltersBar({
         </select>
       </div>
 
-      <div className="ml-auto text-[0.85rem] text-brand-gray-500">
+      <div className="sm:ml-auto text-[0.85rem] text-brand-gray-500">
         Rodomi: {totalCount} produktai
       </div>
     </div>

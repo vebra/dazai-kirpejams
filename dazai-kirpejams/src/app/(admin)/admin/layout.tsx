@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import '../../globals.css'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
+import { AdminSidebarProvider } from '@/components/admin/AdminSidebarContext'
 import { AdminTopbar } from '@/components/admin/AdminTopbar'
 import { getAdminUser } from '@/lib/admin/auth'
 
@@ -41,13 +42,15 @@ export default async function AdminRootLayout({
     <html lang="lt" className={`${inter.variable} h-full`}>
       <body className="min-h-full bg-[#F5F5F7] text-brand-gray-900 antialiased">
         {user ? (
-          <div className="flex min-h-screen">
-            <AdminSidebar />
-            <div className="flex-1 ml-[260px] min-h-screen flex flex-col">
-              <AdminTopbar email={user.email ?? ''} />
-              <div className="flex-1 p-8">{children}</div>
+          <AdminSidebarProvider>
+            <div className="flex min-h-screen">
+              <AdminSidebar />
+              <div className="flex-1 lg:ml-[260px] min-h-screen flex flex-col">
+                <AdminTopbar email={user.email ?? ''} />
+                <div className="flex-1 p-4 lg:p-8">{children}</div>
+              </div>
             </div>
-          </div>
+          </AdminSidebarProvider>
         ) : (
           // Neprisijungęs — rodome vien tik children (login puslapis turi
           // savo visaekranio layout'ą)

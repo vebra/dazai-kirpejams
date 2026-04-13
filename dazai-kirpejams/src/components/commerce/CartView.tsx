@@ -77,13 +77,13 @@ export function CartView({ lang, dict }: CartViewProps) {
             return (
               <div
                 key={item.productId}
-                className="grid md:grid-cols-[1fr_120px_140px_40px] gap-4 px-6 py-5 border-t border-brand-gray-50 items-center"
+                className="flex flex-col gap-3 px-4 py-4 border-t border-brand-gray-50 md:grid md:grid-cols-[1fr_120px_140px_40px] md:gap-4 md:px-6 md:py-5 md:items-center"
               >
                 {/* Prekė */}
                 <div className="flex items-center gap-4">
                   <Link
                     href={`/${lang}/produktai/${item.categorySlug}/${item.slug}`}
-                    className="relative w-20 h-20 rounded-xl overflow-hidden bg-brand-gray-50 flex-shrink-0"
+                    className="relative w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden bg-brand-gray-50 flex-shrink-0"
                     style={
                       !item.imageUrl && item.colorHex
                         ? { backgroundColor: item.colorHex }
@@ -100,7 +100,7 @@ export function CartView({ lang, dict }: CartViewProps) {
                       />
                     ) : null}
                   </Link>
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     {item.colorNumber && (
                       <div className="text-xs font-medium text-brand-magenta uppercase tracking-wider mb-1">
                         Color SHOCK · {item.colorNumber}
@@ -119,49 +119,49 @@ export function CartView({ lang, dict }: CartViewProps) {
                   </div>
                 </div>
 
-                {/* Kiekis */}
-                <div className="flex items-center justify-center">
-                  <div className="inline-flex items-center border border-brand-gray-50 rounded-full">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        updateQuantity(item.productId, item.quantity - 1)
-                      }
-                      className="w-9 h-9 flex items-center justify-center text-brand-gray-900 hover:text-brand-magenta transition-colors"
-                      aria-label="-"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </button>
-                    <span className="w-8 text-center text-sm font-semibold tabular-nums">
-                      {item.quantity}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        updateQuantity(item.productId, item.quantity + 1)
-                      }
-                      className="w-9 h-9 flex items-center justify-center text-brand-gray-900 hover:text-brand-magenta transition-colors"
-                      aria-label="+"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
+                {/* Kiekis + Suma + Pašalinti — vienoje eilutėje mobiliajame */}
+                <div className="flex items-center justify-between md:contents">
+                  <div className="flex items-center">
+                    <div className="inline-flex items-center border border-brand-gray-50 rounded-full">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateQuantity(item.productId, item.quantity - 1)
+                        }
+                        className="w-9 h-9 flex items-center justify-center text-brand-gray-900 hover:text-brand-magenta transition-colors"
+                        aria-label="-"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      <span className="w-8 text-center text-sm font-semibold tabular-nums">
+                        {item.quantity}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateQuantity(item.productId, item.quantity + 1)
+                        }
+                        className="w-9 h-9 flex items-center justify-center text-brand-gray-900 hover:text-brand-magenta transition-colors"
+                        aria-label="+"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-                </div>
 
-                {/* Suma */}
-                <div className="text-right text-base font-bold text-brand-gray-900 tabular-nums">
-                  {formatPrice(lineTotal / 100, lang)}
-                </div>
+                  <div className="text-right text-base font-bold text-brand-gray-900 tabular-nums">
+                    {formatPrice(lineTotal / 100, lang)}
+                  </div>
 
-                {/* Pašalinti */}
-                <button
-                  type="button"
-                  onClick={() => removeItem(item.productId)}
-                  className="justify-self-end w-9 h-9 flex items-center justify-center text-brand-gray-500 hover:text-brand-magenta transition-colors"
-                  aria-label={dict.cart.remove}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => removeItem(item.productId)}
+                    className="justify-self-end w-9 h-9 flex items-center justify-center text-brand-gray-500 hover:text-brand-magenta transition-colors"
+                    aria-label={dict.cart.remove}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             )
           })}

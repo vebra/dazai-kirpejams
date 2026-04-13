@@ -36,7 +36,7 @@ export function Comparison({ lang, dict: _dict }: ComparisonProps) {
           <div className="flex items-end justify-center gap-10">
             <div className="flex flex-col items-center gap-3">
               <div
-                className="w-20 h-[260px] rounded-t-lg rounded-b flex items-end justify-center pb-4 font-extrabold text-[1.3rem] text-white bg-[linear-gradient(180deg,#E91E8C_0%,#c4166f_100%)]"
+                className="w-16 h-[200px] sm:w-20 sm:h-[260px] rounded-t-lg rounded-b flex items-end justify-center pb-4 font-extrabold text-lg sm:text-[1.3rem] text-white bg-[linear-gradient(180deg,#E91E8C_0%,#c4166f_100%)]"
               >
                 180 ml
               </div>
@@ -46,7 +46,7 @@ export function Comparison({ lang, dict: _dict }: ComparisonProps) {
             </div>
             <div className="flex flex-col items-center gap-3">
               <div
-                className="w-20 h-[100px] rounded-t-lg rounded-b flex items-end justify-center pb-4 font-extrabold text-base text-white bg-white/15"
+                className="w-16 h-[76px] sm:w-20 sm:h-[100px] rounded-t-lg rounded-b flex items-end justify-center pb-4 font-extrabold text-sm sm:text-base text-white bg-white/15"
               >
                 60 ml
               </div>
@@ -76,7 +76,7 @@ export function Comparison({ lang, dict: _dict }: ComparisonProps) {
               ].map((stat) => (
                 <div
                   key={stat.label}
-                  className="bg-white/[0.06] border border-white/10 rounded-lg p-6"
+                  className="bg-white/[0.06] border border-white/10 rounded-lg p-4 sm:p-6"
                 >
                   <div className="text-[2rem] font-extrabold text-brand-magenta leading-none mb-2">
                     {stat.number}
