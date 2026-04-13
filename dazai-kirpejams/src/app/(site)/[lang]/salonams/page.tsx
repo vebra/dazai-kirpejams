@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { hasLocale } from '@/i18n/dictionaries'
+import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { buildPageMetadata } from '@/lib/seo'
 import { CONTACT, phoneHref } from '@/lib/site'
@@ -13,12 +13,13 @@ export async function generateMetadata({
 }: PageProps<'/[lang]/salonams'>): Promise<Metadata> {
   const { lang } = await params
   if (!hasLocale(lang)) return {}
+  const dict = await getDictionary(lang)
+  const t = dict.b2bPage
   return buildPageMetadata({
     lang,
     path: '/salonams',
-    title: 'Bendradarbiavimas salonams — B2B specialios sąlygos',
-    description:
-      'Specialios sąlygos grožio salonams ir kirpykloms. Individualios kainos, reguliarus tiekimas, asmeninis vadybininkas. Gaukite pasiūlymą jau šiandien.',
+    title: t.metaTitle,
+    description: t.metaDesc,
   })
 }
 
@@ -28,17 +29,22 @@ export default async function B2BPage({
   const { lang } = await params
   if (!hasLocale(lang)) notFound()
 
+  const dict = await getDictionary(lang)
+  const t = dict.b2bPage
+  const c = dict.common
+  const p = langPrefix(lang)
+
   return (
     <>
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>
-          <Link href={`${langPrefix(lang) || '/'}`} className="hover:text-brand-magenta transition-colors">
-            Pradžia
+          <Link href={`${p || '/'}`} className="hover:text-brand-magenta transition-colors">
+            {c.home}
           </Link>
           <span className="mx-2 text-[#E0E0E0]">/</span>
           <span className="text-brand-gray-900 font-medium">
-            Bendradarbiavimas salonams
+            {t.breadcrumb}
           </span>
         </Container>
       </section>
@@ -47,22 +53,20 @@ export default async function B2BPage({
       <section className="py-12 lg:py-20 bg-[linear-gradient(135deg,#ffffff_0%,#f5f5f7_100%)] text-center">
         <Container>
           <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-            B2B bendradarbiavimas
+            {t.heroBadge}
           </span>
           <h1 className="text-[clamp(2rem,5vw,3.25rem)] font-bold text-brand-gray-900 mb-5 leading-[1.2] max-w-[820px] mx-auto">
-            Specialios sąlygos{' '}
-            <span className="text-brand-magenta">grožio salonams</span>
+            {t.heroTitle}{' '}
+            <span className="text-brand-magenta">{t.heroTitleHighlight}</span>
           </h1>
           <p className="text-[1.15rem] text-brand-gray-500 leading-[1.7] max-w-[720px] mx-auto mb-9">
-            Gaukite profesionalius dažus ir priemones geriausiomis kainomis.
-            Individualus pasiūlymas, reguliarus tiekimas ir asmeninis
-            vadybininkas — viskas, ko reikia Jūsų salonui.
+            {t.heroSubtitle}
           </p>
           <a
             href="#b2b-forma"
             className="inline-flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
           >
-            Gauti pasiūlymą →
+            {t.heroCta} →
           </a>
         </Container>
       </section>
@@ -72,55 +76,24 @@ export default async function B2BPage({
         <Container>
           <div className="text-center max-w-[720px] mx-auto mb-12">
             <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-              Privalumai
+              {t.advantagesBadge}
             </span>
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-3 leading-tight">
-              Kodėl salonai renkasi mus?
+              {t.advantagesTitle}
             </h2>
             <p className="text-[1.1rem] text-brand-gray-500">
-              Sukuriame sąlygas, kad Jūsų salonas dirbtų efektyviau ir
-              pelningiau
+              {t.advantagesSubtitle}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              {
-                icon: '💰',
-                title: 'Individualios kainos dideliems užsakymams',
-                desc:
-                  'Kuo didesnis užsakymas — tuo geresnė kaina. Kiekvienas salonas gauna pasiūlymą, pritaikytą būtent jo poreikiams ir apimtims.',
-              },
-              {
-                icon: '📦',
-                title: 'Reguliaraus tiekimo galimybė',
-                desc:
-                  'Sutarkite pastovų pristatymo grafiką — dažai visada bus laiku. Jokio streso dėl pasibaigusių atsargų.',
-              },
-              {
-                icon: '🤝',
-                title: 'Asmeninis vadybininkas',
-                desc:
-                  'Kiekvienam salonui priskiriamas asmeninis vadybininkas, kuris pasirūpins užsakymais, patarimais ir operatyviu aptarnavimu.',
-              },
-              {
-                icon: '🚚',
-                title: 'Greitas pristatymas',
-                desc:
-                  'Pristatymas per 1–3 darbo dienas visoje Lietuvoje. Neatidėliotini užsakymai — galimybė gauti kitą darbo dieną.',
-              },
-              {
-                icon: '📈',
-                title: '180 ml ekonominė nauda salonams',
-                desc:
-                  'Didesnė pakuotė reiškia mažesnę savikainą kiekvienam dažymui. 180 ml — tai 3× daugiau produkto nei standartinis 60 ml.',
-              },
-              {
-                icon: '🎨',
-                title: 'Galimybė testuoti produktus',
-                desc:
-                  'Prieš užsisakydami didelį kiekį, galite išbandyti produktus savo salone. Patvirtinkite kokybę praktiškai.',
-              },
+              { icon: '💰', title: t.adv1Title, desc: t.adv1Desc },
+              { icon: '📦', title: t.adv2Title, desc: t.adv2Desc },
+              { icon: '🤝', title: t.adv3Title, desc: t.adv3Desc },
+              { icon: '🚚', title: t.adv4Title, desc: t.adv4Desc },
+              { icon: '📈', title: t.adv5Title, desc: t.adv5Desc },
+              { icon: '🎨', title: t.adv6Title, desc: t.adv6Desc },
             ].map((card) => (
               <div
                 key={card.title}
@@ -146,36 +119,21 @@ export default async function B2BPage({
         <Container>
           <div className="text-center max-w-[720px] mx-auto mb-12">
             <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-              Kaip tai veikia
+              {t.stepsBadge}
             </span>
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-3 leading-tight">
-              Trys paprasti žingsniai
+              {t.stepsTitle}
             </h2>
             <p className="text-[1.1rem] text-brand-gray-500">
-              Pradėti bendradarbiauti su mumis — paprasta ir greita
+              {t.stepsSubtitle}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
             {[
-              {
-                n: '1',
-                title: 'Pateikite užklausą',
-                desc:
-                  'Užpildykite žemiau esančią formą arba susisiekite el. paštu. Nurodykite salono poreikius ir pageidavimus.',
-              },
-              {
-                n: '2',
-                title: 'Gausite individualų pasiūlymą',
-                desc:
-                  'Per 1 darbo dieną mūsų vadybininkas parengs ir atsiųs Jūsų salonui pritaikytą kainų pasiūlymą.',
-              },
-              {
-                n: '3',
-                title: 'Pradėkite bendradarbiavimą',
-                desc:
-                  'Sutarkite pristatymo grafiką, gaukite produktus ir pradėkite dirbti su kokybiškais dažais geriausia kaina.',
-              },
+              { n: '1', title: t.step1Title, desc: t.step1Desc },
+              { n: '2', title: t.step2Title, desc: t.step2Desc },
+              { n: '3', title: t.step3Title, desc: t.step3Desc },
             ].map((step) => (
               <div
                 key={step.n}
@@ -201,13 +159,13 @@ export default async function B2BPage({
         <Container>
           <div className="text-center max-w-[720px] mx-auto mb-12">
             <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-              Ekonominė nauda
+              {t.econBadge}
             </span>
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-white mb-3 leading-tight">
-              180 ml pranašumas Jūsų salonui
+              {t.econTitle}
             </h2>
             <p className="text-[1.1rem] text-white/70">
-              Palyginimas su standartinėmis 60 ml pakuotėmis rinkoje
+              {t.econSubtitle}
             </p>
           </div>
 
@@ -215,25 +173,12 @@ export default async function B2BPage({
             {/* Comparison table */}
             <div className="bg-white/[0.06] border border-white/10 rounded-xl overflow-hidden">
               {[
-                {
-                  param: 'Parametras',
-                  std: 'Standartinė (60 ml)',
-                  ours: 'Mūsų (180 ml)',
-                  header: true,
-                },
-                { param: 'Pakuotės tūris', std: '60 ml', ours: '180 ml' },
-                { param: 'Kaina už pakuotę', std: '€4–6', ours: '€6.99' },
-                {
-                  param: 'Kaina už 1 ml',
-                  std: '€0.07–0.10',
-                  ours: '€0.039',
-                },
-                {
-                  param: 'Pakuotės / 100 dažymų',
-                  std: '~150 vnt.',
-                  ours: '~50 vnt.',
-                },
-                { param: 'Pakuočių atliekos', std: 'Daug', ours: '3× mažiau' },
+                { param: t.econParam, std: t.econStd, ours: t.econOurs, header: true },
+                { param: t.econVolume, std: '60 ml', ours: '180 ml' },
+                { param: t.econPricePkg, std: '€4–6', ours: '€6.99' },
+                { param: t.econPriceMl, std: '€0.07–0.10', ours: '€0.039' },
+                { param: t.econPkgPer100, std: '~150', ours: '~50' },
+                { param: t.econWaste, std: t.econWasteStd, ours: t.econWasteOurs },
               ].map((row, i) => (
                 <div
                   key={row.param}
@@ -245,27 +190,13 @@ export default async function B2BPage({
                         : ''
                   } ${!row.header && i < 5 ? 'border-t border-white/10' : ''}`}
                 >
-                  <div
-                    className={
-                      row.header ? 'text-white' : 'text-white/70 font-medium'
-                    }
-                  >
+                  <div className={row.header ? 'text-white' : 'text-white/70 font-medium'}>
                     {row.param}
                   </div>
-                  <div
-                    className={
-                      row.header ? 'text-white' : 'text-white/60 text-center'
-                    }
-                  >
+                  <div className={row.header ? 'text-white' : 'text-white/60 text-center'}>
                     {row.std}
                   </div>
-                  <div
-                    className={
-                      row.header
-                        ? 'text-brand-magenta text-right'
-                        : 'text-brand-magenta font-bold text-right'
-                    }
-                  >
+                  <div className={row.header ? 'text-brand-magenta text-right' : 'text-brand-magenta font-bold text-right'}>
                     {row.ours}
                   </div>
                 </div>
@@ -275,20 +206,15 @@ export default async function B2BPage({
             {/* Explanation */}
             <div>
               <h3 className="text-[1.5rem] lg:text-[1.75rem] font-bold text-white leading-tight">
-                Daugiau produkto. Mažesnė savikaina.
+                {t.econExplainTitle}
               </h3>
               <p className="mt-4 text-[1.05rem] text-white/75 leading-[1.7]">
-                Viena mūsų 180 ml pakuotė prilygsta trims standartinėms 60 ml
-                pakuotėms. Tai reiškia žymiai mažesnes išlaidas kiekvienam
-                dažymui ir mažiau užsakymų per mėnesį.
+                {t.econExplainP1}
               </p>
               <p className="mt-3 text-[1.05rem] text-white/75 leading-[1.7]">
-                Salonams, atliekantiems 20+ dažymų per mėnesį, sutaupymas gali
-                siekti iki{' '}
-                <strong className="text-brand-magenta">
-                  40% nuo įprastų dažų išlaidų
-                </strong>
-                . O pridėjus B2B nuolaidą — ekonomija tampa dar didesnė.
+                {t.econExplainP2}{' '}
+                <strong className="text-brand-magenta">{t.econExplainHighlight}</strong>
+                {t.econExplainP2End}
               </p>
             </div>
           </div>
@@ -296,9 +222,9 @@ export default async function B2BPage({
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { num: '3×', label: 'Daugiau produkto vienoje pakuotėje' },
-              { num: '~40%', label: 'Mažesnė kaina už 1 ml' },
-              { num: '↓ 3×', label: 'Mažiau pakuočių atliekų' },
+              { num: '3×', label: t.econStat1 },
+              { num: '~40%', label: t.econStat2 },
+              { num: '↓ 3×', label: t.econStat3 },
             ].map((stat) => (
               <div
                 key={stat.label}
@@ -323,24 +249,17 @@ export default async function B2BPage({
             {/* Info */}
             <div>
               <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-                Užklausa
+                {t.formBadge}
               </span>
               <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-4 leading-tight">
-                Gaukite individualų pasiūlymą
+                {t.formTitle}
               </h2>
               <p className="text-[1.05rem] text-brand-gray-500 leading-[1.7] mb-8">
-                Užpildykite formą ir mūsų vadybininkas susisieks su Jumis per 1
-                darbo dieną. Parengsime pasiūlymą, pritaikytą būtent Jūsų
-                salono poreikiams.
+                {t.formSubtitle}
               </p>
 
               <div className="grid gap-3.5">
-                {[
-                  'Atsakome per 1 darbo dieną',
-                  'Individualios kainos nuo pirmo užsakymo',
-                  'Nemokamas produkto testavimas',
-                  'Be įsipareigojimų',
-                ].map((perk) => (
+                {[t.formPerk1, t.formPerk2, t.formPerk3, t.formPerk4].map((perk) => (
                   <div
                     key={perk}
                     className="flex items-center gap-3 text-[0.95rem] text-brand-gray-900 font-medium"
@@ -357,14 +276,13 @@ export default async function B2BPage({
             {/* Form card */}
             <div className="bg-brand-gray-50 rounded-xl p-8 lg:p-10 border border-[#E0E0E0]">
               <h3 className="text-[1.35rem] font-bold text-brand-gray-900 mb-1.5">
-                Pateikite užklausą
+                {t.formCardTitle}
               </h3>
               <p className="text-[0.9rem] text-brand-gray-500 mb-6">
-                Laukai pažymėti{' '}
-                <span className="text-brand-magenta">*</span> yra privalomi
+                {t.formCardSubtitle}
               </p>
 
-              <B2bForm lang={lang} />
+              <B2bForm lang={lang} labels={t} />
             </div>
           </div>
         </Container>
@@ -375,60 +293,42 @@ export default async function B2BPage({
         <Container>
           <div className="text-center max-w-[720px] mx-auto mb-12">
             <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-              Atsiliepimai
+              {t.reviewsBadge}
             </span>
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-3 leading-tight">
-              Ką sako mūsų partneriai
+              {t.reviewsTitle}
             </h2>
             <p className="text-[1.1rem] text-brand-gray-500">
-              Salonai, kurie jau bendradarbiauja su mumis
+              {t.reviewsSubtitle}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
             {[
-              {
-                quote:
-                  '„Perėjome prie 180 ml pakuočių prieš pusę metų ir jau matome reikšmingą sutaupymą. Asmeninis vadybininkas visada pasiekiamas, o pristatymas — punktualus."',
-                initials: 'DK',
-                name: 'Diana K.',
-                role: 'Salono savininkė, Kaunas',
-              },
-              {
-                quote:
-                  '„Labai patogi bendradarbiavimo sistema. Užsisakome reguliariai, kainos nuostabios, o kokybė nenusileidžia brangesnėms prekių markėms. Mūsų koloristės patenkintos."',
-                initials: 'IG',
-                name: 'Ieva G.',
-                role: 'Grožio studija, Vilnius',
-              },
-              {
-                quote:
-                  '„Turime tris salonus ir visiems gauname vienodai geras sąlygas. Ypatingai vertiname galimybę testuoti naujus atspalvius prieš užsisakant didelį kiekį."',
-                initials: 'RS',
-                name: 'Rasa S.',
-                role: 'Salonų tinklo vadovė, Klaipėda',
-              },
-            ].map((t) => (
+              { quote: t.review1, initials: 'DK', name: t.review1Name, role: t.review1Role },
+              { quote: t.review2, initials: 'IG', name: t.review2Name, role: t.review2Role },
+              { quote: t.review3, initials: 'RS', name: t.review3Name, role: t.review3Role },
+            ].map((r) => (
               <div
-                key={t.name}
+                key={r.name}
                 className="bg-white rounded-xl p-8 border border-[#E0E0E0] hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
               >
                 <div className="text-[#F5A623] text-[1.1rem] mb-4 tracking-wider">
                   ★★★★★
                 </div>
                 <p className="text-[0.98rem] text-brand-gray-900 leading-[1.7] italic mb-6">
-                  {t.quote}
+                  {r.quote}
                 </p>
                 <div className="flex items-center gap-3 pt-5 border-t border-[#E0E0E0]">
                   <div className="w-12 h-12 rounded-full bg-brand-magenta text-white font-bold flex items-center justify-center text-[0.95rem] flex-shrink-0">
-                    {t.initials}
+                    {r.initials}
                   </div>
                   <div>
                     <div className="text-[0.95rem] font-bold text-brand-gray-900">
-                      {t.name}
+                      {r.name}
                     </div>
                     <div className="text-[0.82rem] text-brand-gray-500">
-                      {t.role}
+                      {r.role}
                     </div>
                   </div>
                 </div>
@@ -442,21 +342,20 @@ export default async function B2BPage({
       <section className="py-20 bg-brand-gray-900 text-white text-center">
         <Container>
           <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-white/60 mb-3">
-            Pradėkite dabar
+            {t.ctaBadge}
           </span>
           <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-white mb-4 leading-tight">
-            Pasiruošę pradėti?
+            {t.ctaTitle}
           </h2>
           <p className="text-[1.1rem] text-white/75 mb-9 max-w-[600px] mx-auto leading-[1.7]">
-            Susisiekite su mumis patogiu būdu ir gaukite individualų pasiūlymą
-            Jūsų salonui jau šiandien.
+            {t.ctaSubtitle}
           </p>
 
           <a
             href="#b2b-forma"
             className="inline-flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
           >
-            Užpildyti užklausos formą →
+            {t.ctaCta} →
           </a>
 
           <div className="flex flex-wrap justify-center gap-4 mt-10">
@@ -482,4 +381,3 @@ export default async function B2BPage({
     </>
   )
 }
-

@@ -196,6 +196,419 @@
     "agreeTerms": "I agree to the terms and privacy policy",
     "requiredField": "Required field"
   },
+  "common": {
+    "home": "Home",
+    "viewProducts": "View Products",
+    "contactUs": "Contact Us",
+    "readyToTry": "Ready to Try?",
+    "startNow": "Start Now",
+    "readyCtaDesc": "Professional dyes with 180 ml volume — more value for every coloring session in Your salon."
+  },
+  "aboutPage": {
+    "metaTitle": "About Us — Dažai Kirpėjams",
+    "metaDesc": "We supply Lithuanian hairdressers and salons with professional work tools. Our mission — high-quality, economical dyes in 180 ml packaging.",
+    "badge": "About Us",
+    "title": "We supply hairdressers with work tools they can",
+    "titleHighlight": "trust",
+    "subtitle": "Our goal is simple — to help hairdressers and colorists work more efficiently. Professional products, smart pricing and real value for everyday salon work.",
+    "imagePlaceholder": "Professional atmosphere",
+    "storyBadge": "Our Story",
+    "storyTitle": "How It All Started",
+    "storyP1": "It all started with a simple observation: Lithuanian hairdressers pay too much for professional hair dyes. Many suppliers offer 60–100 ml packages at prices that don't always match the reality of daily work. Hairdressers use dyes every day — it's their primary work tool, not a luxury item. We decided there had to be a better way.",
+    "storyP2": "We established direct relationships with Italian manufacturers and brought Color SHOCK to the Lithuanian market — a professional hair dye line in 180 ml packages. That's two to three times more than the standard package on the market. The formula with Argan and Jojoba oils and rose extract ensures quality results, while the larger volume means a lower cost per application. Alongside Color SHOCK, we also introduced RosaNera Cosmetic — a professional hair care line that perfectly complements the coloring process.",
+    "storyP3": "Today we work with hairdressers, colorists and beauty salons across Lithuania. We don't aspire to be just another \"beauty\" company with empty promises. Our approach is pragmatic: a good work tool must be reliable, economical and easily accessible. That's exactly what we offer.",
+    "missionBadge": "Mission",
+    "missionTitle": "What We Do and Why",
+    "missionSubtitle": "Our mission — to supply hairdressers with high-quality, economical work tools. Not \"beauty\" industry cliches, but practical value for everyday work.",
+    "missionCard1Title": "Quality Without Overpaying",
+    "missionCard1Desc": "Professional formula from Italy — quality ingredients at a smart price. Larger packaging means lower cost per application.",
+    "missionCard2Title": "Practice-Oriented",
+    "missionCard2Desc": "Every decision we make is based on one question: does this make the hairdresser's daily work easier?",
+    "missionCard3Title": "For Professionals — Not Everyone",
+    "missionCard3Desc": "We work exclusively with professionals. We understand their needs, so we can offer exactly what's required.",
+    "brandsBadge": "Brands",
+    "brandsTitle": "Products Trusted by Professionals",
+    "brandsSubtitle": "Two brands — everything needed for professional salon work",
+    "colorShockTagline": "Professional Hair Dyes",
+    "colorShockFeatures": ["50+ professional shades", "180 ml economical packaging", "Argan & Jojoba oils", "Rose extract", "Italian quality", "Mixing ratio 1+2"],
+    "viewDyes": "View Dyes",
+    "rosaneraTagline": "Professional Hair Care",
+    "rosaneraFeatures": ["Professional shampoos", "Hair masks & care", "Complementary products", "Suitable after coloring", "Salon-grade quality", "Complements Color SHOCK line"],
+    "statsBadge": "Numbers",
+    "statsTitle": "Facts That Speak for Us",
+    "stat1": "colors in the palette",
+    "stat2": "our standard",
+    "stat3": "satisfied clients",
+    "stat4": "country of manufacture"
+  },
+  "contactPage": {
+    "metaTitle": "Contact — Dažai Kirpėjams",
+    "metaDesc": "Contact us regarding products, B2B offers or any questions. Email, phone, contact form.",
+    "badge": "Contact",
+    "title": "Get in Touch",
+    "subtitle": "We will respond to Your questions within 1 business day. We consult on products, orders and B2B collaboration.",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "workingHours": "Working Hours",
+    "writeToUs": "Write to Us",
+    "formSubtitle": "Fill out the form and we will get back to You as soon as possible. You can write about anything — from product selection to B2B collaboration.",
+    "feature1": "We respond within 1 business day",
+    "feature2": "Product consultations",
+    "feature3": "Individual B2B offers",
+    "followUs": "Follow Us",
+    "mapPlaceholder": "Google Maps will be displayed here",
+    "faqTitle": "Frequently Asked Questions",
+    "faqDesc": "Find answers to the most commonly asked questions about ordering, delivery and products.",
+    "deliveryTitle": "Delivery Information",
+    "deliveryDesc": "Learn about delivery methods, timeframes and prices across Lithuania.",
+    "formName": "Name",
+    "formNamePlaceholder": "Your name",
+    "formEmail": "Email",
+    "formEmailPlaceholder": "your@email.com",
+    "formPhone": "Phone Number",
+    "formPhonePlaceholder": "+370 ...",
+    "formSubject": "Inquiry Type",
+    "formSubjectGeneral": "General question",
+    "formSubjectOrder": "Order question",
+    "formSubjectB2B": "B2B collaboration",
+    "formSubjectOther": "Other",
+    "formMessage": "Message",
+    "formMessagePlaceholder": "Your message...",
+    "formSubmit": "Send Message →",
+    "formSubmitting": "Sending…",
+    "formSuccessTitle": "Message Sent!",
+    "formSuccessDesc": "Thank You for reaching out. We will respond within 1 business day."
+  },
+  "b2bPage": {
+    "metaTitle": "Salon Collaboration — B2B Special Terms",
+    "metaDesc": "Special terms for beauty salons and hair studios. Individual pricing, regular supply, personal manager. Get a quote today.",
+    "breadcrumb": "Collaboration for Salons",
+    "heroBadge": "B2B Collaboration",
+    "heroTitle": "Special Terms for",
+    "heroTitleHighlight": "beauty salons",
+    "heroSubtitle": "Get professional dyes and products at the best prices. Individual offer, regular supply and a personal manager — everything Your salon needs.",
+    "heroCta": "Get a Quote →",
+    "advantagesBadge": "Advantages",
+    "advantagesTitle": "Why Do Salons Choose Us?",
+    "advantagesSubtitle": "We create conditions for Your salon to work more efficiently and profitably",
+    "adv1Title": "Individual Pricing for Large Orders",
+    "adv1Desc": "The larger the order — the better the price. Every salon receives a quote tailored specifically to their needs and volumes.",
+    "adv2Title": "Regular Supply Option",
+    "adv2Desc": "Agree on a regular delivery schedule — dyes will always be on time. No stress about running out of stock.",
+    "adv3Title": "Personal Manager",
+    "adv3Desc": "Each salon is assigned a personal manager who takes care of orders, advice and prompt service.",
+    "adv4Title": "Fast Delivery",
+    "adv4Desc": "Delivery within 1–3 business days across Lithuania. Urgent orders — option to receive the next business day.",
+    "adv5Title": "180 ml Economic Benefit for Salons",
+    "adv5Desc": "Larger packaging means lower cost per application. 180 ml — that's 3× more product than the standard 60 ml.",
+    "adv6Title": "Product Testing Opportunity",
+    "adv6Desc": "Before placing a large order, You can test the products in Your salon. Confirm quality in practice.",
+    "stepsBadge": "How It Works",
+    "stepsTitle": "Three Simple Steps",
+    "stepsSubtitle": "Starting collaboration with us is simple and fast",
+    "step1Title": "Submit an Inquiry",
+    "step1Desc": "Fill out the form below or contact us by email. Specify Your salon's needs and preferences.",
+    "step2Title": "Receive an Individual Quote",
+    "step2Desc": "Within 1 business day, our manager will prepare and send a pricing quote tailored to Your salon.",
+    "step3Title": "Start Collaborating",
+    "step3Desc": "Agree on a delivery schedule, receive products and start working with quality dyes at the best price.",
+    "econBadge": "Economic Benefit",
+    "econTitle": "The 180 ml Advantage for Your Salon",
+    "econSubtitle": "Comparison with standard 60 ml packages on the market",
+    "econParam": "Parameter",
+    "econStd": "Standard (60 ml)",
+    "econOurs": "Ours (180 ml)",
+    "econVolume": "Package volume",
+    "econPricePkg": "Price per package",
+    "econPriceMl": "Price per 1 ml",
+    "econPkgPer100": "Packages / 100 colorings",
+    "econWaste": "Packaging waste",
+    "econWasteStd": "High",
+    "econWasteOurs": "3× less",
+    "econExplainTitle": "More Product. Lower Cost.",
+    "econExplainP1": "One of our 180 ml packages equals three standard 60 ml packages. This means significantly lower expenses per coloring and fewer orders per month.",
+    "econExplainP2": "For salons performing 20+ colorings per month, savings can reach up to",
+    "econExplainHighlight": "40% off regular dye expenses",
+    "econExplainP2End": ". And with a B2B discount added — the savings become even greater.",
+    "econStat1": "More product per package",
+    "econStat2": "Lower price per 1 ml",
+    "econStat3": "Less packaging waste",
+    "formBadge": "Inquiry",
+    "formTitle": "Get an Individual Quote",
+    "formSubtitle": "Fill out the form and our manager will contact You within 1 business day. We will prepare a quote tailored specifically to Your salon's needs.",
+    "formPerk1": "We respond within 1 business day",
+    "formPerk2": "Individual pricing from the first order",
+    "formPerk3": "Free product testing",
+    "formPerk4": "No obligations",
+    "formCardTitle": "Submit an Inquiry",
+    "formCardSubtitle": "Fields marked with * are required",
+    "formSalonName": "Salon Name",
+    "formSalonPlaceholder": "E.g., Beauty Studio \"Aura\"",
+    "formContactPerson": "Contact Person",
+    "formContactPlaceholder": "First Last Name",
+    "formEmail": "Email",
+    "formEmailPlaceholder": "info@your-salon.com",
+    "formPhone": "Phone Number",
+    "formPhonePlaceholder": "+370 ...",
+    "formAddress": "Salon Address",
+    "formAddressPlaceholder": "City, street",
+    "formVolume": "Monthly Demand",
+    "formVolumePlaceholder": "Select approximate volume...",
+    "formVolumeOpt1": "Up to 10 units per month",
+    "formVolumeOpt2": "10–50 units per month",
+    "formVolumeOpt3": "50–100 units per month",
+    "formVolumeOpt4": "100+ units per month",
+    "formMessage": "Additional Message",
+    "formMessagePlaceholder": "Which products are You interested in? Do You have any special requirements?",
+    "formSubmit": "Get a Quote →",
+    "formSubmitting": "Sending…",
+    "formSuccessTitle": "Inquiry Sent!",
+    "formSuccessDesc": "Thank You for Your interest. Our manager will contact You within 1 business day.",
+    "reviewsBadge": "Reviews",
+    "reviewsTitle": "What Our Partners Say",
+    "reviewsSubtitle": "Salons that are already collaborating with us",
+    "review1": "\"We switched to 180 ml packages half a year ago and are already seeing significant savings. The personal manager is always reachable, and delivery is punctual.\"",
+    "review1Name": "Diana K.",
+    "review1Role": "Salon Owner, Kaunas",
+    "review2": "\"A very convenient collaboration system. We order regularly, prices are excellent, and quality matches more expensive brands. Our colorists are satisfied.\"",
+    "review2Name": "Ieva G.",
+    "review2Role": "Beauty Studio, Vilnius",
+    "review3": "\"We have three salons and receive equally good terms for all of them. We especially value the opportunity to test new shades before placing a large order.\"",
+    "review3Name": "Rasa S.",
+    "review3Role": "Salon Chain Manager, Klaipėda",
+    "ctaBadge": "Start Now",
+    "ctaTitle": "Ready to Start?",
+    "ctaSubtitle": "Contact us in a way that's convenient for You and get an individual quote for Your salon today.",
+    "ctaCta": "Fill Out the Inquiry Form →"
+  },
+  "deliveryPage": {
+    "metaTitle": "Delivery & Returns",
+    "metaDesc": "Delivery methods, prices and timeframes. Return policy within 14 days according to Lithuanian law. Free shipping from €50.",
+    "breadcrumb": "Delivery & Returns",
+    "heroBadge": "Information",
+    "heroTitle": "Delivery &",
+    "heroTitleHighlight": "Returns",
+    "heroSubtitle": "Learn about delivery methods, timeframes and return conditions. Our goal — fast and convenient service.",
+    "shippingBadge": "Delivery",
+    "shippingTitle": "Delivery Methods",
+    "shippingSubtitle": "Choose the delivery method most convenient for You",
+    "courierTitle": "Courier",
+    "courierDesc": "Products are delivered directly to Your door across Lithuania on business days.",
+    "courierTime": "1–3 business days",
+    "parcelTitle": "Parcel Locker",
+    "parcelDesc": "Pick up Your shipment at the nearest LP EXPRESS or Omniva parcel locker network.",
+    "parcelTime": "1–2 business days",
+    "pickupTitle": "Pickup in Kaunas",
+    "pickupDesc": "Pick up Your order at our warehouse in Kaunas for free, at an agreed time.",
+    "pickupTime": "Same / next day",
+    "priceTableTitle": "Delivery Prices",
+    "priceColMethod": "Delivery Method",
+    "priceColTerm": "Timeframe",
+    "priceColPrice": "Price",
+    "priceColFree": "From €50",
+    "free": "Free",
+    "shippingTerritory": "Delivery territory: we currently deliver only within the territory of the Republic of Lithuania.",
+    "freeShippingTitle": "Free Delivery from €50",
+    "freeShippingDesc": "For orders from €50, delivery across Lithuania is completely free — regardless of the chosen delivery method.",
+    "returnsBadge": "Returns",
+    "returnsTitle": "Return Conditions",
+    "returnsSubtitle": "Your satisfaction is important to us. Please review the return procedure.",
+    "ret1Title": "Returns within 14 Days",
+    "ret1Desc": "You have the right to return the product within 14 calendar days of receipt, without stating a reason.",
+    "ret2Title": "Original Packaging",
+    "ret2Desc": "The returned product must be unused, undamaged and in the original manufacturer's packaging with all labels.",
+    "ret3Title": "Cosmetic Product Returns",
+    "ret3Desc": "Cosmetic products that do not have a cardboard box, protective film or special membrane cannot be returned after opening.",
+    "ret4Title": "Defective Products — Free of Charge",
+    "ret4Desc": "If You received a defective or incorrect product, contact us — we will replace it free of charge or refund Your money.",
+    "ret5Title": "Refund within 5 Business Days",
+    "ret5Desc": "Upon receiving the returned product, the money is transferred to Your account within 5 business days.",
+    "ret6Title": "Shipping Costs",
+    "ret6Desc": "Return shipping costs are covered by the buyer, unless the product was defective or delivered incorrectly.",
+    "howReturnBadge": "Instructions",
+    "howReturnTitle": "How to Return a Product?",
+    "howReturnSubtitle": "Follow four simple steps",
+    "howRet1Title": "Contact Us",
+    "howRet1Desc": "Write to us by email or fill out the contact form, providing the order number and reason for return.",
+    "howRet2Title": "Receive Confirmation",
+    "howRet2Desc": "Our team will review Your request and send return confirmation with instructions.",
+    "howRet3Title": "Ship the Product",
+    "howRet3Desc": "Pack the product and ship it to the specified address. We recommend using a tracked shipping service.",
+    "howRet4Title": "Refund",
+    "howRet4Desc": "Upon receiving and inspecting the product, we will transfer the money to Your specified account within 5 business days.",
+    "returnContactBadge": "Return Contacts",
+    "returnContactTitle": "Contact Us About Returns",
+    "ctaBadge": "Help",
+    "ctaTitle": "Have Questions?",
+    "ctaSubtitle": "Our team is ready to help. Contact us and we will respond as soon as possible.",
+    "ctaCta": "Contact Us →"
+  },
+  "faqPage": {
+    "metaTitle": "FAQ — Frequently Asked Questions",
+    "metaDesc": "Answers to key questions about professional hair dyes, ordering, delivery, returns and B2B collaboration.",
+    "breadcrumb": "FAQ",
+    "title": "Frequently Asked",
+    "titleHighlight": "Questions",
+    "subtitle": "Finding Your answer here will save time. If You still have questions — our team is always ready to help.",
+    "ctaTitle": "Didn't Find an Answer?",
+    "ctaSubtitle": "Contact us and our team will be happy to help resolve any question.",
+    "ctaEmail": "Send an Email \u2192",
+    "ctaContact": "Contact",
+    "categories": [
+      {
+        "icon": "\ud83c\udfa8",
+        "title": "About Products",
+        "items": [
+          {
+            "q": "How do your dyes differ from other professional dyes?",
+            "intro": "Our Color SHOCK dyes stand out in several key ways:",
+            "list": [
+              "180 ml package \u2014 twice the size of the standard market offering (60\u2013100 ml), making the price per millilitre significantly lower.",
+              "Premium ingredients \u2014 the formula contains Argan oil, Jojoba oil and Rose extract, which nourish and protect hair during colouring.",
+              "Italian quality \u2014 products are manufactured in Italy to the highest quality standards.",
+              "Professional pricing \u2014 the larger package allows us to offer a competitive price without sacrificing quality."
+            ]
+          },
+          {
+            "q": "Why is the 180 ml package better?",
+            "intro": "The 180 ml package offers clear advantages for professionals:",
+            "list": [
+              "2\u00d7 more product \u2014 one package equals two standard ones (60\u2013100 ml).",
+              "Lower cost per use \u2014 the price per millilitre is significantly more economical.",
+              "Fewer packages \u2014 less frequent ordering, less waste.",
+              "Ideal for salons \u2014 the larger volume means one package lasts for more procedures."
+            ]
+          },
+          {
+            "q": "Are the dyes suitable for all hair types?",
+            "text": "Yes. Our dyes are formulated for all hair types \u2014 from fine to thick, straight to curly. The Argan and Jojoba oils in the formula additionally nourish hair, so the result is smooth and shiny regardless of hair structure."
+          },
+          {
+            "q": "How many shades are in the colour palette?",
+            "intro": "We currently offer more than 50 professional shades, grouped into categories:",
+            "list": [
+              "Natural \u2014 natural tones",
+              "Ash \u2014 ash shade series",
+              "Copper \u2014 copper and warm tones",
+              "Red \u2014 red shades",
+              "Violet \u2014 violet series",
+              "Superlift \u2014 intensive lightening tones",
+              "Toner \u2014 toning dyes"
+            ],
+            "outro": "The palette is constantly expanding with new shades."
+          },
+          {
+            "q": "Can shades be mixed?",
+            "text": "Yes, professional colourists can freely mix different shades to create unique, individual colours. We recommend following professional colourisation principles and consulting our team about optimal mixing proportions if needed."
+          },
+          {
+            "q": "Which oxidant is suitable for your dyes?",
+            "intro": "Our dyes work with oxidants of the following concentrations:",
+            "list": [
+              "3% (10 vol.) \u2014 for toning and gentle colouring",
+              "6% (20 vol.) \u2014 for standard colouring and grey coverage",
+              "9% (30 vol.) \u2014 for lightening by 2\u20133 tones",
+              "12% (40 vol.) \u2014 for intensive lightening"
+            ],
+            "outro": "Mixing ratio: 1+2 (1 part dye + 2 parts oxidant)."
+          }
+        ]
+      },
+      {
+        "icon": "\ud83d\uded2",
+        "title": "About Ordering",
+        "items": [
+          {
+            "q": "How do I place an order?",
+            "intro": "Ordering is very simple:",
+            "list": [
+              "Choose your desired products from the catalogue.",
+              "Add them to the cart by pressing the \u201c+\u201d button.",
+              "Go to the cart, review your order and fill in the delivery details.",
+              "Choose a payment method and confirm your order."
+            ],
+            "outro": "Once we receive your order, you will get a confirmation email."
+          },
+          {
+            "q": "Is there a minimum order amount?",
+            "text": "There is no minimum order for individual purchases \u2014 you can order even a single product. B2B clients (salons, barbershops) receive individual terms."
+          },
+          {
+            "q": "What payment methods are accepted?",
+            "intro": "We accept several payment methods for your convenience:",
+            "list": [
+              "Bank transfer \u2014 payment by proforma invoice.",
+              "Payment card \u2014 Visa, Mastercard.",
+              "Paysera \u2014 fast and convenient payment via the electronic banking system."
+            ]
+          },
+          {
+            "q": "Can I get an invoice?",
+            "text": "Yes, for B2B clients (companies, salons) we issue VAT invoices. Provide your company details during the order or contact us by email at info@dazaikirpejams.lt."
+          }
+        ]
+      },
+      {
+        "icon": "\ud83d\ude9a",
+        "title": "About Delivery",
+        "items": [
+          {
+            "q": "How long does delivery take?",
+            "text": "We deliver orders within 1\u20133 business days from order confirmation and payment. Delivery time may vary depending on your location and the chosen delivery method."
+          },
+          {
+            "q": "How much does delivery cost?",
+            "text": "Delivery cost depends on the chosen method. For orders over \u20ac50, delivery within Lithuania is free."
+          },
+          {
+            "q": "Can I pick up the order?",
+            "text": "Yes, you can pick up your order in person in Kaunas. The exact pick-up address and time will be provided in the order confirmation. This is a free service."
+          },
+          {
+            "q": "Which countries do you deliver to?",
+            "text": "Currently we deliver throughout Lithuania. We are actively expanding our delivery geography and plan to start shipping to other Baltic countries soon."
+          }
+        ]
+      },
+      {
+        "icon": "\ud83d\udd04",
+        "title": "About Returns",
+        "items": [
+          {
+            "q": "Can I return products?",
+            "text": "Yes. Under Lithuanian law, you have the right to return products within 14 days of receipt, provided the products have not been opened, used and are in their original packaging. Cosmetic products without a cardboard box, protective film or special membrane cannot be returned after opening."
+          },
+          {
+            "q": "How long is the return period?",
+            "text": "The return period is 14 calendar days from the date of receipt. You must notify us of your decision to return within this period."
+          },
+          {
+            "q": "How do I initiate a return?",
+            "text": "To return a product, contact us by email at info@dazaikirpejams.lt, stating your order number and the reason for the return. We will get back to you within 1\u20132 business days to arrange the return details."
+          }
+        ]
+      },
+      {
+        "icon": "\ud83e\udd1d",
+        "title": "About Collaboration",
+        "items": [
+          {
+            "q": "Do you offer discounts for salons?",
+            "text": "Yes! We offer individual B2B pricing for beauty salons, barbershops and professional colourists, depending on order volumes and regularity."
+          },
+          {
+            "q": "How do I become a partner?",
+            "text": "Becoming a partner is very simple: fill in the B2B form on our website (in the \u201cFor Salons\u201d section) or contact us directly by email at info@dazaikirpejams.lt."
+          },
+          {
+            "q": "Can I get test samples?",
+            "text": "Yes, for potential B2B partners (salons, barbershops) we offer the opportunity to receive test samples so you can evaluate product quality before making a decision."
+          }
+        ]
+      }
+    ]
+  },
   "order": {
     "confirmationTitle": "Thank you for your order!",
     "confirmationDesc": "Your order has been received. We've sent a confirmation by email.",

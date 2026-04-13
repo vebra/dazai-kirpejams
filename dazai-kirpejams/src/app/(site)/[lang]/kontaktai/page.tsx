@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { hasLocale } from '@/i18n/dictionaries'
+import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { buildPageMetadata } from '@/lib/seo'
 import { CONTACT, phoneHref } from '@/lib/site'
@@ -13,12 +13,13 @@ export async function generateMetadata({
 }: PageProps<'/[lang]/kontaktai'>): Promise<Metadata> {
   const { lang } = await params
   if (!hasLocale(lang)) return {}
+  const dict = await getDictionary(lang)
+  const t = dict.contactPage
   return buildPageMetadata({
     lang,
     path: '/kontaktai',
-    title: 'Kontaktai — Dažai Kirpėjams',
-    description:
-      'Susisiekite su mumis dėl produktų, B2B pasiūlymų ar bet kokių klausimų. El. paštas, telefonas, kontaktų forma.',
+    title: t.metaTitle,
+    description: t.metaDesc,
   })
 }
 
@@ -28,16 +29,21 @@ export default async function ContactPage({
   const { lang } = await params
   if (!hasLocale(lang)) notFound()
 
+  const dict = await getDictionary(lang)
+  const t = dict.contactPage
+  const c = dict.common
+  const p = langPrefix(lang)
+
   return (
     <>
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>
-          <Link href={`${langPrefix(lang) || '/'}`} className="hover:text-brand-magenta transition-colors">
-            Pradžia
+          <Link href={`${p || '/'}`} className="hover:text-brand-magenta transition-colors">
+            {c.home}
           </Link>
           <span className="mx-2 text-[#E0E0E0]">/</span>
-          <span className="text-brand-gray-900 font-medium">Kontaktai</span>
+          <span className="text-brand-gray-900 font-medium">{t.badge}</span>
         </Container>
       </section>
 
@@ -46,14 +52,13 @@ export default async function ContactPage({
         <Container>
           <div className="text-center">
             <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-              Kontaktai
+              {t.badge}
             </span>
             <h1 className="text-[clamp(2rem,5vw,3.25rem)] font-bold text-brand-gray-900 mb-4 leading-[1.2]">
-              Susisiekite su mumis
+              {t.title}
             </h1>
             <p className="text-[1.1rem] text-brand-gray-500 max-w-[560px] mx-auto leading-[1.7]">
-              Atsakysime į Jūsų klausimus per 1 darbo dieną. Konsultuojame dėl
-              produktų, užsakymų ir B2B bendradarbiavimo.
+              {t.subtitle}
             </p>
           </div>
         </Container>
@@ -68,7 +73,7 @@ export default async function ContactPage({
             {[
               {
                 icon: '✉',
-                title: 'El. paštas',
+                title: t.email,
                 value: CONTACT.email,
                 href: `mailto:${CONTACT.email}`,
               },
@@ -76,7 +81,7 @@ export default async function ContactPage({
                 ? [
                     {
                       icon: '☎',
-                      title: 'Telefonas',
+                      title: t.phone,
                       value: CONTACT.phone,
                       href: phoneHref,
                     },
@@ -84,12 +89,12 @@ export default async function ContactPage({
                 : []),
               {
                 icon: '📍',
-                title: 'Adresas',
+                title: t.address,
                 value: CONTACT.address,
               },
               {
                 icon: '🕓',
-                title: 'Darbo laikas',
+                title: t.workingHours,
                 value: CONTACT.workingHours,
               },
             ].map((card) => (
@@ -128,20 +133,14 @@ export default async function ContactPage({
             {/* Info */}
             <div>
               <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-4 leading-tight">
-                Parašykite mums
+                {t.writeToUs}
               </h2>
               <p className="text-[1.05rem] text-brand-gray-500 leading-[1.7] mb-8">
-                Užpildykite formą ir mes susisieksime su Jumis kuo greičiau.
-                Galite rašyti dėl bet kokio klausimo — nuo produktų
-                pasirinkimo iki B2B bendradarbiavimo.
+                {t.formSubtitle}
               </p>
 
               <div className="grid gap-3.5 mb-10">
-                {[
-                  'Atsakome per 1 darbo dieną',
-                  'Konsultuojame dėl produktų',
-                  'Individualūs B2B pasiūlymai',
-                ].map((feature) => (
+                {[t.feature1, t.feature2, t.feature3].map((feature) => (
                   <div
                     key={feature}
                     className="flex items-center gap-3 text-[0.95rem] text-brand-gray-900 font-medium"
@@ -157,16 +156,21 @@ export default async function ContactPage({
               {/* Social */}
               <div className="pt-2">
                 <h4 className="text-base font-bold text-brand-gray-900 mb-4">
-                  Sekite mus
+                  {t.followUs}
                 </h4>
                 <div className="flex gap-3 flex-wrap">
-                  {['Facebook', 'Instagram'].map((social) => (
+                  {[
+                    { label: 'Facebook', href: 'https://www.facebook.com/dazaikirpejams' },
+                    { label: 'Instagram', href: 'https://www.instagram.com/dazaikirpejams' },
+                  ].map((social) => (
                     <a
-                      key={social}
-                      href="#"
+                      key={social.label}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#E0E0E0] bg-white text-[0.9rem] font-medium text-brand-gray-900 hover:border-brand-magenta hover:text-brand-magenta hover:shadow-[0_2px_16px_rgba(0,0,0,0.07)] transition-all"
                     >
-                      {social}
+                      {social.label}
                     </a>
                   ))}
                 </div>
@@ -175,7 +179,7 @@ export default async function ContactPage({
 
             {/* Form card */}
             <div className="bg-white rounded-xl p-8 lg:p-10 shadow-[0_2px_16px_rgba(0,0,0,0.07)] border border-[#E0E0E0]">
-              <ContactForm lang={lang} />
+              <ContactForm lang={lang} labels={t} />
             </div>
           </div>
         </Container>
@@ -193,7 +197,7 @@ export default async function ContactPage({
                 Kaunas, Lietuva
               </h3>
               <p className="text-[0.95rem] text-brand-gray-500">
-                Čia bus rodomas Google Maps žemėlapis
+                {t.mapPlaceholder}
               </p>
             </div>
           </div>
@@ -206,18 +210,16 @@ export default async function ContactPage({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
               {
-                href: `${langPrefix(lang)}/duk`,
+                href: `${p}/duk`,
                 icon: '❓',
-                title: 'Populiariausi klausimai',
-                desc:
-                  'Rasite atsakymus į dažniausiai užduodamus klausimus apie užsakymą, pristatymą ir produktus.',
+                title: t.faqTitle,
+                desc: t.faqDesc,
               },
               {
-                href: `${langPrefix(lang)}/pristatymas`,
+                href: `${p}/pristatymas`,
                 icon: '🚚',
-                title: 'Pristatymo informacija',
-                desc:
-                  'Sužinokite apie pristatymo būdus, terminus ir kainas visoje Lietuvoje.',
+                title: t.deliveryTitle,
+                desc: t.deliveryDesc,
               },
             ].map((link) => (
               <Link
@@ -250,4 +252,3 @@ export default async function ContactPage({
     </>
   )
 }
-

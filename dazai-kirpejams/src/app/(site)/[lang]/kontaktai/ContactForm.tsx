@@ -4,9 +4,29 @@ import { useActionState } from 'react'
 import { submitContactAction, type ContactFormState } from './actions'
 import type { Locale } from '@/i18n/config'
 
+type ContactLabels = {
+  formName: string
+  formNamePlaceholder: string
+  formEmail: string
+  formEmailPlaceholder: string
+  formPhone: string
+  formPhonePlaceholder: string
+  formSubject: string
+  formSubjectGeneral: string
+  formSubjectOrder: string
+  formSubjectB2B: string
+  formSubjectOther: string
+  formMessage: string
+  formMessagePlaceholder: string
+  formSubmit: string
+  formSubmitting: string
+  formSuccessTitle: string
+  formSuccessDesc: string
+}
+
 const initialState: ContactFormState = {}
 
-export function ContactForm({ lang }: { lang: Locale }) {
+export function ContactForm({ lang, labels }: { lang: Locale; labels: ContactLabels }) {
   const [state, formAction, isPending] = useActionState(
     submitContactAction,
     initialState
@@ -19,10 +39,10 @@ export function ContactForm({ lang }: { lang: Locale }) {
           <span className="text-3xl">✓</span>
         </div>
         <h3 className="text-lg font-bold text-brand-gray-900">
-          Žinutė išsiųsta!
+          {labels.formSuccessTitle}
         </h3>
         <p className="text-sm text-brand-gray-500 max-w-sm mx-auto leading-relaxed">
-          Dėkojame, kad susisiekėte. Atsakysime per 1 darbo dieną.
+          {labels.formSuccessDesc}
         </p>
       </div>
     )
@@ -38,36 +58,36 @@ export function ContactForm({ lang }: { lang: Locale }) {
         </div>
       )}
 
-      <FormField label="Vardas" name="name" required placeholder="Jūsų vardas" />
+      <FormField label={labels.formName} name="name" required placeholder={labels.formNamePlaceholder} />
       <FormField
-        label="El. paštas"
+        label={labels.formEmail}
         name="email"
         type="email"
         required
-        placeholder="jusu@pastas.lt"
+        placeholder={labels.formEmailPlaceholder}
       />
       <FormField
-        label="Telefono numeris"
+        label={labels.formPhone}
         name="phone"
         type="tel"
-        placeholder="+370 ..."
+        placeholder={labels.formPhonePlaceholder}
       />
       <div>
         <label
           htmlFor="contact-subject"
           className="block text-[0.9rem] font-semibold text-brand-gray-900 mb-2"
         >
-          Užklausos tipas
+          {labels.formSubject}
         </label>
         <select
           id="contact-subject"
           name="subject"
           className="w-full px-4 py-[14px] border border-[#E0E0E0] rounded-lg bg-white text-brand-gray-900 text-[0.95rem] cursor-pointer focus:outline-none focus:border-brand-magenta focus:shadow-[0_0_0_3px_rgba(233,30,140,0.1)] transition-all"
         >
-          <option value="Bendras klausimas">Bendras klausimas</option>
-          <option value="Užsakymo klausimas">Užsakymo klausimas</option>
-          <option value="B2B bendradarbiavimas">B2B bendradarbiavimas</option>
-          <option value="Kita">Kita</option>
+          <option value={labels.formSubjectGeneral}>{labels.formSubjectGeneral}</option>
+          <option value={labels.formSubjectOrder}>{labels.formSubjectOrder}</option>
+          <option value={labels.formSubjectB2B}>{labels.formSubjectB2B}</option>
+          <option value={labels.formSubjectOther}>{labels.formSubjectOther}</option>
         </select>
       </div>
       <div>
@@ -75,14 +95,14 @@ export function ContactForm({ lang }: { lang: Locale }) {
           htmlFor="contact-message"
           className="block text-[0.9rem] font-semibold text-brand-gray-900 mb-2"
         >
-          Žinutė <span className="text-brand-magenta">*</span>
+          {labels.formMessage} <span className="text-brand-magenta">*</span>
         </label>
         <textarea
           id="contact-message"
           name="message"
           rows={5}
           required
-          placeholder="Jūsų žinutė..."
+          placeholder={labels.formMessagePlaceholder}
           className="w-full px-4 py-[14px] border border-[#E0E0E0] rounded-lg bg-white text-brand-gray-900 text-[0.95rem] resize-y min-h-[120px] focus:outline-none focus:border-brand-magenta focus:shadow-[0_0_0_3px_rgba(233,30,140,0.1)] transition-all"
         />
       </div>
@@ -91,7 +111,7 @@ export function ContactForm({ lang }: { lang: Locale }) {
         disabled={isPending}
         className="w-full px-8 py-4 bg-brand-magenta text-white rounded-lg text-[1.05rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isPending ? 'Siunčiama…' : 'Siųsti žinutę →'}
+        {isPending ? labels.formSubmitting : labels.formSubmit}
       </button>
     </form>
   )

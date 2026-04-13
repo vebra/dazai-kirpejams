@@ -196,6 +196,419 @@
     "agreeTerms": "Sutinku su pirkimo sąlygomis ir privatumo politika",
     "requiredField": "Privalomas laukas"
   },
+  "common": {
+    "home": "Pradžia",
+    "viewProducts": "Peržiūrėti produktus",
+    "contactUs": "Susisiekite su mumis",
+    "readyToTry": "Pasiruošę išbandyti?",
+    "startNow": "Pradėkite dabar",
+    "readyCtaDesc": "Profesionalūs dažai su 180 ml talpa — daugiau vertės kiekvienam dažymui Jūsų salone."
+  },
+  "aboutPage": {
+    "metaTitle": "Apie mus — Dažai Kirpėjams",
+    "metaDesc": "Aprūpiname Lietuvos kirpėjus ir salonus profesionaliais darbo įrankiais. Mūsų misija — kokybiški, ekonomiški dažai 180 ml talpoje.",
+    "badge": "Apie mus",
+    "title": "Mes aprūpiname kirpėjus darbo įrankiais, kuriais galima",
+    "titleHighlight": "pasitikėti",
+    "subtitle": "Mūsų tikslas paprastas — padėti kirpėjams ir koloristams dirbti efektyviau. Profesionalūs produktai, protinga kaina ir tikra vertė kasdieniam darbui salone.",
+    "imagePlaceholder": "Profesionali atmosfera",
+    "storyBadge": "Mūsų istorija",
+    "storyTitle": "Kaip viskas prasidėjo",
+    "storyP1": "Viskas prasidėjo nuo paprasto pastebėjimo: Lietuvos kirpėjai moka per daug už profesionalius plaukų dažus. Daugelis tiekėjų siūlo 60–100 ml pakuotes už kainas, kurios ne visada atitinka darbo realybę. Kirpėjai kasdien naudoja dažus — tai jų pagrindinis darbo įrankis, o ne prabangos prekė. Mes nusprendėme, kad galima kitaip.",
+    "storyP2": "Užmezgėme tiesioginius ryšius su Italijos gamintojais ir į Lietuvos rinką atvežėme Color SHOCK — profesionalių plaukų dažų liniją 180 ml pakuotėse. Tai dvigubai ar trigubai daugiau nei standartinė pakuotė rinkoje. Formulė su Argan ir Jojoba aliejais bei rožių ekstraktu užtikrina kokybišką rezultatą, o didesnė talpa reiškia mažesnę savikainą kiekvienam dažymui. Greta Color SHOCK pasiūlėme ir RosaNera Cosmetic — profesionalią plaukų priežiūros liniją, kuri puikiai papildo dažymo procesą.",
+    "storyP3": "Šiandien dirbame su kirpėjais, koloristais ir grožio salonais visoje Lietuvoje. Nesiekiame būti dar viena „grožio“ kompanija su tuščiais pažadais. Mūsų požiūris pragmatiškas: geras darbo įrankis turi būti patikimas, ekonomiškas ir lengvai prieinamas. Būtent tai mes ir siūlome.",
+    "missionBadge": "Misija",
+    "missionTitle": "Ką mes darome ir kodėl",
+    "missionSubtitle": "Mūsų misija — aprūpinti kirpėjus kokybiškais, ekonomiškais darbo įrankiais. Ne „grožio“ industrijos klišės, o praktinė nauda kasdieniam darbui.",
+    "missionCard1Title": "Kokybė be permokėjimo",
+    "missionCard1Desc": "Profesionali formulė iš Italijos — kokybiški ingredientai už protingą kainą. Didesnė pakuotė reiškia mažesnę savikainą.",
+    "missionCard2Title": "Orientacija į praktiką",
+    "missionCard2Desc": "Kiekvienas mūsų sprendimas grindžiamas vienu klausimu: ar tai palengvina kirpėjo kasdienį darbą?",
+    "missionCard3Title": "Profesionalams — ne visiems",
+    "missionCard3Desc": "Dirbame tik su profesionalais. Suprantame jų poreikius, todėl galime pasiūlyti tiksliai tai, ko reikia.",
+    "brandsBadge": "Prekių ženklai",
+    "brandsTitle": "Produktai, kuriais pasitiki profesionalai",
+    "brandsSubtitle": "Du prekių ženklai — viskas, ko reikia profesionaliam darbui salone",
+    "colorShockTagline": "Profesionalūs plaukų dažai",
+    "colorShockFeatures": ["50+ profesionalių atspalvių", "180 ml ekonominė pakuotė", "Argan & Jojoba aliejai", "Rožių ekstraktas", "Itališka kokybė", "Maišymo santykis 1+2"],
+    "viewDyes": "Peržiūrėti dažus",
+    "rosaneraTagline": "Profesionali plaukų priežiūra",
+    "rosaneraFeatures": ["Profesionalūs šampūnai", "Plaukų kaukės ir priežiūra", "Papildomi produktai", "Tinka po dažymo", "Saloninė kokybė", "Papildo Color SHOCK liniją"],
+    "statsBadge": "Skaičiai",
+    "statsTitle": "Faktai, kurie kalba už mus",
+    "stat1": "spalvų paletėje",
+    "stat2": "mūsų standartas",
+    "stat3": "patenkintų klientų",
+    "stat4": "gamybos šalis"
+  },
+  "contactPage": {
+    "metaTitle": "Kontaktai — Dažai Kirpėjams",
+    "metaDesc": "Susisiekite su mumis dėl produktų, B2B pasiūlymų ar bet kokių klausimų. El. paštas, telefonas, kontaktų forma.",
+    "badge": "Kontaktai",
+    "title": "Susisiekite su mumis",
+    "subtitle": "Atsakysime į Jūsų klausimus per 1 darbo dieną. Konsultuojame dėl produktų, užsakymų ir B2B bendradarbiavimo.",
+    "email": "El. paštas",
+    "phone": "Telefonas",
+    "address": "Adresas",
+    "workingHours": "Darbo laikas",
+    "writeToUs": "Parašykite mums",
+    "formSubtitle": "Užpildykite formą ir mes susisieksime su Jumis kuo greičiau. Galite rašyti dėl bet kokio klausimo — nuo produktų pasirinkimo iki B2B bendradarbiavimo.",
+    "feature1": "Atsakome per 1 darbo dieną",
+    "feature2": "Konsultuojame dėl produktų",
+    "feature3": "Individualūs B2B pasiūlymai",
+    "followUs": "Sekite mus",
+    "mapPlaceholder": "Čia bus rodomas Google Maps žemėlapis",
+    "faqTitle": "Populiariausi klausimai",
+    "faqDesc": "Rasite atsakymus į dažniausiai užduodamus klausimus apie užsakymą, pristatymą ir produktus.",
+    "deliveryTitle": "Pristatymo informacija",
+    "deliveryDesc": "Sužinokite apie pristatymo būdus, terminus ir kainas visoje Lietuvoje.",
+    "formName": "Vardas",
+    "formNamePlaceholder": "Jūsų vardas",
+    "formEmail": "El. paštas",
+    "formEmailPlaceholder": "jusu@pastas.lt",
+    "formPhone": "Telefono numeris",
+    "formPhonePlaceholder": "+370 ...",
+    "formSubject": "Užklausos tipas",
+    "formSubjectGeneral": "Bendras klausimas",
+    "formSubjectOrder": "Užsakymo klausimas",
+    "formSubjectB2B": "B2B bendradarbiavimas",
+    "formSubjectOther": "Kita",
+    "formMessage": "Žinutė",
+    "formMessagePlaceholder": "Jūsų žinutė...",
+    "formSubmit": "Siųsti žinutę →",
+    "formSubmitting": "Siunčiama…",
+    "formSuccessTitle": "Žinutė išsiųsta!",
+    "formSuccessDesc": "Dėkojame, kad susisiekėte. Atsakysime per 1 darbo dieną."
+  },
+  "b2bPage": {
+    "metaTitle": "Bendradarbiavimas salonams — B2B specialios sąlygos",
+    "metaDesc": "Specialios sąlygos grožio salonams ir kirpykloms. Individualios kainos, reguliarus tiekimas, asmeninis vadybininkas. Gaukite pasiūlymą jau šiandien.",
+    "breadcrumb": "Bendradarbiavimas salonams",
+    "heroBadge": "B2B bendradarbiavimas",
+    "heroTitle": "Specialios sąlygos",
+    "heroTitleHighlight": "grožio salonams",
+    "heroSubtitle": "Gaukite profesionalius dažus ir priemones geriausiomis kainomis. Individualus pasiūlymas, reguliarus tiekimas ir asmeninis vadybininkas — viskas, ko reikia Jūsų salonui.",
+    "heroCta": "Gauti pasiūlymą →",
+    "advantagesBadge": "Privalumai",
+    "advantagesTitle": "Kodėl salonai renkasi mus?",
+    "advantagesSubtitle": "Sukuriame sąlygas, kad Jūsų salonas dirbtų efektyviau ir pelningiau",
+    "adv1Title": "Individualios kainos dideliems užsakymams",
+    "adv1Desc": "Kuo didesnis užsakymas — tuo geresnė kaina. Kiekvienas salonas gauna pasiūlymą, pritaikytą būtent jo poreikiams ir apimtims.",
+    "adv2Title": "Reguliaraus tiekimo galimybė",
+    "adv2Desc": "Sutarkite pastovų pristatymo grafiką — dažai visada bus laiku. Jokio streso dėl pasibaigusių atsargų.",
+    "adv3Title": "Asmeninis vadybininkas",
+    "adv3Desc": "Kiekvienam salonui priskiriamas asmeninis vadybininkas, kuris pasirūpins užsakymais, patarimais ir operatyviu aptarnavimu.",
+    "adv4Title": "Greitas pristatymas",
+    "adv4Desc": "Pristatymas per 1–3 darbo dienas visoje Lietuvoje. Neatidėliotini užsakymai — galimybė gauti kitą darbo dieną.",
+    "adv5Title": "180 ml ekonominė nauda salonams",
+    "adv5Desc": "Didesnė pakuotė reiškia mažesnę savikainą kiekvienam dažymui. 180 ml — tai 3× daugiau produkto nei standartinis 60 ml.",
+    "adv6Title": "Galimybė testuoti produktus",
+    "adv6Desc": "Prieš užsisakydami didelį kiekį, galite išbandyti produktus savo salone. Patvirtinkite kokybę praktiškai.",
+    "stepsBadge": "Kaip tai veikia",
+    "stepsTitle": "Trys paprasti žingsniai",
+    "stepsSubtitle": "Pradėti bendradarbiauti su mumis — paprasta ir greita",
+    "step1Title": "Pateikite užklausą",
+    "step1Desc": "Užpildykite žemiau esančią formą arba susisiekite el. paštu. Nurodykite salono poreikius ir pageidavimus.",
+    "step2Title": "Gausite individualų pasiūlymą",
+    "step2Desc": "Per 1 darbo dieną mūsų vadybininkas parengs ir atsiųs Jūsų salonui pritaikytą kainų pasiūlymą.",
+    "step3Title": "Pradėkite bendradarbiavimą",
+    "step3Desc": "Sutarkite pristatymo grafiką, gaukite produktus ir pradėkite dirbti su kokybiškais dažais geriausia kaina.",
+    "econBadge": "Ekonominė nauda",
+    "econTitle": "180 ml pranašumas Jūsų salonui",
+    "econSubtitle": "Palyginimas su standartinėmis 60 ml pakuotėmis rinkoje",
+    "econParam": "Parametras",
+    "econStd": "Standartinė (60 ml)",
+    "econOurs": "Mūsų (180 ml)",
+    "econVolume": "Pakuotės tūris",
+    "econPricePkg": "Kaina už pakuotę",
+    "econPriceMl": "Kaina už 1 ml",
+    "econPkgPer100": "Pakuotės / 100 dažymų",
+    "econWaste": "Pakuočių atliekos",
+    "econWasteStd": "Daug",
+    "econWasteOurs": "3× mažiau",
+    "econExplainTitle": "Daugiau produkto. Mažesnė savikaina.",
+    "econExplainP1": "Viena mūsų 180 ml pakuotė prilygsta trims standartinėms 60 ml pakuotėms. Tai reiškia žymiai mažesnes išlaidas kiekvienam dažymui ir mažiau užsakymų per mėnesį.",
+    "econExplainP2": "Salonams, atliekantiems 20+ dažymų per mėnesį, sutaupymas gali siekti iki",
+    "econExplainHighlight": "40% nuo įprastų dažų išlaidų",
+    "econExplainP2End": ". O pridėjus B2B nuolaidą — ekonomija tampa dar didesnė.",
+    "econStat1": "Daugiau produkto vienoje pakuotėje",
+    "econStat2": "Mažesnė kaina už 1 ml",
+    "econStat3": "Mažiau pakuočių atliekų",
+    "formBadge": "Užklausa",
+    "formTitle": "Gaukite individualų pasiūlymą",
+    "formSubtitle": "Užpildykite formą ir mūsų vadybininkas susisieks su Jumis per 1 darbo dieną. Parengsime pasiūlymą, pritaikytą būtent Jūsų salono poreikiams.",
+    "formPerk1": "Atsakome per 1 darbo dieną",
+    "formPerk2": "Individualios kainos nuo pirmo užsakymo",
+    "formPerk3": "Nemokamas produkto testavimas",
+    "formPerk4": "Be įsipareigojimų",
+    "formCardTitle": "Pateikite užklausą",
+    "formCardSubtitle": "Laukai pažymėti * yra privalomi",
+    "formSalonName": "Salono pavadinimas",
+    "formSalonPlaceholder": "Pvz., Grožio studija „Aura“",
+    "formContactPerson": "Kontaktinis asmuo",
+    "formContactPlaceholder": "Vardas Pavardė",
+    "formEmail": "El. paštas",
+    "formEmailPlaceholder": "info@jusu-salonas.lt",
+    "formPhone": "Telefono numeris",
+    "formPhonePlaceholder": "+370 ...",
+    "formAddress": "Salono adresas",
+    "formAddressPlaceholder": "Miestas, gatvė",
+    "formVolume": "Mėnesinis poreikis",
+    "formVolumePlaceholder": "Pasirinkite apytikslę apimtį...",
+    "formVolumeOpt1": "Iki 10 vnt. per mėnesį",
+    "formVolumeOpt2": "10–50 vnt. per mėnesį",
+    "formVolumeOpt3": "50–100 vnt. per mėnesį",
+    "formVolumeOpt4": "100+ vnt. per mėnesį",
+    "formMessage": "Papildoma žinutė",
+    "formMessagePlaceholder": "Kokie produktai domėtų? Ar turite specialių pageidavimų?",
+    "formSubmit": "Gauti pasiūlymą →",
+    "formSubmitting": "Siunčiama…",
+    "formSuccessTitle": "Užklausa išsiųsta!",
+    "formSuccessDesc": "Dėkojame už susidomėjimą. Mūsų vadybininkas susisieks su Jumis per 1 darbo dieną.",
+    "reviewsBadge": "Atsiliepimai",
+    "reviewsTitle": "Ką sako mūsų partneriai",
+    "reviewsSubtitle": "Salonai, kurie jau bendradarbiauja su mumis",
+    "review1": "„Perėjome prie 180 ml pakuočių prieš pusę metų ir jau matome reikšmingą sutaupymą. Asmeninis vadybininkas visada pasiekiamas, o pristatymas — punktualus.“",
+    "review1Name": "Diana K.",
+    "review1Role": "Salono savininkė, Kaunas",
+    "review2": "„Labai patogi bendradarbiavimo sistema. Užsisakome reguliariai, kainos nuostabios, o kokybė nenusileidžia brangesnėms prekių markėms. Mūsų koloristės patenkintos.“",
+    "review2Name": "Ieva G.",
+    "review2Role": "Grožio studija, Vilnius",
+    "review3": "„Turime tris salonus ir visiems gauname vienodai geras sąlygas. Ypatingai vertiname galimybę testuoti naujus atspalvius prieš užsisakant didelį kiekį.“",
+    "review3Name": "Rasa S.",
+    "review3Role": "Salonų tinklo vadovė, Klaipėda",
+    "ctaBadge": "Pradėkite dabar",
+    "ctaTitle": "Pasiruošę pradėti?",
+    "ctaSubtitle": "Susisiekite su mumis patogiu būdu ir gaukite individualų pasiūlymą Jūsų salonui jau šiandien.",
+    "ctaCta": "Užpildyti užklausos formą →"
+  },
+  "deliveryPage": {
+    "metaTitle": "Pristatymas ir grąžinimas",
+    "metaDesc": "Pristatymo būdai, kainos ir terminai. Grąžinimo politika per 14 dienų pagal LR teisės aktus. Nemokamas pristatymas nuo €50.",
+    "breadcrumb": "Pristatymas ir grąžinimas",
+    "heroBadge": "Informacija",
+    "heroTitle": "Pristatymas ir",
+    "heroTitleHighlight": "grąžinimas",
+    "heroSubtitle": "Sužinokite apie pristatymo būdus, terminus ir grąžinimo sąlygas. Mūsų tikslas — greitas ir patogus aptarnavimas.",
+    "shippingBadge": "Pristatymas",
+    "shippingTitle": "Pristatymo būdai",
+    "shippingSubtitle": "Pasirinkite Jums patogiausią pristatymo būdą",
+    "courierTitle": "Kurjeris",
+    "courierDesc": "Prekės pristatomos tiesiai iki Jūsų durų visoje Lietuvoje darbo dienomis.",
+    "courierTime": "1–3 darbo dienos",
+    "parcelTitle": "Paštomatas",
+    "parcelDesc": "Atsiimkite siuntą Jums artimiausiame LP EXPRESS arba Omniva paštomatų tinkle.",
+    "parcelTime": "1–2 darbo dienos",
+    "pickupTitle": "Atsiėmimas Kaune",
+    "pickupDesc": "Atsiimkite užsakymą mūsų sandėlyje Kaune nemokamai, sutartu laiku.",
+    "pickupTime": "Tą pačią / kitą dieną",
+    "priceTableTitle": "Pristatymo kainos",
+    "priceColMethod": "Pristatymo būdas",
+    "priceColTerm": "Terminas",
+    "priceColPrice": "Kaina",
+    "priceColFree": "Nuo €50",
+    "free": "Nemokamas",
+    "shippingTerritory": "Pristatymo teritorija: šiuo metu pristatome tik Lietuvos Respublikos teritorijoje.",
+    "freeShippingTitle": "Nemokamas pristatymas nuo €50",
+    "freeShippingDesc": "Užsakymams nuo 50 € pristatymas visoje Lietuvoje yra visiškai nemokamas — nepriklausomai nuo pasirinkto pristatymo būdo.",
+    "returnsBadge": "Grąžinimas",
+    "returnsTitle": "Grąžinimo sąlygos",
+    "returnsSubtitle": "Jūsų pasitenkinimas mums svarbus. Susipažinkite su grąžinimo tvarka.",
+    "ret1Title": "Grąžinimas per 14 dienų",
+    "ret1Desc": "Turite teisę grąžinti prekę per 14 kalendorinių dienų nuo gavimo dienos, nenurodydami priežasties.",
+    "ret2Title": "Originali pakuotė",
+    "ret2Desc": "Grąžinama prekė turi būti nenaudota, nepažeista ir originalioje gamintojo pakuotėje su visomis etiketėmis.",
+    "ret3Title": "Kosmetikos prekių grąžinimas",
+    "ret3Desc": "Kosmetikos prekės, neturinčios kartoninės pakuotės, apsauginės plėvelės ar specialios membranos, po atidarymo negrąžinamos.",
+    "ret4Title": "Brokuotos prekės — nemokamai",
+    "ret4Desc": "Jeigu gavote brokuotą ar netinkamą prekę, susisiekite su mumis — pakeisime nemokamai arba grąžinsime pinigus.",
+    "ret5Title": "Pinigai grąžinami per 5 d.d.",
+    "ret5Desc": "Gavus grąžintą prekę, pinigai pervedami į Jūsų sąskaitą per 5 darbo dienas.",
+    "ret6Title": "Siuntimo išlaidos",
+    "ret6Desc": "Grąžinimo siuntimo išlaidas dengia pirkėjas, nebent prekė buvo brokuota ar pristatyta netinkamai.",
+    "howReturnBadge": "Instrukcija",
+    "howReturnTitle": "Kaip grąžinti prekę?",
+    "howReturnSubtitle": "Atlikite keturis paprastus žingsnius",
+    "howRet1Title": "Susisiekite su mumis",
+    "howRet1Desc": "Parašykite mums el. paštu arba užpildykite kontaktų formą nurodydami užsakymo numerį ir grąžinimo priežastį.",
+    "howRet2Title": "Gaukite patvirtinimą",
+    "howRet2Desc": "Mūsų komanda peržiūrės Jūsų užklausą ir atsiųs grąžinimo patvirtinimą su instrukcijomis.",
+    "howRet3Title": "Išsiųskite prekę",
+    "howRet3Desc": "Supakuokite prekę ir išsiųskite nurodytu adresu. Rekomenduojame naudoti siuntimo su sekimu paslaugą.",
+    "howRet4Title": "Pinigų grąžinimas",
+    "howRet4Desc": "Gavę ir patikrinę prekę, pinigus pervesime į Jūsų nurodytą sąskaitą per 5 darbo dienas.",
+    "returnContactBadge": "Kontaktai grąžinimui",
+    "returnContactTitle": "Susisiekite dėl grąžinimo",
+    "ctaBadge": "Pagalba",
+    "ctaTitle": "Turite klausimų?",
+    "ctaSubtitle": "Mūsų komanda pasiruošusi padėti. Susisiekite su mumis ir atsakysime kuo greičiau.",
+    "ctaCta": "Susisiekti →"
+  },
+  "faqPage": {
+    "metaTitle": "DUK — Dažnai užduodami klausimai",
+    "metaDesc": "Atsakymai į pagrindinius klausimus apie profesionalius plaukų dažus, užsakymą, pristatymą, grąžinimą ir B2B bendradarbiavimą.",
+    "breadcrumb": "DUK",
+    "title": "Dažniausiai užduodami",
+    "titleHighlight": "klausimai",
+    "subtitle": "Radę atsakymą čia sutaupysite laiko. Jei vis dėlto liko klausimų — mūsų komanda visada pasirengusi padėti.",
+    "ctaTitle": "Neradote atsakymo?",
+    "ctaSubtitle": "Susisiekite su mumis ir mūsų komanda mielai padės išspręsti bet kurį klausimą.",
+    "ctaEmail": "Rašyti el. laišką →",
+    "ctaContact": "Kontaktai",
+    "categories": [
+      {
+        "icon": "🎨",
+        "title": "Apie produktus",
+        "items": [
+          {
+            "q": "Kuo jūsų dažai skiriasi nuo kitų profesionalių dažų?",
+            "intro": "Mūsų Color SHOCK dažai išsiskiria keliais esminiais aspektais:",
+            "list": [
+              "180 ml pakuotė — dvigubai didesnė nei standartinė rinkoje (60–100 ml), todėl kaina už mililitrą yra žymiai mažesnė.",
+              "Premium ingredientai — formulėje naudojamas Argano aliejus, Jojobos aliejus ir Rožių ekstraktas, kurie maitina ir saugo plaukus dažymo metu.",
+              "Itališka kokybė — produktai gaminami Italijoje, laikantis aukščiausių kokybės standartų.",
+              "Profesionali kaina — didesnė pakuotė leidžia pasiūlyti konkurencingą kainą, neprarandant kokybės."
+            ]
+          },
+          {
+            "q": "Kodėl 180 ml pakuotė yra geriau?",
+            "intro": "180 ml pakuotė suteikia akivaizdžių privalumų profesionalams:",
+            "list": [
+              "2× daugiau produkto — viena pakuotė prilygsta dviem standartinių (60–100 ml).",
+              "Mažesnė savikaina — kaina už mililitrą yra žymiai ekonomiškesnė.",
+              "Mažiau pakuočių — rečiau reikia užsakyti, mažiau atliekų.",
+              "Idealu salonams — didesnė talpa reiškia, kad vienos pakuotės užtenka daugiau procedūrų."
+            ]
+          },
+          {
+            "q": "Ar dažai tinka visiems plaukų tipams?",
+            "text": "Taip. Mūsų dažai sukurti su profesionalia formule, tinkama visiems plaukų tipams — nuo plonių iki tankių, nuo tiesių iki garbanotų. Dažų sudėtyje esantys Argano ir Jojobos aliejai papildomai maitina plaukus, todėl rezultatas būna švelnus ir žvilgantis nepriklausomai nuo plaukų struktūros."
+          },
+          {
+            "q": "Kokia spalvų paletės apimtis?",
+            "intro": "Šiuo metu siūlome daugiau nei 50 profesionalių atspalvių, suskirstytų į kategorijas:",
+            "list": [
+              "Natural — natūralūs tonai",
+              "Ash — peleninių atspalvių serija",
+              "Copper — vario ir šilti tonai",
+              "Red — raudoni atspalviai",
+              "Violet — violetinės serija",
+              "Superlift — intensyvūs šviesinimo tonai",
+              "Toner — tonavimo dažai"
+            ],
+            "outro": "Paletė nuolat plečiama, įtraukiant naujus atspalvius."
+          },
+          {
+            "q": "Ar galima maišyti spalvas?",
+            "text": "Taip, profesionalūs koloristai gali laisvai maišyti skirtingus atspalvius tarpusavyje, kad gautų unikalias, individualias spalvas. Rekomenduojame laikytis profesionalios kolorizacijos principų ir, esant poreikiui, konsultuotis su mūsų komanda dėl optimalių maišymo proporcijų."
+          },
+          {
+            "q": "Koks oksidantas tinka jūsų dažams?",
+            "intro": "Mūsų dažams tinka oksidantai šių koncentracijų:",
+            "list": [
+              "3% (10 vol.) — tonavimui ir švelniam dažymui",
+              "6% (20 vol.) — standartiniam dažymui ir žilų dengimui",
+              "9% (30 vol.) — šviesinimui 2–3 tonais",
+              "12% (40 vol.) — intensyviam šviesinimui"
+            ],
+            "outro": "Maišymo proporcija: 1+2 (1 dalis dažų + 2 dalys oksidanto)."
+          }
+        ]
+      },
+      {
+        "icon": "🛒",
+        "title": "Apie užsakymą",
+        "items": [
+          {
+            "q": "Kaip užsakyti?",
+            "intro": "Užsakyti labai paprasta:",
+            "list": [
+              "Pasirinkite norimus produktus iš katalogo.",
+              "Pridėkite juos į krepšelį paspaudę \u201e+\u201c mygtuką.",
+              "Eikite į krepšelį, patikrinkite užsakymą ir užpildykite pristatymo informaciją.",
+              "Pasirinkite mokėjimo būdą ir patvirtinkite užsakymą."
+            ],
+            "outro": "Gavus užsakymą, Jūs gausite patvirtinimo laišką el. paštu."
+          },
+          {
+            "q": "Kokia minimali užsakymo suma?",
+            "text": "Individualiems pirkimams minimalios užsakymo sumos nėra — galite užsisakyti net ir vieną produktą. B2B klientams (salonams, kirpykloms) taikomos individualios sąlygos."
+          },
+          {
+            "q": "Kokie mokėjimo būdai?",
+            "intro": "Priimame kelis mokėjimo būdus Jūsų patogumui:",
+            "list": [
+              "Banko pavedimas — atsiskaitymas pagal išankstinę sąskaitą.",
+              "Mokėjimo kortelė — Visa, Mastercard.",
+              "Paysera — greitas ir patogus mokėjimas per elektroninę bankų sistemą."
+            ]
+          },
+          {
+            "q": "Ar galiu gauti sąskaitą-faktūrą?",
+            "text": "Taip, B2B klientams (įmonėms, salonams) išrašome PVM sąskaitas-faktūras. Užsakymo metu nurodykite įmonės rekvizitus arba susisiekite su mumis el. paštu info@dazaikirpejams.lt."
+          }
+        ]
+      },
+      {
+        "icon": "🚚",
+        "title": "Apie pristatymą",
+        "items": [
+          {
+            "q": "Per kiek laiko pristatote?",
+            "text": "Užsakymus pristatome per 1–3 darbo dienas nuo užsakymo patvirtinimo ir apmokėjimo. Pristatymo laikas gali skirtis priklausomai nuo Jūsų vietos ir pasirinkto pristatymo būdo."
+          },
+          {
+            "q": "Kiek kainuoja pristatymas?",
+            "text": "Pristatymo kaina priklauso nuo pasirinkto būdo. Užsakymams nuo €50 pristatymas Lietuvoje yra nemokamas."
+          },
+          {
+            "q": "Ar galima atsiimti?",
+            "text": "Taip, užsakymą galite atsiimti asmeniškai Kaune. Tikslus atsiėmimo adresas ir laikas bus nurodyti užsakymo patvirtinime. Tai nemokama paslauga."
+          },
+          {
+            "q": "Kokiose šalyse pristatote?",
+            "text": "Šiuo metu pristatome visoje Lietuvoje. Aktyviai plečiame pristatymo geografiją ir artimiausiu metu planuojame pradėti siųsti užsakymus į kitas Baltijos šalis."
+          }
+        ]
+      },
+      {
+        "icon": "🔄",
+        "title": "Apie grąžinimą",
+        "items": [
+          {
+            "q": "Ar galiu grąžinti prekes?",
+            "text": "Taip. Pagal LR įstatymus, Jūs turite teisę grąžinti prekes per 14 dienų nuo gavimo dienos, jei prekės nebuvo atidarytos, naudotos ir išsaugotos originalioje pakuotėje. Kosmetikos prekės, neturinčios kartoninės pakuotės, apsauginės plėvelės ar specialios membranos, po atidarymo negrąžinamos."
+          },
+          {
+            "q": "Per kiek laiko galima grąžinti?",
+            "text": "Grąžinimo terminas yra 14 kalendorinių dienų nuo prekės gavimo dienos. Per šį laikotarpį turite informuoti mus apie savo sprendimą grąžinti prekę."
+          },
+          {
+            "q": "Kaip inicijuoti grąžinimą?",
+            "text": "Norėdami grąžinti prekę, susisiekite el. paštu info@dazaikirpejams.lt, nurodydami užsakymo numerį ir grąžinimo priežastį. Susisieksime per 1–2 darbo dienas ir suderinsime grąžinimo detales."
+          }
+        ]
+      },
+      {
+        "icon": "🤝",
+        "title": "Apie bendradarbiavimą",
+        "items": [
+          {
+            "q": "Ar siūlote nuolaidas salonams?",
+            "text": "Taip! Grožio salonams, kirpykloms ir profesionaliems koloristams siūlome individualias B2B kainas, priklausančias nuo užsakymų apimčių ir reguliarumo."
+          },
+          {
+            "q": "Kaip tapti partneriu?",
+            "text": "Tapti partneriu labai paprasta: užpildykite B2B formą mūsų svetainėje (skyriuje „Salonams\u201c) arba susisiekite tiesiogiai el. paštu info@dazaikirpejams.lt."
+          },
+          {
+            "q": "Ar galima gauti testavimo pavyzdžių?",
+            "text": "Taip, potencialiems B2B partneriams (salonams, kirpykloms) siūlome galimybę gauti testavimo pavyzdžius, kad galėtumėte įvertinti produktų kokybę prieš priimdami sprendimą."
+          }
+        ]
+      }
+    ]
+  },
   "order": {
     "confirmationTitle": "Ačiū už užsakymą!",
     "confirmationDesc": "Jūsų užsakymas priimtas. Išsiuntėme patvirtinimą el. paštu.",

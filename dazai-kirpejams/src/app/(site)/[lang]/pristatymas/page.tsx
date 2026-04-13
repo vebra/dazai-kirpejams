@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { hasLocale } from '@/i18n/dictionaries'
+import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { buildPageMetadata } from '@/lib/seo'
 import { CONTACT, phoneHref } from '@/lib/site'
@@ -12,12 +12,13 @@ export async function generateMetadata({
 }: PageProps<'/[lang]/pristatymas'>): Promise<Metadata> {
   const { lang } = await params
   if (!hasLocale(lang)) return {}
+  const dict = await getDictionary(lang)
+  const t = dict.deliveryPage
   return buildPageMetadata({
     lang,
     path: '/pristatymas',
-    title: 'Pristatymas ir grąžinimas',
-    description:
-      'Pristatymo būdai, kainos ir terminai. Grąžinimo politika per 14 dienų pagal LR teisės aktus. Nemokamas pristatymas nuo €50.',
+    title: t.metaTitle,
+    description: t.metaDesc,
   })
 }
 
@@ -27,20 +28,25 @@ export default async function DeliveryPage({
   const { lang } = await params
   if (!hasLocale(lang)) notFound()
 
+  const dict = await getDictionary(lang)
+  const t = dict.deliveryPage
+  const c = dict.common
+  const p = langPrefix(lang)
+
   return (
     <>
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>
           <Link
-            href={`${langPrefix(lang) || '/'}`}
+            href={`${p || '/'}`}
             className="hover:text-brand-magenta transition-colors"
           >
-            Pradžia
+            {c.home}
           </Link>
           <span className="mx-2 text-[#E0E0E0]">/</span>
           <span className="text-brand-gray-900 font-medium">
-            Pristatymas ir grąžinimas
+            {t.breadcrumb}
           </span>
         </Container>
       </section>
@@ -49,15 +55,14 @@ export default async function DeliveryPage({
       <section className="py-12 lg:py-20 bg-[linear-gradient(135deg,#ffffff_0%,#f5f5f7_100%)] text-center">
         <Container>
           <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-            Informacija
+            {t.heroBadge}
           </span>
           <h1 className="text-[clamp(2rem,5vw,3.25rem)] font-bold text-brand-gray-900 mb-5 leading-[1.2] max-w-[820px] mx-auto">
-            Pristatymas ir{' '}
-            <span className="text-brand-magenta">grąžinimas</span>
+            {t.heroTitle}{' '}
+            <span className="text-brand-magenta">{t.heroTitleHighlight}</span>
           </h1>
           <p className="text-[1.15rem] text-brand-gray-500 leading-[1.7] max-w-[680px] mx-auto">
-            Sužinokite apie pristatymo būdus, terminus ir grąžinimo sąlygas.
-            Mūsų tikslas — greitas ir patogus aptarnavimas.
+            {t.heroSubtitle}
           </p>
         </Container>
       </section>
@@ -67,36 +72,21 @@ export default async function DeliveryPage({
         <Container>
           <div className="text-center max-w-[720px] mx-auto mb-12">
             <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-              Pristatymas
+              {t.shippingBadge}
             </span>
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-3 leading-tight">
-              Pristatymo būdai
+              {t.shippingTitle}
             </h2>
             <p className="text-[1.1rem] text-brand-gray-500">
-              Pasirinkite Jums patogiausią pristatymo būdą
+              {t.shippingSubtitle}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-14">
             {[
-              {
-                icon: '🚚',
-                title: 'Kurjeris',
-                desc: 'Prekės pristatomos tiesiai iki Jūsų durų visoje Lietuvoje darbo dienomis.',
-                time: '1–3 darbo dienos',
-              },
-              {
-                icon: '📦',
-                title: 'Paštomatas',
-                desc: 'Atsiimkite siuntą Jums artimiausiame LP EXPRESS arba Omniva paštomatų tinkle.',
-                time: '1–2 darbo dienos',
-              },
-              {
-                icon: '🏢',
-                title: 'Atsiėmimas Kaune',
-                desc: 'Atsiimkite užsakymą mūsų sandėlyje Kaune nemokamai, sutartu laiku.',
-                time: 'Tą pačią / kitą dieną',
-              },
+              { icon: '🚚', title: t.courierTitle, desc: t.courierDesc, time: t.courierTime },
+              { icon: '📦', title: t.parcelTitle, desc: t.parcelDesc, time: t.parcelTime },
+              { icon: '🏢', title: t.pickupTitle, desc: t.pickupDesc, time: t.pickupTime },
             ].map((card) => (
               <div
                 key={card.title}
@@ -121,53 +111,32 @@ export default async function DeliveryPage({
           {/* Pricing table */}
           <div className="bg-brand-gray-50 rounded-xl p-8 lg:p-10 border border-[#E0E0E0] max-w-[920px] mx-auto">
             <h3 className="text-[1.35rem] font-bold text-brand-gray-900 mb-6 text-center">
-              Pristatymo kainos
+              {t.priceTableTitle}
             </h3>
             <div className="overflow-x-auto">
               <table className="w-full text-[0.95rem]">
                 <thead>
                   <tr className="border-b-2 border-[#E0E0E0]">
                     <th className="text-left py-3 pr-4 font-bold text-brand-gray-900">
-                      Pristatymo būdas
+                      {t.priceColMethod}
                     </th>
                     <th className="text-left py-3 px-4 font-bold text-brand-gray-900">
-                      Terminas
+                      {t.priceColTerm}
                     </th>
                     <th className="text-left py-3 px-4 font-bold text-brand-gray-900">
-                      Kaina
+                      {t.priceColPrice}
                     </th>
                     <th className="text-left py-3 pl-4 font-bold text-brand-gray-900">
-                      Nuo €50
+                      {t.priceColFree}
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {[
-                    {
-                      method: '🚚 Kurjeris (visoje Lietuvoje)',
-                      term: '1–3 d.d.',
-                      price: '€3,99',
-                      free: true,
-                    },
-                    {
-                      method: '📦 LP EXPRESS paštomatas',
-                      term: '1–2 d.d.',
-                      price: '€2,49',
-                      free: true,
-                    },
-                    {
-                      method: '📦 Omniva paštomatas',
-                      term: '1–2 d.d.',
-                      price: '€2,49',
-                      free: true,
-                    },
-                    {
-                      method: '🏢 Atsiėmimas Kaune',
-                      term: 'Tą pačią / kitą dieną',
-                      price: 'Nemokamas',
-                      free: true,
-                      priceIsFree: true,
-                    },
+                    { method: `🚚 ${t.courierTitle}`, term: t.courierTime, price: '€3,99', free: true },
+                    { method: '📦 LP EXPRESS', term: t.parcelTime, price: '€2,49', free: true },
+                    { method: '📦 Omniva', term: t.parcelTime, price: '€2,49', free: true },
+                    { method: `🏢 ${t.pickupTitle}`, term: t.pickupTime, price: t.free, free: true, priceIsFree: true },
                   ].map((row) => (
                     <tr
                       key={row.method}
@@ -191,7 +160,7 @@ export default async function DeliveryPage({
                       <td className="py-4 pl-4">
                         {row.free && (
                           <strong className="text-brand-magenta">
-                            Nemokamas
+                            {t.free}
                           </strong>
                         )}
                       </td>
@@ -202,8 +171,7 @@ export default async function DeliveryPage({
             </div>
 
             <p className="mt-6 text-[0.9rem] text-brand-gray-500 text-center">
-              🌍 <strong>Pristatymo teritorija:</strong> šiuo metu pristatome
-              tik Lietuvos Respublikos teritorijoje.
+              🌍 <strong>{t.shippingTerritory}</strong>
             </p>
           </div>
 
@@ -214,11 +182,10 @@ export default async function DeliveryPage({
             </div>
             <div className="text-center sm:text-left">
               <h4 className="text-[1.2rem] font-bold mb-1.5">
-                Nemokamas pristatymas nuo €50
+                {t.freeShippingTitle}
               </h4>
               <p className="text-[0.95rem] text-white/90 leading-[1.6]">
-                Užsakymams nuo 50 € pristatymas visoje Lietuvoje yra visiškai
-                nemokamas — nepriklausomai nuo pasirinkto pristatymo būdo.
+                {t.freeShippingDesc}
               </p>
             </div>
           </div>
@@ -230,49 +197,24 @@ export default async function DeliveryPage({
         <Container>
           <div className="text-center max-w-[720px] mx-auto mb-12">
             <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-              Grąžinimas
+              {t.returnsBadge}
             </span>
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-3 leading-tight">
-              Grąžinimo sąlygos
+              {t.returnsTitle}
             </h2>
             <p className="text-[1.1rem] text-brand-gray-500">
-              Jūsų pasitenkinimas mums svarbus. Susipažinkite su grąžinimo
-              tvarka.
+              {t.returnsSubtitle}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              {
-                icon: '📅',
-                title: 'Grąžinimas per 14 dienų',
-                desc: 'Turite teisę grąžinti prekę per 14 kalendorinių dienų nuo gavimo dienos, nenurodydami priežasties.',
-              },
-              {
-                icon: '📦',
-                title: 'Originali pakuotė',
-                desc: 'Grąžinama prekė turi būti nenaudota, nepažeista ir originalioje gamintojo pakuotėje su visomis etiketėmis.',
-              },
-              {
-                icon: '🚫',
-                title: 'Kosmetikos prekių grąžinimas',
-                desc: 'Kosmetikos prekės, neturinčios kartoninės pakuotės, apsauginės plėvelės ar specialios membranos, po atidarymo negrąžinamos.',
-              },
-              {
-                icon: '🔄',
-                title: 'Brokuotos prekės — nemokamai',
-                desc: 'Jeigu gavote brokuotą ar netinkamą prekę, susisiekite su mumis — pakeisime nemokamai arba grąžinsime pinigus.',
-              },
-              {
-                icon: '💰',
-                title: 'Pinigai grąžinami per 5 d.d.',
-                desc: 'Gavus grąžintą prekę, pinigai pervedami į Jūsų sąskaitą per 5 darbo dienas.',
-              },
-              {
-                icon: '📤',
-                title: 'Siuntimo išlaidos',
-                desc: 'Grąžinimo siuntimo išlaidas dengia pirkėjas, nebent prekė buvo brokuota ar pristatyta netinkamai.',
-              },
+              { icon: '📅', title: t.ret1Title, desc: t.ret1Desc },
+              { icon: '📦', title: t.ret2Title, desc: t.ret2Desc },
+              { icon: '🚫', title: t.ret3Title, desc: t.ret3Desc },
+              { icon: '🔄', title: t.ret4Title, desc: t.ret4Desc },
+              { icon: '💰', title: t.ret5Title, desc: t.ret5Desc },
+              { icon: '📤', title: t.ret6Title, desc: t.ret6Desc },
             ].map((card) => (
               <div
                 key={card.title}
@@ -298,42 +240,22 @@ export default async function DeliveryPage({
         <Container>
           <div className="text-center max-w-[720px] mx-auto mb-12">
             <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-              Instrukcija
+              {t.howReturnBadge}
             </span>
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-3 leading-tight">
-              Kaip grąžinti prekę?
+              {t.howReturnTitle}
             </h2>
             <p className="text-[1.1rem] text-brand-gray-500">
-              Atlikite keturis paprastus žingsnius
+              {t.howReturnSubtitle}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              {
-                n: '1',
-                icon: '✉',
-                title: 'Susisiekite su mumis',
-                desc: 'Parašykite mums el. paštu arba užpildykite kontaktų formą nurodydami užsakymo numerį ir grąžinimo priežastį.',
-              },
-              {
-                n: '2',
-                icon: '✅',
-                title: 'Gaukite patvirtinimą',
-                desc: 'Mūsų komanda peržiūrės Jūsų užklausą ir atsiųs grąžinimo patvirtinimą su instrukcijomis.',
-              },
-              {
-                n: '3',
-                icon: '🚚',
-                title: 'Išsiųskite prekę',
-                desc: 'Supakuokite prekę ir išsiųskite nurodytu adresu. Rekomenduojame naudoti siuntimo su sekimu paslaugą.',
-              },
-              {
-                n: '4',
-                icon: '💰',
-                title: 'Pinigų grąžinimas',
-                desc: 'Gavę ir patikrinę prekę, pinigus pervesime į Jūsų nurodytą sąskaitą per 5 darbo dienas.',
-              },
+              { n: '1', icon: '✉', title: t.howRet1Title, desc: t.howRet1Desc },
+              { n: '2', icon: '✅', title: t.howRet2Title, desc: t.howRet2Desc },
+              { n: '3', icon: '🚚', title: t.howRet3Title, desc: t.howRet3Desc },
+              { n: '4', icon: '💰', title: t.howRet4Title, desc: t.howRet4Desc },
             ].map((step) => (
               <div
                 key={step.n}
@@ -362,10 +284,10 @@ export default async function DeliveryPage({
         <Container>
           <div className="text-center max-w-[720px] mx-auto mb-10">
             <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-              Kontaktai grąžinimui
+              {t.returnContactBadge}
             </span>
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 leading-tight">
-              Susisiekite dėl grąžinimo
+              {t.returnContactTitle}
             </h2>
           </div>
 
@@ -375,7 +297,7 @@ export default async function DeliveryPage({
             {[
               {
                 icon: '✉',
-                label: 'El. paštas',
+                label: dict.contactPage?.email || 'El. paštas',
                 value: CONTACT.email,
                 href: `mailto:${CONTACT.email}`,
               },
@@ -383,7 +305,7 @@ export default async function DeliveryPage({
                 ? [
                     {
                       icon: '☎',
-                      label: 'Telefonas',
+                      label: dict.contactPage?.phone || 'Telefonas',
                       value: CONTACT.phone,
                       href: phoneHref,
                     },
@@ -391,7 +313,7 @@ export default async function DeliveryPage({
                 : []),
               {
                 icon: '🕓',
-                label: 'Darbo laikas',
+                label: dict.contactPage?.workingHours || 'Darbo laikas',
                 value: CONTACT.workingHours,
               },
             ].map((method) => (
@@ -429,20 +351,19 @@ export default async function DeliveryPage({
       <section className="py-20 bg-brand-gray-900 text-white text-center">
         <Container>
           <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-white/60 mb-3">
-            Pagalba
+            {t.ctaBadge}
           </span>
           <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-white mb-4 leading-tight">
-            Turite klausimų?
+            {t.ctaTitle}
           </h2>
           <p className="text-[1.1rem] text-white/75 mb-9 max-w-[560px] mx-auto leading-[1.7]">
-            Mūsų komanda pasiruošusi padėti. Susisiekite su mumis ir atsakysime
-            kuo greičiau.
+            {t.ctaSubtitle}
           </p>
           <Link
-            href={`${langPrefix(lang)}/kontaktai`}
+            href={`${p}/kontaktai`}
             className="inline-flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
           >
-            Susisiekti →
+            {t.ctaCta}
           </Link>
         </Container>
       </section>

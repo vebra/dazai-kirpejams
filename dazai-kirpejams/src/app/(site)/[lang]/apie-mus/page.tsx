@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { hasLocale } from '@/i18n/dictionaries'
+import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { buildPageMetadata } from '@/lib/seo'
 import { langPrefix } from '@/lib/utils'
@@ -11,12 +11,13 @@ export async function generateMetadata({
 }: PageProps<'/[lang]/apie-mus'>): Promise<Metadata> {
   const { lang } = await params
   if (!hasLocale(lang)) return {}
+  const dict = await getDictionary(lang)
+  const t = dict.aboutPage
   return buildPageMetadata({
     lang,
     path: '/apie-mus',
-    title: 'Apie mus — Dažai Kirpėjams',
-    description:
-      'Aprūpiname Lietuvos kirpėjus ir salonus profesionaliais darbo įrankiais. Mūsų misija — kokybiški, ekonomiški dažai 180 ml talpoje.',
+    title: t.metaTitle,
+    description: t.metaDesc,
   })
 }
 
@@ -26,16 +27,21 @@ export default async function AboutPage({
   const { lang } = await params
   if (!hasLocale(lang)) notFound()
 
+  const dict = await getDictionary(lang)
+  const t = dict.aboutPage
+  const c = dict.common
+  const p = langPrefix(lang)
+
   return (
     <>
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>
-          <Link href={`${langPrefix(lang) || '/'}`} className="hover:text-brand-magenta transition-colors">
-            Pradžia
+          <Link href={`${p || '/'}`} className="hover:text-brand-magenta transition-colors">
+            {c.home}
           </Link>
           <span className="mx-2 text-[#E0E0E0]">/</span>
-          <span className="text-brand-gray-900 font-medium">Apie mus</span>
+          <span className="text-brand-gray-900 font-medium">{t.badge}</span>
         </Container>
       </section>
 
@@ -45,16 +51,14 @@ export default async function AboutPage({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-[60px] items-center">
             <div className="text-center lg:text-left">
               <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-                Apie mus
+                {t.badge}
               </span>
               <h1 className="text-[clamp(2rem,5vw,3.25rem)] font-bold leading-[1.2] text-brand-gray-900 mb-5">
-                Mes aprūpiname kirpėjus darbo įrankiais, kuriais galima{' '}
-                <span className="text-brand-magenta">pasitikėti</span>
+                {t.title}{' '}
+                <span className="text-brand-magenta">{t.titleHighlight}</span>
               </h1>
               <p className="text-[1.15rem] text-brand-gray-500 leading-[1.7]">
-                Mūsų tikslas paprastas — padėti kirpėjams ir koloristams dirbti
-                efektyviau. Profesionalūs produktai, protinga kaina ir tikra
-                vertė kasdieniam darbui salone.
+                {t.subtitle}
               </p>
             </div>
             <div className="aspect-[4/3] bg-brand-gray-50 rounded-xl border-2 border-dashed border-[#E0E0E0] flex flex-col items-center justify-center gap-3">
@@ -62,7 +66,7 @@ export default async function AboutPage({
                 ✂
               </div>
               <p className="text-[0.9rem] text-brand-gray-500 opacity-60">
-                Profesionali atmosfera
+                {t.imagePlaceholder}
               </p>
             </div>
           </div>
@@ -74,37 +78,20 @@ export default async function AboutPage({
         <Container>
           <div className="max-w-[780px] mx-auto text-center">
             <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-              Mūsų istorija
+              {t.storyBadge}
             </span>
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-8 leading-tight">
-              Kaip viskas prasidėjo
+              {t.storyTitle}
             </h2>
             <div className="text-left space-y-5">
               <p className="text-[1.05rem] leading-[1.8] text-brand-gray-500">
-                Viskas prasidėjo nuo paprasto pastebėjimo: Lietuvos kirpėjai
-                moka per daug už profesionalius plaukų dažus. Daugelis tiekėjų
-                siūlo 60–100 ml pakuotes už kainas, kurios ne visada atitinka
-                darbo realybę. Kirpėjai kasdien naudoja dažus — tai jų
-                pagrindinis darbo įrankis, o ne prabangos prekė. Mes
-                nusprendėme, kad galima kitaip.
+                {t.storyP1}
               </p>
               <p className="text-[1.05rem] leading-[1.8] text-brand-gray-500">
-                Užmezgėme tiesioginius ryšius su Italijos gamintojais ir į
-                Lietuvos rinką atvežėme Color SHOCK — profesionalių plaukų
-                dažų liniją 180 ml pakuotėse. Tai dvigubai ar trigubai daugiau
-                nei standartinė pakuotė rinkoje. Formulė su Argan ir Jojoba
-                aliejais bei rožių ekstraktu užtikrina kokybišką rezultatą, o
-                didesnė talpa reiškia mažesnę savikainą kiekvienam dažymui.
-                Greta Color SHOCK pasiūlėme ir RosaNera Cosmetic —
-                profesionalią plaukų priežiūros liniją, kuri puikiai papildo
-                dažymo procesą.
+                {t.storyP2}
               </p>
               <p className="text-[1.05rem] leading-[1.8] text-brand-gray-500">
-                Šiandien dirbame su kirpėjais, koloristais ir grožio salonais
-                visoje Lietuvoje. Nesiekiame būti dar viena „grožio" kompanija
-                su tuščiais pažadais. Mūsų požiūris pragmatiškas: geras darbo
-                įrankis turi būti patikimas, ekonomiškas ir lengvai
-                prieinamas. Būtent tai mes ir siūlome.
+                {t.storyP3}
               </p>
             </div>
           </div>
@@ -116,37 +103,20 @@ export default async function AboutPage({
         <Container>
           <div className="text-center">
             <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-white/60 mb-3">
-              Misija
+              {t.missionBadge}
             </span>
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-white mb-4 leading-tight">
-              Ką mes darome ir kodėl
+              {t.missionTitle}
             </h2>
             <p className="text-[1.1rem] text-white/75 max-w-[640px] mx-auto mb-12 leading-[1.7]">
-              Mūsų misija — aprūpinti kirpėjus kokybiškais, ekonomiškais darbo
-              įrankiais. Ne „grožio" industrijos klišės, o praktinė nauda
-              kasdieniam darbui.
+              {t.missionSubtitle}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
               {[
-                {
-                  icon: '💪',
-                  title: 'Kokybė be permokėjimo',
-                  desc:
-                    'Profesionali formulė iš Italijos — kokybiški ingredientai už protingą kainą. Didesnė pakuotė reiškia mažesnę savikainą.',
-                },
-                {
-                  icon: '⚙',
-                  title: 'Orientacija į praktiką',
-                  desc:
-                    'Kiekvienas mūsų sprendimas grindžiamas vienu klausimu: ar tai palengvina kirpėjo kasdienį darbą?',
-                },
-                {
-                  icon: '🤝',
-                  title: 'Profesionalams — ne visiems',
-                  desc:
-                    'Dirbame tik su profesionalais. Suprantame jų poreikius, todėl galime pasiūlyti tiksliai tai, ko reikia.',
-                },
+                { icon: '💪', title: t.missionCard1Title, desc: t.missionCard1Desc },
+                { icon: '⚙', title: t.missionCard2Title, desc: t.missionCard2Desc },
+                { icon: '🤝', title: t.missionCard3Title, desc: t.missionCard3Desc },
               ].map((card) => (
                 <div
                   key={card.title}
@@ -173,14 +143,13 @@ export default async function AboutPage({
         <Container>
           <div className="text-center max-w-2xl mx-auto mb-12">
             <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-              Prekių ženklai
+              {t.brandsBadge}
             </span>
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-3 leading-tight">
-              Produktai, kuriais pasitiki profesionalai
+              {t.brandsTitle}
             </h2>
             <p className="text-[1.1rem] text-brand-gray-500">
-              Du prekių ženklai — viskas, ko reikia profesionaliam darbui
-              salone
+              {t.brandsSubtitle}
             </p>
           </div>
 
@@ -189,30 +158,16 @@ export default async function AboutPage({
               {
                 icon: '🎨',
                 name: 'Color SHOCK',
-                tagline: 'Profesionalūs plaukų dažai',
-                features: [
-                  '50+ profesionalių atspalvių',
-                  '180 ml ekonominė pakuotė',
-                  'Argan & Jojoba aliejai',
-                  'Rožių ekstraktas',
-                  'Itališka kokybė',
-                  'Maišymo santykis 1+2',
-                ],
-                cta: { label: 'Peržiūrėti dažus →', href: `${langPrefix(lang)}/produktai/dazai`, variant: 'primary' as const },
+                tagline: t.colorShockTagline,
+                features: t.colorShockFeatures,
+                cta: { label: `${t.viewDyes} →`, href: `${p}/produktai/dazai`, variant: 'primary' as const },
               },
               {
                 icon: '🧴',
                 name: 'RosaNera Cosmetic',
-                tagline: 'Profesionali plaukų priežiūra',
-                features: [
-                  'Profesionalūs šampūnai',
-                  'Plaukų kaukės ir priežiūra',
-                  'Papildomi produktai',
-                  'Tinka po dažymo',
-                  'Saloninė kokybė',
-                  'Papildo Color SHOCK liniją',
-                ],
-                cta: { label: 'Peržiūrėti produktus →', href: `${langPrefix(lang)}/produktai/sampunai`, variant: 'outline' as const },
+                tagline: t.rosaneraTagline,
+                features: t.rosaneraFeatures,
+                cta: { label: `${c.viewProducts} →`, href: `${p}/produktai/sampunai`, variant: 'outline' as const },
               },
             ].map((brand) => (
               <div
@@ -229,7 +184,7 @@ export default async function AboutPage({
                   {brand.tagline}
                 </p>
                 <ul className="text-left max-w-[280px] mx-auto mb-7 space-y-2.5">
-                  {brand.features.map((f) => (
+                  {brand.features.map((f: string) => (
                     <li
                       key={f}
                       className="flex items-center gap-2.5 text-[0.92rem] text-brand-gray-500 leading-snug"
@@ -262,19 +217,19 @@ export default async function AboutPage({
         <Container>
           <div className="text-center mb-12">
             <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-              Skaičiai
+              {t.statsBadge}
             </span>
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 leading-tight">
-              Faktai, kurie kalba už mus
+              {t.statsTitle}
             </h2>
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { number: '50+', label: 'spalvų paletėje' },
-              { number: '180 ml', label: 'mūsų standartas' },
-              { number: '100+', label: 'patenkintų klientų' },
-              { number: 'Italija', label: 'gamybos šalis' },
+              { number: '50+', label: t.stat1 },
+              { number: '180 ml', label: t.stat2 },
+              { number: '100+', label: t.stat3 },
+              { number: 'Italija', label: t.stat4 },
             ].map((stat) => (
               <div
                 key={stat.label}
@@ -296,27 +251,26 @@ export default async function AboutPage({
       <section className="py-20 bg-brand-gray-50 text-center">
         <Container>
           <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-            Pradėkite dabar
+            {c.startNow}
           </span>
           <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-4 leading-tight">
-            Pasiruošę išbandyti?
+            {c.readyToTry}
           </h2>
           <p className="text-[1.1rem] text-brand-gray-500 mb-9 max-w-[560px] mx-auto leading-[1.7]">
-            Profesionalūs dažai su 180 ml talpa — daugiau vertės kiekvienam
-            dažymui Jūsų salone.
+            {c.readyCtaDesc}
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href={`${langPrefix(lang)}/produktai`}
+              href={`${p}/produktai`}
               className="inline-flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
             >
-              Peržiūrėti produktus →
+              {c.viewProducts} →
             </Link>
             <Link
-              href={`${langPrefix(lang)}/kontaktai`}
+              href={`${p}/kontaktai`}
               className="inline-flex items-center justify-center gap-2 px-10 py-[18px] border-2 border-brand-gray-900 text-brand-gray-900 rounded-lg text-[1.1rem] font-semibold hover:bg-brand-gray-900 hover:text-white hover:-translate-y-0.5 transition-all"
             >
-              Susisiekite su mumis
+              {c.contactUs}
             </Link>
           </div>
         </Container>
