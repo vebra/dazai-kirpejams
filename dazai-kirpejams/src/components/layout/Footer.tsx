@@ -66,15 +66,16 @@ export function Footer({ lang, dict }: FooterProps) {
             </p>
             <div className="flex gap-3 mt-4">
               {[
-                { href: '#', label: 'Facebook', icon: 'f' },
-                { href: '#', label: 'Instagram', icon: 'ig' },
-                { href: '#', label: 'LinkedIn', icon: 'in' },
+                { href: 'https://www.facebook.com/dazaikirpejams', label: 'Facebook', icon: 'f' },
+                { href: 'https://www.instagram.com/dazaikirpejams', label: 'Instagram', icon: 'ig' },
               ].map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
                   title={social.label}
                   aria-label={social.label}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-10 h-10 rounded-full border border-white/15 flex items-center justify-center text-base text-white/70 hover:bg-brand-magenta hover:border-brand-magenta hover:text-white transition-colors"
                 >
                   {social.icon}

@@ -22,9 +22,19 @@ export function organizationSchema(): Record<string, unknown> {
     name: SITE_NAME,
     alternateName: ['Dazai Kirpejams', 'Color SHOCK'],
     url: SITE_URL,
-    logo: `${SITE_URL}/logo.png`,
+    logo: {
+      '@type': 'ImageObject',
+      url: `${SITE_URL}/logo.png`,
+      width: 512,
+      height: 512,
+    },
     description:
       'Profesionalūs plaukų dažai kirpėjams ir koloristams. Didesnė 180 ml talpa — daugiau vertės darbui salone.',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Kaunas',
+      addressCountry: 'LT',
+    },
     sameAs: [
       // Pridėkite savo socialinių tinklų URL čia:
       // 'https://www.instagram.com/dazaikirpejams',
@@ -46,7 +56,7 @@ export function websiteSchema(): Record<string, unknown> {
     '@id': `${SITE_URL}/#website`,
     url: SITE_URL,
     name: SITE_NAME,
-    inLanguage: ['lt-LT', 'en-US', 'ru-RU'],
+    inLanguage: 'lt',
     publisher: { '@id': `${SITE_URL}/#organization` },
     potentialAction: {
       '@type': 'SearchAction',
@@ -133,27 +143,6 @@ export function itemListSchema(
       position: idx + 1,
       url: `${SITE_URL}${langPrefix(lang)}/produktai/${categorySlug}/${product.slug}`,
       name: getProductName(product, lang),
-    })),
-  }
-}
-
-/**
- * FAQPage schema — naudojama DUK puslapyje, kad Google galėtų rodyti
- * rich result'us su klausimais tiesiai paieškos rezultatuose.
- */
-export function faqPageSchema(
-  questions: Array<{ question: string; answer: string }>
-): Record<string, unknown> {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: questions.map((q) => ({
-      '@type': 'Question',
-      name: q.question,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: q.answer,
-      },
     })),
   }
 }

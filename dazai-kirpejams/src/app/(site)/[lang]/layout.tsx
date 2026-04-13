@@ -94,7 +94,12 @@ export default async function RootLayout({
 
   return (
     <html lang={lang} className={`${inter.variable} h-full`}>
-      <head>
+      <body className="min-h-full flex flex-col antialiased">
+        <JsonLd data={organizationSchema()} />
+        <JsonLd data={websiteSchema()} />
+        <Header lang={lang} dict={dict} />
+        <main className="flex-1 pt-[72px] lg:pt-[100px]">{children}</main>
+        <Footer lang={lang} dict={dict} />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-DS608JQ7CV"
           strategy="afterInteractive"
@@ -107,13 +112,6 @@ export default async function RootLayout({
             gtag('config', 'G-DS608JQ7CV');
           `}
         </Script>
-      </head>
-      <body className="min-h-full flex flex-col antialiased">
-        <JsonLd data={organizationSchema()} />
-        <JsonLd data={websiteSchema()} />
-        <Header lang={lang} dict={dict} />
-        <main className="flex-1 pt-[72px] lg:pt-[100px]">{children}</main>
-        <Footer lang={lang} dict={dict} />
       </body>
     </html>
   )

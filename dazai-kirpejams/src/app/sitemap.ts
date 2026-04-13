@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { locales, defaultLocale } from '@/i18n/config'
 import { SITE_URL } from '@/lib/seo'
-import { getCategories, getProducts } from '@/lib/data/queries'
+import { getCategories, getProducts, getBlogPosts } from '@/lib/data/queries'
 
 /**
  * Statinių puslapių sąrašas — pathai BE lokalės prefikso.
@@ -91,5 +91,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return expandLocales(path, lastMod, 'weekly', 0.7)
   })
 
-  return [...staticEntries, ...categoryEntries, ...productEntries]
+  // 4. Blogo straipsnių puslapiai
+  const blogPosts = await getBlogPosts()
+  const blogEntries: MetadataRoute.Sitemap = blogPosts.flatMap((post) => {
+    const lastMod = post.publishedAt ? new Date(post.publishedAt) : now
+    return expandLocales(`/blogas/${post.slug}`, lastMod, 'monthly', 0.6)
+  })
+
+  return [...staticEntries, ...categoryEntries, ...productEntries, ...blogEntries]
 }

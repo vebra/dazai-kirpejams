@@ -52,7 +52,10 @@ export async function generateMetadata({
       title: name,
       description: description || undefined,
       url: canonical,
-      type: 'website',
+      type: 'article',
+      images: product.image_urls?.[0]
+        ? [{ url: product.image_urls[0], alt: name }]
+        : undefined,
     },
   }
 }

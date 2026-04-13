@@ -47,8 +47,9 @@ export function Header({ lang, dict }: HeaderProps) {
             <Image
               src="/logo-colorshock.png"
               alt="Color SHOCK"
-              width={600}
-              height={554}
+              width={87}
+              height={80}
+              sizes="80px"
               priority
               className="h-[56px] lg:h-[80px] w-auto"
             />
