@@ -1,12 +1,12 @@
 {
   "meta": {
     "title": "Dažai Kirpėjams — Professional Hair Dyes for Hairdressers",
-    "description": "Professional hair dyes and products for hairdressers, colorists and beauty salons. 180 ml volume — more value for salon work."
+    "description": "Professional hair dyes and products for hairdressers, colourists and beauty salons. 180 ml volume — more value for salon work."
   },
   "nav": {
     "home": "Home",
     "products": "Products",
-    "colorPalette": "Color Palette",
+    "colorPalette": "Colour Palette",
     "forSalons": "For Salons",
     "blog": "Blog",
     "about": "About Us",
@@ -38,15 +38,15 @@
     },
     "formula": {
       "title": "Professional Formula",
-      "desc": "High-quality ingredients ensuring stable and long-lasting color results"
+      "desc": "High-quality ingredients ensuring stable and long-lasting colour results"
     },
     "economy": {
       "title": "More Economical",
       "desc": "Lower cost per application — save every working day"
     },
     "palette": {
-      "title": "Wide Color Palette",
-      "desc": "Extensive color selection for every client request"
+      "title": "Wide Colour Palette",
+      "desc": "Extensive colour selection for every client request"
     },
     "convenient": {
       "title": "Convenient Ordering",
@@ -62,9 +62,9 @@
     "hairDyes": "Hair Dyes",
     "hairDyesDesc": "Color SHOCK professional hair dyes",
     "oxidants": "Oxidants",
-    "oxidantsDesc": "Professional oxidants for coloring",
+    "oxidantsDesc": "Professional oxidants for colouring",
     "shampoos": "Shampoos & Care",
-    "shampoosDesc": "Hair care products after coloring",
+    "shampoosDesc": "Hair care products after colouring",
     "accessories": "Accessories",
     "accessoriesDesc": "Professional work tools"
   },
@@ -93,8 +93,8 @@
       "desc": "Reliable tools for everyday use in the salon"
     },
     "colorists": {
-      "title": "Colorists",
-      "desc": "Wide color palette and stable formula for precise color results"
+      "title": "Colourists",
+      "desc": "Wide colour palette and stable formula for precise colour results"
     },
     "salons": {
       "title": "Beauty Salons",
@@ -139,7 +139,7 @@
   "cart": {
     "title": "Your Cart",
     "empty": "Your cart is empty",
-    "emptyDesc": "You haven't added any products yet. Browse our catalog.",
+    "emptyDesc": "You haven't added any products yet. Browse our catalogue.",
     "continueShopping": "Continue Shopping",
     "product": "Product",
     "price": "Price",
@@ -202,7 +202,7 @@
     "contactUs": "Contact Us",
     "readyToTry": "Ready to Try?",
     "startNow": "Start Now",
-    "readyCtaDesc": "Professional dyes with 180 ml volume — more value for every coloring session in Your salon."
+    "readyCtaDesc": "Professional dyes with 180 ml volume — more value for every colouring session in Your salon."
   },
   "aboutPage": {
     "metaTitle": "About Us — Dažai Kirpėjams",
@@ -210,13 +210,13 @@
     "badge": "About Us",
     "title": "We supply hairdressers with work tools they can",
     "titleHighlight": "trust",
-    "subtitle": "Our goal is simple — to help hairdressers and colorists work more efficiently. Professional products, smart pricing and real value for everyday salon work.",
+    "subtitle": "Our goal is simple — to help hairdressers and colourists work more efficiently. Professional products, smart pricing and real value for everyday salon work.",
     "imagePlaceholder": "Professional atmosphere",
     "storyBadge": "Our Story",
     "storyTitle": "How It All Started",
     "storyP1": "It all started with a simple observation: Lithuanian hairdressers pay too much for professional hair dyes. Many suppliers offer 60–100 ml packages at prices that don't always match the reality of daily work. Hairdressers use dyes every day — it's their primary work tool, not a luxury item. We decided there had to be a better way.",
-    "storyP2": "We established direct relationships with Italian manufacturers and brought Color SHOCK to the Lithuanian market — a professional hair dye line in 180 ml packages. That's two to three times more than the standard package on the market. The formula with Argan and Jojoba oils and rose extract ensures quality results, while the larger volume means a lower cost per application. Alongside Color SHOCK, we also introduced RosaNera Cosmetic — a professional hair care line that perfectly complements the coloring process.",
-    "storyP3": "Today we work with hairdressers, colorists and beauty salons across Lithuania. We don't aspire to be just another \"beauty\" company with empty promises. Our approach is pragmatic: a good work tool must be reliable, economical and easily accessible. That's exactly what we offer.",
+    "storyP2": "We established direct relationships with Italian manufacturers and brought Color SHOCK to the Lithuanian market — a professional hair dye line in 180 ml packages. That's two to three times more than the standard package on the market. The formula with Argan and Jojoba oils and rose extract ensures quality results, while the larger volume means a lower cost per application. Alongside Color SHOCK, we also introduced RosaNera Cosmetic — a professional hair care line that perfectly complements the colouring process.",
+    "storyP3": "Today we work with hairdressers, colourists and beauty salons across Lithuania. We don't aspire to be just another \"beauty\" company with empty promises. Our approach is pragmatic: a good work tool must be reliable, economical and easily accessible. That's exactly what we offer.",
     "missionBadge": "Mission",
     "missionTitle": "What We Do and Why",
     "missionSubtitle": "Our mission — to supply hairdressers with high-quality, economical work tools. Not \"beauty\" industry cliches, but practical value for everyday work.",
@@ -233,10 +233,10 @@
     "colorShockFeatures": ["50+ professional shades", "180 ml economical packaging", "Argan & Jojoba oils", "Rose extract", "Italian quality", "Mixing ratio 1+2"],
     "viewDyes": "View Dyes",
     "rosaneraTagline": "Professional Hair Care",
-    "rosaneraFeatures": ["Professional shampoos", "Hair masks & care", "Complementary products", "Suitable after coloring", "Salon-grade quality", "Complements Color SHOCK line"],
+    "rosaneraFeatures": ["Professional shampoos", "Hair masks & care", "Complementary products", "Suitable after colouring", "Salon-grade quality", "Complements Color SHOCK line"],
     "statsBadge": "Numbers",
     "statsTitle": "Facts That Speak for Us",
-    "stat1": "colors in the palette",
+    "stat1": "colours in the palette",
     "stat2": "our standard",
     "stat3": "satisfied clients",
     "stat4": "country of manufacture"
@@ -322,14 +322,14 @@
     "econVolume": "Package volume",
     "econPricePkg": "Price per package",
     "econPriceMl": "Price per 1 ml",
-    "econPkgPer100": "Packages / 100 colorings",
+    "econPkgPer100": "Packages / 100 colourings",
     "econWaste": "Packaging waste",
     "econWasteStd": "High",
     "econWasteOurs": "3× less",
     "econExplainTitle": "More Product. Lower Cost.",
-    "econExplainP1": "One of our 180 ml packages equals three standard 60 ml packages. This means significantly lower expenses per coloring and fewer orders per month.",
-    "econExplainP2": "For salons performing 20+ colorings per month, savings can reach up to",
-    "econExplainHighlight": "40% off regular dye expenses",
+    "econExplainP1": "One of our 180 ml packages equals three standard 60 ml packages. This means significantly lower expenses per colouring and fewer orders per month.",
+    "econExplainP2": "For salons performing 20+ colourings per month, savings can reach up to",
+    "econExplainHighlight": "40% of regular dye expenses",
     "econExplainP2End": ". And with a B2B discount added — the savings become even greater.",
     "econStat1": "More product per package",
     "econStat2": "Lower price per 1 ml",
@@ -353,7 +353,7 @@
     "formPhonePlaceholder": "+370 ...",
     "formAddress": "Salon Address",
     "formAddressPlaceholder": "City, street",
-    "formVolume": "Monthly Demand",
+    "formVolume": "Monthly Volume",
     "formVolumePlaceholder": "Select approximate volume...",
     "formVolumeOpt1": "Up to 10 units per month",
     "formVolumeOpt2": "10–50 units per month",
@@ -371,7 +371,7 @@
     "review1": "\"We switched to 180 ml packages half a year ago and are already seeing significant savings. The personal manager is always reachable, and delivery is punctual.\"",
     "review1Name": "Diana K.",
     "review1Role": "Salon Owner, Kaunas",
-    "review2": "\"A very convenient collaboration system. We order regularly, prices are excellent, and quality matches more expensive brands. Our colorists are satisfied.\"",
+    "review2": "\"A very convenient collaboration system. We order regularly, prices are excellent, and quality matches more expensive brands. Our colourists are satisfied.\"",
     "review2Name": "Ieva G.",
     "review2Role": "Beauty Studio, Vilnius",
     "review3": "\"We have three salons and receive equally good terms for all of them. We especially value the opportunity to test new shades before placing a large order.\"",
