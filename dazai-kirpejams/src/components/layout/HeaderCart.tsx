@@ -16,13 +16,13 @@ export function HeaderCart({ lang, label }: HeaderCartProps) {
   return (
     <Link
       href={`${langPrefix(lang)}/krepselis`}
-      className="relative p-2 text-brand-gray-900 hover:text-brand-magenta transition-colors"
+      className="relative flex items-center justify-center min-w-[44px] min-h-[44px] p-2.5 text-brand-gray-900 hover:text-brand-magenta transition-colors"
       aria-label={`${label}${count > 0 ? ` (${count})` : ''}`}
     >
       <ShoppingCart className="w-5 h-5" />
       {count > 0 && (
         <span
-          className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-brand-magenta text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none"
+          className="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 bg-brand-magenta text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none"
           aria-hidden="true"
         >
           {count > 99 ? '99+' : count}

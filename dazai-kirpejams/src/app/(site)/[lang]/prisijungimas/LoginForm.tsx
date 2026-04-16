@@ -31,6 +31,8 @@ export function LoginForm({ lang }: { lang: Locale }) {
           type="email"
           name="email"
           required
+          autoComplete="email"
+          inputMode="email"
           placeholder="jusu@paštas.lt"
           className="w-full px-4 py-3 border border-brand-gray-50 rounded-xl text-sm focus:outline-none focus:border-brand-magenta transition-colors bg-white"
         />
@@ -44,6 +46,7 @@ export function LoginForm({ lang }: { lang: Locale }) {
           type="password"
           name="password"
           required
+          autoComplete="current-password"
           placeholder="Jūsų slaptažodis"
           className="w-full px-4 py-3 border border-brand-gray-50 rounded-xl text-sm focus:outline-none focus:border-brand-magenta transition-colors bg-white"
         />

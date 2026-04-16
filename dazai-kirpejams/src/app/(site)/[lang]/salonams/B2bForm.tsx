@@ -160,6 +160,21 @@ function B2BField({
   required?: boolean
   placeholder?: string
 }) {
+  const autoComplete =
+    name === 'salon_name'
+      ? 'organization'
+      : name === 'contact_name'
+        ? 'name'
+        : name === 'address'
+          ? 'street-address'
+          : type === 'email'
+            ? 'email'
+            : type === 'tel'
+              ? 'tel'
+              : undefined
+  const inputMode =
+    type === 'email' ? 'email' : type === 'tel' ? 'tel' : undefined
+
   return (
     <div>
       <label
@@ -175,6 +190,8 @@ function B2BField({
         name={name}
         required={required}
         placeholder={placeholder}
+        autoComplete={autoComplete}
+        inputMode={inputMode}
         className="w-full px-4 py-[14px] border border-[#E0E0E0] rounded-lg bg-white text-brand-gray-900 text-[0.95rem] placeholder:text-[#B0B0B0] focus:outline-none focus:border-brand-magenta focus:shadow-[0_0_0_3px_rgba(233,30,140,0.1)] transition-all"
       />
     </div>

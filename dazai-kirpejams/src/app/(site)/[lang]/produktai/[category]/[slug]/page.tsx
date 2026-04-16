@@ -267,16 +267,27 @@ export default async function ProductPage({
                   )}
                 </div>
               ) : (
-                <div className="mb-5 px-5 py-4 bg-brand-gray-50 rounded-xl border border-[#E0E0E0]">
-                  <p className="text-[0.92rem] text-brand-gray-500 mb-2">
-                    Kainos matomos tik patvirtintiems profesionalams.
+                <div className="mb-5 px-5 py-5 bg-brand-gray-50 rounded-xl border border-[#E0E0E0]">
+                  <p className="text-[0.95rem] text-brand-gray-900 font-semibold mb-1.5">
+                    Kaina — tik profesionalams
                   </p>
-                  <Link
-                    href={`${langPrefix(lang)}/prisijungimas`}
-                    className="text-brand-magenta font-semibold text-[0.92rem] hover:underline"
-                  >
-                    Prisijunkite arba registruokitės →
-                  </Link>
+                  <p className="text-[0.88rem] text-brand-gray-500 mb-4 leading-[1.5]">
+                    Prisijunkite arba užsiregistruokite, kad pamatytumėte kainas ir galėtumėte užsisakyti.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2.5">
+                    <Link
+                      href={`${langPrefix(lang)}/prisijungimas`}
+                      className="flex-1 flex items-center justify-center min-h-[48px] px-6 py-3 bg-brand-magenta text-white rounded-lg text-[0.95rem] font-semibold hover:bg-brand-magenta-dark transition-colors"
+                    >
+                      Prisijungti
+                    </Link>
+                    <Link
+                      href={`${langPrefix(lang)}/registracija`}
+                      className="flex-1 flex items-center justify-center min-h-[48px] px-6 py-3 border-2 border-brand-magenta text-brand-magenta rounded-lg text-[0.95rem] font-semibold hover:bg-brand-magenta hover:text-white transition-all"
+                    >
+                      Registruotis
+                    </Link>
+                  </div>
                 </div>
               )}
 

@@ -104,14 +104,12 @@ export function ProductCard({
             />
           </div>
         ) : (
-          <div className="pt-1">
-            <Link
-              href={`${langPrefix(lang)}/prisijungimas`}
-              className="text-[0.78rem] font-semibold text-brand-magenta hover:underline"
-            >
-              Prisijunkite dėl kainos →
-            </Link>
-          </div>
+          <Link
+            href={`${langPrefix(lang)}/prisijungimas`}
+            className="flex items-center justify-center w-full min-h-[44px] px-4 py-2.5 bg-brand-magenta text-white text-[0.85rem] font-semibold rounded-lg hover:bg-brand-magenta-dark transition-colors"
+          >
+            Prisijungti dėl kainos
+          </Link>
         )}
       </div>
     </div>

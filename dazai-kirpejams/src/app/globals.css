@@ -58,3 +58,13 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--color-magenta);
   color: white;
 }
+
+/* iOS Safari priartina puslapį, kai įvesties laukelio šriftas <16px.
+   Mobiliai priverstinai 16px (!important nugali Tailwind text-sm utility). */
+@media (max-width: 640px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}

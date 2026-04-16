@@ -94,7 +94,7 @@ export function MobileMenu({ lang, links }: MobileMenuProps) {
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="p-2 text-brand-gray-900 hover:text-brand-magenta transition-colors"
+            className="flex items-center justify-center min-w-[44px] min-h-[44px] p-2.5 text-brand-gray-900 hover:text-brand-magenta transition-colors"
             aria-label="Uždaryti meniu"
           >
             <X className="w-6 h-6" />
@@ -163,7 +163,7 @@ export function MobileMenu({ lang, links }: MobileMenuProps) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="lg:hidden p-2 text-brand-gray-900 hover:text-brand-magenta transition-colors"
+        className="lg:hidden flex items-center justify-center min-w-[44px] min-h-[44px] p-2.5 text-brand-gray-900 hover:text-brand-magenta transition-colors"
         aria-label="Atidaryti meniu"
         aria-expanded={open}
         aria-controls="mobile-menu"

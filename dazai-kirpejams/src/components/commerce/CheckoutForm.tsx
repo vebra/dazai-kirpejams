@@ -241,12 +241,14 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
               label={dict.checkout.firstName}
               value={firstName}
               onChange={setFirstName}
+              autoComplete="given-name"
               required
             />
             <TextField
               label={dict.checkout.lastName}
               value={lastName}
               onChange={setLastName}
+              autoComplete="family-name"
               required
             />
             <TextField
@@ -281,12 +283,14 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
                 label={dict.checkout.companyName}
                 value={companyName}
                 onChange={setCompanyName}
+                autoComplete="organization"
                 required
               />
               <TextField
                 label={dict.checkout.companyCode}
                 value={companyCode}
                 onChange={setCompanyCode}
+                inputMode="numeric"
                 required
               />
               <TextField
@@ -351,6 +355,7 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
                 label={dict.checkout.address}
                 value={address}
                 onChange={setAddress}
+                autoComplete="street-address"
                 required
               />
               <div className="grid sm:grid-cols-2 gap-4">
@@ -358,12 +363,15 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
                   label={dict.checkout.city}
                   value={city}
                   onChange={setCity}
+                  autoComplete="address-level2"
                   required
                 />
                 <TextField
                   label={dict.checkout.postalCode}
                   value={postalCode}
                   onChange={setPostalCode}
+                  autoComplete="postal-code"
+                  inputMode="numeric"
                   required
                 />
               </div>
@@ -593,6 +601,8 @@ function TextField({
   required,
   placeholder,
   className = '',
+  autoComplete,
+  inputMode,
 }: {
   label: string
   value: string
@@ -601,7 +611,16 @@ function TextField({
   required?: boolean
   placeholder?: string
   className?: string
+  autoComplete?: string
+  inputMode?: 'text' | 'email' | 'tel' | 'numeric' | 'decimal' | 'search' | 'url'
 }) {
+  const resolvedAutoComplete =
+    autoComplete ??
+    (type === 'email' ? 'email' : type === 'tel' ? 'tel' : undefined)
+  const resolvedInputMode =
+    inputMode ??
+    (type === 'email' ? 'email' : type === 'tel' ? 'tel' : undefined)
+
   return (
     <label className={`block ${className}`}>
       <span className="block text-xs font-medium text-brand-gray-500 mb-1.5">
@@ -613,6 +632,8 @@ function TextField({
         onChange={(e) => onChange(e.target.value)}
         required={required}
         placeholder={placeholder}
+        autoComplete={resolvedAutoComplete}
+        inputMode={resolvedInputMode}
         className="w-full px-4 py-3 border border-brand-gray-50 rounded-xl focus:outline-none focus:border-brand-magenta transition-colors text-sm bg-white"
       />
     </label>

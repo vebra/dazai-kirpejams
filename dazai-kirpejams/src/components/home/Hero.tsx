@@ -35,11 +35,11 @@ export async function Hero({ lang, dict }: HeroProps) {
   const imageUrl = banner?.imageUrl ?? '/color-shock-hero.jpg'
 
   return (
-    <section className="relative overflow-hidden bg-[linear-gradient(135deg,#ffffff_0%,#f5f5f7_100%)] py-16 lg:py-20">
+    <section className="relative overflow-hidden bg-[linear-gradient(135deg,#ffffff_0%,#f5f5f7_100%)] py-8 lg:py-20">
       <Container>
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-[60px] items-center">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-[60px] items-center">
           {/* Kairė pusė — turinys */}
-          <div className="max-w-[540px] text-center lg:text-left order-2 lg:order-1">
+          <div className="max-w-[540px] text-center lg:text-left order-1 lg:order-1">
             <div className="inline-flex items-center gap-1.5 bg-brand-magenta/[0.08] text-brand-magenta px-4 py-2 rounded-full text-sm font-semibold mb-6">
               <span aria-hidden>★</span>
               <span>{badge}</span>
@@ -56,7 +56,7 @@ export async function Hero({ lang, dict }: HeroProps) {
               </h1>
             )}
 
-            <p className="text-[1.15rem] leading-[1.7] text-brand-gray-500 mb-9">
+            <p className="text-[1rem] lg:text-[1.15rem] leading-[1.6] lg:leading-[1.7] text-brand-gray-500 mb-6 lg:mb-9">
               {subtitle}
             </p>
 
@@ -77,8 +77,8 @@ export async function Hero({ lang, dict }: HeroProps) {
           </div>
 
           {/* Dešinė pusė — produkto vaizdas */}
-          <div className="relative flex items-center justify-center order-1 lg:order-2">
-            <div className="relative w-full max-w-[360px] lg:max-w-[680px] aspect-[3/4] rounded-xl overflow-hidden">
+          <div className="relative flex items-center justify-center order-2 lg:order-2">
+            <div className="relative w-full max-w-[260px] lg:max-w-[680px] aspect-[3/4] rounded-xl overflow-hidden">
               {imageUrl ? (
                 <Image
                   src={imageUrl}

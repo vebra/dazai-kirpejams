@@ -169,15 +169,15 @@ export default async function CategoryPage({
       </section>
 
       {/* Category Hero */}
-      <section className="pt-8 pb-10 bg-white">
+      <section className="pt-5 pb-6 lg:pt-8 lg:pb-10 bg-white">
         <Container>
-          <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
+          <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-2 lg:mb-3">
             Color SHOCK • RosaNera Cosmetics
           </span>
-          <h1 className="text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-brand-gray-900 mb-3 leading-tight">
+          <h1 className="text-[clamp(1.5rem,4vw,2.5rem)] font-bold text-brand-gray-900 mb-2 lg:mb-3 leading-tight">
             {isDazai ? 'Plaukų dažai — Color SHOCK' : categoryName}
           </h1>
-          <p className="max-w-[650px] text-brand-gray-500 leading-[1.7] mb-6">
+          <p className="hidden lg:block max-w-[650px] text-brand-gray-500 leading-[1.7] mb-6">
             {isDazai ? (
               <>
                 Profesionalūs kreminiai plaukų dažai su Argan &amp; Jojoba
@@ -190,22 +190,24 @@ export default async function CategoryPage({
             )}
           </p>
 
-          <div className="flex flex-wrap gap-3 lg:gap-8">
-            <div className="inline-flex items-center gap-1.5 text-[0.95rem] text-brand-gray-500 px-5 py-2 bg-brand-gray-50 rounded-full">
+          <div className="flex flex-wrap gap-2 lg:gap-8 mt-3 lg:mt-0">
+            <div className="inline-flex items-center gap-1.5 text-[0.85rem] lg:text-[0.95rem] text-brand-gray-500 px-3.5 lg:px-5 py-1.5 lg:py-2 bg-brand-gray-50 rounded-full">
               <strong className="text-brand-magenta font-bold">
                 {showColorFilters ? DYE_PALETTE_TARGET_COUNT : products.length}
               </strong>{' '}
               {showColorFilters ? 'spalvų' : 'produktai'}
             </div>
-            <div className="inline-flex items-center gap-1.5 text-[0.95rem] text-brand-gray-500 px-5 py-2 bg-brand-gray-50 rounded-full">
+            <div className="inline-flex items-center gap-1.5 text-[0.85rem] lg:text-[0.95rem] text-brand-gray-500 px-3.5 lg:px-5 py-1.5 lg:py-2 bg-brand-gray-50 rounded-full">
               <strong className="text-brand-magenta font-bold">180 ml</strong>{' '}
               talpa
             </div>
-            <div className="inline-flex items-center gap-1.5 text-[0.95rem] text-brand-gray-500 px-5 py-2 bg-brand-gray-50 rounded-full">
-              <strong className="text-brand-magenta font-bold">
-                Nuo €{minPrice.toFixed(2)}
-              </strong>
-            </div>
+            {verified && (
+              <div className="inline-flex items-center gap-1.5 text-[0.85rem] lg:text-[0.95rem] text-brand-gray-500 px-3.5 lg:px-5 py-1.5 lg:py-2 bg-brand-gray-50 rounded-full">
+                <strong className="text-brand-magenta font-bold">
+                  Nuo €{minPrice.toFixed(2)}
+                </strong>
+              </div>
+            )}
           </div>
         </Container>
       </section>
@@ -310,9 +312,11 @@ export default async function CategoryPage({
             </div>
             <div>
               <strong className="block text-brand-magenta text-[1.2rem] font-extrabold mb-1">
-                Nuo €{minPrice.toFixed(2)}
+                {verified ? `Nuo €${minPrice.toFixed(2)}` : 'Patvirtintiems'}
               </strong>
-              <span className="text-[0.85rem] text-white/60">Už pakuotę</span>
+              <span className="text-[0.85rem] text-white/60">
+                {verified ? 'Už pakuotę' : 'Profesionalams'}
+              </span>
             </div>
             <div>
               <strong className="block text-brand-magenta text-[1.2rem] font-extrabold mb-1">

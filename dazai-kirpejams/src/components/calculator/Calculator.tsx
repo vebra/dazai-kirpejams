@@ -192,6 +192,7 @@ function CalcField({
       <input
         id={id}
         type="number"
+        inputMode="decimal"
         value={value}
         min={min}
         max={max}

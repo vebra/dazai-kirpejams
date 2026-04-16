@@ -76,7 +76,7 @@ export function Footer({ lang, dict }: FooterProps) {
                   aria-label={social.label}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full border border-white/15 flex items-center justify-center text-base text-white/70 hover:bg-brand-magenta hover:border-brand-magenta hover:text-white transition-colors"
+                  className="w-11 h-11 rounded-full border border-white/15 flex items-center justify-center text-base text-white/70 hover:bg-brand-magenta hover:border-brand-magenta hover:text-white transition-colors"
                 >
                   {social.icon}
                 </a>
@@ -89,12 +89,12 @@ export function Footer({ lang, dict }: FooterProps) {
             <h4 className="text-[0.95rem] font-bold uppercase tracking-wider text-white mb-5">
               {footer.products}
             </h4>
-            <ul className="space-y-2.5">
+            <ul>
               {products.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="block text-[0.9rem] text-white/60 hover:text-brand-magenta transition-colors"
+                    className="flex items-center min-h-[44px] py-2 text-[0.9rem] text-white/60 hover:text-brand-magenta transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -108,12 +108,12 @@ export function Footer({ lang, dict }: FooterProps) {
             <h4 className="text-[0.95rem] font-bold uppercase tracking-wider text-white mb-5">
               {footer.information}
             </h4>
-            <ul className="space-y-2.5">
+            <ul>
               {information.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="block text-[0.9rem] text-white/60 hover:text-brand-magenta transition-colors"
+                    className="flex items-center min-h-[44px] py-2 text-[0.9rem] text-white/60 hover:text-brand-magenta transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -127,11 +127,11 @@ export function Footer({ lang, dict }: FooterProps) {
             <h4 className="text-[0.95rem] font-bold uppercase tracking-wider text-white mb-5">
               {footer.contacts}
             </h4>
-            <ul className="space-y-2.5 text-[0.9rem] text-white/70">
+            <ul className="text-[0.9rem] text-white/70">
               <li>
                 <a
                   href={`mailto:${CONTACT.email}`}
-                  className="flex items-center gap-2 hover:text-brand-magenta transition-colors"
+                  className="flex items-center gap-2 min-h-[44px] py-2 hover:text-brand-magenta transition-colors"
                 >
                   <span aria-hidden>✉</span>
                   {CONTACT.email}
@@ -141,14 +141,14 @@ export function Footer({ lang, dict }: FooterProps) {
                 <li>
                   <a
                     href={phoneHref}
-                    className="flex items-center gap-2 hover:text-brand-magenta transition-colors"
+                    className="flex items-center gap-2 min-h-[44px] py-2 hover:text-brand-magenta transition-colors"
                   >
                     <span aria-hidden>☎</span>
                     {CONTACT.phone}
                   </a>
                 </li>
               )}
-              <li className="flex items-center gap-2">
+              <li className="flex items-center gap-2 py-2">
                 <span aria-hidden>📍</span>
                 {CONTACT.address}
               </li>

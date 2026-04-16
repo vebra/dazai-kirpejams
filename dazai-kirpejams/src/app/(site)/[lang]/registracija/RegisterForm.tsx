@@ -86,12 +86,14 @@ export function RegisterForm({
             label="Vardas"
             name="first_name"
             required
+            autoComplete="given-name"
             placeholder="Jonas"
           />
           <Field
             label="Pavardė"
             name="last_name"
             required
+            autoComplete="family-name"
             placeholder="Jonaitis"
           />
           <Field
@@ -137,6 +139,7 @@ export function RegisterForm({
             <Field
               label="Salono / įmonės pavadinimas"
               name="salon_name"
+              autoComplete="organization"
               placeholder={'Grožio salonas „Stilius"'}
             />
             <Field
@@ -198,13 +201,31 @@ function Field({
   type = 'text',
   required,
   placeholder,
+  autoComplete,
+  inputMode,
 }: {
   label: string
   name: string
   type?: string
   required?: boolean
   placeholder?: string
+  autoComplete?: string
+  inputMode?: 'text' | 'email' | 'tel' | 'numeric' | 'decimal' | 'search' | 'url'
 }) {
+  const defaultAutoComplete =
+    autoComplete ??
+    (type === 'email'
+      ? 'email'
+      : type === 'tel'
+        ? 'tel'
+        : type === 'password'
+          ? name === 'password'
+            ? 'new-password'
+            : 'current-password'
+          : undefined)
+  const defaultInputMode =
+    inputMode ?? (type === 'email' ? 'email' : type === 'tel' ? 'tel' : undefined)
+
   return (
     <label className="block">
       <span className="block text-xs font-medium text-brand-gray-500 mb-1.5">
@@ -215,6 +236,8 @@ function Field({
         name={name}
         required={required}
         placeholder={placeholder}
+        autoComplete={defaultAutoComplete}
+        inputMode={defaultInputMode}
         className="w-full px-4 py-3 border border-brand-gray-50 rounded-xl text-sm focus:outline-none focus:border-brand-magenta transition-colors bg-white"
       />
     </label>
