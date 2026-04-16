@@ -12,7 +12,7 @@
  *  3. Color SHOCK dažus sugretina su `hairDyeColors` iš mock-products.ts —
  *     paima LT/EN/RU pavadinimus, HEX, slug, dye group
  *  4. Pritaiko kainodaros taisykles:
- *       - Pro Hair Color 180ml:    retail €7.99,  b2b €4.99
+ *       - Pro Hair Color 180ml:    retail €7.90,  b2b €4.99
  *       - MEN 180ml:               retail €12.99, b2b €7.99
  *       - Oksidantai / priežiūra:  retail = cost×3.0, b2b = cost×2.0
  *  5. Upsert pagal `ean` (unikalus raktas) — saugu leisti kelis kartus
@@ -210,7 +210,7 @@ function calculatePrices(
     if (isMen) {
       return { priceCents: 1299, b2bPriceCents: 799 } // €12.99 / €7.99
     }
-    return { priceCents: 799, b2bPriceCents: 499 } // €7.99 / €4.99
+    return { priceCents: 790, b2bPriceCents: 499 } // €7.90 / €4.99
   }
 
   // Kiti produktai — formulė (×3.0 retail, ×2.0 b2b)

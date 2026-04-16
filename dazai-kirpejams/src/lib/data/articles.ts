@@ -152,7 +152,7 @@ export const articles: Article[] = [
         ],
         rows: [
           ['Talpa', '60 ml', '180 ml'],
-          ['Kaina', '~5,00 €', '7,99 €'],
+          ['Kaina', '~5,00 €', '7,90 €'],
           ['Kaina per ml', '~0,083 €/ml', '0,044 €/ml'],
           ['Pakuočių per mėnesį (80 dažymų)', '~80 vnt.', '~27 vnt.'],
           ['Atliekos per mėnesį', '80 tūbių', '27 tūbiai'],
@@ -180,9 +180,9 @@ export const articles: Article[] = [
       {
         type: 'ul',
         items: [
-          'Per savaitę: ~7 pakuotės × 7,99 € = <strong>55,93 €</strong>',
-          'Per mėnesį: ~27 pakuotės × 7,99 € = <strong>215,73 €</strong>',
-          'Per metus: ~320 pakuočių × 7,99 € = <strong>2 556,80 €</strong>',
+          'Per savaitę: ~7 pakuotės × 7,90 € = <strong>55,30 €</strong>',
+          'Per mėnesį: ~27 pakuotės × 7,90 € = <strong>213,30 €</strong>',
+          'Per metus: ~320 pakuočių × 7,90 € = <strong>2 528,00 €</strong>',
         ],
       },
       {

@@ -112,10 +112,10 @@ export async function Hero({ lang, dict }: HeroProps) {
               {/* Kainos elementas */}
               <div className="absolute -bottom-[1px] -left-5 bg-white rounded-full px-6 py-3 shadow-[0_4px_24px_rgba(0,0,0,0.13)] flex items-center gap-2.5">
                 <span className="text-[0.95rem] text-brand-gray-500 line-through font-medium">
-                  €10.00
+                  €11.00
                 </span>
                 <span className="text-[1.3rem] text-brand-magenta font-extrabold">
-                  €7.99
+                  €7.90
                 </span>
               </div>
             </div>

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 
-const OUR_PRICE = 7.99
+const OUR_PRICE = 7.9
 const OUR_VOLUME = 180
 
 function formatEur(value: number): string {
@@ -108,7 +108,7 @@ export function Calculator() {
             <div className="mt-1 text-[0.95rem] text-brand-gray-900">
               <strong>Color SHOCK 180 ml</strong> —{' '}
               <span className="text-brand-magenta font-extrabold text-[1.15rem]">
-                €7,99
+                €7,90
               </span>
             </div>
           </div>

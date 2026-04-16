@@ -105,7 +105,7 @@ export default async function CalculatorPage({
                 <tbody>
                   {[
                     { label: 'Talpa', std: '60 ml', ours: '180 ml' },
-                    { label: 'Kaina', std: '~€10,00', ours: '€7,99' },
+                    { label: 'Kaina', std: '~€10,00', ours: '€7,90' },
                     {
                       label: 'Kaina per ml',
                       std: '~€0,167',

@@ -107,7 +107,7 @@ export default async function CategoryPage({
 
   const minPrice = products.length
     ? Math.min(...products.map((p) => p.price_cents / 100))
-    : 7.99
+    : 7.9
 
   // Grupavimas pagal HTML Color SHOCK kategorijas (Natural, Ash, …) —
   // atitinka originalų category.html išdėstymą.

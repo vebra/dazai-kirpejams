@@ -256,7 +256,7 @@ const hairDyes: Product[] = hairDyeColors.map((c, idx) => {
       'Mix 1:2 with oxidant of chosen concentration. Development time: 30–35 min. Rinse with shampoo.',
     usage_ru:
       'Смешайте 1:2 с оксидантом выбранной концентрации. Время выдержки: 30–35 мин. Смойте шампунём.',
-    price_cents: 799, // 7.99 € — kaip HTML duomenyse
+    price_cents: 790, // 7.90 €
     compare_price_cents: 1000, // 10.00 € senoji kaina (oldPrice iš HTML)
     volume_ml: 180,
     color_number: c.num,

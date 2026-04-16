@@ -35,7 +35,7 @@ export default async function ColorPalettePage({
   ])
   const minPrice = products.length
     ? Math.min(...products.map((p) => p.price_cents / 100))
-    : 7.99
+    : 7.9
 
   return (
     <>
