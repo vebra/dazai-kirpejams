@@ -14,19 +14,14 @@ import { INVOICE_BRAND_DEFAULTS } from './types'
  * PVM sąskaitos faktūros PDF šablonas. Naudoja @react-pdf/renderer —
  * JSX kompiliuojamas į PDF serveryje.
  *
- * Šriftas: Inter (Latin + Latin-Ext subset'ai). Default Helvetica NEPALAIKO
- * lietuviškų diakritikų (ą, ę, į, ų, ė, č, š, ž, ū), todėl registruojam
- * Inter TTF failus iš `public/fonts/`. Failai įtraukiami į Vercel deploy'ą
- * kaip dalis `public/` direktorijos.
- *
- * Dizainas — švarus, profesionalus A4 formatas, atitinka LR PVM sąskaitos
- * faktūros reikalavimus (seller+buyer rekvizitai, prekių lentelė, sumos,
- * PVM, mokėjimo detalės).
+ * Šriftas: Inter latin-ext WOFF2 iš @fontsource/inter npm paketo. Default
+ * Helvetica NEPALAIKO lietuviškų diakritikų (ą, ę, į, ų, ė, č, š, ž, ū).
+ * `latin-ext` subset'as apima Latin Extended-A zoną, kurioje yra visi
+ * lietuviški diakritikai.
  */
 
 // Šriftų registracija turi įvykti PRIEŠ pirmą render'ą. Module-level'yje
-// užtikrina, kad tai atsitinka vieną kartą per Node procesą (dev reload'ai
-// apeina module cache — @react-pdf/renderer Font.register'is idempotentiškas).
+// užtikrina, kad tai atsitinka vieną kartą per Node procesą.
 Font.register({
   family: 'Inter',
   fonts: [
