@@ -409,6 +409,9 @@ export async function generateInvoiceForOrder(
     .upload(pdfPath, pdfBuffer, {
       contentType: 'application/pdf',
       upsert: true,
+      // 0 — kad regeneravimo atveju admin'as ir klientas iškart gautų
+      // šviežią PDF (default Supabase storage cacheControl yra 3600s).
+      cacheControl: '0',
     })
 
   if (uploadError) {
@@ -526,6 +529,9 @@ async function regeneratePdfOnly(
     .upload(pdfPath, pdfBuffer, {
       contentType: 'application/pdf',
       upsert: true,
+      // 0 — kad regeneravimo atveju admin'as ir klientas iškart gautų
+      // šviežią PDF (default Supabase storage cacheControl yra 3600s).
+      cacheControl: '0',
     })
 
   if (uploadError) {
