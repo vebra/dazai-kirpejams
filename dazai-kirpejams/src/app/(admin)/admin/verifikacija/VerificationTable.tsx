@@ -4,6 +4,7 @@ import { useState, useActionState } from 'react'
 import {
   approveUserAction,
   rejectUserAction,
+  viewVerificationDocumentAction,
   type RejectUserState,
 } from './actions'
 import type { UserProfileRow } from '@/lib/admin/queries'
@@ -238,14 +239,15 @@ function ProfileRow({
                 </span>
                 <div className="mt-0.5">
                   {p.verificationDocumentUrl ? (
-                    <a
-                      href={p.verificationDocumentUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-brand-magenta hover:underline font-medium"
-                    >
-                      Peržiūrėti dokumentą
-                    </a>
+                    <form action={viewVerificationDocumentAction}>
+                      <input type="hidden" name="id" value={p.id} />
+                      <button
+                        type="submit"
+                        className="text-brand-magenta hover:underline font-medium"
+                      >
+                        Peržiūrėti dokumentą
+                      </button>
+                    </form>
                   ) : (
                     <span className="text-brand-gray-500">Nepateiktas</span>
                   )}

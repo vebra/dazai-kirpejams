@@ -1230,6 +1230,80 @@ export async function getCompanyInfo(): Promise<CompanyInfo> {
 }
 
 // ============================================
+// Sąskaitos faktūros šablonas
+// ============================================
+
+export type InvoiceTemplateSettings = {
+  brandName: string
+  tagline: string
+  accentColor: string
+  footerText: string
+  defaultNotes: string
+  paymentTermsDays: number
+}
+
+export const INVOICE_TEMPLATE_DEFAULTS: InvoiceTemplateSettings = {
+  brandName: 'Dažai Kirpėjams',
+  tagline: 'Profesionalūs plaukų dažai kirpėjams',
+  accentColor: '#E91E8C',
+  footerText: '',
+  defaultNotes: '',
+  paymentTermsDays: 14,
+}
+
+/**
+ * Grąžina PVM sąskaitos šablono nustatymus iš `shop_settings`. Neužpildyti
+ * laukai grąžinami kaip default'ai (INVOICE_TEMPLATE_DEFAULTS) — tai padeda
+ * išvengti tuščio brand'o sąskaitose, jei admin'as dar nepradėjo
+ * customization'o.
+ */
+export async function getInvoiceTemplateSettings(): Promise<InvoiceTemplateSettings> {
+  const supabase = await createServerSupabase()
+  const { data, error } = await supabase
+    .from('shop_settings')
+    .select('key, value')
+    .in('key', [
+      'invoice_brand_name',
+      'invoice_brand_tagline',
+      'invoice_accent_color',
+      'invoice_footer_text',
+      'invoice_default_notes',
+      'invoice_payment_terms_days',
+    ])
+
+  if (error) {
+    console.error(
+      '[admin/queries] getInvoiceTemplateSettings:',
+      error.message
+    )
+    return INVOICE_TEMPLATE_DEFAULTS
+  }
+
+  const map = new Map<string, unknown>()
+  for (const row of data ?? []) {
+    map.set(row.key, row.value)
+  }
+
+  return {
+    brandName:
+      parseStringSetting(map.get('invoice_brand_name')) ||
+      INVOICE_TEMPLATE_DEFAULTS.brandName,
+    tagline:
+      parseStringSetting(map.get('invoice_brand_tagline')) ||
+      INVOICE_TEMPLATE_DEFAULTS.tagline,
+    accentColor:
+      parseStringSetting(map.get('invoice_accent_color')) ||
+      INVOICE_TEMPLATE_DEFAULTS.accentColor,
+    footerText: parseStringSetting(map.get('invoice_footer_text')),
+    defaultNotes: parseStringSetting(map.get('invoice_default_notes')),
+    paymentTermsDays: parseNumericSetting(
+      map.get('invoice_payment_terms_days'),
+      INVOICE_TEMPLATE_DEFAULTS.paymentTermsDays
+    ),
+  }
+}
+
+// ============================================
 // Administratoriai
 // ============================================
 

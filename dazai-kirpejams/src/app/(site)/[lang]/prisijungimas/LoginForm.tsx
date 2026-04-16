@@ -1,7 +1,6 @@
 'use client'
 
-import { useActionState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useActionState } from 'react'
 import Link from 'next/link'
 import { loginAction, type LoginState } from './actions'
 import type { Locale } from '@/i18n/config'
@@ -14,17 +13,10 @@ export function LoginForm({ lang }: { lang: Locale }) {
     loginAction,
     initialState
   )
-  const router = useRouter()
-
-  useEffect(() => {
-    if (state.success) {
-      router.push(`${langPrefix(lang)}/produktai`)
-      router.refresh()
-    }
-  }, [state.success, lang, router])
 
   return (
     <form action={formAction} className="space-y-5">
+      <input type="hidden" name="lang" value={lang} />
       {state.error && (
         <div className="px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
           {state.error}

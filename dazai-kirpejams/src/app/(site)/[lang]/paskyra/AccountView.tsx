@@ -3,11 +3,22 @@
 import { useActionState } from 'react'
 import type { Locale } from '@/i18n/config'
 import type { VerificationStatus } from '@/lib/auth/verification'
+import type { CustomerInvoice } from '@/lib/invoices/queries'
 import {
   uploadDocumentAction,
   logoutAction,
+  downloadCustomerInvoiceAction,
   type UploadDocState,
 } from './actions'
+
+const PRICE_FORMATTER = new Intl.NumberFormat('lt-LT', {
+  style: 'currency',
+  currency: 'EUR',
+})
+
+const DATE_FORMATTER = new Intl.DateTimeFormat('lt-LT', {
+  dateStyle: 'long',
+})
 
 const STATUS_CONFIG: Record<
   string,
@@ -49,12 +60,14 @@ export function AccountView({
   email,
   status,
   profile,
+  invoices,
 }: {
   lang: Locale
   email: string
   userId: string
   status: VerificationStatus
   profile: Profile
+  invoices: CustomerInvoice[]
 }) {
   const [uploadState, uploadFormAction, isUploading] = useActionState(
     uploadDocumentAction,
@@ -164,6 +177,65 @@ export function AccountView({
           </form>
         </div>
       )}
+
+      {/* PVM sąskaitos faktūros */}
+      <div className="bg-white rounded-2xl p-8 shadow-sm">
+        <h3 className="text-lg font-bold text-brand-gray-900 mb-2">
+          Mano sąskaitos
+        </h3>
+        <p className="text-sm text-brand-gray-500 mb-5 leading-relaxed">
+          PVM sąskaitos faktūros, išrašytos pagal jūsų užsakymus. Sąskaita
+          paprastai atsiranda iš karto po apmokėjimo.
+        </p>
+
+        {invoices.length === 0 ? (
+          <div className="px-4 py-6 bg-brand-gray-50 border border-[#eee] rounded-xl text-sm text-brand-gray-500 text-center">
+            Sąskaitų dar nėra. Kai užsakymas bus apmokėtas, sąskaita atsiras
+            čia ir bus išsiųsta jums el. paštu.
+          </div>
+        ) : (
+          <ul className="divide-y divide-[#eee] border border-[#eee] rounded-xl overflow-hidden">
+            {invoices.map((inv) => (
+              <li
+                key={inv.id}
+                className="flex items-center justify-between gap-4 p-4 flex-wrap bg-white"
+              >
+                <div className="min-w-0">
+                  <div className="font-mono font-semibold text-brand-gray-900 text-sm">
+                    {inv.invoiceNumber}
+                  </div>
+                  <div className="text-[12px] text-brand-gray-500 mt-0.5">
+                    Užsakymas{' '}
+                    <span className="font-mono">{inv.orderNumber}</span> ·{' '}
+                    {DATE_FORMATTER.format(new Date(inv.issuedAt))}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-semibold text-brand-gray-900">
+                    {PRICE_FORMATTER.format(inv.totalCents / 100)}
+                  </span>
+                  {inv.pdfPath ? (
+                    <form action={downloadCustomerInvoiceAction}>
+                      <input type="hidden" name="invoice_id" value={inv.id} />
+                      <input type="hidden" name="lang" value={lang} />
+                      <button
+                        type="submit"
+                        className="px-4 py-2 bg-brand-magenta text-white rounded-lg text-[13px] font-semibold hover:bg-brand-magenta/90 transition-colors"
+                      >
+                        Parsisiųsti PDF
+                      </button>
+                    </form>
+                  ) : (
+                    <span className="text-[12px] text-brand-gray-500 italic">
+                      PDF ruošiamas
+                    </span>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       {/* Atsijungimas */}
       <div className="bg-white rounded-2xl p-8 shadow-sm">

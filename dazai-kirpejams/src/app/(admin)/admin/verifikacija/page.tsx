@@ -20,7 +20,11 @@ export default async function AdminVerificationPage({
       ? 'Trūksta ID.'
       : errorParam === 'update-failed'
         ? 'Nepavyko atnaujinti.'
-        : null
+        : errorParam === 'no-document'
+          ? 'Dokumentas nerastas.'
+          : errorParam === 'signed-url-failed'
+            ? 'Nepavyko sugeneruoti nuorodos į dokumentą.'
+            : null
 
   const profiles = await getUserProfiles()
 

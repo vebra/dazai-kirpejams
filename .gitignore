@@ -1,1 +1,8 @@
 .vercel
+
+# Claude Code local config
+.claude/
+
+# Local dev/debug artifacts
+/screenshots/
+/scripts/

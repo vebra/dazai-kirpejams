@@ -18,7 +18,12 @@ type MobileMenuProps = {
 export function MobileMenu({ lang, links }: MobileMenuProps) {
   const [open, setOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Uždarom meniu kai pakeičiamas route'as
   useEffect(() => {
@@ -166,7 +171,7 @@ export function MobileMenu({ lang, links }: MobileMenuProps) {
         <Menu className="w-6 h-6" />
       </button>
 
-      {typeof document !== 'undefined' && createPortal(overlay, document.body)}
+      {mounted && createPortal(overlay, document.body)}
     </>
   )
 }

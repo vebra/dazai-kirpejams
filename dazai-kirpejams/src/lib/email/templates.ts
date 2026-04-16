@@ -679,6 +679,113 @@ ${input.siteUrl}
   return { subject, html, text }
 }
 
+// ============================================
+// PVM sąskaitos faktūros email klientui (su PDF priedu)
+// ============================================
+
+type InvoicePaidEmailInput = {
+  orderNumber: string
+  invoiceNumber: string
+  firstName: string
+  totalCents: number
+  siteUrl: string
+  accountUrl: string
+}
+
+export function buildInvoicePaidEmail(input: InvoicePaidEmailInput): {
+  subject: string
+  html: string
+  text: string
+} {
+  const subject = `PVM sąskaita faktūra ${input.invoiceNumber} — Dažai Kirpėjams`
+
+  const html = `<!doctype html>
+<html lang="lt">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(subject)}</title></head>
+<body style="margin:0;padding:0;background:${GRAY_50};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:${GRAY_900};">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">
+  Sąskaita ${escapeHtml(input.invoiceNumber)} priede. Suma ${formatEur(input.totalCents)}.
+</div>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};padding:32px 16px;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
+      <tr>
+        <td style="padding:32px;border-bottom:1px solid ${BORDER};">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:${BRAND_MAGENTA};">Dažai Kirpėjams</div>
+          <h1 style="margin:8px 0 0;font-size:24px;font-weight:700;color:${GRAY_900};">Jūsų PVM sąskaita faktūra</h1>
+          <p style="margin:8px 0 0;font-size:14px;color:${GRAY_500};line-height:1.5;">
+            Sveiki, ${escapeHtml(input.firstName)}. Ačiū už apmokėjimą — sąskaitą rasite šio laiško priede (PDF).
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:24px 32px 0;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};border-radius:12px;">
+            <tr>
+              <td style="padding:16px 20px;">
+                <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:${GRAY_500};">Sąskaitos numeris</div>
+                <div style="font-size:18px;font-weight:700;color:${GRAY_900};font-family:monospace;margin-top:4px;">${escapeHtml(input.invoiceNumber)}</div>
+              </td>
+              <td style="padding:16px 20px;text-align:right;">
+                <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:${GRAY_500};">Suma</div>
+                <div style="font-size:18px;font-weight:700;color:${GRAY_900};margin-top:4px;">${formatEur(input.totalCents)}</div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" style="padding:0 20px 16px;">
+                <div style="font-size:12px;color:${GRAY_500};">Užsakymas <span style="font-family:monospace;color:${GRAY_900};">${escapeHtml(input.orderNumber)}</span></div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:24px 32px;">
+          <p style="margin:0 0 16px;font-size:14px;color:${GRAY_900};line-height:1.6;">
+            Sąskaitą taip pat galite peržiūrėti ir parsisiųsti savo paskyroje:
+          </p>
+          <a href="${input.accountUrl}" style="display:inline-block;padding:12px 24px;background:${BRAND_MAGENTA};color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">
+            Mano sąskaitos →
+          </a>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:0 32px 32px;border-top:1px solid ${BORDER};padding-top:24px;">
+          <p style="margin:0;font-size:13px;color:${GRAY_500};line-height:1.6;">
+            Jei turite klausimų — tiesiog atsakykite į šį laišką.
+          </p>
+          <p style="margin:12px 0 0;font-size:12px;color:${GRAY_500};">
+            <strong style="color:${GRAY_900};">Dažai Kirpėjams</strong><br>
+            <a href="${input.siteUrl}" style="color:${BRAND_MAGENTA};text-decoration:none;">${input.siteUrl.replace(/^https?:\/\//, '')}</a>
+          </p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body></html>`
+
+  const text = `
+PVM sąskaita faktūra ${input.invoiceNumber} — Dažai Kirpėjams
+
+Sveiki, ${input.firstName}.
+
+Ačiū už apmokėjimą. Jūsų PVM sąskaita faktūra ${input.invoiceNumber} (užsakymas ${input.orderNumber}) pridėta prie šio laiško kaip PDF.
+
+Suma: ${formatEur(input.totalCents)}
+
+Sąskaitą taip pat galite parsisiųsti savo paskyroje:
+${input.accountUrl}
+
+Jei turite klausimų — tiesiog atsakykite į šį laišką.
+
+Dažai Kirpėjams
+${input.siteUrl}
+`.trim()
+
+  return { subject, html, text }
+}
+
 function buildCancelledEmail(input: StatusChangeEmailInput): {
   subject: string
   html: string

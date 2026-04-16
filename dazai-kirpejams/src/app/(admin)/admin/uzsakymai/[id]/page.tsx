@@ -12,7 +12,10 @@ import {
   updateOrderStatusAction,
   updateOrderNotesAction,
   updateTrackingAction,
+  generateInvoiceAction,
+  downloadInvoiceAction,
 } from '../actions'
+import { getInvoiceByOrderId } from '@/lib/invoices/queries'
 
 export const metadata = {
   title: 'Užsakymas',
@@ -72,7 +75,10 @@ export default async function AdminOrderDetailPage({
 
   const { id } = await params
   const sp = await searchParams
-  const order = await getAdminOrderById(id)
+  const [order, invoice] = await Promise.all([
+    getAdminOrderById(id),
+    getInvoiceByOrderId(id),
+  ])
 
   if (!order) {
     notFound()
@@ -82,13 +88,21 @@ export default async function AdminOrderDetailPage({
   const statusUpdated = sp['status-updated'] === '1'
   const notesUpdated = sp['notes-updated'] === '1'
   const trackingUpdated = sp['tracking-updated'] === '1'
+  const invoiceParam = typeof sp.invoice === 'string' ? sp.invoice : undefined
+  const invoiceReason = typeof sp.reason === 'string' ? sp.reason : undefined
 
   const errorMessage =
     errorParam === 'invalid-status'
       ? 'Neteisinga būsena.'
       : errorParam === 'update-failed'
         ? 'Nepavyko išsaugoti pakeitimų.'
-        : null
+        : errorParam === 'invoice-failed'
+          ? `Nepavyko išrašyti sąskaitos${invoiceReason ? `: ${invoiceReason}` : '.'}`
+          : errorParam === 'no-invoice'
+            ? 'Sąskaita dar neišrašyta.'
+            : errorParam === 'signed-url-failed'
+              ? 'Nepavyko sugeneruoti parsisiuntimo nuorodos.'
+              : null
 
   const currentStatusIndex = STATUS_FLOW.indexOf(order.status)
   const isTerminal =
@@ -130,6 +144,16 @@ export default async function AdminOrderDetailPage({
       {trackingUpdated && (
         <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">
           ✓ Siuntimo sekimo informacija išsaugota
+        </div>
+      )}
+      {invoiceParam === 'created' && (
+        <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">
+          ✓ PVM sąskaita faktūra išrašyta
+        </div>
+      )}
+      {invoiceParam === 'exists' && (
+        <div className="px-4 py-3 bg-sky-50 border border-sky-200 text-sky-700 rounded-lg text-sm">
+          Sąskaita jau buvo išrašyta — rodoma esama.
         </div>
       )}
 
@@ -499,6 +523,68 @@ export default async function AdminOrderDetailPage({
             </dd>
           </div>
         </div>
+      </section>
+
+      {/* PVM sąskaita faktūra */}
+      <section className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6">
+        <h3 className="text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500 mb-4">
+          PVM sąskaita faktūra
+        </h3>
+        {invoice ? (
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="space-y-1 text-sm">
+              <div className="font-mono font-semibold text-brand-gray-900 text-base">
+                {invoice.invoiceNumber}
+              </div>
+              <div className="text-brand-gray-500 text-[13px]">
+                Išrašyta: {formatDate(invoice.issuedAt)}
+              </div>
+              {invoice.status === 'cancelled' && (
+                <div className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                  Anuliuota
+                </div>
+              )}
+            </div>
+            <div className="flex gap-2">
+              {invoice.pdfPath ? (
+                <form action={downloadInvoiceAction}>
+                  <input type="hidden" name="id" value={order.id} />
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark transition-colors"
+                  >
+                    ↓ Parsisiųsti PDF
+                  </button>
+                </form>
+              ) : (
+                <form action={generateInvoiceAction}>
+                  <input type="hidden" name="id" value={order.id} />
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-[#F5F5F7] border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-white transition-colors"
+                  >
+                    Sugeneruoti PDF
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <p className="text-sm text-brand-gray-500 max-w-md">
+              Sąskaita dar neišrašyta. Statusui pasikeitus į „Apmokėtas" ji bus
+              sugeneruota automatiškai, arba galite ją išrašyti rankiniu būdu
+              (pvz. B2B pasiūlymui prieš apmokėjimą). Prieš išrašymą galite
+              pakoreguoti apmokėjimo terminą ir pastabas.
+            </p>
+            <Link
+              href={`/admin/uzsakymai/${order.id}/saskaita`}
+              className="px-4 py-2 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark transition-colors"
+            >
+              Išrašyti sąskaitą →
+            </Link>
+          </div>
+        )}
       </section>
 
       {/* Vidinės pastabos */}

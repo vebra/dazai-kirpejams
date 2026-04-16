@@ -3,6 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createServerSupabase } from '@/lib/supabase/ssr'
+import { createServerClient } from '@/lib/supabase/server'
+import { getInvoiceSignedUrl } from '@/lib/invoices/queries'
 
 export type UploadDocState = {
   error?: string
@@ -47,28 +49,39 @@ export async function uploadDocumentAction(
   const ext = file.name.split('.').pop() ?? 'bin'
   const path = `${user.id}/document.${ext}`
 
+  const buffer = Buffer.from(await file.arrayBuffer())
+
   const { error: uploadError } = await supabase.storage
     .from('verification-docs')
-    .upload(path, file, { upsert: true })
+    .upload(path, buffer, {
+      contentType: file.type,
+      upsert: true,
+    })
 
   if (uploadError) {
-    console.error('[upload-doc] storage error:', uploadError.message)
+    console.error(
+      '[upload-doc] storage error:',
+      uploadError.message,
+      uploadError
+    )
     return { error: 'Nepavyko įkelti failo. Bandykite dar kartą.' }
   }
 
-  // Get public/signed URL
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from('verification-docs').getPublicUrl(path)
+  // verification-docs bucket'as privatus (migration 010). Saugome storage
+  // PATH'ą (ne publicUrl), nes privataus bucket'o public URL'as negalioja.
+  // Admin'as gauna signed URL on-demand per viewVerificationDocumentAction.
+  const profilePayload = {
+    id: user.id,
+    verification_document_url: path,
+    verification_status: 'pending' as const,
+  }
 
-  // Update profile
-  const { error: updateError } = await supabase
+  const { error: upsertError } = await supabase
     .from('user_profiles')
-    .update({ verification_document_url: publicUrl })
-    .eq('id', user.id)
+    .upsert(profilePayload, { onConflict: 'id' })
 
-  if (updateError) {
-    console.error('[upload-doc] profile update error:', updateError.message)
+  if (upsertError) {
+    console.error('[upload-doc] profile upsert error:', upsertError.message)
     return { error: 'Failas įkeltas, bet nepavyko atnaujinti profilio.' }
   }
 
@@ -80,4 +93,66 @@ export async function logoutAction(): Promise<never> {
   const supabase = await createServerSupabase()
   await supabase.auth.signOut()
   redirect('/lt')
+}
+
+/**
+ * Kliento sąskaitos parsisiuntimas. Saugumas:
+ *   1. Vartotojas turi būti prisijungęs (auth user.email).
+ *   2. Sąskaita per `orders` turi priklausyti tam pačiam email'ui.
+ * Jei abu praeina — generuojam 1 val. galiojantį signed URL ir redirect'inam.
+ *
+ * Naudojam service role klientą sąskaitos tikrinimui, nes `invoices` lentelė
+ * neturi RLS, tačiau prieš tai patys patikrinom ownership per email.
+ */
+export async function downloadCustomerInvoiceAction(
+  formData: FormData
+): Promise<void> {
+  const sessionClient = await createServerSupabase()
+  const {
+    data: { user },
+  } = await sessionClient.auth.getUser()
+
+  if (!user || !user.email) {
+    redirect('/lt/prisijungimas')
+  }
+
+  const langRaw = formData.get('lang')
+  const lang = typeof langRaw === 'string' && langRaw.length > 0 ? langRaw : 'lt'
+  const accountUrl = `/${lang}/paskyra`
+
+  const invoiceId = formData.get('invoice_id')
+  if (typeof invoiceId !== 'string' || invoiceId.length === 0) {
+    redirect(`${accountUrl}?error=invalid-invoice`)
+  }
+
+  const admin = createServerClient()
+  const { data: inv, error } = await admin
+    .from('invoices')
+    .select('pdf_path, orders!inner(email)')
+    .eq('id', invoiceId)
+    .maybeSingle<{
+      pdf_path: string | null
+      orders: { email: string } | { email: string }[]
+    }>()
+
+  if (error || !inv) {
+    console.error('[paskyra/actions] download: invoice lookup failed', error?.message)
+    redirect(`${accountUrl}?error=invoice-not-found`)
+  }
+
+  const ownerEmail = Array.isArray(inv.orders) ? inv.orders[0]?.email : inv.orders?.email
+  if (!ownerEmail || ownerEmail.toLowerCase() !== user.email.toLowerCase()) {
+    redirect(`${accountUrl}?error=forbidden`)
+  }
+
+  if (!inv.pdf_path) {
+    redirect(`${accountUrl}?error=no-pdf`)
+  }
+
+  const url = await getInvoiceSignedUrl(inv.pdf_path)
+  if (!url) {
+    redirect(`${accountUrl}?error=signed-url-failed`)
+  }
+
+  redirect(url)
 }

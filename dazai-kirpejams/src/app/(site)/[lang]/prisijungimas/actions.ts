@@ -1,10 +1,19 @@
 'use server'
 
+import { redirect } from 'next/navigation'
 import { createServerSupabase } from '@/lib/supabase/ssr'
+import { locales, type Locale, defaultLocale } from '@/i18n/config'
+import { langPrefix } from '@/lib/utils'
 
 export type LoginState = {
   error?: string
-  success?: boolean
+}
+
+function resolveLang(raw: FormDataEntryValue | null): Locale {
+  if (typeof raw === 'string' && (locales as readonly string[]).includes(raw)) {
+    return raw as Locale
+  }
+  return defaultLocale
 }
 
 export async function loginAction(
@@ -13,6 +22,7 @@ export async function loginAction(
 ): Promise<LoginState> {
   const email = ((formData.get('email') as string) ?? '').trim().toLowerCase()
   const password = (formData.get('password') as string) ?? ''
+  const lang = resolveLang(formData.get('lang'))
 
   if (!email || !password) {
     return { error: 'Įveskite el. paštą ir slaptažodį.' }
@@ -38,7 +48,7 @@ export async function loginAction(
     return { error: 'Nepavyko prisijungti. Bandykite dar kartą.' }
   }
 
-  return { success: true }
+  redirect(`${langPrefix(lang)}/paskyra`)
 }
 
 export async function logoutAction(): Promise<void> {

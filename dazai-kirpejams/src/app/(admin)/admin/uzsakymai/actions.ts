@@ -6,7 +6,15 @@ import { requireAdmin } from '@/lib/admin/auth'
 import { createServerClient } from '@/lib/supabase/server'
 import { ORDER_STATUSES, type OrderStatus } from '@/lib/admin/queries'
 import { sendEmail } from '@/lib/email/resend'
-import { buildStatusChangeEmail } from '@/lib/email/templates'
+import {
+  buildStatusChangeEmail,
+  buildInvoicePaidEmail,
+} from '@/lib/email/templates'
+import { generateInvoiceForOrder } from '@/lib/invoices/generate'
+import {
+  getInvoicePdfBuffer,
+  getInvoiceSignedUrl,
+} from '@/lib/invoices/queries'
 
 /**
  * Užsakymo administravimo Server Action'ai.
@@ -42,13 +50,15 @@ export async function updateOrderStatusAction(
     redirect(`/admin/uzsakymai/${id}?error=invalid-status`)
   }
 
-  // Jei statusas shipped arba cancelled — reiks siųsti email, todėl
-  // pirmiausia paimam užsakymo duomenis
-  const shouldEmail = status === 'shipped' || status === 'cancelled'
+  // Jei statusas keičiamas į shipped/cancelled/paid — reikės kliento duomenų
+  // email pranešimui. Paimam vieną kartą prieš update'ą.
+  const shouldEmail =
+    status === 'shipped' || status === 'cancelled' || status === 'paid'
   let orderData: {
     order_number: string
     email: string
     first_name: string
+    total_cents: number
     tracking_number: string | null
     tracking_carrier: string | null
   } | null = null
@@ -56,7 +66,9 @@ export async function updateOrderStatusAction(
   if (shouldEmail) {
     const { data } = await supabase
       .from('orders')
-      .select('order_number, email, first_name, tracking_number, tracking_carrier')
+      .select(
+        'order_number, email, first_name, total_cents, tracking_number, tracking_carrier'
+      )
       .eq('id', id)
       .maybeSingle()
     orderData = data
@@ -75,18 +87,70 @@ export async function updateOrderStatusAction(
     redirect(`/admin/uzsakymai/${id}?error=update-failed`)
   }
 
-  // Siunčiam email klientui (non-blocking — jei nepavyks, statusas vis tiek
-  // jau pakeistas)
-  if (shouldEmail && orderData) {
-    const siteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ||
-      'https://www.dazaikirpejams.lt'
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ||
+    'https://www.dazaikirpejams.lt'
 
+  // Kai užsakymas pažymimas „paid" — auto-generuojam PVM sąskaitą faktūrą ir
+  // išsiunčiam ją klientui email'u kaip PDF priedą.
+  // Idempotentiška: jei sąskaita jau egzistuoja, grąžina esamą be pakeitimų.
+  // Veikia visiems mokėjimo būdams (Paysera callback / Stripe webhook /
+  // rankinis bank_transfer patvirtinimas).
+  if (status === 'paid') {
+    const result = await generateInvoiceForOrder(id)
+    if (!result.ok) {
+      console.error(
+        '[admin/uzsakymai/actions] invoice auto-generation failed:',
+        result.error
+      )
+      // Nenutraukiam srauto — statusas jau pakeistas. Admin'as galės
+      // rankiniu būdu iš naujo spausti „Išrašyti sąskaitą" užsakymo kortelėje.
+    } else if (orderData) {
+      try {
+        const pdfBuffer = await getInvoicePdfBuffer(result.pdfPath)
+        if (!pdfBuffer) {
+          console.error(
+            '[admin/uzsakymai/actions] invoice PDF buffer fetch failed for',
+            result.pdfPath
+          )
+        } else {
+          const emailPayload = buildInvoicePaidEmail({
+            orderNumber: orderData.order_number,
+            invoiceNumber: result.invoiceNumber,
+            firstName: orderData.first_name,
+            totalCents: orderData.total_cents,
+            siteUrl,
+            accountUrl: `${siteUrl}/lt/paskyra`,
+          })
+
+          await sendEmail({
+            to: orderData.email,
+            subject: emailPayload.subject,
+            html: emailPayload.html,
+            text: emailPayload.text,
+            attachments: [
+              {
+                filename: `${result.invoiceNumber}.pdf`,
+                content: pdfBuffer,
+                contentType: 'application/pdf',
+              },
+            ],
+          })
+        }
+      } catch (emailErr) {
+        console.error('[admin/uzsakymai/actions] Invoice email failed:', emailErr)
+      }
+    }
+  }
+
+  // Siunčiam status change email'ą klientui (shipped/cancelled). „Paid" turi
+  // savo atskirą email'ą su PDF priedu (žr. aukščiau).
+  if (orderData && (status === 'shipped' || status === 'cancelled')) {
     try {
       const emailPayload = buildStatusChangeEmail({
         orderNumber: orderData.order_number,
         firstName: orderData.first_name,
-        status: status as 'shipped' | 'cancelled',
+        status,
         trackingNumber: orderData.tracking_number ?? null,
         trackingCarrier: orderData.tracking_carrier ?? null,
         siteUrl,
@@ -184,3 +248,89 @@ export async function updateTrackingAction(
   revalidatePath(`/admin/uzsakymai/${id}`)
   redirect(`/admin/uzsakymai/${id}?tracking-updated=1`)
 }
+
+// ============================================
+// Sąskaitų faktūrų veiksmai
+// ============================================
+
+/**
+ * Rankinis sąskaitos išrašymas — admin'as paspaudžia mygtuką užsakymo
+ * kortelėje. Statuso keitimas į „paid" tai daro automatiškai, bet admin'ui
+ * kartais reikia išrašyti iš anksto (pvz. B2B pasiūlymai prieš apmokėjimą)
+ * arba pakartoti po klaidos.
+ */
+export async function generateInvoiceAction(formData: FormData): Promise<void> {
+  await requireAdmin()
+
+  const id = formData.get('id') as string | null
+  if (!id) redirect('/admin/uzsakymai?error=invalid-id')
+
+  // Opcijonalūs override'ai iš /admin/uzsakymai/[id]/saskaita formos.
+  // Jei laukai nepateikti (pvz. kvietimas iš paprastos „Sugeneruoti PDF"
+  // formos) — paliekam default'us.
+  const paymentDueRaw = formData.get('payment_due_date')
+  const customNotesRaw = formData.get('custom_notes')
+
+  const paymentDueDate =
+    typeof paymentDueRaw === 'string'
+      ? paymentDueRaw.trim() === ''
+        ? null
+        : paymentDueRaw.trim()
+      : undefined
+
+  const customNotes =
+    typeof customNotesRaw === 'string' && customNotesRaw.trim().length > 0
+      ? customNotesRaw.trim()
+      : null
+
+  const result = await generateInvoiceForOrder(id, {
+    paymentDueDate,
+    customNotes,
+  })
+
+  if (!result.ok) {
+    console.error('[admin/uzsakymai/actions] generateInvoice:', result.error)
+    redirect(
+      `/admin/uzsakymai/${id}?error=invoice-failed&reason=${encodeURIComponent(
+        result.error
+      )}`
+    )
+  }
+
+  revalidatePath(`/admin/uzsakymai/${id}`)
+  redirect(
+    `/admin/uzsakymai/${id}?invoice=${result.alreadyExisted ? 'exists' : 'created'}`
+  )
+}
+
+/**
+ * Parsisiuntimo veiksmas — generuoja 1 val. galiojantį signed URL ir redirect'ina
+ * naršyklę tiesiai į jį. Supabase'o `download: true` užtikrina, kad failas bus
+ * atsiųstas, o ne atidarytas tab'e.
+ */
+export async function downloadInvoiceAction(formData: FormData): Promise<void> {
+  await requireAdmin()
+
+  const id = formData.get('id') as string | null
+  if (!id) redirect('/admin/uzsakymai?error=invalid-id')
+
+  const supabase = createServerClient()
+  const { data: inv, error } = await supabase
+    .from('invoices')
+    .select('pdf_path')
+    .eq('order_id', id)
+    .maybeSingle<{ pdf_path: string | null }>()
+
+  if (error || !inv || !inv.pdf_path) {
+    console.error('[admin/uzsakymai/actions] download: no invoice for', id)
+    redirect(`/admin/uzsakymai/${id}?error=no-invoice`)
+  }
+
+  const url = await getInvoiceSignedUrl(inv.pdf_path)
+  if (!url) {
+    redirect(`/admin/uzsakymai/${id}?error=signed-url-failed`)
+  }
+
+  redirect(url)
+}
+

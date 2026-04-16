@@ -114,6 +114,77 @@ export async function updateCompanyInfoAction(
 }
 
 // ============================================
+// Sąskaitos faktūros šablonas
+// ============================================
+
+export type UpdateInvoiceTemplateState = {
+  error?: string
+  success?: boolean
+}
+
+/**
+ * HEX spalvos validacija — priimam 3 arba 6 hex simbolių formatą su `#`
+ * prefiksu (pvz. "#E91E8C" arba "#e19").
+ */
+function isValidHex(raw: string): boolean {
+  return /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(raw)
+}
+
+export async function updateInvoiceTemplateAction(
+  _prev: UpdateInvoiceTemplateState,
+  formData: FormData
+): Promise<UpdateInvoiceTemplateState> {
+  await requireAdmin()
+  const supabase = createServerClient()
+
+  const brandName = ((formData.get('brand_name') as string) ?? '').trim()
+  const tagline = ((formData.get('tagline') as string) ?? '').trim()
+  const accentColorRaw = ((formData.get('accent_color') as string) ?? '').trim()
+  const footerText = ((formData.get('footer_text') as string) ?? '').trim()
+  const defaultNotes = ((formData.get('default_notes') as string) ?? '').trim()
+  const paymentTermsRaw = ((formData.get('payment_terms_days') as string) ?? '14').trim()
+
+  if (accentColorRaw && !isValidHex(accentColorRaw)) {
+    return {
+      error: 'Neteisinga akcentinės spalvos reikšmė. Naudokite HEX formatą, pvz. #E91E8C.',
+    }
+  }
+
+  const paymentTermsDays = Number.parseInt(paymentTermsRaw, 10)
+  if (!Number.isFinite(paymentTermsDays) || paymentTermsDays < 0 || paymentTermsDays > 365) {
+    return { error: 'Apmokėjimo terminas turi būti tarp 0 ir 365 dienų.' }
+  }
+
+  const rows = [
+    { key: 'invoice_brand_name', value: brandName },
+    { key: 'invoice_brand_tagline', value: tagline },
+    { key: 'invoice_accent_color', value: accentColorRaw },
+    { key: 'invoice_footer_text', value: footerText },
+    { key: 'invoice_default_notes', value: defaultNotes },
+    { key: 'invoice_payment_terms_days', value: paymentTermsDays },
+  ].map((r) => ({
+    key: r.key,
+    value: r.value,
+    updated_at: new Date().toISOString(),
+  }))
+
+  const { error } = await supabase
+    .from('shop_settings')
+    .upsert(rows, { onConflict: 'key' })
+
+  if (error) {
+    console.error(
+      '[admin/nustatymai/actions] updateInvoiceTemplate:',
+      error.message
+    )
+    return { error: `Nepavyko išsaugoti: ${error.message}` }
+  }
+
+  revalidatePath('/admin/nustatymai')
+  return { success: true }
+}
+
+// ============================================
 // Administratoriai
 // ============================================
 

@@ -37,12 +37,19 @@ function getClient(): Resend | null {
   return resendClient
 }
 
+export type EmailAttachment = {
+  filename: string
+  content: Buffer
+  contentType?: string
+}
+
 export type SendEmailInput = {
   to: string | string[]
   subject: string
   html: string
   text?: string
   replyTo?: string
+  attachments?: EmailAttachment[]
 }
 
 export type SendEmailResult =
@@ -67,6 +74,11 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
       html: input.html,
       text: input.text,
       replyTo: input.replyTo,
+      attachments: input.attachments?.map((a) => ({
+        filename: a.filename,
+        content: a.content,
+        contentType: a.contentType,
+      })),
     })
 
     if (error || !data) {

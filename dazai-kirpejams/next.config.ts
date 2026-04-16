@@ -46,6 +46,10 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '12mb',
     },
   },
+  // @react-pdf/renderer naudoja Node-specific API (pdfkit, fs, fonts) —
+  // Next.js negali jo bundle'inti į server components build'ą. Paliekam jį
+  // kaip išorinį paketą, kad server runtime jį resolve'intų per require().
+  serverExternalPackages: ['@react-pdf/renderer'],
   async headers() {
     return [
       {

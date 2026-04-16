@@ -81,14 +81,6 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
     }
   }, [mounted, items.length, lang, router])
 
-  if (!mounted || items.length === 0) {
-    return (
-      <div className="animate-pulse">
-        <div className="h-96 bg-brand-gray-50 rounded-2xl" />
-      </div>
-    )
-  }
-
   const subtotalCents = items.reduce(
     (sum, i) => sum + i.priceCents * i.quantity,
     0
@@ -100,6 +92,24 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
     deliveryMethod,
     discountCents
   )
+
+  // Jei subtotal sumažėjo žemiau kupono vertės po prekių pašalinimo — auto-nuimam kuponą.
+  // SVARBU: visi hook'ai turi būti prieš bet kokį early return'ą, kitaip React'as
+  // pranešs apie „change in the order of Hooks".
+  useEffect(() => {
+    if (!appliedDiscount) return
+    if (appliedDiscount.cents > subtotalCents) {
+      setAppliedDiscount(null)
+    }
+  }, [subtotalCents, appliedDiscount])
+
+  if (!mounted || items.length === 0) {
+    return (
+      <div className="animate-pulse">
+        <div className="h-96 bg-brand-gray-50 rounded-2xl" />
+      </div>
+    )
+  }
 
   const handleApplyDiscount = async () => {
     setDiscountError(null)
@@ -128,13 +138,6 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
     setDiscountError(null)
   }
 
-  // Jei subtotal sumažėjo žemiau min_order po prekių pašalinimo — auto-nuimam kuponą
-  useEffect(() => {
-    if (!appliedDiscount) return
-    if (appliedDiscount.cents > subtotalCents) {
-      setAppliedDiscount(null)
-    }
-  }, [subtotalCents, appliedDiscount])
   const canSubmit =
     meetsMinimumOrder(subtotalCents) &&
     agreed &&

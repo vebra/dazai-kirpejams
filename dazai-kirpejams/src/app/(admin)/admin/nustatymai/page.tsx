@@ -1,6 +1,11 @@
 import { requireAdmin } from '@/lib/admin/auth'
-import { getCompanyInfo, getAdminUsers } from '@/lib/admin/queries'
+import {
+  getCompanyInfo,
+  getAdminUsers,
+  getInvoiceTemplateSettings,
+} from '@/lib/admin/queries'
 import { CompanyInfoForm } from './CompanyInfoForm'
+import { InvoiceTemplateForm } from './InvoiceTemplateForm'
 import { AdminsManager } from './AdminsManager'
 
 export const metadata = {
@@ -28,8 +33,9 @@ export default async function AdminSettingsPage({
             : null
 
   // Paraleliai — nepriklausomi duomenys
-  const [companyInfo, admins] = await Promise.all([
+  const [companyInfo, invoiceTemplate, admins] = await Promise.all([
     getCompanyInfo(),
+    getInvoiceTemplateSettings(),
     getAdminUsers(),
   ])
 
@@ -65,7 +71,23 @@ export default async function AdminSettingsPage({
         <CompanyInfoForm info={companyInfo} />
       </section>
 
-      {/* 2. Administratoriai */}
+      {/* 2. Sąskaitos faktūros šablonas */}
+      <section className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6 space-y-5">
+        <div className="pb-4 border-b border-[#eee]">
+          <h3 className="text-lg font-bold text-brand-gray-900">
+            PVM sąskaitos faktūros šablonas
+          </h3>
+          <p className="mt-1 text-[13px] text-brand-gray-500">
+            Prekės ženklo pavadinimas, šūkis, akcentinė spalva ir standartinės
+            pastabos, kurios naudojamos generuojant naujas sąskaitas. Jau
+            išrašytos sąskaitos lieka nekintamos (LR apskaitos įstatymas).
+          </p>
+        </div>
+
+        <InvoiceTemplateForm settings={invoiceTemplate} />
+      </section>
+
+      {/* 3. Administratoriai */}
       <section className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6 space-y-5">
         <div className="pb-4 border-b border-[#eee]">
           <h3 className="text-lg font-bold text-brand-gray-900">

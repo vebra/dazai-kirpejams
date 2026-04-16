@@ -7,6 +7,7 @@ import { Section } from '@/components/ui/Section'
 import { buildPageMetadata } from '@/lib/seo'
 import { createServerSupabase } from '@/lib/supabase/ssr'
 import { getVerificationStatus } from '@/lib/auth/verification'
+import { getInvoicesForEmail } from '@/lib/invoices/queries'
 import { AccountView } from './AccountView'
 import { langPrefix } from '@/lib/utils'
 
@@ -39,14 +40,11 @@ export default async function AccountPage({
 
   if (!user) redirect(`${langPrefix(lang)}/prisijungimas`)
 
-  const status = await getVerificationStatus()
-
-  // Fetch profile data
-  const { data: profile } = await supabase
-    .from('user_profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single()
+  const [status, profileResult, invoices] = await Promise.all([
+    getVerificationStatus(),
+    supabase.from('user_profiles').select('*').eq('id', user.id).single(),
+    user.email ? getInvoicesForEmail(user.email) : Promise.resolve([]),
+  ])
 
   return (
     <>
@@ -58,7 +56,8 @@ export default async function AccountPage({
             email={user.email ?? ''}
             userId={user.id}
             status={status}
-            profile={profile}
+            profile={profileResult.data}
+            invoices={invoices}
           />
         </Container>
       </Section>
