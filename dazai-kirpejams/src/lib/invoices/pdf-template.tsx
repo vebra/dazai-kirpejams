@@ -73,11 +73,13 @@ function createStyles(accent: string) {
     fontSize: 20,
     fontWeight: 'bold',
     color: PALETTE.text,
+    lineHeight: 1.1,
+    marginBottom: 6,
   },
   brandTagline: {
     fontSize: 8,
     color: PALETTE.muted,
-    marginTop: 2,
+    lineHeight: 1.2,
   },
   invoiceMeta: {
     flexDirection: 'column',
