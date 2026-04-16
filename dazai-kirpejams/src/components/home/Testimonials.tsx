@@ -12,7 +12,7 @@ export function Testimonials({ dict: _dict }: { dict: any }) {
         '180 ml pakuotė — tikras atradimas. Vienos pakuotės pakanka dvigubai ilgiau nei įprasta. Spalvos sodrūs ir ilgai išlieka.',
       initials: 'RS',
       name: 'Rasa S.',
-      role: 'Koloristė, Vilnius',
+      role: 'Koloristė, Kaunas',
     },
     {
       quote:

@@ -158,7 +158,7 @@ export function RegisterForm({
             id="verification_notes"
             name="verification_notes"
             rows={2}
-            placeholder={'Pvz. dirbu salone „Stilius", Vilniuje, 5+ metų patirtis...'}
+            placeholder={'Pvz. dirbu salone „Stilius", Kaune, 5+ metų patirtis...'}
             className="w-full px-4 py-3 border border-brand-gray-50 rounded-xl text-sm focus:outline-none focus:border-brand-magenta transition-colors resize-none"
           />
         </div>

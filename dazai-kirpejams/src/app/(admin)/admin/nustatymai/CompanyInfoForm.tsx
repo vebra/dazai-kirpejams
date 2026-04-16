@@ -57,7 +57,7 @@ export function CompanyInfoForm({ info }: { info: CompanyInfo }) {
             label="Adresas"
             name="address"
             defaultValue={info.address}
-            placeholder="Gedimino pr. 1, LT-01103 Vilnius"
+            placeholder="Laisvės al. 1, LT-44240 Kaunas"
             className="md:col-span-2"
           />
         </div>
