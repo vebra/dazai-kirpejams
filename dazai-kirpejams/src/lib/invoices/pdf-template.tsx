@@ -333,7 +333,7 @@ export function InvoicePdfDocument({ data }: { data: InvoiceData }) {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.logoSection}>
-            <Text style={styles.brandName}>{brand.brandName}</Text>
+            <Text style={styles.brandName}>WWW.DAZAIKIRPEJAMS.LT</Text>
             {brand.tagline && (
               <Text style={styles.brandTagline}>{brand.tagline}</Text>
             )}
