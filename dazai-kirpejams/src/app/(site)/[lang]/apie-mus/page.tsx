@@ -256,7 +256,7 @@ export default async function AboutPage({
               { number: '50+', label: t.stat1 },
               { number: '180 ml', label: t.stat2 },
               { number: '100+', label: t.stat3 },
-              { number: 'Italija', label: t.stat4 },
+              { number: t.stat4Number, label: t.stat4 },
             ].map((stat) => (
               <div
                 key={stat.label}

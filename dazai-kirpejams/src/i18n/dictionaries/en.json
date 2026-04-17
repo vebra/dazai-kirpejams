@@ -279,7 +279,8 @@
     "stat1": "colours in the palette",
     "stat2": "our standard",
     "stat3": "satisfied clients",
-    "stat4": "country of manufacture"
+    "stat4": "country of manufacture",
+    "stat4Number": "Italy"
   },
   "contactPage": {
     "metaTitle": "Contact — Dažai Kirpėjams",
