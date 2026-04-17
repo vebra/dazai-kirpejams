@@ -5,7 +5,7 @@ import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { buildPageMetadata, buildCanonicalUrl, SITE_URL } from '@/lib/seo'
 import { JsonLd } from '@/components/seo/JsonLd'
-import { breadcrumbSchema } from '@/lib/schema'
+import { breadcrumbSchema, localBusinessSchema } from '@/lib/schema'
 import { CONTACT, phoneHref } from '@/lib/site'
 import { ContactForm } from './ContactForm'
 
@@ -44,6 +44,7 @@ export default async function ContactPage({
         { name: c.home, url: buildCanonicalUrl(lang, '/') },
         { name: t.badge, url: buildCanonicalUrl(lang, '/kontaktai') },
       ])} />
+      <JsonLd data={localBusinessSchema()} />
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>

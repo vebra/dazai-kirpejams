@@ -52,6 +52,9 @@ export async function generateMetadata({
       siteName: 'Dažai Kirpėjams',
       type: 'website',
       locale: lang === 'lt' ? 'lt_LT' : lang === 'en' ? 'en_US' : 'ru_RU',
+      alternateLocale: ['lt_LT', 'en_US', 'ru_RU'].filter(
+        (l) => l !== (lang === 'lt' ? 'lt_LT' : lang === 'en' ? 'en_US' : 'ru_RU')
+      ),
       images: [
         {
           url: `${SITE_URL}/og-image.jpg`,

@@ -54,6 +54,39 @@ export function organizationSchema(): Record<string, unknown> {
   }
 }
 
+export function localBusinessSchema(): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Store',
+    '@id': `${SITE_URL}/#store`,
+    name: SITE_NAME,
+    url: SITE_URL,
+    telephone: CONTACT.phone,
+    email: CONTACT.email,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: CONTACT.street,
+      addressLocality: CONTACT.city,
+      postalCode: CONTACT.postalCode,
+      addressCountry: CONTACT.country,
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 54.8985,
+      longitude: 23.9036,
+    },
+    openingHoursSpecification: {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '09:00',
+      closes: '18:00',
+    },
+    priceRange: '€€',
+    image: `${SITE_URL}/logo.png`,
+    sameAs: [SOCIAL.facebook, SOCIAL.instagram],
+  }
+}
+
 const LOCALE_MAP: Record<string, string> = {
   lt: 'lt',
   en: 'en-US',
@@ -130,6 +163,7 @@ export function productSchema(
       url: productUrl,
       priceCurrency: 'EUR',
       price: priceEur,
+      priceValidUntil: `${new Date().getFullYear()}-12-31`,
       availability: product.is_in_stock
         ? 'https://schema.org/InStock'
         : 'https://schema.org/OutOfStock',
