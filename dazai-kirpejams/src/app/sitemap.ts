@@ -52,14 +52,14 @@ function buildAlternates(pathWithoutLocale: string) {
  */
 function expandLocales(
   path: string,
-  lastModified: Date,
+  lastModified: Date | undefined,
   changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'],
   priority: number
 ): MetadataRoute.Sitemap {
   const alternates = buildAlternates(path)
   return locales.map((loc) => ({
     url: locUrl(loc, path),
-    lastModified,
+    ...(lastModified && { lastModified }),
     changeFrequency,
     priority,
     alternates,
@@ -67,34 +67,41 @@ function expandLocales(
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date()
-
   // 1. Statiniai puslapiai — po 3 entries kiekvienam (LT/EN/RU)
+  // Nenaudojam `new Date()` — build timestamp neturi SEO vertės.
+  // Paliekam lastModified undefined — Google ignoruos, bet nesugadins.
   const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.flatMap(
     ({ path, priority, changeFrequency }) =>
-      expandLocales(path, now, changeFrequency, priority)
+      expandLocales(path, undefined, changeFrequency, priority)
   )
 
-  // 2. Kategorijų puslapiai
+  // 2. Kategorijų puslapiai — naudojam naujausio kategorijos produkto datą
   const categories = await getCategories()
-  const categoryEntries: MetadataRoute.Sitemap = categories.flatMap((cat) =>
-    expandLocales(`/produktai/${cat.slug}`, now, 'weekly', 0.8)
-  )
-
-  // 3. Produktų puslapiai
   const products = await getProducts()
+
+  const categoryEntries: MetadataRoute.Sitemap = categories.flatMap((cat) => {
+    const catProducts = products.filter((p) => p.category_id === cat.id)
+    const latestDate = catProducts.reduce<Date | undefined>((latest, p) => {
+      const d = p.updated_at ? new Date(p.updated_at) : undefined
+      if (!d) return latest
+      return !latest || d > latest ? d : latest
+    }, undefined)
+    return expandLocales(`/produktai/${cat.slug}`, latestDate, 'weekly', 0.8)
+  })
+
+  // 3. Produktų puslapiai (naudojam jau gautus products iš #2)
   const productEntries: MetadataRoute.Sitemap = products.flatMap((product) => {
     const category = categories.find((c) => c.id === product.category_id)
     const categorySlug = category?.slug || 'produktai'
     const path = `/produktai/${categorySlug}/${product.slug}`
-    const lastMod = product.updated_at ? new Date(product.updated_at) : now
+    const lastMod = product.updated_at ? new Date(product.updated_at) : undefined
     return expandLocales(path, lastMod, 'weekly', 0.7)
   })
 
   // 4. Blogo straipsnių puslapiai
   const blogPosts = await getBlogPosts()
   const blogEntries: MetadataRoute.Sitemap = blogPosts.flatMap((post) => {
-    const lastMod = post.publishedAt ? new Date(post.publishedAt) : now
+    const lastMod = post.publishedAt ? new Date(post.publishedAt) : undefined
     return expandLocales(`/blogas/${post.slug}`, lastMod, 'monthly', 0.6)
   })
 
