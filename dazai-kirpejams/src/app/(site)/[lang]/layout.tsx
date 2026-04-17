@@ -94,7 +94,7 @@ export default async function RootLayout({
 
   return (
     <html lang={lang} className={`${inter.variable} h-full`}>
-      <body className="min-h-full flex flex-col antialiased">
+      <body className="min-h-full flex flex-col antialiased overflow-x-hidden">
         <JsonLd data={organizationSchema()} />
         <JsonLd data={websiteSchema(lang)} />
         <Header lang={lang} dict={dict} />
