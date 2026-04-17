@@ -40,7 +40,7 @@ export default async function CartPage({
             href={`${langPrefix(lang) || '/'}`}
             className="hover:text-brand-magenta transition-colors"
           >
-            Pradžia
+            {dict.common.home}
           </Link>
           <span className="mx-2 text-[#E0E0E0]">/</span>
           <span className="text-brand-gray-900 font-medium">

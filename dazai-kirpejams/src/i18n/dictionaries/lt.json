@@ -16,7 +16,9 @@
     "hairDyes": "Plaukų dažai",
     "oxidants": "Oksidantai",
     "shampoos": "Šampūnai ir priežiūra",
-    "accessories": "Pagalbinės priemonės"
+    "accessories": "Pagalbinės priemonės",
+    "terms": "Pirkimo sąlygos",
+    "privacy": "Privatumo politika"
   },
   "hero": {
     "title": "Profesionalūs plaukų dažai kirpėjams",
@@ -202,7 +204,8 @@
     "contactUs": "Susisiekite su mumis",
     "readyToTry": "Pasiruošę išbandyti?",
     "startNow": "Pradėkite dabar",
-    "readyCtaDesc": "Profesionalūs dažai su 180 ml talpa — daugiau vertės kiekvienam dažymui Jūsų salone."
+    "readyCtaDesc": "Profesionalūs dažai su 180 ml talpa — daugiau vertės kiekvienam dažymui Jūsų salone.",
+    "legalBadge": "Teisinė informacija"
   },
   "aboutPage": {
     "metaTitle": "Apie mus — Dažai Kirpėjams",

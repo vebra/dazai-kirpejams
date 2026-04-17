@@ -16,7 +16,9 @@
     "hairDyes": "Hair Dyes",
     "oxidants": "Oxidants",
     "shampoos": "Shampoos & Care",
-    "accessories": "Accessories"
+    "accessories": "Accessories",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy"
   },
   "hero": {
     "title": "Professional Hair Dyes for Hairdressers",
@@ -202,7 +204,8 @@
     "contactUs": "Contact Us",
     "readyToTry": "Ready to Try?",
     "startNow": "Start Now",
-    "readyCtaDesc": "Professional dyes with 180 ml volume — more value for every colouring session in Your salon."
+    "readyCtaDesc": "Professional dyes with 180 ml volume — more value for every colouring session in Your salon.",
+    "legalBadge": "Legal information"
   },
   "aboutPage": {
     "metaTitle": "About Us — Dažai Kirpėjams",
