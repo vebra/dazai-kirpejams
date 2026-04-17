@@ -1,4 +1,5 @@
 import { getSupabase, isSupabaseConfigured } from '@/lib/supabase/client'
+import { unstable_cache } from 'next/cache'
 import { mockCategories, mockProducts } from './mock-products'
 import type { Category, Product } from '@/lib/types'
 
@@ -34,7 +35,7 @@ type GetProductsOptions = {
 // CATEGORIES
 // ============================================
 
-export async function getCategories(): Promise<Category[]> {
+async function _getCategories(): Promise<Category[]> {
   const supabase = getSupabase()
 
   if (!supabase) {
@@ -56,7 +57,12 @@ export async function getCategories(): Promise<Category[]> {
   return (data || []) as Category[]
 }
 
-export async function getCategoryBySlug(
+export const getCategories = unstable_cache(_getCategories, ['categories'], {
+  revalidate: 120,
+  tags: ['categories'],
+})
+
+async function _getCategoryBySlug(
   slug: string
 ): Promise<Category | null> {
   const supabase = getSupabase()
@@ -79,11 +85,18 @@ export async function getCategoryBySlug(
   return (data as Category) || null
 }
 
+export const getCategoryBySlug = (slug: string) =>
+  unstable_cache(
+    () => _getCategoryBySlug(slug),
+    ['category', slug],
+    { revalidate: 120, tags: ['categories'] }
+  )()
+
 // ============================================
 // PRODUCTS
 // ============================================
 
-export async function getProducts(
+async function _getProducts(
   options?: GetProductsOptions
 ): Promise<Product[]> {
   const supabase = getSupabase()
@@ -160,7 +173,16 @@ export async function getProducts(
   return (data || []) as Product[]
 }
 
-export async function getProductBySlug(slug: string): Promise<Product | null> {
+export const getProducts = (options?: GetProductsOptions) => {
+  const key = JSON.stringify(options ?? {})
+  return unstable_cache(
+    () => _getProducts(options),
+    ['products', key],
+    { revalidate: 60, tags: ['products'] }
+  )()
+}
+
+async function _getProductBySlug(slug: string): Promise<Product | null> {
   const supabase = getSupabase()
 
   if (!supabase) {
@@ -181,9 +203,17 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   return (data as Product) || null
 }
 
-export async function getRelatedProducts(
-  product: Product,
-  limit = 4
+export const getProductBySlug = (slug: string) =>
+  unstable_cache(
+    () => _getProductBySlug(slug),
+    ['product', slug],
+    { revalidate: 60, tags: ['products'] }
+  )()
+
+async function _getRelatedProducts(
+  productId: string,
+  categoryId: string,
+  limit: number
 ): Promise<Product[]> {
   const supabase = getSupabase()
 
@@ -192,8 +222,8 @@ export async function getRelatedProducts(
       .filter(
         (p) =>
           p.is_active &&
-          p.id !== product.id &&
-          p.category_id === product.category_id
+          p.id !== productId &&
+          p.category_id === categoryId
       )
       .slice(0, limit)
   }
@@ -202,8 +232,8 @@ export async function getRelatedProducts(
     .from('products')
     .select('*')
     .eq('is_active', true)
-    .eq('category_id', product.category_id)
-    .neq('id', product.id)
+    .eq('category_id', categoryId)
+    .neq('id', productId)
     .limit(limit)
 
   if (error) {
@@ -212,6 +242,13 @@ export async function getRelatedProducts(
   }
   return (data || []) as Product[]
 }
+
+export const getRelatedProducts = (product: Product, limit = 4) =>
+  unstable_cache(
+    () => _getRelatedProducts(product.id, product.category_id, limit),
+    ['related', product.id, String(limit)],
+    { revalidate: 60, tags: ['products'] }
+  )()
 
 // ============================================
 // Mock fallback filtravimo helper'is
@@ -365,7 +402,7 @@ function pickLang<T>(lt: T, en: T, ru: T, lang: Locale): T {
   return lang === 'en' ? en : lang === 'ru' ? ru : lt
 }
 
-export async function getBlogPosts(lang: Locale = 'lt'): Promise<BlogPost[]> {
+async function _getBlogPosts(lang: Locale = 'lt'): Promise<BlogPost[]> {
   if (!isSupabaseConfigured) return []
   const supabase = getSupabase()
   if (!supabase) return []
@@ -394,7 +431,14 @@ export async function getBlogPosts(lang: Locale = 'lt'): Promise<BlogPost[]> {
   }))
 }
 
-export async function getBlogPostBySlug(
+export const getBlogPosts = (lang: Locale = 'lt') =>
+  unstable_cache(
+    () => _getBlogPosts(lang),
+    ['blog-posts', lang],
+    { revalidate: 60, tags: ['blog'] }
+  )()
+
+async function _getBlogPostBySlug(
   slug: string,
   lang: Locale = 'lt'
 ): Promise<BlogPost | null> {
@@ -423,6 +467,13 @@ export async function getBlogPostBySlug(
     createdAt: data.created_at,
   }
 }
+
+export const getBlogPostBySlug = (slug: string, lang: Locale = 'lt') =>
+  unstable_cache(
+    () => _getBlogPostBySlug(slug, lang),
+    ['blog-post', slug, lang],
+    { revalidate: 60, tags: ['blog'] }
+  )()
 
 // ============================================
 // Info helper'is — ar DB prijungta
