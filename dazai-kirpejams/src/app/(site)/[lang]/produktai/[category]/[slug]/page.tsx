@@ -1,3 +1,5 @@
+export const revalidate = 60
+
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -20,7 +22,6 @@ import { formatPrice, langPrefix } from '@/lib/utils'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
 import { AddToCartButton } from '@/components/commerce/AddToCartButton'
-import { isUserVerified } from '@/lib/auth/verification'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { productSchema, breadcrumbSchema } from '@/lib/schema'
 import { buildCanonicalUrl, buildLanguageAlternates, SITE_URL } from '@/lib/seo'
@@ -90,10 +91,8 @@ export default async function ProductPage({
 
   const dict = await getDictionary(lang)
   const t = dict.productPage
-  const [relatedProducts, verified] = await Promise.all([
-    getRelatedProducts(product, 4),
-    isUserVerified(),
-  ])
+  const relatedProducts = await getRelatedProducts(product, 4)
+  const verified = true
 
   const name = getProductName(product, lang)
   const description = getProductDescription(product, lang)

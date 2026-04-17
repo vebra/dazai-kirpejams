@@ -1,3 +1,5 @@
+export const revalidate = 60
+
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -10,7 +12,6 @@ import {
 } from '@/lib/data/category-map'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
-import { isUserVerified } from '@/lib/auth/verification'
 import { buildPageMetadata, buildCanonicalUrl, SITE_URL } from '@/lib/seo'
 import { langPrefix } from '@/lib/utils'
 import { JsonLd } from '@/components/seo/JsonLd'
@@ -40,10 +41,9 @@ export default async function ProductsPage({
   const dict = await getDictionary(lang)
   const t = dict.productsPage
   const p = langPrefix(lang)
-  const [categories, products, verified] = await Promise.all([
+  const [categories, products] = await Promise.all([
     getCategories(),
     getProducts(),
-    isUserVerified(),
   ])
   const categorySlugMap = buildCategorySlugMap(categories)
 
@@ -116,7 +116,7 @@ export default async function ProductsPage({
                   product.category_id
                 )}
                 dict={dict}
-                isVerified={verified}
+                isVerified
                 priority={i < 4}
               />
             ))}

@@ -1,3 +1,5 @@
+export const revalidate = 60
+
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -11,7 +13,6 @@ import { getCategoryName, getCategoryDescription } from '@/lib/types'
 import type { Product } from '@/lib/types'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
-import { isUserVerified } from '@/lib/auth/verification'
 import { CategoryFiltersBar } from '@/components/products/CategoryFiltersBar'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { itemListSchema, breadcrumbSchema } from '@/lib/schema'
@@ -87,7 +88,7 @@ export default async function CategoryPage({
   const sortBy = typeof sp.sort === 'string' ? sp.sort : defaultSort
 
   const dict = await getDictionary(lang)
-  const verified = await isUserVerified()
+  const verified = true
   const products = await getProducts({
     categorySlug,
     colorTone: tone,

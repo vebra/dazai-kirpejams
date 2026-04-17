@@ -1,3 +1,5 @@
+export const revalidate = 60
+
 import { notFound } from 'next/navigation'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Hero } from '@/components/home/Hero'

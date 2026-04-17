@@ -14,6 +14,17 @@ import { langPrefix } from '@/lib/utils'
 
 export const revalidate = 60
 
+export async function generateStaticParams() {
+  const posts = await getBlogPosts()
+  const params: { lang: string; slug: string }[] = []
+  for (const lang of ['lt', 'en', 'ru'] as const) {
+    for (const post of posts) {
+      params.push({ lang, slug: post.slug })
+    }
+  }
+  return params
+}
+
 export async function generateMetadata({
   params,
 }: PageProps<'/[lang]/blogas/[slug]'>): Promise<Metadata> {
