@@ -84,7 +84,7 @@ export default async function BlogPage({
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {posts.map((post) => (
+              {posts.map((post, i) => (
                 <article
                   key={post.slug}
                   className="group bg-white rounded-xl overflow-hidden border border-[#E0E0E0] hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 hover:border-brand-magenta transition-all flex flex-col"
@@ -101,6 +101,7 @@ export default async function BlogPage({
                         fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-cover"
+                        {...(i < 3 && { priority: true })}
                       />
                     ) : (
                       <span

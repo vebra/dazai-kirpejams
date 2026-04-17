@@ -13,6 +13,8 @@ type ProductCardProps = {
   dict: any
   /** When false, price and cart button are hidden — user must be a verified professional */
   isVerified?: boolean
+  /** Eager-load image (above-the-fold cards) */
+  priority?: boolean
 }
 
 export function ProductCard({
@@ -21,6 +23,7 @@ export function ProductCard({
   categorySlug,
   dict,
   isVerified = false,
+  priority = false,
 }: ProductCardProps) {
   const name = getProductName(product, lang)
   const href = `${langPrefix(lang)}/produktai/${categorySlug}/${product.slug}`
@@ -46,6 +49,7 @@ export function ProductCard({
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="object-cover transition-transform duration-300 group-hover:scale-105"
+            {...(priority && { priority: true })}
           />
         ) : product.color_hex ? (
           <div

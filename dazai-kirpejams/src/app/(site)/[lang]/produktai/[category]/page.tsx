@@ -261,7 +261,7 @@ export default async function CategoryPage({
                       </span>
                     </h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 lg:gap-6">
-                      {items.map((product) => (
+                      {items.map((product, i) => (
                         <ProductCard
                           key={product.id}
                           product={product}
@@ -269,6 +269,7 @@ export default async function CategoryPage({
                           categorySlug={categorySlug}
                           dict={dict}
                           isVerified={verified}
+                          priority={i < 4}
                         />
                       ))}
                     </div>
@@ -278,7 +279,7 @@ export default async function CategoryPage({
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 lg:gap-6">
-              {products.map((product) => (
+              {products.map((product, i) => (
                 <ProductCard
                   key={product.id}
                   product={product}
@@ -286,6 +287,7 @@ export default async function CategoryPage({
                   categorySlug={categorySlug}
                   dict={dict}
                   isVerified={verified}
+                  priority={i < 4}
                 />
               ))}
             </div>

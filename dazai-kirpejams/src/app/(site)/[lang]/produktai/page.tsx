@@ -106,7 +106,7 @@ export default async function ProductsPage({
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 lg:gap-6">
-            {products.map((product) => (
+            {products.map((product, i) => (
               <ProductCard
                 key={product.id}
                 product={product}
@@ -117,6 +117,7 @@ export default async function ProductsPage({
                 )}
                 dict={dict}
                 isVerified={verified}
+                priority={i < 4}
               />
             ))}
           </div>
