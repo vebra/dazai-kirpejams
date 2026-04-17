@@ -5,28 +5,13 @@ import { Container } from '@/components/ui/Container'
  * 4 elementai: emoji ikona + h4 + smulki aprašymo eilutė.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function TrustBar({ dict: _dict }: { dict: any }) {
+export function TrustBar({ dict }: { dict: any }) {
+  const t = dict.trustBar
   const items = [
-    {
-      icon: '📦',
-      title: '180 ml talpa',
-      desc: '2× daugiau nei standartinė',
-    },
-    {
-      icon: '⚗',
-      title: 'Profesionali formulė',
-      desc: 'Kokybiški ingredientai',
-    },
-    {
-      icon: '🚚',
-      title: 'Greitas pristatymas',
-      desc: 'Per 1–3 darbo dienas',
-    },
-    {
-      icon: '🤝',
-      title: 'Sąlygos salonams',
-      desc: 'Individualūs B2B pasiūlymai',
-    },
+    { icon: '📦', title: t.volumeTitle, desc: t.volumeDesc },
+    { icon: '⚗', title: t.formulaTitle, desc: t.formulaDesc },
+    { icon: '🚚', title: t.deliveryTitle, desc: t.deliveryDesc },
+    { icon: '🤝', title: t.b2bTitle, desc: t.b2bDesc },
   ]
 
   return (

@@ -681,6 +681,16 @@
     "ctaProducts": "Peržiūrėti produktus →",
     "ctaSalons": "Gauti pasiūlymą salonui"
   },
+  "trustBar": {
+    "volumeTitle": "180 ml talpa",
+    "volumeDesc": "2× daugiau nei standartinė",
+    "formulaTitle": "Profesionali formulė",
+    "formulaDesc": "Kokybiški ingredientai",
+    "deliveryTitle": "Greitas pristatymas",
+    "deliveryDesc": "Per 1–3 darbo dienas",
+    "b2bTitle": "Sąlygos salonams",
+    "b2bDesc": "Individualūs B2B pasiūlymai"
+  },
   "categoryPage": {
     "dyeTitle": "Plaukų dažai — Color SHOCK",
     "dyeDesc": "Profesionalūs kreminiai plaukų dažai su Argan & Jojoba aliejumi ir rožių ekstraktu.",
