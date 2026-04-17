@@ -12,13 +12,16 @@ export async function generateMetadata({
 }: PageProps<'/[lang]/prisijungimas'>): Promise<Metadata> {
   const { lang } = await params
   if (!hasLocale(lang)) return {}
-  return buildPageMetadata({
-    lang,
-    path: '/prisijungimas',
-    title: 'Prisijungimas',
-    description:
-      'Prisijunkite prie savo profesionalo paskyros ir peržiūrėkite produktų kainas.',
-  })
+  return {
+    ...buildPageMetadata({
+      lang,
+      path: '/prisijungimas',
+      title: 'Prisijungimas',
+      description:
+        'Prisijunkite prie savo profesionalo paskyros ir peržiūrėkite produktų kainas.',
+    }),
+    robots: { index: false, follow: true },
+  }
 }
 
 export default async function LoginPage({
