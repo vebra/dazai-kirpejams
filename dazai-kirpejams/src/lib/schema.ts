@@ -104,17 +104,14 @@ export function productSchema(
   const name = getProductName(product, lang)
   const description = getProductDescription(product, lang)
   const priceEur = (product.price_cents / 100).toFixed(2)
-  const image =
-    product.image_urls && product.image_urls.length > 0
-      ? product.image_urls
-      : [`${SITE_URL}/og-product.jpg`]
+  const hasImages = product.image_urls && product.image_urls.length > 0
 
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name,
     description,
-    image,
+    ...(hasImages && { image: product.image_urls }),
     sku: product.sku || product.id,
     ...(product.color_number && { mpn: product.color_number }),
     brand: {
