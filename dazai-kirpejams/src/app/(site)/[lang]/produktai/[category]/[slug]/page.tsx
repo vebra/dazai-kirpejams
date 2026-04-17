@@ -216,16 +216,6 @@ export default async function ProductPage({
                 {name}
               </h1>
 
-              {/* Rating placeholder */}
-              <div className="flex items-center gap-2 mb-5">
-                <span className="text-[#F5A623] text-[1rem]" aria-hidden>
-                  ★★★★★
-                </span>
-                <span className="text-[0.85rem] text-brand-gray-500">
-                  {t.reviewCount}
-                </span>
-              </div>
-
               {/* 180 ml badge row */}
               {product.volume_ml === 180 && (
                 <div className="flex flex-wrap items-center gap-4 mb-6 p-4 bg-brand-gray-50 rounded-xl border border-[#E0E0E0]">
