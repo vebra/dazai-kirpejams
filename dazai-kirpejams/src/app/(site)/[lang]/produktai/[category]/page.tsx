@@ -152,14 +152,14 @@ export default async function CategoryPage({
             href={`${langPrefix(lang) || '/'}`}
             className="hover:text-brand-magenta transition-colors"
           >
-            Pradžia
+            {dict.common.home}
           </Link>
           <span className="mx-2 text-[#E0E0E0]">/</span>
           <Link
             href={`${langPrefix(lang)}/produktai`}
             className="hover:text-brand-magenta transition-colors"
           >
-            Produktai
+            {dict.nav.products}
           </Link>
           <span className="mx-2 text-[#E0E0E0]">/</span>
           <span className="text-brand-gray-900 font-medium">
@@ -175,15 +175,14 @@ export default async function CategoryPage({
             Color SHOCK • RosaNera Cosmetics
           </span>
           <h1 className="text-[clamp(1.5rem,4vw,2.5rem)] font-bold text-brand-gray-900 mb-2 lg:mb-3 leading-tight">
-            {isDazai ? 'Plaukų dažai — Color SHOCK' : categoryName}
+            {isDazai ? dict.categoryPage.dyeTitle : categoryName}
           </h1>
           <p className="hidden lg:block max-w-[650px] text-brand-gray-500 leading-[1.7] mb-6">
             {isDazai ? (
               <>
-                Profesionalūs kreminiai plaukų dažai su Argan &amp; Jojoba
-                aliejumi ir rožių ekstraktu.{' '}
-                <strong className="text-brand-gray-900">180 ml talpa</strong> —
-                dvigubai daugiau nei standartinė pakuotė.
+                {dict.categoryPage.dyeDesc}{' '}
+                <strong className="text-brand-gray-900">{dict.categoryPage.dyeDescBold}</strong>{' '}
+                {dict.categoryPage.dyeDescEnd}
               </>
             ) : (
               categoryDescription
@@ -195,11 +194,11 @@ export default async function CategoryPage({
               <strong className="text-brand-magenta font-bold">
                 {showColorFilters ? DYE_PALETTE_TARGET_COUNT : products.length}
               </strong>{' '}
-              {showColorFilters ? 'spalvų' : 'produktai'}
+              {showColorFilters ? dict.categoryPage.colorsLabel : dict.categoryPage.productsLabel}
             </div>
             <div className="inline-flex items-center gap-1.5 text-[0.85rem] lg:text-[0.95rem] text-brand-gray-500 px-3.5 lg:px-5 py-1.5 lg:py-2 bg-brand-gray-50 rounded-full">
               <strong className="text-brand-magenta font-bold">180 ml</strong>{' '}
-              talpa
+              {dict.categoryPage.volumeLabel}
             </div>
             {verified && (
               <div className="inline-flex items-center gap-1.5 text-[0.85rem] lg:text-[0.95rem] text-brand-gray-500 px-3.5 lg:px-5 py-1.5 lg:py-2 bg-brand-gray-50 rounded-full">
@@ -231,7 +230,7 @@ export default async function CategoryPage({
           {products.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-brand-gray-500">
-                Nerasta produktų pagal pasirinktus filtrus.
+                {dict.categoryPage.noProducts}
               </p>
             </div>
           ) : showColorFilters ? (
@@ -253,7 +252,7 @@ export default async function CategoryPage({
                       />
                       {cat.label}
                       <span className="text-[0.85rem] font-medium text-brand-gray-500 ml-auto">
-                        {items.length} spalv.
+                        {items.length} {dict.categoryPage.colorsAbbrev}
                       </span>
                     </h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 lg:gap-6">
@@ -296,10 +295,10 @@ export default async function CategoryPage({
             <div>
               <strong className="block text-brand-magenta text-[1.2rem] font-extrabold mb-1">
                 {isDazai ? DYE_PALETTE_TARGET_COUNT : products.length}{' '}
-                {isDazai ? 'spalvų' : 'produktų'}
+                {isDazai ? dict.categoryPage.colorsLabel : dict.categoryPage.productsLabel}
               </strong>
               <span className="text-[0.85rem] text-white/60">
-                Profesionali paletė
+                {dict.categoryPage.advPalette}
               </span>
             </div>
             <div>
@@ -307,15 +306,15 @@ export default async function CategoryPage({
                 180 ml
               </strong>
               <span className="text-[0.85rem] text-white/60">
-                Kiekvienoje pakuotėje
+                {dict.categoryPage.advPerPackage}
               </span>
             </div>
             <div>
               <strong className="block text-brand-magenta text-[1.2rem] font-extrabold mb-1">
-                {verified ? `Nuo €${minPrice.toFixed(2)}` : 'Patvirtintiems'}
+                {verified ? `Nuo €${minPrice.toFixed(2)}` : dict.categoryPage.advVerifiedOnly}
               </strong>
               <span className="text-[0.85rem] text-white/60">
-                {verified ? 'Už pakuotę' : 'Profesionalams'}
+                {verified ? dict.categoryPage.advPerUnit : dict.categoryPage.advProfessionals}
               </span>
             </div>
             <div>
@@ -323,7 +322,7 @@ export default async function CategoryPage({
                 Argan &amp; Jojoba
               </strong>
               <span className="text-[0.85rem] text-white/60">
-                Aliejus formulėje
+                {dict.categoryPage.advOils}
               </span>
             </div>
           </div>
@@ -334,26 +333,26 @@ export default async function CategoryPage({
       <section className="py-20 bg-white text-center">
         <Container>
           <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-            Salonams
+            {dict.categoryPage.ctaBadge}
           </span>
           <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-4 leading-tight">
-            Dirbate salone? Gaukite specialų pasiūlymą
+            {dict.categoryPage.ctaTitle}
           </h2>
           <p className="text-[1.05rem] text-brand-gray-500 mb-8 max-w-[620px] mx-auto leading-[1.7]">
-            Individualios kainos, reguliarus tiekimas ir asmeninis vadybininkas.
+            {dict.categoryPage.ctaDesc}
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href={`${langPrefix(lang)}/salonams`}
               className="inline-flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
             >
-              Gauti pasiūlymą →
+              {dict.categoryPage.ctaPrimary}
             </Link>
             <Link
               href={`${langPrefix(lang)}/kontaktai`}
               className="inline-flex items-center justify-center gap-2 px-10 py-[18px] border-2 border-brand-gray-900 text-brand-gray-900 rounded-lg text-[1.1rem] font-semibold hover:bg-brand-gray-900 hover:text-white hover:-translate-y-0.5 transition-all"
             >
-              Susisiekti
+              {dict.categoryPage.ctaSecondary}
             </Link>
           </div>
         </Container>

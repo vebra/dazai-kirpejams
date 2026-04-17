@@ -24,6 +24,58 @@ export type BlogFormState = {
   success?: boolean
 }
 
+export type CoverUploadState = {
+  error?: string
+  url?: string
+}
+
+const BLOG_BUCKET = 'blog'
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB
+const ALLOWED_MIME = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/avif',
+])
+
+export async function uploadBlogCoverAction(
+  _prev: CoverUploadState,
+  formData: FormData
+): Promise<CoverUploadState> {
+  await requireAdmin()
+
+  const file = formData.get('file') as File | null
+  if (!file || file.size === 0) {
+    return { error: 'Pasirinkite paveikslėlį.' }
+  }
+  if (file.size > MAX_FILE_SIZE) {
+    return { error: 'Failas per didelis (max 10 MB).' }
+  }
+  if (!ALLOWED_MIME.has(file.type)) {
+    return { error: 'Netinkamas formatas. Leidžiama: JPG, PNG, WebP, AVIF.' }
+  }
+
+  const supabase = createServerClient()
+  const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
+  const path = `covers/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+  const buffer = Buffer.from(await file.arrayBuffer())
+
+  const { error: uploadError } = await supabase.storage
+    .from(BLOG_BUCKET)
+    .upload(path, buffer, { contentType: file.type, upsert: true })
+
+  if (uploadError) {
+    console.error('[blog/upload]', uploadError.message)
+    return { error: `Nepavyko įkelti: ${uploadError.message}` }
+  }
+
+  const { data: publicData } = supabase.storage
+    .from(BLOG_BUCKET)
+    .getPublicUrl(path)
+
+  return { url: publicData.publicUrl }
+}
+
 export async function saveBlogPostAction(
   _prev: BlogFormState,
   formData: FormData

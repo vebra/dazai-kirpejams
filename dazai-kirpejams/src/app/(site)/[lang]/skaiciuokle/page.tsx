@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { hasLocale } from '@/i18n/dictionaries'
+import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { Calculator } from '@/components/calculator/Calculator'
 import { buildPageMetadata } from '@/lib/seo'
@@ -12,12 +12,13 @@ export async function generateMetadata({
 }: PageProps<'/[lang]/skaiciuokle'>): Promise<Metadata> {
   const { lang } = await params
   if (!hasLocale(lang)) return {}
+  const dict = await getDictionary(lang)
+  const t = dict.calculatorPage
   return buildPageMetadata({
     lang,
     path: '/skaiciuokle',
-    title: 'Kainų skaičiuoklė — 180 ml vs standartinė pakuotė',
-    description:
-      'Suskaičiuokite, kiek Jūsų salonas sutaupo rinkdamasis Color SHOCK 180 ml pakuotę vietoj standartinės. Įveskite savo duomenis ir pamatykite realų skirtumą.',
+    title: t.metaTitle,
+    description: t.metaDesc,
   })
 }
 
@@ -26,6 +27,10 @@ export default async function CalculatorPage({
 }: PageProps<'/[lang]/skaiciuokle'>) {
   const { lang } = await params
   if (!hasLocale(lang)) notFound()
+
+  const dict = await getDictionary(lang)
+  const t = dict.calculatorPage
+  const c = dict.common
 
   return (
     <>
@@ -36,11 +41,11 @@ export default async function CalculatorPage({
             href={`${langPrefix(lang) || '/'}`}
             className="hover:text-brand-magenta transition-colors"
           >
-            Pradžia
+            {c.home}
           </Link>
           <span className="mx-2 text-[#E0E0E0]">/</span>
           <span className="text-brand-gray-900 font-medium">
-            Kainų skaičiuoklė
+            {t.breadcrumb}
           </span>
         </Container>
       </section>
@@ -49,15 +54,13 @@ export default async function CalculatorPage({
       <section className="py-12 lg:py-20 bg-[linear-gradient(135deg,#ffffff_0%,#f5f5f7_100%)] text-center">
         <Container>
           <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-            Sutaupykite su 180 ml
+            {t.badge}
           </span>
           <h1 className="text-[clamp(2rem,5vw,3.25rem)] font-bold text-brand-gray-900 mb-5 leading-[1.2]">
-            Kainų <span className="text-brand-magenta">skaičiuoklė</span>
+            {t.title} <span className="text-brand-magenta">{t.titleHighlight}</span>
           </h1>
           <p className="text-[1.15rem] text-brand-gray-500 leading-[1.7] max-w-[720px] mx-auto">
-            Suskaičiuokite, kiek Jūsų salonas sutaupo rinkdamasis Color SHOCK
-            180 ml pakuotę vietoj standartinės. Įveskite savo duomenis ir
-            pamatykite realų skirtumą.
+            {t.subtitle}
           </p>
         </Container>
       </section>
@@ -74,17 +77,17 @@ export default async function CalculatorPage({
         <Container>
           <div className="text-center max-w-[720px] mx-auto mb-10">
             <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-              Palyginimas
+              {t.comparisonBadge}
             </span>
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-3 leading-tight">
-              Standartinė pakuotė{' '}
+              {t.comparisonTitle}{' '}
               <span className="text-brand-gray-500 font-normal italic">
-                vs
+                {t.comparisonVs}
               </span>{' '}
-              Color SHOCK
+              {t.comparisonEnd}
             </h2>
             <p className="text-[1.05rem] text-brand-gray-500">
-              Pamatykite skirtumą — skaičiai kalba patys.
+              {t.comparisonDesc}
             </p>
           </div>
 
@@ -95,24 +98,24 @@ export default async function CalculatorPage({
                   <tr className="border-b-2 border-[#E0E0E0]">
                     <th className="text-left py-4 pr-4 font-bold text-brand-gray-500 uppercase tracking-wider text-[0.75rem]"></th>
                     <th className="text-center py-4 px-4 font-bold text-brand-gray-900">
-                      Standartinė pakuotė
+                      {t.tableStdHeader}
                     </th>
                     <th className="text-center py-4 pl-4 font-bold text-brand-magenta bg-brand-magenta/[0.05]">
-                      Color SHOCK
+                      {t.tableOurHeader}
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {[
-                    { label: 'Talpa', std: '60 ml', ours: '180 ml' },
-                    { label: 'Kaina', std: '~€10,00', ours: '€7,90' },
+                    { label: t.rowVolume, std: '60 ml', ours: '180 ml' },
+                    { label: t.rowPrice, std: '~€10,00', ours: '€7,90' },
                     {
-                      label: 'Kaina per ml',
+                      label: t.rowPriceMl,
                       std: '~€0,167',
                       ours: '€0,044',
                     },
                     {
-                      label: 'Pakuočių per mėnesį*',
+                      label: t.rowPackages,
                       std: '~60 vnt.',
                       ours: '~20 vnt. (3× mažiau)',
                     },
@@ -136,7 +139,7 @@ export default async function CalculatorPage({
               </table>
             </div>
             <p className="mt-5 text-[0.82rem] text-brand-gray-500 italic text-center">
-              * Skaičiuojant 15 dažymų per savaitę, 60 ml vienam dažymui.
+              {t.tableFootnote}
             </p>
           </div>
         </Container>
@@ -147,10 +150,10 @@ export default async function CalculatorPage({
         <Container>
           <div className="text-center max-w-[720px] mx-auto mb-12">
             <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-              Kodėl verta
+              {t.benefitsBadge}
             </span>
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 leading-tight">
-              Trys priežastys rinktis 180 ml
+              {t.benefitsTitle}
             </h2>
           </div>
 
@@ -158,18 +161,18 @@ export default async function CalculatorPage({
             {[
               {
                 icon: '💰',
-                title: 'Mažesnė savikaina',
-                desc: 'Kaina per ml yra iki 3,7 karto mažesnė nei standartinės pakuotės. Tai reiškia realų sutaupymą kiekvieną dieną.',
+                title: t.benefit1Title,
+                desc: t.benefit1Desc,
               },
               {
                 icon: '📦',
-                title: 'Mažiau pakuočių',
-                desc: 'Su 180 ml pakuote Jums reikia 3 kartus mažiau vienetų tam pačiam darbui atlikti. Mažiau užsakymų, mažiau atliekų.',
+                title: t.benefit2Title,
+                desc: t.benefit2Desc,
               },
               {
                 icon: '📈',
-                title: 'Didesnis pelningumas',
-                desc: 'Sutaupytos lėšos tiesiogiai didina Jūsų salono pelningumą. Per metus tai gali siekti šimtus eurų.',
+                title: t.benefit3Title,
+                desc: t.benefit3Desc,
               },
             ].map((card) => (
               <div
@@ -196,24 +199,23 @@ export default async function CalculatorPage({
         <Container>
           <div className="bg-brand-gray-900 text-white rounded-2xl p-10 lg:p-16 text-center">
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-white mb-4 leading-tight">
-              Išbandykite patys
+              {t.ctaTitle}
             </h2>
             <p className="text-[1.05rem] text-white/75 mb-8 max-w-[600px] mx-auto leading-[1.7]">
-              Peržiūrėkite Color SHOCK produktų asortimentą ir įsitikinkite 180
-              ml pranašumu savo salone.
+              {t.ctaDesc}
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
                 href={`${langPrefix(lang)}/produktai`}
                 className="inline-flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
               >
-                Peržiūrėti produktus →
+                {t.ctaProducts}
               </Link>
               <Link
                 href={`${langPrefix(lang)}/salonams`}
                 className="inline-flex items-center justify-center gap-2 px-10 py-[18px] border-2 border-white/30 text-white rounded-lg text-[1.1rem] font-semibold hover:bg-white hover:text-brand-gray-900 hover:border-white hover:-translate-y-0.5 transition-all"
               >
-                Gauti pasiūlymą salonui
+                {t.ctaSalons}
               </Link>
             </div>
           </div>

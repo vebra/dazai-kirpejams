@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
-import { buildPageMetadata } from '@/lib/seo'
+import { buildPageMetadata, SITE_URL } from '@/lib/seo'
 import { langPrefix } from '@/lib/utils'
 
 export async function generateMetadata({
@@ -13,12 +14,25 @@ export async function generateMetadata({
   if (!hasLocale(lang)) return {}
   const dict = await getDictionary(lang)
   const t = dict.aboutPage
-  return buildPageMetadata({
+  const base = buildPageMetadata({
     lang,
     path: '/apie-mus',
     title: t.metaTitle,
     description: t.metaDesc,
   })
+  const ogImage =
+    lang === 'en'
+      ? '/about-us.webp'
+      : lang === 'ru'
+        ? '/o-nas.webp'
+        : '/apie-mus-hero.webp'
+  return {
+    ...base,
+    openGraph: {
+      ...base.openGraph,
+      images: [{ url: `${SITE_URL}${ogImage}`, width: 1262, height: 1577, alt: t.metaTitle }],
+    },
+  }
 }
 
 export default async function AboutPage({
@@ -31,6 +45,9 @@ export default async function AboutPage({
   const t = dict.aboutPage
   const c = dict.common
   const p = langPrefix(lang)
+
+  const heroImage =
+    lang === 'en' ? '/about-us.webp' : lang === 'ru' ? '/o-nas.webp' : '/apie-mus-hero.webp'
 
   return (
     <>
@@ -61,13 +78,15 @@ export default async function AboutPage({
                 {t.subtitle}
               </p>
             </div>
-            <div className="aspect-[4/3] bg-brand-gray-50 rounded-xl border-2 border-dashed border-[#E0E0E0] flex flex-col items-center justify-center gap-3">
-              <div className="text-[3rem] opacity-40" aria-hidden>
-                ✂
-              </div>
-              <p className="text-[0.9rem] text-brand-gray-500 opacity-60">
-                {t.imagePlaceholder}
-              </p>
+            <div className="relative aspect-[4/5] rounded-xl overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.12)]">
+              <Image
+                src={heroImage}
+                alt={t.imagePlaceholder}
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                priority
+              />
             </div>
           </div>
         </Container>
