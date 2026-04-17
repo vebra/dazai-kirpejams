@@ -108,7 +108,30 @@
     }
   },
   "testimonials": {
-    "title": "Ką sako profesionalai"
+    "badge": "Atsiliepimai",
+    "title": "Ką sako mūsų klientai",
+    "subtitle": "Patirtis iš salonų, kurie jau naudoja mūsų produktus",
+    "starsLabel": "5 iš 5 žvaigždučių",
+    "items": [
+      {
+        "quote": "180 ml pakuotė — tikras atradimas. Vienos pakuotės pakanka dvigubai ilgiau nei įprasta. Spalvos sodrūs ir ilgai išlieka.",
+        "initials": "RS",
+        "name": "Rasa S.",
+        "role": "Koloristė, Kaunas"
+      },
+      {
+        "quote": "Puikus kainos ir kokybės santykis. Mūsų salonui tai leido sumažinti dažų sąnaudas beveik 40%. Rekomenduoju kolegoms.",
+        "initials": "DK",
+        "name": "Diana K.",
+        "role": "Salono savininkė, Kaunas"
+      },
+      {
+        "quote": "Greitas pristatymas, patogus užsakymas. Spalvų paletė plati — randu viską, ko reikia kasdieniam darbui.",
+        "initials": "LM",
+        "name": "Laura M.",
+        "role": "Kirpėja, Klaipėda"
+      }
+    ]
   },
   "b2b": {
     "title": "Dirbate salone? Gaukite specialų pasiūlymą",
@@ -233,10 +256,24 @@
     "brandsTitle": "Produktai, kuriais pasitiki profesionalai",
     "brandsSubtitle": "Du prekių ženklai — viskas, ko reikia profesionaliam darbui salone",
     "colorShockTagline": "Profesionalūs plaukų dažai",
-    "colorShockFeatures": ["50+ profesionalių atspalvių", "180 ml ekonominė pakuotė", "Argan & Jojoba aliejai", "Rožių ekstraktas", "Itališka kokybė", "Maišymo santykis 1+2"],
+    "colorShockFeatures": [
+      "50+ profesionalių atspalvių",
+      "180 ml ekonominė pakuotė",
+      "Argan & Jojoba aliejai",
+      "Rožių ekstraktas",
+      "Itališka kokybė",
+      "Maišymo santykis 1+2"
+    ],
     "viewDyes": "Peržiūrėti dažus",
     "rosaneraTagline": "Profesionali plaukų priežiūra",
-    "rosaneraFeatures": ["Profesionalūs šampūnai", "Plaukų kaukės ir priežiūra", "Papildomi produktai", "Tinka po dažymo", "Saloninė kokybė", "Papildo Color SHOCK liniją"],
+    "rosaneraFeatures": [
+      "Profesionalūs šampūnai",
+      "Plaukų kaukės ir priežiūra",
+      "Papildomi produktai",
+      "Tinka po dažymo",
+      "Saloninė kokybė",
+      "Papildo Color SHOCK liniją"
+    ],
     "statsBadge": "Skaičiai",
     "statsTitle": "Faktai, kurie kalba už mus",
     "stat1": "spalvų paletėje",
@@ -385,6 +422,18 @@
     "ctaSubtitle": "Susisiekite su mumis patogiu būdu ir gaukite individualų pasiūlymą Jūsų salonui jau šiandien.",
     "ctaCta": "Užpildyti užklausos formą →"
   },
+  "termsPage": {
+    "metaTitle": "Pirkimo sąlygos",
+    "metaDesc": "Bendrosios pirkimo–pardavimo taisyklės ir sąlygos www.dazaikirpejams.lt elektroninėje parduotuvėje.",
+    "subtitle": "Bendrosios pirkimo–pardavimo taisyklės www.dazaikirpejams.lt elektroninėje parduotuvėje.",
+    "content": "<h2>1. Bendrosios nuostatos</h2><p>Šios pirkimo taisyklės yra teisinis dokumentas, kuris nustato pirkėjo ir pardavėjo tarpusavio teises, pareigas ir atsakomybę pirkėjui įsigyjant prekes elektroninėje parduotuvėje <strong>www.dazaikirpejams.lt</strong>.</p><h2>2. Pardavėjas</h2><p>Elektroninės parduotuvės administratorius ir pardavėjas — Dažai Kirpėjams, veikianti pagal LR įstatymus.</p><h2>3. Pirkimo-pardavimo sutarties sudarymas</h2><p>Pirkimo-pardavimo sutartis tarp pirkėjo ir pardavėjo laikoma sudaryta tada, kai pirkėjas, išsirinkęs prekes ir sudaręs krepšelį, paspaudžia nuorodą „Patvirtinti užsakymą\" ir sumoka už prekes.</p><h2>4. Kainos ir mokėjimas</h2><p>Prekių kainos nurodytos su PVM. Galutinė suma apskaičiuojama krepšelyje, pridėjus pristatymo mokestį, jei jis taikomas.</p><p>Priimami mokėjimo būdai:</p><ul><li>Banko pavedimas</li><li>Mokėjimo kortelės (Visa, Mastercard)</li><li>Paysera</li></ul><h2>5. Pristatymas</h2><p>Pristatymo sąlygos nurodytos <a href=\"/pristatymas\">Pristatymo ir grąžinimo</a> puslapyje. Užsakymai pristatomi per 1–3 darbo dienas nuo apmokėjimo patvirtinimo.</p><h2>6. Sutarties atsisakymas</h2><p>Pirkėjas turi teisę atsisakyti pirkimo–pardavimo sutarties per 14 dienų nuo prekės gavimo dienos, pranešdamas apie tai pardavėjui el. paštu.</p><h2>7. Garantija</h2><p>Visoms parduodamoms prekėms taikoma gamintojo garantija pagal LR teisės aktus. Brokuotos prekės keičiamos nemokamai.</p><h2>8. Atsakomybės apribojimas</h2><p>Pardavėjas neatsako už žalą, atsiradusią dėl netinkamo prekės naudojimo ar nepaisant instrukcijų. Pirkėjas prisiima atsakomybę už teisingą prekės naudojimą pagal jos paskirtį.</p><h2>9. Ginčų sprendimas</h2><p>Ginčai sprendžiami derybomis. Nepavykus susitarti — LR įstatymų nustatyta tvarka. Vartotojai gali kreiptis į Valstybinę vartotojų teisių apsaugos tarnybą (<a href=\"https://www.vvtat.lt\" target=\"_blank\" rel=\"noopener noreferrer\">www.vvtat.lt</a>).</p><h2>10. Baigiamosios nuostatos</h2><p>Pardavėjas pasilieka teisę keisti šias taisykles. Pasikeitimai įsigalioja nuo jų paskelbimo svetainėje dienos.</p>"
+  },
+  "privacyPage": {
+    "metaTitle": "Privatumo politika",
+    "metaDesc": "Informacija apie jūsų asmens duomenų tvarkymą pagal BDAR reikalavimus.",
+    "subtitle": "Informacija apie jūsų asmens duomenų tvarkymą pagal BDAR reikalavimus.",
+    "content": "<h2>1. Duomenų valdytojas</h2><p>Asmens duomenų valdytojas yra Dažai Kirpėjams, veikianti pagal Lietuvos Respublikos įstatymus. Kontaktai: <a href=\"mailto:info@dazaikirpejams.lt\">info@dazaikirpejams.lt</a>.</p><h2>2. Kokius duomenis renkame</h2><p>Rinksime šiuos asmens duomenis:</p><ul><li>Vardas, pavardė</li><li>El. pašto adresas</li><li>Telefono numeris</li><li>Pristatymo adresas</li><li>Įmonės rekvizitai (B2B klientams)</li><li>Užsakymų istorija</li><li>IP adresas ir naršymo duomenys (slapukai)</li></ul><h2>3. Duomenų tvarkymo tikslai</h2><p>Jūsų asmens duomenis tvarkome šiais tikslais:</p><ul><li>Užsakymų vykdymas ir pristatymas</li><li>Sąskaitų faktūrų išrašymas</li><li>Klientų aptarnavimas</li><li>Tiesioginė rinkodara (su jūsų sutikimu)</li><li>Teisinių įsipareigojimų vykdymas</li></ul><h2>4. Duomenų saugojimo terminas</h2><p>Asmens duomenis saugome tiek, kiek reikalinga nurodytiems tikslams pasiekti, bet ne ilgiau nei numato LR teisės aktai. Užsakymų duomenys saugomi 10 metų apskaitos reikalavimams vykdyti.</p><h2>5. Slapukai</h2><p>Svetainėje naudojame slapukus (cookies), kurie padeda gerinti vartotojo patirtį, analizuoti svetainės veiklą ir pritaikyti turinį. Galite bet kada pakeisti slapukų nustatymus savo naršyklėje.</p><h2>6. Duomenų perdavimas tretiesiems asmenims</h2><p>Jūsų duomenys gali būti perduoti:</p><ul><li>Pristatymo paslaugų teikėjams (kurjeriams)</li><li>Mokėjimų apdorojimo platformoms (Stripe, Paysera)</li><li>Valstybinėms institucijoms (pagal teisinius reikalavimus)</li></ul><h2>7. Jūsų teisės</h2><p>Turite teisę:</p><ul><li>Sužinoti, kokius jūsų duomenis tvarkome</li><li>Prašyti duomenų ištaisymo</li><li>Prašyti duomenų ištrynimo</li><li>Atšaukti sutikimą bet kuriuo metu</li><li>Pateikti skundą Valstybinei duomenų apsaugos inspekcijai</li></ul><h2>8. Kontaktai</h2><p>Klausimais dėl asmens duomenų tvarkymo kreipkitės el. paštu: <a href=\"mailto:info@dazaikirpejams.lt\">info@dazaikirpejams.lt</a>.</p>"
+  },
   "deliveryPage": {
     "metaTitle": "Pristatymas ir grąžinimas",
     "metaDesc": "Pristatymo būdai, kainos ir terminai. Grąžinimo politika per 14 dienų pagal LR teisės aktus. Nemokamas pristatymas nuo €50.",
@@ -527,7 +576,7 @@
             "intro": "Užsakyti labai paprasta:",
             "list": [
               "Pasirinkite norimus produktus iš katalogo.",
-              "Pridėkite juos į krepšelį paspaudę \u201e+\u201c mygtuką.",
+              "Pridėkite juos į krepšelį paspaudę „+“ mygtuką.",
               "Eikite į krepšelį, patikrinkite užsakymą ir užpildykite pristatymo informaciją.",
               "Pasirinkite mokėjimo būdą ir patvirtinkite užsakymą."
             ],
@@ -602,7 +651,7 @@
           },
           {
             "q": "Kaip tapti partneriu?",
-            "text": "Tapti partneriu labai paprasta: užpildykite B2B formą mūsų svetainėje (skyriuje „Salonams\u201c) arba susisiekite tiesiogiai el. paštu info@dazaikirpejams.lt."
+            "text": "Tapti partneriu labai paprasta: užpildykite B2B formą mūsų svetainėje (skyriuje „Salonams“) arba susisiekite tiesiogiai el. paštu info@dazaikirpejams.lt."
           },
           {
             "q": "Ar galima gauti testavimo pavyzdžių?",
@@ -659,32 +708,6 @@
     "ctaTitle": "Peržiūrėkite mūsų produktus",
     "ctaDesc": "Skaičiai kalba patys už save. Išbandykite Color SHOCK 180 ml dažus ir įvertinkite skirtumą savo darbe — nuo pirmo dažymo.",
     "ctaCta": "Peržiūrėti produktus →"
-  },
-  "testimonials": {
-    "badge": "Atsiliepimai",
-    "title": "Ką sako mūsų klientai",
-    "subtitle": "Patirtis iš salonų, kurie jau naudoja mūsų produktus",
-    "starsLabel": "5 iš 5 žvaigždučių",
-    "items": [
-      {
-        "quote": "180 ml pakuotė — tikras atradimas. Vienos pakuotės pakanka dvigubai ilgiau nei įprasta. Spalvos sodrūs ir ilgai išlieka.",
-        "initials": "RS",
-        "name": "Rasa S.",
-        "role": "Koloristė, Kaunas"
-      },
-      {
-        "quote": "Puikus kainos ir kokybės santykis. Mūsų salonui tai leido sumažinti dažų sąnaudas beveik 40%. Rekomenduoju kolegoms.",
-        "initials": "DK",
-        "name": "Diana K.",
-        "role": "Salono savininkė, Kaunas"
-      },
-      {
-        "quote": "Greitas pristatymas, patogus užsakymas. Spalvų paletė plati — randu viską, ko reikia kasdieniam darbui.",
-        "initials": "LM",
-        "name": "Laura M.",
-        "role": "Kirpėja, Klaipėda"
-      }
-    ]
   },
   "calculatorPage": {
     "metaTitle": "Kainų skaičiuoklė — 180 ml vs standartinė pakuotė",

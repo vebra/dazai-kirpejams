@@ -108,7 +108,30 @@
     }
   },
   "testimonials": {
-    "title": "What Professionals Say"
+    "badge": "Testimonials",
+    "title": "What our clients say",
+    "subtitle": "Experience from salons already using our products",
+    "starsLabel": "5 out of 5 stars",
+    "items": [
+      {
+        "quote": "The 180 ml package is a real discovery. One package lasts twice as long as usual. The colours are rich and long-lasting.",
+        "initials": "RS",
+        "name": "Rasa S.",
+        "role": "Colourist, Kaunas"
+      },
+      {
+        "quote": "Excellent value for money. It allowed our salon to reduce dye costs by almost 40%. I recommend it to colleagues.",
+        "initials": "DK",
+        "name": "Diana K.",
+        "role": "Salon owner, Kaunas"
+      },
+      {
+        "quote": "Fast delivery, convenient ordering. The colour palette is wide — I find everything I need for daily work.",
+        "initials": "LM",
+        "name": "Laura M.",
+        "role": "Hairdresser, Klaipėda"
+      }
+    ]
   },
   "b2b": {
     "title": "Work at a Salon? Get a Special Offer",
@@ -233,10 +256,24 @@
     "brandsTitle": "Products Trusted by Professionals",
     "brandsSubtitle": "Two brands — everything needed for professional salon work",
     "colorShockTagline": "Professional Hair Dyes",
-    "colorShockFeatures": ["50+ professional shades", "180 ml economical packaging", "Argan & Jojoba oils", "Rose extract", "Italian quality", "Mixing ratio 1+2"],
+    "colorShockFeatures": [
+      "50+ professional shades",
+      "180 ml economical packaging",
+      "Argan & Jojoba oils",
+      "Rose extract",
+      "Italian quality",
+      "Mixing ratio 1+2"
+    ],
     "viewDyes": "View Dyes",
     "rosaneraTagline": "Professional Hair Care",
-    "rosaneraFeatures": ["Professional shampoos", "Hair masks & care", "Complementary products", "Suitable after colouring", "Salon-grade quality", "Complements Color SHOCK line"],
+    "rosaneraFeatures": [
+      "Professional shampoos",
+      "Hair masks & care",
+      "Complementary products",
+      "Suitable after colouring",
+      "Salon-grade quality",
+      "Complements Color SHOCK line"
+    ],
     "statsBadge": "Numbers",
     "statsTitle": "Facts That Speak for Us",
     "stat1": "colours in the palette",
@@ -385,6 +422,18 @@
     "ctaSubtitle": "Contact us in a way that's convenient for You and get an individual quote for Your salon today.",
     "ctaCta": "Fill Out the Inquiry Form →"
   },
+  "termsPage": {
+    "metaTitle": "Terms & Conditions",
+    "metaDesc": "General terms and conditions of purchase at the www.dazaikirpejams.lt online store.",
+    "subtitle": "General terms and conditions of purchase at the www.dazaikirpejams.lt online store.",
+    "content": "<h2>1. General Provisions</h2><p>These purchase terms constitute a legal document that establishes the mutual rights, obligations and responsibilities of the buyer and seller when purchasing goods at the <strong>www.dazaikirpejams.lt</strong> online store.</p><h2>2. Seller</h2><p>The administrator and seller of the online store is Dažai Kirpėjams, operating under the laws of the Republic of Lithuania.</p><h2>3. Conclusion of the Purchase Agreement</h2><p>The purchase agreement between the buyer and the seller is considered concluded when the buyer selects the goods, forms the basket, clicks the \"Confirm Order\" link and pays for the goods.</p><h2>4. Prices and Payment</h2><p>Product prices include VAT. The final amount is calculated in the basket, including the delivery fee if applicable.</p><p>Accepted payment methods:</p><ul><li>Bank transfer</li><li>Payment cards (Visa, Mastercard)</li><li>Paysera</li></ul><h2>5. Delivery</h2><p>Delivery terms are described on the <a href=\"/en/pristatymas\">Delivery & Returns</a> page. Orders are delivered within 1–3 business days after payment confirmation.</p><h2>6. Withdrawal from the Agreement</h2><p>The buyer has the right to withdraw from the purchase agreement within 14 days of receiving the goods by notifying the seller via email.</p><h2>7. Warranty</h2><p>All products sold are covered by the manufacturer's warranty in accordance with the laws of the Republic of Lithuania. Defective goods are replaced free of charge.</p><h2>8. Limitation of Liability</h2><p>The seller is not liable for damage caused by improper use of the product or disregard of instructions. The buyer assumes responsibility for the correct use of the product according to its purpose.</p><h2>9. Dispute Resolution</h2><p>Disputes are resolved through negotiation. If an agreement cannot be reached — in accordance with the procedure established by the laws of the Republic of Lithuania. Consumers may contact the State Consumer Rights Protection Authority (<a href=\"https://www.vvtat.lt\" target=\"_blank\" rel=\"noopener noreferrer\">www.vvtat.lt</a>).</p><h2>10. Final Provisions</h2><p>The seller reserves the right to amend these terms. Changes take effect from the date of their publication on the website.</p>"
+  },
+  "privacyPage": {
+    "metaTitle": "Privacy Policy",
+    "metaDesc": "Information about the processing of Your personal data in accordance with GDPR requirements.",
+    "subtitle": "Information about the processing of Your personal data in accordance with GDPR requirements.",
+    "content": "<h2>1. Data Controller</h2><p>The personal data controller is Dažai Kirpėjams, operating under the laws of the Republic of Lithuania. Contact: <a href=\"mailto:info@dazaikirpejams.lt\">info@dazaikirpejams.lt</a>.</p><h2>2. Data We Collect</h2><p>We collect the following personal data:</p><ul><li>First and last name</li><li>Email address</li><li>Phone number</li><li>Delivery address</li><li>Company details (for B2B clients)</li><li>Order history</li><li>IP address and browsing data (cookies)</li></ul><h2>3. Purposes of Data Processing</h2><p>We process Your personal data for the following purposes:</p><ul><li>Order fulfilment and delivery</li><li>Invoice issuance</li><li>Customer service</li><li>Direct marketing (with Your consent)</li><li>Fulfilment of legal obligations</li></ul><h2>4. Data Retention Period</h2><p>We retain personal data for as long as necessary to achieve the stated purposes, but no longer than required by the laws of the Republic of Lithuania. Order data is retained for 10 years to meet accounting requirements.</p><h2>5. Cookies</h2><p>We use cookies on the website to improve user experience, analyse website activity and tailor content. You can change cookie settings in Your browser at any time.</p><h2>6. Data Transfer to Third Parties</h2><p>Your data may be transferred to:</p><ul><li>Delivery service providers (couriers)</li><li>Payment processing platforms (Stripe, Paysera)</li><li>Government institutions (as required by law)</li></ul><h2>7. Your Rights</h2><p>You have the right to:</p><ul><li>Know what personal data we process</li><li>Request data rectification</li><li>Request data erasure</li><li>Withdraw consent at any time</li><li>Lodge a complaint with the State Data Protection Inspectorate</li></ul><h2>8. Contact</h2><p>For questions regarding personal data processing, please email: <a href=\"mailto:info@dazaikirpejams.lt\">info@dazaikirpejams.lt</a>.</p>"
+  },
   "deliveryPage": {
     "metaTitle": "Delivery & Returns",
     "metaDesc": "Delivery methods, prices and timeframes. Return policy within 14 days according to Lithuanian law. Free shipping from €50.",
@@ -456,48 +505,48 @@
     "subtitle": "Finding Your answer here will save time. If You still have questions — our team is always ready to help.",
     "ctaTitle": "Didn't Find an Answer?",
     "ctaSubtitle": "Contact us and our team will be happy to help resolve any question.",
-    "ctaEmail": "Send an Email \u2192",
+    "ctaEmail": "Send an Email →",
     "ctaContact": "Contact",
     "categories": [
       {
-        "icon": "\ud83c\udfa8",
+        "icon": "🎨",
         "title": "About Products",
         "items": [
           {
             "q": "How do your dyes differ from other professional dyes?",
             "intro": "Our Color SHOCK dyes stand out in several key ways:",
             "list": [
-              "180 ml package \u2014 twice the size of the standard market offering (60\u2013100 ml), making the price per millilitre significantly lower.",
-              "Premium ingredients \u2014 the formula contains Argan oil, Jojoba oil and Rose extract, which nourish and protect hair during colouring.",
-              "Italian quality \u2014 products are manufactured in Italy to the highest quality standards.",
-              "Professional pricing \u2014 the larger package allows us to offer a competitive price without sacrificing quality."
+              "180 ml package — twice the size of the standard market offering (60–100 ml), making the price per millilitre significantly lower.",
+              "Premium ingredients — the formula contains Argan oil, Jojoba oil and Rose extract, which nourish and protect hair during colouring.",
+              "Italian quality — products are manufactured in Italy to the highest quality standards.",
+              "Professional pricing — the larger package allows us to offer a competitive price without sacrificing quality."
             ]
           },
           {
             "q": "Why is the 180 ml package better?",
             "intro": "The 180 ml package offers clear advantages for professionals:",
             "list": [
-              "2\u00d7 more product \u2014 one package equals two standard ones (60\u2013100 ml).",
-              "Lower cost per use \u2014 the price per millilitre is significantly more economical.",
-              "Fewer packages \u2014 less frequent ordering, less waste.",
-              "Ideal for salons \u2014 the larger volume means one package lasts for more procedures."
+              "2× more product — one package equals two standard ones (60–100 ml).",
+              "Lower cost per use — the price per millilitre is significantly more economical.",
+              "Fewer packages — less frequent ordering, less waste.",
+              "Ideal for salons — the larger volume means one package lasts for more procedures."
             ]
           },
           {
             "q": "Are the dyes suitable for all hair types?",
-            "text": "Yes. Our dyes are formulated for all hair types \u2014 from fine to thick, straight to curly. The Argan and Jojoba oils in the formula additionally nourish hair, so the result is smooth and shiny regardless of hair structure."
+            "text": "Yes. Our dyes are formulated for all hair types — from fine to thick, straight to curly. The Argan and Jojoba oils in the formula additionally nourish hair, so the result is smooth and shiny regardless of hair structure."
           },
           {
             "q": "How many shades are in the colour palette?",
             "intro": "We currently offer more than 50 professional shades, grouped into categories:",
             "list": [
-              "Natural \u2014 natural tones",
-              "Ash \u2014 ash shade series",
-              "Copper \u2014 copper and warm tones",
-              "Red \u2014 red shades",
-              "Violet \u2014 violet series",
-              "Superlift \u2014 intensive lightening tones",
-              "Toner \u2014 toning dyes"
+              "Natural — natural tones",
+              "Ash — ash shade series",
+              "Copper — copper and warm tones",
+              "Red — red shades",
+              "Violet — violet series",
+              "Superlift — intensive lightening tones",
+              "Toner — toning dyes"
             ],
             "outro": "The palette is constantly expanding with new shades."
           },
@@ -509,17 +558,17 @@
             "q": "Which oxidant is suitable for your dyes?",
             "intro": "Our dyes work with oxidants of the following concentrations:",
             "list": [
-              "3% (10 vol.) \u2014 for toning and gentle colouring",
-              "6% (20 vol.) \u2014 for standard colouring and grey coverage",
-              "9% (30 vol.) \u2014 for lightening by 2\u20133 tones",
-              "12% (40 vol.) \u2014 for intensive lightening"
+              "3% (10 vol.) — for toning and gentle colouring",
+              "6% (20 vol.) — for standard colouring and grey coverage",
+              "9% (30 vol.) — for lightening by 2–3 tones",
+              "12% (40 vol.) — for intensive lightening"
             ],
             "outro": "Mixing ratio: 1+2 (1 part dye + 2 parts oxidant)."
           }
         ]
       },
       {
-        "icon": "\ud83d\uded2",
+        "icon": "🛒",
         "title": "About Ordering",
         "items": [
           {
@@ -527,7 +576,7 @@
             "intro": "Ordering is very simple:",
             "list": [
               "Choose your desired products from the catalogue.",
-              "Add them to the cart by pressing the \u201c+\u201d button.",
+              "Add them to the cart by pressing the “+” button.",
               "Go to the cart, review your order and fill in the delivery details.",
               "Choose a payment method and confirm your order."
             ],
@@ -535,15 +584,15 @@
           },
           {
             "q": "Is there a minimum order amount?",
-            "text": "There is no minimum order for individual purchases \u2014 you can order even a single product. B2B clients (salons, barbershops) receive individual terms."
+            "text": "There is no minimum order for individual purchases — you can order even a single product. B2B clients (salons, barbershops) receive individual terms."
           },
           {
             "q": "What payment methods are accepted?",
             "intro": "We accept several payment methods for your convenience:",
             "list": [
-              "Bank transfer \u2014 payment by proforma invoice.",
-              "Payment card \u2014 Visa, Mastercard.",
-              "Paysera \u2014 fast and convenient payment via the electronic banking system."
+              "Bank transfer — payment by proforma invoice.",
+              "Payment card — Visa, Mastercard.",
+              "Paysera — fast and convenient payment via the electronic banking system."
             ]
           },
           {
@@ -553,16 +602,16 @@
         ]
       },
       {
-        "icon": "\ud83d\ude9a",
+        "icon": "🚚",
         "title": "About Delivery",
         "items": [
           {
             "q": "How long does delivery take?",
-            "text": "We deliver orders within 1\u20133 business days from order confirmation and payment. Delivery time may vary depending on your location and the chosen delivery method."
+            "text": "We deliver orders within 1–3 business days from order confirmation and payment. Delivery time may vary depending on your location and the chosen delivery method."
           },
           {
             "q": "How much does delivery cost?",
-            "text": "Delivery cost depends on the chosen method. For orders over \u20ac50, delivery within Lithuania is free."
+            "text": "Delivery cost depends on the chosen method. For orders over €50, delivery within Lithuania is free."
           },
           {
             "q": "Can I pick up the order?",
@@ -575,7 +624,7 @@
         ]
       },
       {
-        "icon": "\ud83d\udd04",
+        "icon": "🔄",
         "title": "About Returns",
         "items": [
           {
@@ -588,12 +637,12 @@
           },
           {
             "q": "How do I initiate a return?",
-            "text": "To return a product, contact us by email at info@dazaikirpejams.lt, stating your order number and the reason for the return. We will get back to you within 1\u20132 business days to arrange the return details."
+            "text": "To return a product, contact us by email at info@dazaikirpejams.lt, stating your order number and the reason for the return. We will get back to you within 1–2 business days to arrange the return details."
           }
         ]
       },
       {
-        "icon": "\ud83e\udd1d",
+        "icon": "🤝",
         "title": "About Collaboration",
         "items": [
           {
@@ -602,7 +651,7 @@
           },
           {
             "q": "How do I become a partner?",
-            "text": "Becoming a partner is very simple: fill in the B2B form on our website (in the \u201cFor Salons\u201d section) or contact us directly by email at info@dazaikirpejams.lt."
+            "text": "Becoming a partner is very simple: fill in the B2B form on our website (in the “For Salons” section) or contact us directly by email at info@dazaikirpejams.lt."
           },
           {
             "q": "Can I get test samples?",
@@ -659,32 +708,6 @@
     "ctaTitle": "Browse our products",
     "ctaDesc": "The numbers speak for themselves. Try Color SHOCK 180 ml dyes and feel the difference in Your work — from the very first application.",
     "ctaCta": "View products →"
-  },
-  "testimonials": {
-    "badge": "Testimonials",
-    "title": "What our clients say",
-    "subtitle": "Experience from salons already using our products",
-    "starsLabel": "5 out of 5 stars",
-    "items": [
-      {
-        "quote": "The 180 ml package is a real discovery. One package lasts twice as long as usual. The colours are rich and long-lasting.",
-        "initials": "RS",
-        "name": "Rasa S.",
-        "role": "Colourist, Kaunas"
-      },
-      {
-        "quote": "Excellent value for money. It allowed our salon to reduce dye costs by almost 40%. I recommend it to colleagues.",
-        "initials": "DK",
-        "name": "Diana K.",
-        "role": "Salon owner, Kaunas"
-      },
-      {
-        "quote": "Fast delivery, convenient ordering. The colour palette is wide — I find everything I need for daily work.",
-        "initials": "LM",
-        "name": "Laura M.",
-        "role": "Hairdresser, Klaipėda"
-      }
-    ]
   },
   "calculatorPage": {
     "metaTitle": "Price Calculator — 180 ml vs Standard Package",
