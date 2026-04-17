@@ -73,7 +73,7 @@ export function websiteSchema(lang = 'lt'): Record<string, unknown> {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${SITE_URL}/produktai?q={search_term_string}`,
+        urlTemplate: `${SITE_URL}${langPrefix(lang)}/produktai?q={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
