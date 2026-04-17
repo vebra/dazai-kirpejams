@@ -340,7 +340,7 @@ export async function createOrder(
   // `Promise.all` — abu email'us siunčiam paraleliai, kad nelaikytume
   // vartotojo laukimo ilgiau nei reikia.
   const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ||
+    process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
     'https://www.dazaikirpejams.lt'
   const createdAtIso = new Date().toISOString()
 

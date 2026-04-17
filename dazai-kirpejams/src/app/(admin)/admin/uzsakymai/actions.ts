@@ -88,7 +88,7 @@ export async function updateOrderStatusAction(
   }
 
   const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ||
+    process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
     'https://www.dazaikirpejams.lt'
 
   // Kai užsakymas pažymimas „paid" — auto-generuojam PVM sąskaitą faktūrą ir

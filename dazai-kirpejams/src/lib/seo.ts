@@ -5,8 +5,9 @@ import { locales, defaultLocale, type Locale } from '@/i18n/config'
  * Kanoninis svetainės URL. Gamybinėje aplinkoje — https://www.dazaikirpejams.lt
  * Lokaliai — http://localhost:3000
  */
-export const SITE_URL =
+export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || 'https://www.dazaikirpejams.lt'
+).trim()
 
 export const SITE_NAME = 'Dažai Kirpėjams'
 
