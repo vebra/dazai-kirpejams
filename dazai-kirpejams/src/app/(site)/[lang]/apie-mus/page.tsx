@@ -7,6 +7,8 @@ import { Container } from '@/components/ui/Container'
 import { buildPageMetadata, SITE_URL } from '@/lib/seo'
 import { langPrefix } from '@/lib/utils'
 
+export const revalidate = 300
+
 export async function generateMetadata({
   params,
 }: PageProps<'/[lang]/apie-mus'>): Promise<Metadata> {

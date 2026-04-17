@@ -6,6 +6,8 @@ import { Container } from '@/components/ui/Container'
 import { buildPageMetadata } from '@/lib/seo'
 import { CONTACT, phoneHref } from '@/lib/site'
 import { ContactForm } from './ContactForm'
+
+export const revalidate = 300
 import { langPrefix } from '@/lib/utils'
 
 export async function generateMetadata({

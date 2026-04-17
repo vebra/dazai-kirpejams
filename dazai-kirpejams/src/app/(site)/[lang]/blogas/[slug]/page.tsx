@@ -12,6 +12,8 @@ import { blogPostingSchema, breadcrumbSchema } from '@/lib/schema'
 import { CATEGORY_STYLES, type ArticleCategory } from '@/lib/data/articles'
 import { langPrefix } from '@/lib/utils'
 
+export const revalidate = 60
+
 const CATEGORY_LABELS: Record<string, string> = {
   patarimai: 'Patarimai',
   produktai: 'Produktai',

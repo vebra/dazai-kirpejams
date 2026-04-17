@@ -9,6 +9,8 @@ import { Newsletter } from '@/components/home/Newsletter'
 import { buildPageMetadata } from '@/lib/seo'
 import { langPrefix } from '@/lib/utils'
 
+export const revalidate = 60
+
 export async function generateMetadata({
   params,
 }: PageProps<'/[lang]/spalvu-palete'>): Promise<Metadata> {

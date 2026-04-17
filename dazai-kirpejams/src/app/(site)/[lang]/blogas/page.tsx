@@ -10,6 +10,8 @@ import { getBlogPosts } from '@/lib/data/queries'
 import { CATEGORY_STYLES, type ArticleCategory } from '@/lib/data/articles'
 import { langPrefix } from '@/lib/utils'
 
+export const revalidate = 60
+
 export async function generateMetadata({
   params,
 }: PageProps<'/[lang]/blogas'>): Promise<Metadata> {

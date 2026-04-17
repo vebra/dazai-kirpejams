@@ -7,6 +7,8 @@ import { Calculator } from '@/components/calculator/Calculator'
 import { buildPageMetadata } from '@/lib/seo'
 import { langPrefix } from '@/lib/utils'
 
+export const revalidate = 300
+
 export async function generateMetadata({
   params,
 }: PageProps<'/[lang]/skaiciuokle'>): Promise<Metadata> {

@@ -7,6 +7,8 @@ import { LegalContent } from '@/components/ui/LegalContent'
 import { buildPageMetadata } from '@/lib/seo'
 import { langPrefix } from '@/lib/utils'
 
+export const revalidate = 300
+
 export async function generateMetadata({
   params,
 }: PageProps<'/[lang]/pirkimo-salygos'>): Promise<Metadata> {

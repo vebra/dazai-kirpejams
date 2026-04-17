@@ -7,6 +7,8 @@ import { buildPageMetadata } from '@/lib/seo'
 import { CONTACT, phoneHref } from '@/lib/site'
 import { langPrefix } from '@/lib/utils'
 
+export const revalidate = 300
+
 export async function generateMetadata({
   params,
 }: PageProps<'/[lang]/pristatymas'>): Promise<Metadata> {
