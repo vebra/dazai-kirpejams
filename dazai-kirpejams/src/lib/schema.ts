@@ -54,14 +54,20 @@ export function organizationSchema(): Record<string, unknown> {
   }
 }
 
-export function websiteSchema(): Record<string, unknown> {
+const LOCALE_MAP: Record<string, string> = {
+  lt: 'lt',
+  en: 'en-US',
+  ru: 'ru',
+}
+
+export function websiteSchema(lang = 'lt'): Record<string, unknown> {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     '@id': `${SITE_URL}/#website`,
     url: SITE_URL,
     name: SITE_NAME,
-    inLanguage: 'lt',
+    inLanguage: LOCALE_MAP[lang] ?? lang,
     publisher: { '@id': `${SITE_URL}/#organization` },
     potentialAction: {
       '@type': 'SearchAction',
