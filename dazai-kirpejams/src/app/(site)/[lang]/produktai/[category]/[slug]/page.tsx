@@ -89,6 +89,7 @@ export default async function ProductPage({
   if (!category || category.id !== product.category_id) notFound()
 
   const dict = await getDictionary(lang)
+  const t = dict.productPage
   const [relatedProducts, verified] = await Promise.all([
     getRelatedProducts(product, 4),
     isUserVerified(),
@@ -137,7 +138,7 @@ export default async function ProductPage({
             href={`${langPrefix(lang) || '/'}`}
             className="hover:text-brand-magenta transition-colors"
           >
-            Pradžia
+            {dict.common.home}
           </Link>
           <span className="mx-2 text-[#E0E0E0]">/</span>
           <Link
@@ -221,7 +222,7 @@ export default async function ProductPage({
                   ★★★★★
                 </span>
                 <span className="text-[0.85rem] text-brand-gray-500">
-                  4.9 (27 atsiliepimai)
+                  {t.reviewCount}
                 </span>
               </div>
 
@@ -233,14 +234,12 @@ export default async function ProductPage({
                       180 ml
                     </div>
                     <div className="text-[0.82rem] text-brand-gray-500 leading-snug">
-                      2× daugiau nei standartinė
-                      <br />
-                      pakuotė
+                      {t.volumeDouble}
                     </div>
                   </div>
                   {pricePerMl && verified && (
                     <div className="text-[0.88rem] text-brand-gray-900 ml-auto">
-                      Kaina per ml:{' '}
+                      {t.pricePerMl}{' '}
                       <strong className="text-brand-magenta">
                         €{pricePerMl}
                       </strong>
@@ -262,30 +261,30 @@ export default async function ProductPage({
                   </span>
                   {savings && savings > 0 && (
                     <span className="px-3 py-1 bg-brand-magenta/10 text-brand-magenta text-[0.78rem] font-bold rounded-full">
-                      Sutaupote {formatPrice(savings, lang)}
+                      {t.youSave} {formatPrice(savings, lang)}
                     </span>
                   )}
                 </div>
               ) : (
                 <div className="mb-5 px-5 py-5 bg-brand-gray-50 rounded-xl border border-[#E0E0E0]">
                   <p className="text-[0.95rem] text-brand-gray-900 font-semibold mb-1.5">
-                    Kaina — tik profesionalams
+                    {t.priceOnlyPro}
                   </p>
                   <p className="text-[0.88rem] text-brand-gray-500 mb-4 leading-[1.5]">
-                    Prisijunkite arba užsiregistruokite, kad pamatytumėte kainas ir galėtumėte užsisakyti.
+                    {t.loginToSeePrice}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-2.5">
                     <Link
                       href={`${langPrefix(lang)}/prisijungimas`}
                       className="flex-1 flex items-center justify-center min-h-[48px] px-6 py-3 bg-brand-magenta text-white rounded-lg text-[0.95rem] font-semibold hover:bg-brand-magenta-dark transition-colors"
                     >
-                      Prisijungti
+                      {t.login}
                     </Link>
                     <Link
                       href={`${langPrefix(lang)}/registracija`}
                       className="flex-1 flex items-center justify-center min-h-[48px] px-6 py-3 border-2 border-brand-magenta text-brand-magenta rounded-lg text-[0.95rem] font-semibold hover:bg-brand-magenta hover:text-white transition-all"
                     >
-                      Registruotis
+                      {t.register}
                     </Link>
                   </div>
                 </div>
@@ -323,7 +322,7 @@ export default async function ProductPage({
                     href={`${langPrefix(lang)}/salonams`}
                     className="inline-flex items-center justify-center px-8 py-[18px] border-2 border-brand-magenta text-brand-magenta rounded-lg font-semibold hover:bg-brand-magenta hover:text-white transition-all"
                   >
-                    B2B kaina
+                    {t.b2bPrice}
                   </Link>
                 </div>
               ) : (
@@ -332,22 +331,22 @@ export default async function ProductPage({
                     href={`${langPrefix(lang)}/registracija`}
                     className="flex-1 flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.05rem] font-semibold hover:bg-brand-magenta/90 transition-colors"
                   >
-                    Registruotis kaip profesionalas
+                    {t.registerPro}
                   </Link>
                   <Link
                     href={`${langPrefix(lang)}/salonams`}
                     className="inline-flex items-center justify-center px-8 py-[18px] border-2 border-brand-magenta text-brand-magenta rounded-lg font-semibold hover:bg-brand-magenta hover:text-white transition-all"
                   >
-                    B2B kaina
+                    {t.b2bPrice}
                   </Link>
                 </div>
               )}
 
               {/* Meta */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-[#E0E0E0]">
-                <MetaItem icon="🚚" text="Pristatymas per 1–3 d.d." />
-                <MetaItem icon="📦" text="Nemokamas nuo €50" />
-                <MetaItem icon="🔄" text="Grąžinimas per 14 d." />
+                <MetaItem icon="🚚" text={t.deliveryTime} />
+                <MetaItem icon="📦" text={t.freeShipping} />
+                <MetaItem icon="🔄" text={t.returnPolicy} />
               </div>
             </div>
           </div>
@@ -360,7 +359,7 @@ export default async function ProductPage({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0]">
               <h2 className="text-[1.35rem] font-bold text-brand-gray-900 mb-4 leading-tight">
-                Aprašymas
+                {t.descriptionTitle}
               </h2>
               {description ? (
                 <p className="text-[0.95rem] text-brand-gray-500 leading-[1.7] mb-4">
@@ -369,32 +368,24 @@ export default async function ProductPage({
               ) : null}
               <ul className="space-y-2.5 text-[0.92rem] text-brand-gray-500 leading-[1.6]">
                 <li>
-                  <strong className="text-brand-gray-900">180 ml talpa</strong>{' '}
-                  — dvigubai daugiau nei standartinė pakuotė
+                  <strong className="text-brand-gray-900">{t.feat180ml}</strong>{' '}
+                  — {t.feat180mlDesc}
                 </li>
                 <li>
-                  <strong className="text-brand-gray-900">
-                    Argan &amp; Jojoba aliejus
-                  </strong>{' '}
-                  — maitina ir apsaugo plaukus
+                  <strong className="text-brand-gray-900">{t.featArgan}</strong>{' '}
+                  — {t.featArganDesc}
                 </li>
                 <li>
-                  <strong className="text-brand-gray-900">
-                    Rožių ekstraktas
-                  </strong>{' '}
-                  — suteikia blizgesio
+                  <strong className="text-brand-gray-900">{t.featRose}</strong>{' '}
+                  — {t.featRoseDesc}
                 </li>
                 <li>
-                  <strong className="text-brand-gray-900">
-                    100% pilkų plaukų padengimas
-                  </strong>{' '}
-                  — patikimas rezultatas
+                  <strong className="text-brand-gray-900">{t.featGray}</strong>{' '}
+                  — {t.featGrayDesc}
                 </li>
                 <li>
-                  <strong className="text-brand-gray-900">
-                    Ilgai išliekanti spalva
-                  </strong>{' '}
-                  — iki 6–8 savaičių
+                  <strong className="text-brand-gray-900">{t.featColor}</strong>{' '}
+                  — {t.featColorDesc}
                 </li>
               </ul>
             </div>
@@ -402,7 +393,7 @@ export default async function ProductPage({
             {usage && (
               <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0]">
                 <h2 className="text-[1.35rem] font-bold text-brand-gray-900 mb-4 leading-tight">
-                  Naudojimo instrukcija
+                  {t.usageTitle}
                 </h2>
                 <p className="text-[0.95rem] text-brand-gray-500 leading-[1.7] whitespace-pre-line">
                   {usage}
@@ -413,7 +404,7 @@ export default async function ProductPage({
             {ingredients && (
               <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0] lg:col-span-2">
                 <h2 className="text-[1.35rem] font-bold text-brand-gray-900 mb-4 leading-tight">
-                  Sudėtis
+                  {t.ingredientsTitle}
                 </h2>
                 <p className="text-[0.85rem] text-brand-gray-500 leading-[1.7]">
                   {ingredients}
@@ -423,23 +414,23 @@ export default async function ProductPage({
 
             <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0] lg:col-span-2">
               <h2 className="text-[1.35rem] font-bold text-brand-gray-900 mb-4 leading-tight">
-                Papildoma informacija
+                {t.additionalInfo}
               </h2>
               <table className="w-full text-[0.92rem]">
                 <tbody>
                   {[
                     [
-                      'Prekės ženklas',
+                      t.brand,
                       'Color SHOCK / RosaNera Cosmetics',
                     ],
                     [
-                      'Talpa',
+                      t.volume,
                       product.volume_ml ? `${product.volume_ml} ml` : '—',
                     ],
-                    ['Tipas', 'Kreminiai plaukų dažai'],
-                    ['Maišymo santykis', '1+2'],
-                    ['Galiojimo laikas', '36 mėnesiai (neatidaryta)'],
-                    ['Kilmės šalis', 'Italija'],
+                    [t.type, t.typeValue],
+                    [t.mixingRatio, '1+2'],
+                    [t.shelfLife, t.shelfLifeValue],
+                    [t.countryOfOrigin, t.countryValue],
                   ].map(([label, value]) => (
                     <tr
                       key={label}
@@ -466,10 +457,10 @@ export default async function ProductPage({
           <Container>
             <div className="text-center max-w-[720px] mx-auto mb-10">
               <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-                Rekomenduojama kartu
+                {t.relatedBadge}
               </span>
               <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 leading-tight">
-                Tinka prie šio produkto
+                {t.relatedTitle}
               </h2>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 lg:gap-6">
@@ -493,17 +484,16 @@ export default async function ProductPage({
         <Container>
           <div className="bg-brand-gray-900 text-white rounded-2xl p-10 lg:p-14 text-center">
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-white mb-4 leading-tight">
-              Dirbate salone? Gaukite specialų pasiūlymą
+              {t.ctaTitle}
             </h2>
             <p className="text-[1.05rem] text-white/75 mb-8 max-w-[600px] mx-auto leading-[1.7]">
-              Individualios kainos, reguliarus tiekimas ir asmeninis
-              vadybininkas.
+              {t.ctaDesc}
             </p>
             <Link
               href={`${langPrefix(lang)}/salonams`}
               className="inline-flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
             >
-              Gauti pasiūlymą →
+              {t.ctaPrimary}
             </Link>
           </div>
         </Container>
