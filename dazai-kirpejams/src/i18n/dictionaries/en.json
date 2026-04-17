@@ -726,6 +726,17 @@
     "b2bTitle": "Salon terms",
     "b2bDesc": "Individual B2B offers"
   },
+  "productsPage": {
+    "badge": "Catalogue",
+    "title": "Professional hair dyes & salon supplies",
+    "subtitle": "Color SHOCK and RosaNera Cosmetics — everything you need for daily salon work. Hair dyes, oxidants, shampoos and accessories in one place.",
+    "allCategories": "All categories",
+    "ctaBadge": "For professionals",
+    "ctaTitle": "Need a custom offer?",
+    "ctaDesc": "We offer special pricing and regular supply for salons and loyal customers.",
+    "ctaPrimary": "Get a salon offer",
+    "ctaSecondary": "Contact us"
+  },
   "categoryPage": {
     "dyeTitle": "Hair Dyes — Color SHOCK",
     "dyeDesc": "Professional cream hair dyes with Argan & Jojoba oils and rose extract.",

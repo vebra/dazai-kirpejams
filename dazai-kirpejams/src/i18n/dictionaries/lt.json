@@ -726,6 +726,17 @@
     "b2bTitle": "Sąlygos salonams",
     "b2bDesc": "Individualūs B2B pasiūlymai"
   },
+  "productsPage": {
+    "badge": "Katalogas",
+    "title": "Profesionalūs plaukų dažai ir priemonės",
+    "subtitle": "Color SHOCK ir RosaNera Cosmetics — viskas, ko reikia kasdieniam darbui salone. Plaukų dažai, oksidantai, šampūnai ir pagalbinės priemonės vienoje vietoje.",
+    "allCategories": "Visos kategorijos",
+    "ctaBadge": "Profesionalams",
+    "ctaTitle": "Reikia individualaus pasiūlymo?",
+    "ctaDesc": "Salonams ir nuolatiniams klientams siūlome specialias kainas ir reguliarų tiekimą.",
+    "ctaPrimary": "Gauti pasiūlymą salonui",
+    "ctaSecondary": "Susisiekti"
+  },
   "categoryPage": {
     "dyeTitle": "Plaukų dažai — Color SHOCK",
     "dyeDesc": "Profesionalūs kreminiai plaukų dažai su Argan & Jojoba aliejumi ir rožių ekstraktu.",
