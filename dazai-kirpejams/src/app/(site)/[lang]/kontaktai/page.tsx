@@ -3,7 +3,9 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
-import { buildPageMetadata } from '@/lib/seo'
+import { buildPageMetadata, SITE_URL } from '@/lib/seo'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { breadcrumbSchema } from '@/lib/schema'
 import { CONTACT, phoneHref } from '@/lib/site'
 import { ContactForm } from './ContactForm'
 
@@ -38,6 +40,10 @@ export default async function ContactPage({
 
   return (
     <>
+      <JsonLd data={breadcrumbSchema([
+        { name: c.home, url: `${SITE_URL}/${lang}` },
+        { name: t.badge, url: `${SITE_URL}/${lang}/kontaktai` },
+      ])} />
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>

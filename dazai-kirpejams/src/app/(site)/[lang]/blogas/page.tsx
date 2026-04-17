@@ -5,7 +5,9 @@ import { notFound } from 'next/navigation'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { Newsletter } from '@/components/home/Newsletter'
-import { buildPageMetadata } from '@/lib/seo'
+import { buildPageMetadata, SITE_URL } from '@/lib/seo'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { breadcrumbSchema } from '@/lib/schema'
 import { getBlogPosts } from '@/lib/data/queries'
 import { CATEGORY_STYLES, type ArticleCategory } from '@/lib/data/articles'
 import { langPrefix } from '@/lib/utils'
@@ -40,6 +42,10 @@ export default async function BlogPage({
 
   return (
     <>
+      <JsonLd data={breadcrumbSchema([
+        { name: c.home, url: `${SITE_URL}/${lang}` },
+        { name: t.breadcrumb, url: `${SITE_URL}/${lang}/blogas` },
+      ])} />
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>

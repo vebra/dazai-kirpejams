@@ -14,8 +14,8 @@ import { ProductCard } from '@/components/products/ProductCard'
 import { isUserVerified } from '@/lib/auth/verification'
 import { CategoryFiltersBar } from '@/components/products/CategoryFiltersBar'
 import { JsonLd } from '@/components/seo/JsonLd'
-import { itemListSchema } from '@/lib/schema'
-import { buildCanonicalUrl, buildLanguageAlternates } from '@/lib/seo'
+import { itemListSchema, breadcrumbSchema } from '@/lib/schema'
+import { buildCanonicalUrl, buildLanguageAlternates, SITE_URL } from '@/lib/seo'
 import { locales } from '@/i18n/config'
 import { langPrefix } from '@/lib/utils'
 import {
@@ -144,6 +144,11 @@ export default async function CategoryPage({
   return (
     <>
       <JsonLd data={listJsonLd} />
+      <JsonLd data={breadcrumbSchema([
+        { name: dict.common.home, url: `${SITE_URL}/${lang}` },
+        { name: dict.nav.products, url: `${SITE_URL}/${lang}/produktai` },
+        { name: categoryName, url: `${SITE_URL}/${lang}/produktai/${categorySlug}` },
+      ])} />
 
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">

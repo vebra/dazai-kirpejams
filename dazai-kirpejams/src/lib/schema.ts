@@ -6,6 +6,7 @@ import {
   getCategoryName,
 } from '@/lib/types'
 import { SITE_URL, SITE_NAME } from '@/lib/seo'
+import { CONTACT, COMPANY, SOCIAL } from '@/lib/site'
 import { langPrefix } from '@/lib/utils'
 
 /**
@@ -30,20 +31,24 @@ export function organizationSchema(): Record<string, unknown> {
     },
     description:
       'Profesionalūs plaukų dažai kirpėjams ir koloristams. Didesnė 180 ml talpa — daugiau vertės darbui salone.',
+    legalName: COMPANY.legalName,
+    taxID: COMPANY.code,
     address: {
       '@type': 'PostalAddress',
-      addressLocality: 'Kaunas',
-      addressCountry: 'LT',
+      streetAddress: CONTACT.street,
+      addressLocality: CONTACT.city,
+      postalCode: CONTACT.postalCode,
+      addressCountry: CONTACT.country,
     },
     sameAs: [
-      // Pridėkite savo socialinių tinklų URL čia:
-      // 'https://www.instagram.com/dazaikirpejams',
-      // 'https://www.facebook.com/dazaikirpejams',
+      SOCIAL.facebook,
+      SOCIAL.instagram,
     ],
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer service',
-      email: 'info@dazaikirpejams.lt',
+      telephone: CONTACT.phone,
+      email: CONTACT.email,
       availableLanguage: ['Lithuanian', 'English', 'Russian'],
     },
   }

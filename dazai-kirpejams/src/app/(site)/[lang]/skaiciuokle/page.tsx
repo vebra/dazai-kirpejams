@@ -4,7 +4,9 @@ import { notFound } from 'next/navigation'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { Calculator } from '@/components/calculator/Calculator'
-import { buildPageMetadata } from '@/lib/seo'
+import { buildPageMetadata, SITE_URL } from '@/lib/seo'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { breadcrumbSchema } from '@/lib/schema'
 import { langPrefix } from '@/lib/utils'
 
 export const revalidate = 300
@@ -36,6 +38,10 @@ export default async function CalculatorPage({
 
   return (
     <>
+      <JsonLd data={breadcrumbSchema([
+        { name: c.home, url: `${SITE_URL}/${lang}` },
+        { name: t.breadcrumb, url: `${SITE_URL}/${lang}/skaiciuokle` },
+      ])} />
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>
