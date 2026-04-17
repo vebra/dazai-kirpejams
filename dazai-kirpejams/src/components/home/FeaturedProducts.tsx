@@ -57,7 +57,6 @@ export async function FeaturedProducts({ lang, dict }: FeaturedProductsProps) {
                 lang={lang}
                 categorySlug={categorySlug}
                 dict={dict}
-                isVerified
               />
             )
           })}

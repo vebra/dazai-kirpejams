@@ -1,8 +1,11 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { getProductName, type Product } from '@/lib/types'
 import { formatPrice, langPrefix } from '@/lib/utils'
 import type { Locale } from '@/i18n/config'
+import { useIsVerified } from '@/components/auth/VerificationProvider'
 import { AddToCartButton } from '@/components/commerce/AddToCartButton'
 
 type ProductCardProps = {
@@ -11,8 +14,6 @@ type ProductCardProps = {
   categorySlug: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict: any
-  /** When false, price and cart button are hidden — user must be a verified professional */
-  isVerified?: boolean
   /** Eager-load image (above-the-fold cards) */
   priority?: boolean
 }
@@ -22,9 +23,9 @@ export function ProductCard({
   lang,
   categorySlug,
   dict,
-  isVerified = false,
   priority = false,
 }: ProductCardProps) {
+  const isVerified = useIsVerified()
   const name = getProductName(product, lang)
   const href = `${langPrefix(lang)}/produktai/${categorySlug}/${product.slug}`
   const primaryImage = product.image_urls?.[0]

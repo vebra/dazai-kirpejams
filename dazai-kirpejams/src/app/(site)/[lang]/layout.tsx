@@ -7,8 +7,14 @@ import { locales } from '@/i18n/config'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
+import { VerificationProvider } from '@/components/auth/VerificationProvider'
 import { JsonLd } from '@/components/seo/JsonLd'
-import { organizationSchema, websiteSchema } from '@/lib/schema'
+import {
+  organizationSchema,
+  websiteSchema,
+  shippingDetailsSchema,
+  returnPolicySchema,
+} from '@/lib/schema'
 import {
   SITE_URL,
   buildCanonicalUrl,
@@ -112,9 +118,13 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col antialiased overflow-x-hidden">
         <JsonLd data={organizationSchema()} />
         <JsonLd data={websiteSchema(lang)} />
-        <Header lang={lang} dict={dict} />
-        <main className="flex-1 pt-[72px] lg:pt-[100px]">{children}</main>
-        <Footer lang={lang} dict={dict} />
+        <JsonLd data={shippingDetailsSchema()} />
+        <JsonLd data={returnPolicySchema()} />
+        <VerificationProvider>
+          <Header lang={lang} dict={dict} />
+          <main className="flex-1 pt-[72px] lg:pt-[100px]">{children}</main>
+          <Footer lang={lang} dict={dict} />
+        </VerificationProvider>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-DS608JQ7CV"
           strategy="afterInteractive"

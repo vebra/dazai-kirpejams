@@ -63,6 +63,7 @@ export function localBusinessSchema(): Record<string, unknown> {
     url: SITE_URL,
     telephone: CONTACT.phone,
     email: CONTACT.email,
+    parentOrganization: { '@id': `${SITE_URL}/#organization` },
     address: {
       '@type': 'PostalAddress',
       streetAddress: CONTACT.street,
@@ -164,10 +165,13 @@ export function productSchema(
       priceCurrency: 'EUR',
       price: priceEur,
       priceValidUntil: `${new Date().getFullYear()}-12-31`,
+      itemCondition: 'https://schema.org/NewCondition',
       availability: product.is_in_stock
         ? 'https://schema.org/InStock'
         : 'https://schema.org/OutOfStock',
       seller: { '@id': `${SITE_URL}/#organization` },
+      shippingDetails: { '@id': `${SITE_URL}/#shipping` },
+      hasMerchantReturnPolicy: { '@id': `${SITE_URL}/#return-policy` },
     },
   }
 }
@@ -227,6 +231,74 @@ export function blogPostingSchema({
       '@type': 'WebPage',
       '@id': url,
     },
+  }
+}
+
+/**
+ * OfferShippingDetails — nurodoma Product Offer'e per @id nuorodą.
+ * Google naudoja merchant rich results generavimui.
+ */
+export function shippingDetailsSchema(): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'OfferShippingDetails',
+    '@id': `${SITE_URL}/#shipping`,
+    shippingRate: {
+      '@type': 'MonetaryAmount',
+      value: '0',
+      currency: 'EUR',
+    },
+    shippingDestination: {
+      '@type': 'DefinedRegion',
+      addressCountry: 'LT',
+    },
+    deliveryTime: {
+      '@type': 'ShippingDeliveryTime',
+      handlingTime: {
+        '@type': 'QuantitativeValue',
+        minValue: 0,
+        maxValue: 1,
+        unitCode: 'DAY',
+      },
+      transitTime: {
+        '@type': 'QuantitativeValue',
+        minValue: 1,
+        maxValue: 3,
+        unitCode: 'DAY',
+      },
+    },
+  }
+}
+
+/**
+ * MerchantReturnPolicy — nurodoma Product Offer'e per @id nuorodą.
+ */
+export function returnPolicySchema(): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'MerchantReturnPolicy',
+    '@id': `${SITE_URL}/#return-policy`,
+    applicableCountry: 'LT',
+    returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+    merchantReturnDays: 14,
+    returnMethod: 'https://schema.org/ReturnByMail',
+    returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+  }
+}
+
+/**
+ * WebPage schema — naudojama pagrindiniame puslapyje.
+ */
+export function webPageSchema(lang = 'lt'): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    '@id': `${SITE_URL}${langPrefix(lang) || '/'}#webpage`,
+    url: `${SITE_URL}${langPrefix(lang) || '/'}`,
+    name: SITE_NAME,
+    isPartOf: { '@id': `${SITE_URL}/#website` },
+    about: { '@id': `${SITE_URL}/#organization` },
+    inLanguage: LOCALE_MAP[lang] ?? lang,
   }
 }
 

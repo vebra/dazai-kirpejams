@@ -2,6 +2,9 @@ export const revalidate = 60
 
 import { notFound } from 'next/navigation'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
+import { JsonLd } from '@/components/seo/JsonLd'
+import { breadcrumbSchema, webPageSchema } from '@/lib/schema'
+import { buildCanonicalUrl } from '@/lib/seo'
 import { Hero } from '@/components/home/Hero'
 import { TrustBar } from '@/components/home/TrustBar'
 import { Advantages } from '@/components/home/Advantages'
@@ -22,6 +25,10 @@ export default async function HomePage({ params }: PageProps<'/[lang]'>) {
 
   return (
     <>
+      <JsonLd data={webPageSchema(lang)} />
+      <JsonLd data={breadcrumbSchema([
+        { name: dict.common.home, url: buildCanonicalUrl(lang, '/') },
+      ])} />
       <Hero lang={lang} dict={dict} />
       <TrustBar dict={dict} />
       <Advantages dict={dict} />

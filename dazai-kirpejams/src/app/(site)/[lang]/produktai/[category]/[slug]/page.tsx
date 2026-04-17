@@ -21,7 +21,7 @@ import {
 import { formatPrice, langPrefix } from '@/lib/utils'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
-import { AddToCartButton } from '@/components/commerce/AddToCartButton'
+import { ProductPriceBlock } from '@/components/products/ProductPriceBlock'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { productSchema, breadcrumbSchema } from '@/lib/schema'
 import { buildCanonicalUrl, buildLanguageAlternates, SITE_URL } from '@/lib/seo'
@@ -92,7 +92,7 @@ export default async function ProductPage({
   const dict = await getDictionary(lang)
   const t = dict.productPage
   const relatedProducts = await getRelatedProducts(product, 4)
-  const verified = true
+  // Verifikacija tikrinama kliento pusėje per VerificationProvider kontekstą
 
   const name = getProductName(product, lang)
   const description = getProductDescription(product, lang)
@@ -215,120 +215,46 @@ export default async function ProductPage({
                 {name}
               </h1>
 
-              {/* 180 ml badge row */}
-              {product.volume_ml === 180 && (
-                <div className="flex flex-wrap items-center gap-4 mb-6 p-4 bg-brand-gray-50 rounded-xl border border-[#E0E0E0]">
-                  <div className="flex items-center gap-3">
-                    <div className="px-3 py-1.5 bg-brand-magenta text-white text-[0.85rem] font-bold rounded-lg">
-                      180 ml
-                    </div>
-                    <div className="text-[0.82rem] text-brand-gray-500 leading-snug">
-                      {t.volumeDouble}
-                    </div>
-                  </div>
-                  {pricePerMl && verified && (
-                    <div className="text-[0.88rem] text-brand-gray-900 ml-auto">
-                      {t.pricePerMl}{' '}
-                      <strong className="text-brand-magenta">
-                        €{pricePerMl}
-                      </strong>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Price */}
-              {verified ? (
-                <div className="flex items-baseline flex-wrap gap-3 mb-5">
-                  {comparePrice && (
-                    <span className="text-[1.1rem] text-brand-gray-500 line-through">
-                      {formatPrice(comparePrice, lang)}
-                    </span>
-                  )}
-                  <span className="text-[2.25rem] font-extrabold text-brand-magenta leading-none">
-                    {formatPrice(price, lang)}
-                  </span>
-                  {savings && savings > 0 && (
-                    <span className="px-3 py-1 bg-brand-magenta/10 text-brand-magenta text-[0.78rem] font-bold rounded-full">
-                      {t.youSave} {formatPrice(savings, lang)}
-                    </span>
-                  )}
-                </div>
-              ) : (
-                <div className="mb-5 px-5 py-5 bg-brand-gray-50 rounded-xl border border-[#E0E0E0]">
-                  <p className="text-[0.95rem] text-brand-gray-900 font-semibold mb-1.5">
-                    {t.priceOnlyPro}
-                  </p>
-                  <p className="text-[0.88rem] text-brand-gray-500 mb-4 leading-[1.5]">
-                    {t.loginToSeePrice}
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-2.5">
-                    <Link
-                      href={`${langPrefix(lang)}/prisijungimas`}
-                      className="flex-1 flex items-center justify-center min-h-[48px] px-6 py-3 bg-brand-magenta text-white rounded-lg text-[0.95rem] font-semibold hover:bg-brand-magenta-dark transition-colors"
-                    >
-                      {t.login}
-                    </Link>
-                    <Link
-                      href={`${langPrefix(lang)}/registracija`}
-                      className="flex-1 flex items-center justify-center min-h-[48px] px-6 py-3 border-2 border-brand-magenta text-brand-magenta rounded-lg text-[0.95rem] font-semibold hover:bg-brand-magenta hover:text-white transition-all"
-                    >
-                      {t.register}
-                    </Link>
-                  </div>
-                </div>
-              )}
+              <ProductPriceBlock
+                lang={lang}
+                langPrefixStr={langPrefix(lang)}
+                price={price}
+                comparePrice={comparePrice}
+                savings={savings}
+                pricePerMl={pricePerMl}
+                volumeMl={product.volume_ml}
+                cartItem={{
+                  productId: product.id,
+                  slug: product.slug,
+                  categorySlug,
+                  sku: product.sku,
+                  name,
+                  priceCents: product.price_cents,
+                  volumeMl: product.volume_ml,
+                  imageUrl: images[0] ?? null,
+                  colorHex: product.color_hex,
+                  colorNumber: product.color_number,
+                }}
+                labels={{
+                  volumeDouble: t.volumeDouble,
+                  pricePerMl: t.pricePerMl,
+                  priceOnlyPro: t.priceOnlyPro,
+                  loginToSeePrice: t.loginToSeePrice,
+                  login: t.login,
+                  register: t.register,
+                  registerPro: t.registerPro,
+                  b2bPrice: t.b2bPrice,
+                  addToCart: dict.popular.addToCart,
+                  addedToCart: dict.popular.added ?? 'Pridėta į krepšelį',
+                  youSave: t.youSave,
+                }}
+              />
 
               {/* Description */}
               {description && (
                 <p className="text-[0.95rem] text-brand-gray-500 leading-[1.7] mb-7">
                   {description}
                 </p>
-              )}
-
-              {/* CTA */}
-              {verified ? (
-                <div className="flex flex-col sm:flex-row gap-3 mb-8">
-                  <AddToCartButton
-                    variant="large"
-                    className="flex-1 !px-10 !py-[18px] !rounded-lg !text-[1.05rem]"
-                    label={dict.popular.addToCart}
-                    labelAdded={dict.popular.added ?? 'Pridėta į krepšelį'}
-                    item={{
-                      productId: product.id,
-                      slug: product.slug,
-                      categorySlug,
-                      sku: product.sku,
-                      name,
-                      priceCents: product.price_cents,
-                      volumeMl: product.volume_ml,
-                      imageUrl: images[0] ?? null,
-                      colorHex: product.color_hex,
-                      colorNumber: product.color_number,
-                    }}
-                  />
-                  <Link
-                    href={`${langPrefix(lang)}/salonams`}
-                    className="inline-flex items-center justify-center px-8 py-[18px] border-2 border-brand-magenta text-brand-magenta rounded-lg font-semibold hover:bg-brand-magenta hover:text-white transition-all"
-                  >
-                    {t.b2bPrice}
-                  </Link>
-                </div>
-              ) : (
-                <div className="flex flex-col sm:flex-row gap-3 mb-8">
-                  <Link
-                    href={`${langPrefix(lang)}/registracija`}
-                    className="flex-1 flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.05rem] font-semibold hover:bg-brand-magenta/90 transition-colors"
-                  >
-                    {t.registerPro}
-                  </Link>
-                  <Link
-                    href={`${langPrefix(lang)}/salonams`}
-                    className="inline-flex items-center justify-center px-8 py-[18px] border-2 border-brand-magenta text-brand-magenta rounded-lg font-semibold hover:bg-brand-magenta hover:text-white transition-all"
-                  >
-                    {t.b2bPrice}
-                  </Link>
-                </div>
               )}
 
               {/* Meta */}
@@ -460,7 +386,6 @@ export default async function ProductPage({
                   lang={lang}
                   categorySlug={categorySlug}
                   dict={dict}
-                  isVerified={verified}
                 />
               ))}
             </div>

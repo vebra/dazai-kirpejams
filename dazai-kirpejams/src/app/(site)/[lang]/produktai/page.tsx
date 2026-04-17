@@ -116,7 +116,6 @@ export default async function ProductsPage({
                   product.category_id
                 )}
                 dict={dict}
-                isVerified
                 priority={i < 4}
               />
             ))}
