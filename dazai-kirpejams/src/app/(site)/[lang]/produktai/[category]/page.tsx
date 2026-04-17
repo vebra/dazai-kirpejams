@@ -182,7 +182,7 @@ export default async function CategoryPage({
           <h1 className="text-[clamp(1.5rem,4vw,2.5rem)] font-bold text-brand-gray-900 mb-2 lg:mb-3 leading-tight">
             {isDazai ? dict.categoryPage.dyeTitle : categoryName}
           </h1>
-          <p className="hidden lg:block max-w-[650px] text-brand-gray-500 leading-[1.7] mb-6">
+          <p className="max-w-[650px] text-brand-gray-500 text-[0.9rem] lg:text-base leading-[1.7] mb-6">
             {isDazai ? (
               <>
                 {dict.categoryPage.dyeDesc}{' '}
