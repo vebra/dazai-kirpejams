@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { hasLocale } from '@/i18n/dictionaries'
+import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { Newsletter } from '@/components/home/Newsletter'
 import { buildPageMetadata, SITE_URL } from '@/lib/seo'
@@ -13,12 +13,6 @@ import { CATEGORY_STYLES, type ArticleCategory } from '@/lib/data/articles'
 import { langPrefix } from '@/lib/utils'
 
 export const revalidate = 60
-
-const CATEGORY_LABELS: Record<string, string> = {
-  patarimai: 'Patarimai',
-  produktai: 'Produktai',
-  tendencijos: 'Tendencijos',
-}
 
 export async function generateMetadata({
   params,
@@ -43,8 +37,14 @@ export default async function ArticlePage({
   const { lang, slug } = await params
   if (!hasLocale(lang)) notFound()
 
-  const post = await getBlogPostBySlug(slug, lang)
+  const [post, dict] = await Promise.all([
+    getBlogPostBySlug(slug, lang),
+    getDictionary(lang),
+  ])
   if (!post) notFound()
+
+  const t = dict.blogPost
+  const catLabels = dict.blogPage.categoryLabels as Record<string, string>
 
   // Related: other posts from same category, then any other
   const allPosts = await getBlogPosts(lang)
@@ -76,8 +76,8 @@ export default async function ArticlePage({
       />
       <JsonLd
         data={breadcrumbSchema([
-          { name: 'Pradžia', url: `${SITE_URL}/${lang}` },
-          { name: 'Blogas', url: `${SITE_URL}/${lang}/blogas` },
+          { name: dict.common.home, url: `${SITE_URL}/${lang}` },
+          { name: dict.blogPage.breadcrumb, url: `${SITE_URL}/${lang}/blogas` },
           { name: post.title, url: postUrl },
         ])}
       />
@@ -89,14 +89,14 @@ export default async function ArticlePage({
             href={`${langPrefix(lang) || '/'}`}
             className="hover:text-brand-magenta transition-colors"
           >
-            Pradžia
+            {dict.common.home}
           </Link>
           <span className="mx-2 text-[#E0E0E0]">/</span>
           <Link
             href={`${langPrefix(lang)}/blogas`}
             className="hover:text-brand-magenta transition-colors"
           >
-            Blogas
+            {dict.blogPage.breadcrumb}
           </Link>
           <span className="mx-2 text-[#E0E0E0]">/</span>
           <span className="text-brand-gray-900 font-medium">{post.title}</span>
@@ -114,7 +114,7 @@ export default async function ArticlePage({
                   'bg-brand-gray-50 text-brand-gray-500'
                 }`}
               >
-                {CATEGORY_LABELS[post.category] ?? post.category}
+                {catLabels[post.category] ?? post.category}
               </span>
             )}
             <h1 className="text-[clamp(1.85rem,4.5vw,2.85rem)] font-bold text-brand-gray-900 mb-5 leading-[1.2]">
@@ -179,7 +179,7 @@ export default async function ArticlePage({
               />
             ) : (
               <p className="text-brand-gray-500">
-                Turinys ruošiamas...
+                {t.contentPending}
               </p>
             )}
           </div>
@@ -192,7 +192,7 @@ export default async function ArticlePage({
           <Container>
             <div className="max-w-[1100px] mx-auto">
               <h2 className="text-[clamp(1.4rem,3vw,2rem)] font-bold text-brand-gray-900 mb-8 text-center">
-                Kiti straipsniai
+                {t.relatedTitle}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {related.map((rel) => (
@@ -208,7 +208,7 @@ export default async function ArticlePage({
                           'bg-brand-gray-50 text-brand-gray-500'
                         }`}
                       >
-                        {CATEGORY_LABELS[rel.category] ?? rel.category}
+                        {catLabels[rel.category] ?? rel.category}
                       </span>
                     )}
                     <h3 className="text-[1.1rem] font-bold text-brand-gray-900 mb-3 leading-snug group-hover:text-brand-magenta transition-colors">
@@ -218,7 +218,7 @@ export default async function ArticlePage({
                       {rel.excerpt}
                     </p>
                     <span className="text-[0.85rem] font-semibold text-brand-magenta group-hover:translate-x-1 inline-block transition-transform">
-                      Skaityti daugiau →
+                      {t.readMore}
                     </span>
                   </Link>
                 ))}
@@ -232,20 +232,19 @@ export default async function ArticlePage({
       <section className="py-20 bg-brand-gray-900 text-white text-center">
         <Container>
           <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-white/60 mb-3">
-            Profesionalūs produktai
+            {t.ctaBadge}
           </span>
           <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-white mb-4 leading-tight">
-            Peržiūrėkite mūsų produktus
+            {t.ctaTitle}
           </h2>
           <p className="text-[1.05rem] text-white/75 mb-9 max-w-[620px] mx-auto leading-[1.7]">
-            Skaičiai kalba patys už save. Išbandykite Color SHOCK 180 ml dažus
-            ir įvertinkite skirtumą savo darbe — nuo pirmo dažymo.
+            {t.ctaDesc}
           </p>
           <Link
             href={`${langPrefix(lang)}/produktai`}
             className="inline-flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
           >
-            Peržiūrėti produktus →
+            {t.ctaCta}
           </Link>
         </Container>
       </section>

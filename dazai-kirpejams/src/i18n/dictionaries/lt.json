@@ -648,6 +648,41 @@
       "tendencijos": "Tendencijos"
     }
   },
+  "blogPost": {
+    "contentPending": "Turinys ruošiamas...",
+    "relatedTitle": "Kiti straipsniai",
+    "readMore": "Skaityti daugiau →",
+    "ctaBadge": "Profesionalūs produktai",
+    "ctaTitle": "Peržiūrėkite mūsų produktus",
+    "ctaDesc": "Skaičiai kalba patys už save. Išbandykite Color SHOCK 180 ml dažus ir įvertinkite skirtumą savo darbe — nuo pirmo dažymo.",
+    "ctaCta": "Peržiūrėti produktus →"
+  },
+  "testimonials": {
+    "badge": "Atsiliepimai",
+    "title": "Ką sako mūsų klientai",
+    "subtitle": "Patirtis iš salonų, kurie jau naudoja mūsų produktus",
+    "starsLabel": "5 iš 5 žvaigždučių",
+    "items": [
+      {
+        "quote": "180 ml pakuotė — tikras atradimas. Vienos pakuotės pakanka dvigubai ilgiau nei įprasta. Spalvos sodrūs ir ilgai išlieka.",
+        "initials": "RS",
+        "name": "Rasa S.",
+        "role": "Koloristė, Kaunas"
+      },
+      {
+        "quote": "Puikus kainos ir kokybės santykis. Mūsų salonui tai leido sumažinti dažų sąnaudas beveik 40%. Rekomenduoju kolegoms.",
+        "initials": "DK",
+        "name": "Diana K.",
+        "role": "Salono savininkė, Kaunas"
+      },
+      {
+        "quote": "Greitas pristatymas, patogus užsakymas. Spalvų paletė plati — randu viską, ko reikia kasdieniam darbui.",
+        "initials": "LM",
+        "name": "Laura M.",
+        "role": "Kirpėja, Klaipėda"
+      }
+    ]
+  },
   "calculatorPage": {
     "metaTitle": "Kainų skaičiuoklė — 180 ml vs standartinė pakuotė",
     "metaDesc": "Suskaičiuokite, kiek Jūsų salonas sutaupo rinkdamasis Color SHOCK 180 ml pakuotę vietoj standartinės. Įveskite savo duomenis ir pamatykite realų skirtumą.",

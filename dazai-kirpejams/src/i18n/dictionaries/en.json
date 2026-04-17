@@ -648,6 +648,41 @@
       "tendencijos": "Trends"
     }
   },
+  "blogPost": {
+    "contentPending": "Content is being prepared...",
+    "relatedTitle": "More articles",
+    "readMore": "Read more →",
+    "ctaBadge": "Professional products",
+    "ctaTitle": "Browse our products",
+    "ctaDesc": "The numbers speak for themselves. Try Color SHOCK 180 ml dyes and feel the difference in Your work — from the very first application.",
+    "ctaCta": "View products →"
+  },
+  "testimonials": {
+    "badge": "Testimonials",
+    "title": "What our clients say",
+    "subtitle": "Experience from salons already using our products",
+    "starsLabel": "5 out of 5 stars",
+    "items": [
+      {
+        "quote": "The 180 ml package is a real discovery. One package lasts twice as long as usual. The colours are rich and long-lasting.",
+        "initials": "RS",
+        "name": "Rasa S.",
+        "role": "Colourist, Kaunas"
+      },
+      {
+        "quote": "Excellent value for money. It allowed our salon to reduce dye costs by almost 40%. I recommend it to colleagues.",
+        "initials": "DK",
+        "name": "Diana K.",
+        "role": "Salon owner, Kaunas"
+      },
+      {
+        "quote": "Fast delivery, convenient ordering. The colour palette is wide — I find everything I need for daily work.",
+        "initials": "LM",
+        "name": "Laura M.",
+        "role": "Hairdresser, Klaipėda"
+      }
+    ]
+  },
   "calculatorPage": {
     "metaTitle": "Price Calculator — 180 ml vs Standard Package",
     "metaDesc": "Calculate how much Your salon saves by choosing the Color SHOCK 180 ml package instead of the standard one. Enter Your data and see the real difference.",
