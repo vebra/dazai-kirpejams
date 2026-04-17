@@ -827,6 +827,8 @@
     "ctaTitle": "Dirbate salone? Gaukite specialų pasiūlymą",
     "ctaDesc": "Individualios kainos, reguliarus tiekimas ir asmeninis vadybininkas.",
     "ctaPrimary": "Gauti pasiūlymą →",
-    "ctaSecondary": "Susisiekti"
+    "ctaSecondary": "Susisiekti",
+    "showMore": "Rodyti daugiau",
+    "showingOf": "Rodoma {visible} iš {total}"
   }
 }

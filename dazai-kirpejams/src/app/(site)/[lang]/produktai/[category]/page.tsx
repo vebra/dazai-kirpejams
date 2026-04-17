@@ -14,6 +14,7 @@ import type { Product } from '@/lib/types'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
 import { CategoryFiltersBar } from '@/components/products/CategoryFiltersBar'
+import { ShowMoreGrid } from '@/components/products/ShowMoreGrid'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { itemListSchema, breadcrumbSchema } from '@/lib/schema'
 import { buildCanonicalUrl, buildLanguageAlternates, SITE_URL } from '@/lib/seo'
@@ -262,17 +263,23 @@ export default async function CategoryPage({
                       </span>
                     </h2>
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 lg:gap-6">
-                      {items.map((product, i) => (
-                        <ProductCard
-                          key={product.id}
-                          product={product}
-                          lang={lang}
-                          categorySlug={categorySlug}
-                          dict={dict}
-                          isVerified={verified}
-                          priority={i < 4}
-                        />
-                      ))}
+                      <ShowMoreGrid
+                        total={items.length}
+                        showMoreLabel={dict.categoryPage.showMore}
+                        showingOfLabel={dict.categoryPage.showingOf}
+                      >
+                        {items.map((product, i) => (
+                          <ProductCard
+                            key={product.id}
+                            product={product}
+                            lang={lang}
+                            categorySlug={categorySlug}
+                            dict={dict}
+                            isVerified={verified}
+                            priority={i < 4}
+                          />
+                        ))}
+                      </ShowMoreGrid>
                     </div>
                   </div>
                 )
@@ -280,17 +287,23 @@ export default async function CategoryPage({
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 lg:gap-6">
-              {products.map((product, i) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  lang={lang}
-                  categorySlug={categorySlug}
-                  dict={dict}
-                  isVerified={verified}
-                  priority={i < 4}
-                />
-              ))}
+              <ShowMoreGrid
+                total={products.length}
+                showMoreLabel={dict.categoryPage.showMore}
+                showingOfLabel={dict.categoryPage.showingOf}
+              >
+                {products.map((product, i) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    lang={lang}
+                    categorySlug={categorySlug}
+                    dict={dict}
+                    isVerified={verified}
+                    priority={i < 4}
+                  />
+                ))}
+              </ShowMoreGrid>
             </div>
           )}
         </Container>

@@ -827,6 +827,8 @@
     "ctaTitle": "Work at a Salon? Get a Special Offer",
     "ctaDesc": "Individual pricing, regular supply and a personal manager.",
     "ctaPrimary": "Get a Quote →",
-    "ctaSecondary": "Contact Us"
+    "ctaSecondary": "Contact Us",
+    "showMore": "Show more",
+    "showingOf": "Showing {visible} of {total}"
   }
 }
