@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { LegalContent } from '@/components/ui/LegalContent'
-import { buildPageMetadata, SITE_URL } from '@/lib/seo'
+import { buildPageMetadata, buildCanonicalUrl, SITE_URL } from '@/lib/seo'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumbSchema } from '@/lib/schema'
 import { langPrefix } from '@/lib/utils'
@@ -34,7 +34,7 @@ export default async function TermsPage({
   return (
     <>
       <JsonLd data={breadcrumbSchema([
-        { name: 'Pirkimo sąlygos', url: `${SITE_URL}/${lang}/pirkimo-salygos` },
+        { name: 'Pirkimo sąlygos', url: buildCanonicalUrl(lang, '/pirkimo-salygos') },
       ])} />
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">

@@ -145,9 +145,9 @@ export default async function CategoryPage({
     <>
       <JsonLd data={listJsonLd} />
       <JsonLd data={breadcrumbSchema([
-        { name: dict.common.home, url: `${SITE_URL}/${lang}` },
-        { name: dict.nav.products, url: `${SITE_URL}/${lang}/produktai` },
-        { name: categoryName, url: `${SITE_URL}/${lang}/produktai/${categorySlug}` },
+        { name: dict.common.home, url: buildCanonicalUrl(lang, '/') },
+        { name: dict.nav.products, url: buildCanonicalUrl(lang, '/produktai') },
+        { name: categoryName, url: buildCanonicalUrl(lang, `/produktai/${categorySlug}`) },
       ])} />
 
       {/* Breadcrumb */}

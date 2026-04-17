@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { Newsletter } from '@/components/home/Newsletter'
-import { buildPageMetadata, SITE_URL } from '@/lib/seo'
+import { buildPageMetadata, buildCanonicalUrl, SITE_URL } from '@/lib/seo'
 import { getBlogPostBySlug, getBlogPosts } from '@/lib/data/queries'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { blogPostingSchema, breadcrumbSchema } from '@/lib/schema'
@@ -60,7 +60,7 @@ export default async function ArticlePage({
     })
     .slice(0, 2)
 
-  const postUrl = `${SITE_URL}/${lang}/blogas/${slug}`
+  const postUrl = buildCanonicalUrl(lang, `/blogas/${slug}`)
 
   return (
     <>
@@ -76,8 +76,8 @@ export default async function ArticlePage({
       />
       <JsonLd
         data={breadcrumbSchema([
-          { name: dict.common.home, url: `${SITE_URL}/${lang}` },
-          { name: dict.blogPage.breadcrumb, url: `${SITE_URL}/${lang}/blogas` },
+          { name: dict.common.home, url: buildCanonicalUrl(lang, '/') },
+          { name: dict.blogPage.breadcrumb, url: buildCanonicalUrl(lang, '/blogas') },
           { name: post.title, url: postUrl },
         ])}
       />

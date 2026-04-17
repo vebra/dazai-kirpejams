@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { LegalContent } from '@/components/ui/LegalContent'
-import { buildPageMetadata, SITE_URL } from '@/lib/seo'
+import { buildPageMetadata, buildCanonicalUrl, SITE_URL } from '@/lib/seo'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumbSchema } from '@/lib/schema'
 import { langPrefix } from '@/lib/utils'
@@ -34,7 +34,7 @@ export default async function PrivacyPage({
   return (
     <>
       <JsonLd data={breadcrumbSchema([
-        { name: 'Privatumo politika', url: `${SITE_URL}/${lang}/privatumo-politika` },
+        { name: 'Privatumo politika', url: buildCanonicalUrl(lang, '/privatumo-politika') },
       ])} />
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">

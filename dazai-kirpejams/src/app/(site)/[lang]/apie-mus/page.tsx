@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
-import { buildPageMetadata, SITE_URL } from '@/lib/seo'
+import { buildPageMetadata, buildCanonicalUrl, SITE_URL } from '@/lib/seo'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumbSchema } from '@/lib/schema'
 import { langPrefix } from '@/lib/utils'
@@ -56,8 +56,8 @@ export default async function AboutPage({
   return (
     <>
       <JsonLd data={breadcrumbSchema([
-        { name: c.home, url: `${SITE_URL}/${lang}` },
-        { name: t.badge, url: `${SITE_URL}/${lang}/apie-mus` },
+        { name: c.home, url: buildCanonicalUrl(lang, '/') },
+        { name: t.badge, url: buildCanonicalUrl(lang, '/apie-mus') },
       ])} />
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">

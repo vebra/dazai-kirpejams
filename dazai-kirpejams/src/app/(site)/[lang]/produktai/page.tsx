@@ -11,7 +11,7 @@ import {
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
 import { isUserVerified } from '@/lib/auth/verification'
-import { buildPageMetadata, SITE_URL } from '@/lib/seo'
+import { buildPageMetadata, buildCanonicalUrl, SITE_URL } from '@/lib/seo'
 import { langPrefix } from '@/lib/utils'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumbSchema } from '@/lib/schema'
@@ -50,8 +50,8 @@ export default async function ProductsPage({
   return (
     <>
       <JsonLd data={breadcrumbSchema([
-        { name: dict.common.home, url: `${SITE_URL}/${lang}` },
-        { name: dict.nav.products, url: `${SITE_URL}/${lang}/produktai` },
+        { name: dict.common.home, url: buildCanonicalUrl(lang, '/') },
+        { name: dict.nav.products, url: buildCanonicalUrl(lang, '/produktai') },
       ])} />
 
       {/* Breadcrumb */}

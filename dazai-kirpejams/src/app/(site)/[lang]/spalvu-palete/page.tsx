@@ -6,7 +6,7 @@ import { getProducts } from '@/lib/data/queries'
 import { Container } from '@/components/ui/Container'
 import { PaletteGrid } from '@/components/products/PaletteGrid'
 import { Newsletter } from '@/components/home/Newsletter'
-import { buildPageMetadata, SITE_URL } from '@/lib/seo'
+import { buildPageMetadata, buildCanonicalUrl, SITE_URL } from '@/lib/seo'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumbSchema } from '@/lib/schema'
 import { langPrefix } from '@/lib/utils'
@@ -44,8 +44,8 @@ export default async function ColorPalettePage({
   return (
     <>
       <JsonLd data={breadcrumbSchema([
-        { name: dict.common.home, url: `${SITE_URL}/${lang}` },
-        { name: dict.nav.colorPalette, url: `${SITE_URL}/${lang}/spalvu-palete` },
+        { name: dict.common.home, url: buildCanonicalUrl(lang, '/') },
+        { name: dict.nav.colorPalette, url: buildCanonicalUrl(lang, '/spalvu-palete') },
       ])} />
       {/* Hero */}
       <section className="py-12 lg:py-20 bg-[linear-gradient(135deg,#ffffff_0%,#f5f5f7_100%)]">

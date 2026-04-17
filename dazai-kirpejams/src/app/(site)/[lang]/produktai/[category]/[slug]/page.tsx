@@ -108,14 +108,14 @@ export default async function ProductPage({
     ? (price / product.volume_ml).toFixed(3)
     : null
 
-  const productUrl = `${SITE_URL}/${lang}/produktai/${categorySlug}/${slug}`
+  const productUrl = buildCanonicalUrl(lang, `/produktai/${categorySlug}/${slug}`)
   const productJsonLd = productSchema(product, category, lang, productUrl)
   const breadcrumbJsonLd = breadcrumbSchema([
-    { name: dict.nav.home, url: `${SITE_URL}/${lang}` },
-    { name: dict.nav.products, url: `${SITE_URL}/${lang}/produktai` },
+    { name: dict.nav.home, url: buildCanonicalUrl(lang, '/') },
+    { name: dict.nav.products, url: buildCanonicalUrl(lang, '/produktai') },
     {
       name: getCategoryName(category, lang),
-      url: `${SITE_URL}/${lang}/produktai/${categorySlug}`,
+      url: buildCanonicalUrl(lang, `/produktai/${categorySlug}`),
     },
     { name, url: productUrl },
   ])

@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { Newsletter } from '@/components/home/Newsletter'
-import { buildPageMetadata, SITE_URL } from '@/lib/seo'
+import { buildPageMetadata, buildCanonicalUrl, SITE_URL } from '@/lib/seo'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumbSchema } from '@/lib/schema'
 import { getBlogPosts } from '@/lib/data/queries'
@@ -43,8 +43,8 @@ export default async function BlogPage({
   return (
     <>
       <JsonLd data={breadcrumbSchema([
-        { name: c.home, url: `${SITE_URL}/${lang}` },
-        { name: t.breadcrumb, url: `${SITE_URL}/${lang}/blogas` },
+        { name: c.home, url: buildCanonicalUrl(lang, '/') },
+        { name: t.breadcrumb, url: buildCanonicalUrl(lang, '/blogas') },
       ])} />
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
