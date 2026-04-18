@@ -11,6 +11,7 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { blogPostingSchema, breadcrumbSchema } from '@/lib/schema'
 import { CATEGORY_STYLES, type ArticleCategory } from '@/lib/data/articles'
 import { langPrefix } from '@/lib/utils'
+import { sanitizeHtml } from '@/lib/sanitize'
 
 export const revalidate = 60
 
@@ -186,7 +187,7 @@ export default async function ArticlePage({
                   [&_td]:px-5 [&_td]:py-4 [&_td]:text-brand-gray-700 [&_td]:border-b [&_td]:border-[#E0E0E0]
                   [&_a]:text-brand-magenta [&_a]:font-semibold [&_a]:hover:underline
                   [&_strong]:text-brand-gray-900"
-                dangerouslySetInnerHTML={{ __html: post.content }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
               />
             ) : (
               <p className="text-brand-gray-500">
@@ -261,7 +262,7 @@ export default async function ArticlePage({
       </section>
 
       {/* Newsletter */}
-      <Newsletter lang={lang} />
+      <Newsletter lang={lang} dict={dict.newsletter} />
     </>
   )
 }

@@ -53,16 +53,16 @@ export type CreateOrderResult =
   | { ok: false; error: string }
 
 /**
- * Generuojame žmogui draugišką užsakymo numerį formato DK-YYMMDD-XXXX.
- * XXXX — 4 atsitiktiniai skaitmenys. Tikimybė dubliuotis ta pačia diena
- * maža; DB turi unique constraint, tad tikroje aplinkoje retry'intume.
+ * Generuojame žmogui draugišką užsakymo numerį formato DK-YYMMDD-XXXXXX.
+ * XXXXXX — 6 atsitiktinių skaitmenų (100k–999k), sumažinant kolizijų
+ * tikimybę iki ~0.06% net prie 1000 užsakymų per dieną.
  */
 function generateOrderNumber(): string {
   const d = new Date()
   const y = String(d.getFullYear()).slice(2)
   const m = String(d.getMonth() + 1).padStart(2, '0')
   const day = String(d.getDate()).padStart(2, '0')
-  const rand = Math.floor(1000 + Math.random() * 9000)
+  const rand = Math.floor(100000 + Math.random() * 900000)
   return `DK-${y}${m}${day}-${rand}`
 }
 
@@ -102,7 +102,7 @@ export async function createOrder(
     return { ok: false, error: 'Nepasiekta minimali užsakymo suma.' }
   }
 
-  const orderNumber = generateOrderNumber()
+  let orderNumber = generateOrderNumber()
 
   // Paysera kol kas nerealizuotas — visada bank_transfer flow
   // (nors UI'uje rodome Paysera variantą). Kai bus keys, keisime čia.
@@ -228,42 +228,73 @@ export async function createOrder(
       discountCents
     )
 
-    // 4) Insert'as į orders
-    try {
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          order_number: orderNumber,
-          email: input.email,
-          phone: input.phone,
-          first_name: input.firstName,
-          last_name: input.lastName,
-          company_name: input.isCompany ? input.companyName ?? null : null,
-          company_code: input.isCompany ? input.companyCode ?? null : null,
-          vat_code: input.isCompany ? input.vatCode ?? null : null,
-          delivery_method: input.deliveryMethod,
-          delivery_address: input.deliveryAddress ?? null,
-          delivery_city: input.deliveryCity ?? null,
-          delivery_postal_code: input.deliveryPostalCode ?? null,
-          delivery_country: 'LT',
-          delivery_cost_cents: computedTotals.shippingCents,
-          payment_method: effectivePayment,
-          payment_status: 'pending',
-          subtotal_cents: computedTotals.subtotalCents,
-          discount_code: appliedDiscountCode,
-          discount_cents: computedTotals.discountCents,
-          vat_cents: computedTotals.vatCents,
-          total_cents: computedTotals.totalCents,
-          status: 'pending',
-          locale: input.locale,
-          notes: input.notes ?? null,
-        })
-        .select('id')
-        .single()
+    // 4) Insert'as į orders — su retry dėl order_number kolizijų
+    //    (unique constraint). Pergeneruojam numerį ir bandome dar kartą.
+    const ORDER_INSERT_RETRIES = 3
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let order: { id: string } | null = null
 
-      if (orderError || !order) {
+    try {
+      for (let attempt = 0; attempt < ORDER_INSERT_RETRIES; attempt++) {
+        const { data, error: orderError } = await supabase
+          .from('orders')
+          .insert({
+            order_number: orderNumber,
+            email: input.email,
+            phone: input.phone,
+            first_name: input.firstName,
+            last_name: input.lastName,
+            company_name: input.isCompany ? input.companyName ?? null : null,
+            company_code: input.isCompany ? input.companyCode ?? null : null,
+            vat_code: input.isCompany ? input.vatCode ?? null : null,
+            delivery_method: input.deliveryMethod,
+            delivery_address: input.deliveryAddress ?? null,
+            delivery_city: input.deliveryCity ?? null,
+            delivery_postal_code: input.deliveryPostalCode ?? null,
+            delivery_country: 'LT',
+            delivery_cost_cents: computedTotals.shippingCents,
+            payment_method: effectivePayment,
+            payment_status: 'pending',
+            subtotal_cents: computedTotals.subtotalCents,
+            discount_code: appliedDiscountCode,
+            discount_cents: computedTotals.discountCents,
+            vat_cents: computedTotals.vatCents,
+            total_cents: computedTotals.totalCents,
+            status: 'pending',
+            locale: input.locale,
+            notes: input.notes ?? null,
+          })
+          .select('id')
+          .single()
+
+        if (!orderError && data) {
+          order = data
+          break
+        }
+
+        // Unique violation (23505) — retry su nauju numeriu
+        if (orderError?.code === '23505' && attempt < ORDER_INSERT_RETRIES - 1) {
+          orderNumber = generateOrderNumber()
+          continue
+        }
+
         console.error('Order insert error:', orderError)
         // Rollback'inam likučius + kuponą
+        await supabase.rpc('restore_stock_for_order', { items: stockItems })
+        if (appliedDiscountCode) {
+          await supabase
+            .rpc('revert_discount_code', { p_code: appliedDiscountCode })
+            .then(() => {}, () => {})
+        }
+        return {
+          ok: false,
+          error: 'Nepavyko sukurti užsakymo. Bandykite dar kartą.',
+        }
+      }
+
+      // Jei po visų bandymų order vis dar null — neturėtų nutikti,
+      // nes paskutinis attempt'as grąžina klaidą, bet dėl saugumo:
+      if (!order) {
         await supabase.rpc('restore_stock_for_order', { items: stockItems })
         if (appliedDiscountCode) {
           await supabase
@@ -279,7 +310,7 @@ export async function createOrder(
       // 5) Insert'as į order_items
       const { error: itemsError } = await supabase.from('order_items').insert(
         input.items.map((i) => ({
-          order_id: order.id,
+          order_id: order!.id,
           product_id: i.productId,
           product_name: i.name,
           product_sku: i.sku,
@@ -292,7 +323,7 @@ export async function createOrder(
       if (itemsError) {
         console.error('Order items insert error:', itemsError)
         // Rollback'inam: užsakymą, likučius, kuponą
-        await supabase.from('orders').delete().eq('id', order.id)
+        await supabase.from('orders').delete().eq('id', order!.id)
         await supabase.rpc('restore_stock_for_order', { items: stockItems })
         if (appliedDiscountCode) {
           await supabase
@@ -305,7 +336,7 @@ export async function createOrder(
         }
       }
 
-      orderDbId = order.id
+      orderDbId = order!.id
     } catch (err) {
       console.error('Order creation failed:', err)
       // Bandom rollback'inti viską

@@ -13,11 +13,32 @@ function formatPerMl(value: number): string {
   return '€' + value.toFixed(3).replace('.', ',')
 }
 
-export function Calculator() {
-  const [dyeingsPerWeek, setDyeingsPerWeek] = useState(15)
-  const [mlPerDyeing, setMlPerDyeing] = useState(60)
-  const [competitorPrice, setCompetitorPrice] = useState(10)
-  const [competitorVolume, setCompetitorVolume] = useState(60)
+type CalculatorDict = {
+  calcTitle: string
+  calcDyeingsLabel: string
+  calcMlLabel: string
+  calcPriceLabel: string
+  calcVolumeLabel: string
+  calcOurOffer: string
+  calcResultsTitle: string
+  calcCompetitorPerMl: string
+  calcOurPerMl: string
+  calcSavingsMonth: string
+  calcSavingsYear: string
+  calcPackagesReduction: string
+  calcDisclaimer: string
+}
+
+export function Calculator({ dict }: { dict: CalculatorDict }) {
+  const [dyeingsStr, setDyeingsStr] = useState('15')
+  const [mlStr, setMlStr] = useState('60')
+  const [priceStr, setPriceStr] = useState('11')
+  const [volumeStr, setVolumeStr] = useState('60')
+
+  const dyeingsPerWeek = parseFloat(dyeingsStr) || 0
+  const mlPerDyeing = parseFloat(mlStr) || 0
+  const competitorPrice = parseFloat(priceStr) || 0
+  const competitorVolume = parseFloat(volumeStr) || 0
 
   const results = useMemo(() => {
     const ourPerMl = OUR_PRICE / OUR_VOLUME
@@ -59,42 +80,42 @@ export function Calculator() {
         {/* Inputs */}
         <div>
           <h2 className="text-[1.5rem] font-bold text-brand-gray-900 mb-7 leading-tight">
-            Jūsų salono duomenys
+            {dict.calcTitle}
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <CalcField
               id="dyeingsPerWeek"
-              label="Kiek dažymų atliekate per savaitę?"
-              value={dyeingsPerWeek}
-              onChange={setDyeingsPerWeek}
+              label={dict.calcDyeingsLabel}
+              value={dyeingsStr}
+              onChange={setDyeingsStr}
               min={1}
               max={200}
               step={1}
             />
             <CalcField
               id="mlPerDyeing"
-              label="Vidutinis dažų kiekis vienam dažymui (ml)"
-              value={mlPerDyeing}
-              onChange={setMlPerDyeing}
+              label={dict.calcMlLabel}
+              value={mlStr}
+              onChange={setMlStr}
               min={10}
               max={500}
               step={5}
             />
             <CalcField
               id="competitorPrice"
-              label="Dabartinė dažų kaina (€)"
-              value={competitorPrice}
-              onChange={setCompetitorPrice}
+              label={dict.calcPriceLabel}
+              value={priceStr}
+              onChange={setPriceStr}
               min={0.01}
               max={100}
               step={0.01}
             />
             <CalcField
               id="competitorVolume"
-              label="Dabartinė dažų talpa (ml)"
-              value={competitorVolume}
-              onChange={setCompetitorVolume}
+              label={dict.calcVolumeLabel}
+              value={volumeStr}
+              onChange={setVolumeStr}
               min={10}
               max={500}
               step={5}
@@ -103,7 +124,7 @@ export function Calculator() {
 
           <div className="mt-7 bg-brand-magenta/[0.08] border border-brand-magenta/20 rounded-xl p-5 relative">
             <div className="absolute -top-3 left-5 px-3 py-1 bg-brand-magenta text-white text-[0.7rem] font-bold uppercase tracking-wider rounded-full">
-              Mūsų pasiūlymas
+              {dict.calcOurOffer}
             </div>
             <div className="mt-1 text-[0.95rem] text-brand-gray-900">
               <strong>Color SHOCK 180 ml</strong> —{' '}
@@ -117,16 +138,16 @@ export function Calculator() {
         {/* Results */}
         <div className="bg-brand-gray-900 text-white rounded-xl p-8 lg:p-10">
           <h2 className="text-[1.5rem] font-bold text-white mb-7 leading-tight">
-            Rezultatai
+            {dict.calcResultsTitle}
           </h2>
 
           <div className="space-y-4">
             <ResultRow
-              label="Kaina per ml (konkurentas)"
+              label={dict.calcCompetitorPerMl}
               value={formatPerMl(results.competitorPerMl)}
             />
             <ResultRow
-              label="Kaina per ml (Color SHOCK)"
+              label={dict.calcOurPerMl}
               value={formatPerMl(results.ourPerMl)}
               highlight
             />
@@ -134,13 +155,13 @@ export function Calculator() {
             <div className="border-t border-white/10 my-5" />
 
             <ResultRow
-              label="Sutaupymas per mėnesį"
+              label={dict.calcSavingsMonth}
               value={formatEur(results.savingsPerMonth)}
               highlight
               big
             />
             <ResultRow
-              label="Sutaupymas per metus"
+              label={dict.calcSavingsYear}
               value={formatEur(results.savingsPerYear)}
               highlight
               big
@@ -149,13 +170,12 @@ export function Calculator() {
             <div className="border-t border-white/10 my-5" />
 
             <ResultRow
-              label="Pakuočių sumažėjimas per mėnesį"
+              label={dict.calcPackagesReduction}
               value={String(results.packagesReduction)}
             />
 
             <p className="text-[0.78rem] text-white/50 italic mt-6 leading-[1.5]">
-              * Skaičiavimai yra orientaciniai ir priklauso nuo faktinių kainų
-              bei naudojimo įpročių.
+              {dict.calcDisclaimer}
             </p>
           </div>
         </div>
@@ -175,8 +195,8 @@ function CalcField({
 }: {
   id: string
   label: string
-  value: number
-  onChange: (val: number) => void
+  value: string
+  onChange: (val: string) => void
   min: number
   max: number
   step: number
@@ -197,7 +217,12 @@ function CalcField({
         min={min}
         max={max}
         step={step}
-        onChange={(e) => onChange(Number(e.target.value) || 0)}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={() => {
+          const num = parseFloat(value)
+          if (isNaN(num) || num < min) onChange(String(min))
+          else if (num > max) onChange(String(max))
+        }}
         className="w-full px-4 py-[14px] border border-[#E0E0E0] rounded-lg bg-brand-gray-50 text-brand-gray-900 text-[1rem] font-semibold focus:outline-none focus:border-brand-magenta focus:bg-white focus:shadow-[0_0_0_3px_rgba(233,30,140,0.1)] transition-all"
       />
     </div>

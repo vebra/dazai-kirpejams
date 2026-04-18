@@ -1,6 +1,6 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/admin/auth'
 import { createServerClient } from '@/lib/supabase/server'
@@ -82,6 +82,7 @@ export async function saveBannerAction(
   revalidatePath('/lt')
   revalidatePath('/en')
   revalidatePath('/ru')
+  revalidateTag('banners', 'max')
 
   return { success: true }
 }
@@ -104,6 +105,7 @@ export async function deleteBannerAction(formData: FormData): Promise<void> {
   revalidatePath('/lt')
   revalidatePath('/en')
   revalidatePath('/ru')
+  revalidateTag('banners', 'max')
   redirect('/admin/baneriai')
 }
 
@@ -134,4 +136,5 @@ export async function toggleBannerActiveAction(
   revalidatePath('/lt')
   revalidatePath('/en')
   revalidatePath('/ru')
+  revalidateTag('banners', 'max')
 }

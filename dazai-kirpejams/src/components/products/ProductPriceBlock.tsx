@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useIsVerified } from '@/components/auth/VerificationProvider'
+import { useVerification } from '@/components/auth/VerificationProvider'
 import { AddToCartButton } from '@/components/commerce/AddToCartButton'
 import { formatPrice } from '@/lib/utils'
 import type { Locale } from '@/i18n/config'
@@ -39,6 +39,11 @@ type Props = {
     addToCart: string
     addedToCart: string
     youSave: string
+    accountPendingTitle?: string
+    accountPendingDesc?: string
+    accountRejectedTitle?: string
+    accountRejectedDesc?: string
+    goToAccount?: string
   }
 }
 
@@ -53,7 +58,18 @@ export function ProductPriceBlock({
   cartItem,
   labels,
 }: Props) {
-  const isVerified = useIsVerified()
+  const { isVerified, isLoggedIn, status } = useVerification()
+
+  // Fallback'ai jei dict raktų dar nėra
+  const pendingTitle = labels.accountPendingTitle ?? 'Paskyra laukia patvirtinimo'
+  const pendingDesc =
+    labels.accountPendingDesc ??
+    'Jūsų paskyra peržiūrima. Kai administratorius patvirtins dokumentą, matysite kainas ir galėsite pirkti.'
+  const rejectedTitle = labels.accountRejectedTitle ?? 'Dokumentas atmestas'
+  const rejectedDesc =
+    labels.accountRejectedDesc ??
+    'Jūsų dokumentas buvo atmestas. Įkelkite naują dokumentą ir bandykite dar kartą.'
+  const goToAccount = labels.goToAccount ?? 'Į mano paskyrą'
 
   return (
     <>
@@ -95,6 +111,36 @@ export function ProductPriceBlock({
               {labels.youSave} {formatPrice(savings, lang)}
             </span>
           )}
+        </div>
+      ) : isLoggedIn && status === 'pending' ? (
+        <div className="mb-5 px-5 py-5 bg-amber-50 rounded-xl border border-amber-200">
+          <p className="text-[0.95rem] text-amber-900 font-semibold mb-1.5">
+            {pendingTitle}
+          </p>
+          <p className="text-[0.88rem] text-amber-800 mb-4 leading-[1.5]">
+            {pendingDesc}
+          </p>
+          <Link
+            href={`${langPrefixStr}/paskyra`}
+            className="inline-flex items-center justify-center min-h-[44px] px-6 py-3 bg-amber-600 text-white rounded-lg text-[0.95rem] font-semibold hover:bg-amber-700 transition-colors"
+          >
+            {goToAccount}
+          </Link>
+        </div>
+      ) : isLoggedIn && status === 'rejected' ? (
+        <div className="mb-5 px-5 py-5 bg-red-50 rounded-xl border border-red-200">
+          <p className="text-[0.95rem] text-red-900 font-semibold mb-1.5">
+            {rejectedTitle}
+          </p>
+          <p className="text-[0.88rem] text-red-800 mb-4 leading-[1.5]">
+            {rejectedDesc}
+          </p>
+          <Link
+            href={`${langPrefixStr}/paskyra`}
+            className="inline-flex items-center justify-center min-h-[44px] px-6 py-3 bg-red-600 text-white rounded-lg text-[0.95rem] font-semibold hover:bg-red-700 transition-colors"
+          >
+            {goToAccount}
+          </Link>
         </div>
       ) : (
         <div className="mb-5 px-5 py-5 bg-brand-gray-50 rounded-xl border border-[#E0E0E0]">
@@ -138,7 +184,7 @@ export function ProductPriceBlock({
             {labels.b2bPrice}
           </Link>
         </div>
-      ) : (
+      ) : isLoggedIn ? null : (
         <div className="flex flex-col sm:flex-row gap-3 mb-8">
           <Link
             href={`${langPrefixStr}/registracija`}

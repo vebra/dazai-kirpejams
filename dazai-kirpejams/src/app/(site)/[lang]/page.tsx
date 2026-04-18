@@ -38,7 +38,7 @@ export default async function HomePage({ params }: PageProps<'/[lang]'>) {
       <Audience dict={dict} />
       <Testimonials dict={dict} />
       <B2BCta lang={lang} dict={dict} />
-      <Newsletter lang={lang} />
+      <Newsletter lang={lang} dict={dict.newsletter} />
       <FinalCta lang={lang} dict={dict} />
     </>
   )

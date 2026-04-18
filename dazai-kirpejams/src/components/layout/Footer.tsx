@@ -37,7 +37,7 @@ export function Footer({ lang, dict }: FooterProps) {
     { href: `${p}/salonams`, label: footer.collaboration },
     { href: `${p}/duk`, label: footer.faq },
     { href: `${p}/pristatymas`, label: footer.delivery },
-    { href: `${p}/skaiciuokle`, label: 'Kainų skaičiuoklė' },
+    { href: `${p}/skaiciuokle`, label: footer.calculator },
   ]
 
   return (
@@ -61,8 +61,7 @@ export function Footer({ lang, dict }: FooterProps) {
               />
             </Link>
             <p className="text-[0.9rem] text-white/55 mt-4 leading-[1.7]">
-              Profesionalūs plaukų dažai ir priemonės kirpėjams. Didesnė 180 ml
-              talpa — daugiau vertės darbui salone.
+              {footer.brandDescription}
             </p>
             <div className="flex gap-3 mt-4">
               {[

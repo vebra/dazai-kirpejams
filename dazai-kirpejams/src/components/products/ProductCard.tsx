@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { getProductName, type Product } from '@/lib/types'
 import { formatPrice, langPrefix } from '@/lib/utils'
 import type { Locale } from '@/i18n/config'
-import { useIsVerified } from '@/components/auth/VerificationProvider'
+import { useVerification } from '@/components/auth/VerificationProvider'
 import { AddToCartButton } from '@/components/commerce/AddToCartButton'
 
 type ProductCardProps = {
@@ -25,10 +25,30 @@ export function ProductCard({
   dict,
   priority = false,
 }: ProductCardProps) {
-  const isVerified = useIsVerified()
+  const { isVerified, isLoggedIn, status } = useVerification()
   const name = getProductName(product, lang)
   const href = `${langPrefix(lang)}/produktai/${categorySlug}/${product.slug}`
   const primaryImage = product.image_urls?.[0]
+
+  const p = dict.popular
+  const loginForPrice = p.loginForPrice ?? 'Prisijungti dėl kainos'
+  const accountPending = p.accountPending ?? 'Paskyra peržiūrima'
+  const accountRejected = p.accountRejected ?? 'Įkelti dokumentą'
+
+  let ctaHref = `${langPrefix(lang)}/prisijungimas`
+  let ctaLabel = loginForPrice
+  let ctaClassName =
+    'bg-brand-magenta text-white hover:bg-brand-magenta-dark'
+
+  if (isLoggedIn && status === 'pending') {
+    ctaHref = `${langPrefix(lang)}/paskyra`
+    ctaLabel = accountPending
+    ctaClassName = 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
+  } else if (isLoggedIn && status === 'rejected') {
+    ctaHref = `${langPrefix(lang)}/paskyra`
+    ctaLabel = accountRejected
+    ctaClassName = 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'
+  }
 
   return (
     <div className="group bg-white rounded-xl border border-[#E0E0E0] overflow-hidden hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all">
@@ -92,8 +112,8 @@ export function ProductCard({
             </div>
             <AddToCartButton
               variant="icon"
-              label={dict.popular.addToCart}
-              labelAdded={dict.popular.added ?? 'Pridėta'}
+              label={p.addToCart}
+              labelAdded={p.added ?? 'Pridėta'}
               item={{
                 productId: product.id,
                 slug: product.slug,
@@ -110,10 +130,10 @@ export function ProductCard({
           </div>
         ) : (
           <Link
-            href={`${langPrefix(lang)}/prisijungimas`}
-            className="flex items-center justify-center w-full min-h-[44px] px-4 py-2.5 bg-brand-magenta text-white text-[0.85rem] font-semibold rounded-lg hover:bg-brand-magenta-dark transition-colors"
+            href={ctaHref}
+            className={`flex items-center justify-center w-full min-h-[44px] px-4 py-2.5 text-[0.85rem] font-semibold rounded-lg transition-colors ${ctaClassName}`}
           >
-            Prisijungti dėl kainos
+            {ctaLabel}
           </Link>
         )}
       </div>

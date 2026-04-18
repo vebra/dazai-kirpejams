@@ -183,8 +183,8 @@ export default async function B2BPage({
               {[
                 { param: t.econParam, std: t.econStd, ours: t.econOurs, header: true },
                 { param: t.econVolume, std: '60 ml', ours: '180 ml' },
-                { param: t.econPricePkg, std: '€4–6', ours: '€6.99' },
-                { param: t.econPriceMl, std: '€0.07–0.10', ours: '€0.039' },
+                { param: t.econPricePkg, std: '€4–6', ours: '€7.90' },
+                { param: t.econPriceMl, std: '€0.07–0.10', ours: '€0.044' },
                 { param: t.econPkgPer100, std: '~150', ours: '~50' },
                 { param: t.econWaste, std: t.econWasteStd, ours: t.econWasteOurs },
               ].map((row, i) => (

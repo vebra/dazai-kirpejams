@@ -1,6 +1,6 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/admin/auth'
 import { createServerClient } from '@/lib/supabase/server'
@@ -139,6 +139,7 @@ export async function updateProductAction(
 
   revalidatePath('/admin/sandelis', 'layout')
   revalidatePath('/admin')
+  revalidateTag('products', 'max')
   return { success: true }
 }
 
@@ -174,6 +175,7 @@ export async function quickUpdateStockAction(formData: FormData): Promise<void> 
 
   revalidatePath('/admin/sandelis')
   revalidatePath('/admin')
+  revalidateTag('products', 'max')
 }
 
 // ============================================
@@ -206,6 +208,7 @@ export async function toggleProductActiveAction(
 
   revalidatePath('/admin/sandelis', 'layout')
   revalidatePath('/admin')
+  revalidateTag('products', 'max')
 }
 
 // ============================================
@@ -255,6 +258,7 @@ export async function bulkActivateInactiveAction(
 
   revalidatePath('/admin/sandelis', 'layout')
   revalidatePath('/admin')
+  revalidateTag('products', 'max')
   redirect(`/admin/sandelis?activated=${count ?? 0}`)
 }
 
@@ -431,6 +435,7 @@ export async function uploadProductImagesAction(
 
   revalidatePath('/admin/sandelis', 'layout')
   revalidatePath(`/admin/sandelis/${productId}`)
+  revalidateTag('products', 'max')
   return { success: true, uploadedCount: newUrls.length }
 }
 
@@ -487,6 +492,7 @@ export async function deleteProductImageAction(
 
   revalidatePath('/admin/sandelis', 'layout')
   revalidatePath(`/admin/sandelis/${productId}`)
+  revalidateTag('products', 'max')
 }
 
 /**
@@ -538,6 +544,7 @@ export async function setPrimaryProductImageAction(
 
   revalidatePath('/admin/sandelis', 'layout')
   revalidatePath(`/admin/sandelis/${productId}`)
+  revalidateTag('products', 'max')
 }
 
 // ============================================
@@ -566,5 +573,6 @@ export async function bulkDeactivateActiveAction(): Promise<void> {
 
   revalidatePath('/admin/sandelis', 'layout')
   revalidatePath('/admin')
+  revalidateTag('products', 'max')
   redirect(`/admin/sandelis?deactivated=${count ?? 0}`)
 }

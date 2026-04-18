@@ -46,11 +46,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Tipografija */
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: var(--color-gray-900);
+/* Tipografija — @layer base, kad Tailwind utility klasės
+   (text-white ir pan.) galėtų perrašyti spalvą tamsiuose blokuose. */
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
 }
 
 /* Skaitomumo pagerinimas */

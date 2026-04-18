@@ -257,7 +257,9 @@ const hairDyes: Product[] = hairDyeColors.map((c, idx) => {
     usage_ru:
       'Смешайте 1:2 с оксидантом выбранной концентрации. Время выдержки: 30–35 мин. Смойте шампунём.',
     price_cents: 790, // 7.90 €
-    compare_price_cents: 1000, // 10.00 € senoji kaina (oldPrice iš HTML)
+    // Vyriški dažai (4-men, 5-men, 6-men, 7-men) — be senos kainos.
+    // Moteriškos spalvos — 11.00 € senoji kaina.
+    compare_price_cents: c.key.endsWith('-men') ? null : 1100,
     volume_ml: 180,
     color_number: c.num,
     color_name: c.name_lt,

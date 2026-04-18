@@ -461,7 +461,7 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
                       {appliedDiscount.code}
                     </div>
                     <div className="text-[11px] text-brand-gray-500">
-                      Nuolaida pritaikyta
+                      {dict.checkout.discountApplied}
                     </div>
                   </div>
                 </div>
@@ -469,7 +469,7 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
                   type="button"
                   onClick={handleRemoveDiscount}
                   className="p-1.5 text-brand-gray-500 hover:text-brand-gray-900 transition-colors"
-                  aria-label="Pašalinti kuponą"
+                  aria-label={dict.checkout.removeDiscount}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -490,7 +490,7 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
                         handleApplyDiscount()
                       }
                     }}
-                    placeholder="Kupono kodas"
+                    placeholder={dict.checkout.discountCode}
                     className="flex-1 px-3 py-2 bg-white border border-brand-gray-50 rounded-lg text-sm font-mono uppercase focus:outline-none focus:border-brand-magenta transition-colors"
                   />
                   <button
@@ -499,7 +499,7 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
                     disabled={discountValidating || !discountInput.trim()}
                     className="px-4 py-2 bg-brand-gray-900 text-white rounded-lg text-xs font-semibold hover:bg-brand-gray-900/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
                   >
-                    {discountValidating ? '…' : 'Pritaikyti'}
+                    {discountValidating ? '…' : dict.checkout.applyDiscount}
                   </button>
                 </div>
                 {discountError && (
@@ -518,7 +518,7 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
             />
             {totals.discountCents > 0 && (
               <Row
-                label={`Nuolaida${appliedDiscount ? ` (${appliedDiscount.code})` : ''}`}
+                label={`${dict.checkout.discountLabel}${appliedDiscount ? ` (${appliedDiscount.code})` : ''}`}
                 value={`−${formatPrice(totals.discountCents / 100, lang)}`}
                 accent
               />

@@ -61,20 +61,11 @@ export async function generateMetadata({
       alternateLocale: ['lt_LT', 'en_US', 'ru_RU'].filter(
         (l) => l !== (lang === 'lt' ? 'lt_LT' : lang === 'en' ? 'en_US' : 'ru_RU')
       ),
-      images: [
-        {
-          url: `${SITE_URL}/og-image.jpg`,
-          width: 1200,
-          height: 630,
-          alt: dict.meta.title,
-        },
-      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: dict.meta.title,
       description: dict.meta.description,
-      images: [`${SITE_URL}/og-image.jpg`],
     },
     robots: {
       index: true,

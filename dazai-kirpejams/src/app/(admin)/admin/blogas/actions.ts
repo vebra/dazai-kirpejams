@@ -1,6 +1,6 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/admin/auth'
 import { createServerClient } from '@/lib/supabase/server'
@@ -149,6 +149,7 @@ export async function saveBlogPostAction(
   revalidatePath('/lt/blogas')
   revalidatePath('/en/blogas')
   revalidatePath('/ru/blogas')
+  revalidateTag('blog', 'max')
 
   return { success: true }
 }
@@ -173,6 +174,7 @@ export async function deleteBlogPostAction(
   revalidatePath('/lt/blogas')
   revalidatePath('/en/blogas')
   revalidatePath('/ru/blogas')
+  revalidateTag('blog', 'max')
   redirect('/admin/blogas')
 }
 
@@ -204,4 +206,5 @@ export async function togglePublishAction(
   revalidatePath('/lt/blogas')
   revalidatePath('/en/blogas')
   revalidatePath('/ru/blogas')
+  revalidateTag('blog', 'max')
 }

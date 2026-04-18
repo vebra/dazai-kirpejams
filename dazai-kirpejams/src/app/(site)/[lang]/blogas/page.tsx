@@ -172,7 +172,7 @@ export default async function BlogPage({
       </section>
 
       {/* Newsletter */}
-      <Newsletter lang={lang} />
+      <Newsletter lang={lang} dict={dict.newsletter} />
     </>
   )
 }

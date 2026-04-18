@@ -86,7 +86,10 @@
     "title": "Populiariausi produktai",
     "addToCart": "Į krepšelį",
     "added": "Pridėta",
-    "viewAll": "Peržiūrėti visus"
+    "viewAll": "Peržiūrėti visus",
+    "loginForPrice": "Prisijungti dėl kainos",
+    "accountPending": "Paskyra peržiūrima",
+    "accountRejected": "Įkelti dokumentą"
   },
   "audience": {
     "title": "Kam skirta",
@@ -139,9 +142,12 @@
     "cta": "Pateikti užklausą"
   },
   "newsletter": {
-    "title": "Gaukite specialius pasiūlymus ir naujienas profesionalams",
+    "title": "Gaukite specialius pasiūlymus",
+    "subtitle": "Naujienos, akcijos ir patarimai profesionalams — tiesiai į Jūsų paštą.",
     "placeholder": "Jūsų el. paštas",
     "cta": "Prenumeruoti",
+    "sending": "Siunčiama…",
+    "success": "Prenumerata sėkminga! Dėkojame.",
     "consent": "Sutinku gauti naujienlaiškius. Galėsite atsisakyti bet kada."
   },
   "finalCta": {
@@ -159,6 +165,8 @@
     "terms": "Pirkimo sąlygos",
     "privacy": "Privatumo politika",
     "collaboration": "Bendradarbiavimas",
+    "calculator": "Kainų skaičiuoklė",
+    "brandDescription": "Profesionalūs plaukų dažai ir priemonės kirpėjams. Didesnė 180 ml talpa — daugiau vertės darbui salone.",
     "rights": "Visos teisės saugomos."
   },
   "cart": {
@@ -219,7 +227,12 @@
     "processing": "Apdorojama...",
     "vat": "PVM (21%, įskaičiuotas)",
     "agreeTerms": "Sutinku su pirkimo sąlygomis ir privatumo politika",
-    "requiredField": "Privalomas laukas"
+    "requiredField": "Privalomas laukas",
+    "discountApplied": "Nuolaida pritaikyta",
+    "discountCode": "Kupono kodas",
+    "applyDiscount": "Pritaikyti",
+    "removeDiscount": "Pašalinti kuponą",
+    "discountLabel": "Nuolaida"
   },
   "common": {
     "home": "Pradžia",
@@ -741,7 +754,20 @@
     "ctaTitle": "Išbandykite patys",
     "ctaDesc": "Peržiūrėkite Color SHOCK produktų asortimentą ir įsitikinkite 180 ml pranašumu savo salone.",
     "ctaProducts": "Peržiūrėti produktus →",
-    "ctaSalons": "Gauti pasiūlymą salonui"
+    "ctaSalons": "Gauti pasiūlymą salonui",
+    "calcTitle": "Jūsų salono duomenys",
+    "calcDyeingsLabel": "Kiek dažymų atliekate per savaitę?",
+    "calcMlLabel": "Vidutinis dažų kiekis vienam dažymui (ml)",
+    "calcPriceLabel": "Dabartinė dažų kaina (€)",
+    "calcVolumeLabel": "Dabartinė dažų talpa (ml)",
+    "calcOurOffer": "Mūsų pasiūlymas",
+    "calcResultsTitle": "Rezultatai",
+    "calcCompetitorPerMl": "Kaina per ml (konkurentas)",
+    "calcOurPerMl": "Kaina per ml (Color SHOCK)",
+    "calcSavingsMonth": "Sutaupymas per mėnesį",
+    "calcSavingsYear": "Sutaupymas per metus",
+    "calcPackagesReduction": "Pakuočių sumažėjimas per mėnesį",
+    "calcDisclaimer": "* Skaičiavimai yra orientaciniai ir priklauso nuo faktinių kainų bei naudojimo įpročių."
   },
   "trustBar": {
     "volumeTitle": "180 ml talpa",
@@ -771,6 +797,11 @@
     "youSave": "Sutaupote",
     "priceOnlyPro": "Kaina — tik profesionalams",
     "loginToSeePrice": "Prisijunkite arba užsiregistruokite, kad pamatytumėte kainas ir galėtumėte užsisakyti.",
+    "accountPendingTitle": "Paskyra laukia patvirtinimo",
+    "accountPendingDesc": "Jūsų paskyra peržiūrima. Kai administratorius patvirtins dokumentą, matysite kainas ir galėsite pirkti.",
+    "accountRejectedTitle": "Dokumentas atmestas",
+    "accountRejectedDesc": "Jūsų dokumentas buvo atmestas. Įkelkite naują dokumentą ir bandykite dar kartą.",
+    "goToAccount": "Į mano paskyrą",
     "login": "Prisijungti",
     "register": "Registruotis",
     "registerPro": "Registruotis kaip profesionalas",

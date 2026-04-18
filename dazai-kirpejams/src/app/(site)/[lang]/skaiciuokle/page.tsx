@@ -76,7 +76,7 @@ export default async function CalculatorPage({
       {/* Calculator */}
       <section className="py-16 bg-white">
         <Container>
-          <Calculator />
+          <Calculator dict={t} />
         </Container>
       </section>
 
@@ -116,10 +116,10 @@ export default async function CalculatorPage({
                 <tbody>
                   {[
                     { label: t.rowVolume, std: '60 ml', ours: '180 ml' },
-                    { label: t.rowPrice, std: '~€10,00', ours: '€7,90' },
+                    { label: t.rowPrice, std: '~€11,00', ours: '€7,90' },
                     {
                       label: t.rowPriceMl,
-                      std: '~€0,167',
+                      std: '~€0,183',
                       ours: '€0,044',
                     },
                     {

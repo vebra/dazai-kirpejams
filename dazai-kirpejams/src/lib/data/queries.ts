@@ -340,7 +340,7 @@ export type Banner = {
   sortOrder: number
 }
 
-export async function getActiveBanners(
+async function _getActiveBanners(
   placement: string,
   lang: 'lt' | 'en' | 'ru' = 'lt'
 ): Promise<Banner[]> {
@@ -378,6 +378,16 @@ export async function getActiveBanners(
     sortOrder: r.sort_order,
   }))
 }
+
+export const getActiveBanners = (
+  placement: string,
+  lang: 'lt' | 'en' | 'ru' = 'lt'
+) =>
+  unstable_cache(
+    () => _getActiveBanners(placement, lang),
+    ['banners', placement, lang],
+    { revalidate: 120, tags: ['banners'] }
+  )()
 
 // ============================================
 // BLOGAS (public)

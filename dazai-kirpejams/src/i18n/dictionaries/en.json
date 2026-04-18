@@ -86,7 +86,10 @@
     "title": "Most Popular Products",
     "addToCart": "Add to Cart",
     "added": "Added",
-    "viewAll": "View All"
+    "viewAll": "View All",
+    "loginForPrice": "Log in to see price",
+    "accountPending": "Account under review",
+    "accountRejected": "Upload document"
   },
   "audience": {
     "title": "Who Is It For",
@@ -139,9 +142,12 @@
     "cta": "Submit Inquiry"
   },
   "newsletter": {
-    "title": "Get Special Offers and News for Professionals",
+    "title": "Get Special Offers",
+    "subtitle": "News, promotions and tips for professionals — straight to your inbox.",
     "placeholder": "Your email",
     "cta": "Subscribe",
+    "sending": "Sending…",
+    "success": "Subscribed successfully! Thank you.",
     "consent": "I agree to receive newsletters. You can unsubscribe at any time."
   },
   "finalCta": {
@@ -159,6 +165,8 @@
     "terms": "Terms & Conditions",
     "privacy": "Privacy Policy",
     "collaboration": "Collaboration",
+    "calculator": "Price Calculator",
+    "brandDescription": "Professional hair dyes and products for hairdressers. Larger 180 ml volume — more value for your salon.",
     "rights": "All rights reserved."
   },
   "cart": {
@@ -219,7 +227,12 @@
     "processing": "Processing...",
     "vat": "VAT (21%, included)",
     "agreeTerms": "I agree to the terms and privacy policy",
-    "requiredField": "Required field"
+    "requiredField": "Required field",
+    "discountApplied": "Discount applied",
+    "discountCode": "Coupon code",
+    "applyDiscount": "Apply",
+    "removeDiscount": "Remove coupon",
+    "discountLabel": "Discount"
   },
   "common": {
     "home": "Home",
@@ -741,7 +754,20 @@
     "ctaTitle": "Try It Yourself",
     "ctaDesc": "Browse the Color SHOCK product range and experience the 180 ml advantage in Your salon.",
     "ctaProducts": "View Products →",
-    "ctaSalons": "Get a Salon Quote"
+    "ctaSalons": "Get a Salon Quote",
+    "calcTitle": "Your Salon Data",
+    "calcDyeingsLabel": "How many colourings per week?",
+    "calcMlLabel": "Average dye amount per colouring (ml)",
+    "calcPriceLabel": "Current dye price (€)",
+    "calcVolumeLabel": "Current dye volume (ml)",
+    "calcOurOffer": "Our Offer",
+    "calcResultsTitle": "Results",
+    "calcCompetitorPerMl": "Price per ml (competitor)",
+    "calcOurPerMl": "Price per ml (Color SHOCK)",
+    "calcSavingsMonth": "Monthly savings",
+    "calcSavingsYear": "Annual savings",
+    "calcPackagesReduction": "Fewer packages per month",
+    "calcDisclaimer": "* Calculations are approximate and depend on actual prices and usage habits."
   },
   "trustBar": {
     "volumeTitle": "180 ml volume",
@@ -771,6 +797,11 @@
     "youSave": "You save",
     "priceOnlyPro": "Pricing — professionals only",
     "loginToSeePrice": "Log in or register to see prices and place orders.",
+    "accountPendingTitle": "Account pending approval",
+    "accountPendingDesc": "Your account is under review. Once an administrator approves your document, you'll see prices and be able to order.",
+    "accountRejectedTitle": "Document rejected",
+    "accountRejectedDesc": "Your document was rejected. Upload a new document and try again.",
+    "goToAccount": "Go to my account",
     "login": "Log in",
     "register": "Register",
     "registerPro": "Register as a professional",

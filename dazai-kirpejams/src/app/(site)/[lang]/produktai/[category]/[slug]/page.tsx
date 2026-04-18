@@ -54,9 +54,6 @@ export async function generateMetadata({
       description: description || undefined,
       url: canonical,
       type: 'article',
-      images: product.image_urls?.[0]
-        ? [{ url: product.image_urls[0], alt: name }]
-        : undefined,
     },
   }
 }
@@ -247,6 +244,11 @@ export default async function ProductPage({
                   addToCart: dict.popular.addToCart,
                   addedToCart: dict.popular.added ?? 'Pridėta į krepšelį',
                   youSave: t.youSave,
+                  accountPendingTitle: t.accountPendingTitle,
+                  accountPendingDesc: t.accountPendingDesc,
+                  accountRejectedTitle: t.accountRejectedTitle,
+                  accountRejectedDesc: t.accountRejectedDesc,
+                  goToAccount: t.goToAccount,
                 }}
               />
 
