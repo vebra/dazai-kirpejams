@@ -134,91 +134,99 @@ export type DyeColor = {
   family: 'šviesi' | 'vidutinė' | 'tamsi'
   tone: 'neutrali' | 'šilta' | 'šalta'
   hex: string
+  /** PDF swatch'o kelias (null — nėra nuotraukos, pvz. MEN linija) */
+  imagePath: string | null
   name_lt: string
   name_en: string
   name_ru: string
 }
 
+/**
+ * Pavadinimai — pagal Color SHOCK PDF katalogą (docs/color-shock-chart.pdf)
+ * ir `docs/spalvu pavadinimai.txt`. Swatch'ų nuotraukos iškirptos 100%
+ * tikslumu iš PDF embedded image resursų (154×255 px native raiška),
+ * saugomos `public/colors/color-shock-{slug}.jpeg`.
+ */
 export const hairDyeColors: DyeColor[] = [
-  // NATURAL — neutrali
-  { key: '1.00',  num: '1.00',  slug: 'color-shock-1-00',  family: 'tamsi',    tone: 'neutrali', hex: '#1A1A1A', name_lt: 'Juoda',                          name_en: 'Black',                          name_ru: 'Чёрный' },
-  { key: '3.00',  num: '3.00',  slug: 'color-shock-3-00',  family: 'tamsi',    tone: 'neutrali', hex: '#3B2314', name_lt: 'Tamsiai kaštoninė',              name_en: 'Dark Chestnut',                  name_ru: 'Тёмно-каштановый' },
-  { key: '4.00',  num: '4.00',  slug: 'color-shock-4-00',  family: 'vidutinė', tone: 'neutrali', hex: '#4A3021', name_lt: 'Kaštoninė',                      name_en: 'Chestnut',                       name_ru: 'Каштановый' },
-  { key: '5.00',  num: '5.00',  slug: 'color-shock-5-00',  family: 'vidutinė', tone: 'neutrali', hex: '#5C3D2E', name_lt: 'Šviesi kaštoninė',               name_en: 'Light Chestnut',                 name_ru: 'Светло-каштановый' },
-  { key: '6.00',  num: '6.00',  slug: 'color-shock-6-00',  family: 'vidutinė', tone: 'neutrali', hex: '#7A5A3E', name_lt: 'Tamsiai blondinė',               name_en: 'Dark Blonde',                    name_ru: 'Тёмный блонд' },
-  { key: '7.00',  num: '7.00',  slug: 'color-shock-7-00',  family: 'šviesi',   tone: 'neutrali', hex: '#8B7355', name_lt: 'Vidutinė blondinė',              name_en: 'Medium Blonde',                  name_ru: 'Средний блонд' },
-  { key: '8.00',  num: '8.00',  slug: 'color-shock-8-00',  family: 'šviesi',   tone: 'neutrali', hex: '#B8956A', name_lt: 'Šviesi blondinė',                name_en: 'Light Blonde',                   name_ru: 'Светлый блонд' },
-  { key: '9.00',  num: '9.00',  slug: 'color-shock-9-00',  family: 'šviesi',   tone: 'neutrali', hex: '#D4B896', name_lt: 'Labai šviesi blondinė',          name_en: 'Very Light Blonde',              name_ru: 'Очень светлый блонд' },
-  { key: '10.00', num: '10.00', slug: 'color-shock-10-00', family: 'šviesi',   tone: 'neutrali', hex: '#E8D5B8', name_lt: 'Ekstra šviesi blondinė',         name_en: 'Extra Light Blonde',             name_ru: 'Экстра светлый блонд' },
+  // NATURAL — neutrali (9)
+  { key: '1.00',  num: '1.00',  slug: 'color-shock-1-00',  family: 'tamsi',    tone: 'neutrali', hex: '#1A1A1A', imagePath: '/colors/color-shock-1-00.jpeg',  name_lt: 'Intensyvi juoda',    name_en: 'Intense Black',   name_ru: 'Интенсивный чёрный' },
+  { key: '3.00',  num: '3.00',  slug: 'color-shock-3-00',  family: 'tamsi',    tone: 'neutrali', hex: '#3B2314', imagePath: '/colors/color-shock-3-00.jpeg',  name_lt: 'Tamsiai ruda',       name_en: 'Dark Brown',      name_ru: 'Тёмно-коричневый' },
+  { key: '4.00',  num: '4.00',  slug: 'color-shock-4-00',  family: 'vidutinė', tone: 'neutrali', hex: '#4A3021', imagePath: '/colors/color-shock-4-00.jpeg',  name_lt: 'Ruda',               name_en: 'Brown',           name_ru: 'Коричневый' },
+  { key: '5.00',  num: '5.00',  slug: 'color-shock-5-00',  family: 'vidutinė', tone: 'neutrali', hex: '#5C3D2E', imagePath: '/colors/color-shock-5-00.jpeg',  name_lt: 'Šviesiai ruda',      name_en: 'Light Brown',     name_ru: 'Светло-коричневый' },
+  { key: '6.00',  num: '6.00',  slug: 'color-shock-6-00',  family: 'vidutinė', tone: 'neutrali', hex: '#7A5A3E', imagePath: '/colors/color-shock-6-00.jpeg',  name_lt: 'Tamsi blondinė',     name_en: 'Dark Blonde',     name_ru: 'Тёмный блонд' },
+  { key: '7.00',  num: '7.00',  slug: 'color-shock-7-00',  family: 'šviesi',   tone: 'neutrali', hex: '#8B7355', imagePath: '/colors/color-shock-7-00.jpeg',  name_lt: 'Intensyvi blondinė', name_en: 'Intense Blonde',  name_ru: 'Интенсивный блонд' },
+  { key: '8.00',  num: '8.00',  slug: 'color-shock-8-00',  family: 'šviesi',   tone: 'neutrali', hex: '#B8956A', imagePath: '/colors/color-shock-8-00.jpeg',  name_lt: 'Šviesi blondinė',    name_en: 'Light Blonde',    name_ru: 'Светлый блонд' },
+  { key: '9.00',  num: '9.00',  slug: 'color-shock-9-00',  family: 'šviesi',   tone: 'neutrali', hex: '#D4B896', imagePath: '/colors/color-shock-9-00.jpeg',  name_lt: 'Blondinė',           name_en: 'Blonde',          name_ru: 'Блонд' },
+  { key: '10.00', num: '10.00', slug: 'color-shock-10-00', family: 'šviesi',   tone: 'neutrali', hex: '#E8D5B8', imagePath: '/colors/color-shock-10-00.jpeg', name_lt: 'Platininė blondinė', name_en: 'Platinum Blonde', name_ru: 'Платиновый блонд' },
 
-  // ASH — šalta
-  { key: '5.1',  num: '5.1',  slug: 'color-shock-5-1',  family: 'vidutinė', tone: 'šalta', hex: '#6B5D52', name_lt: 'Šviesi pelenų kaštoninė',         name_en: 'Light Ash Chestnut',             name_ru: 'Светло-пепельный каштановый' },
-  { key: '6.1',  num: '6.1',  slug: 'color-shock-6-1',  family: 'vidutinė', tone: 'šalta', hex: '#8A7D6E', name_lt: 'Tamsiai pelenų blondinė',         name_en: 'Dark Ash Blonde',                name_ru: 'Тёмный пепельный блонд' },
-  { key: '7.1',  num: '7.1',  slug: 'color-shock-7-1',  family: 'šviesi',   tone: 'šalta', hex: '#A09585', name_lt: 'Pelenų blondinė',                name_en: 'Ash Blonde',                     name_ru: 'Пепельный блонд' },
-  { key: '8.1',  num: '8.1',  slug: 'color-shock-8-1',  family: 'šviesi',   tone: 'šalta', hex: '#B8AE9E', name_lt: 'Šviesi pelenų blondinė',         name_en: 'Light Ash Blonde',               name_ru: 'Светлый пепельный блонд' },
-  { key: '9.1',  num: '9.1',  slug: 'color-shock-9-1',  family: 'šviesi',   tone: 'šalta', hex: '#D0C8B8', name_lt: 'Labai šviesi pelenų blondinė',   name_en: 'Very Light Ash Blonde',          name_ru: 'Очень светлый пепельный блонд' },
-  { key: '10.1', num: '10.1', slug: 'color-shock-10-1', family: 'šviesi',   tone: 'šalta', hex: '#E2DDD0', name_lt: 'Ekstra šviesi pelenų blondinė',  name_en: 'Extra Light Ash Blonde',         name_ru: 'Экстра светлый пепельный блонд' },
+  // ASH — šalta (6)
+  { key: '5.1',  num: '5.1',  slug: 'color-shock-5-1',  family: 'vidutinė', tone: 'šalta', hex: '#6B5D52', imagePath: '/colors/color-shock-5-1.jpeg',  name_lt: 'Šviesiai pelenų ruda',        name_en: 'Light Ash Brown',        name_ru: 'Светлый пепельно-коричневый' },
+  { key: '6.1',  num: '6.1',  slug: 'color-shock-6-1',  family: 'vidutinė', tone: 'šalta', hex: '#8A7D6E', imagePath: '/colors/color-shock-6-1.jpeg',  name_lt: 'Tamsi pelenų blondinė',       name_en: 'Dark Ash Blonde',        name_ru: 'Тёмный пепельный блонд' },
+  { key: '7.1',  num: '7.1',  slug: 'color-shock-7-1',  family: 'šviesi',   tone: 'šalta', hex: '#A09585', imagePath: '/colors/color-shock-7-1.jpeg',  name_lt: 'Pelenų blondinė',             name_en: 'Ash Blonde',             name_ru: 'Пепельный блонд' },
+  { key: '8.1',  num: '8.1',  slug: 'color-shock-8-1',  family: 'šviesi',   tone: 'šalta', hex: '#B8AE9E', imagePath: '/colors/color-shock-8-1.jpeg',  name_lt: 'Šviesi pelenų blondinė',      name_en: 'Light Ash Blonde',       name_ru: 'Светлый пепельный блонд' },
+  { key: '9.1',  num: '9.1',  slug: 'color-shock-9-1',  family: 'šviesi',   tone: 'šalta', hex: '#D0C8B8', imagePath: '/colors/color-shock-9-1.jpeg',  name_lt: 'Labai šviesi pelenų blondinė', name_en: 'Very Light Ash Blonde', name_ru: 'Очень светлый пепельный блонд' },
+  { key: '10.1', num: '10.1', slug: 'color-shock-10-1', family: 'šviesi',   tone: 'šalta', hex: '#E2DDD0', imagePath: '/colors/color-shock-10-1.jpeg', name_lt: 'Platininė pelenų blondinė',   name_en: 'Platinum Ash Blonde',    name_ru: 'Платиновый пепельный блонд' },
 
-  // ICY CHOCOLATE — šalta
-  { key: '7.18', num: '7.18', slug: 'color-shock-7-18', family: 'šviesi', tone: 'šalta', hex: '#7A6550', name_lt: 'Ledinis šokoladas', name_en: 'Icy Chocolate', name_ru: 'Ледяной шоколад' },
+  // ICY CHOCOLATE — šalta (1)
+  { key: '7.18', num: '7.18', slug: 'color-shock-7-18', family: 'šviesi', tone: 'šalta', hex: '#7A6550', imagePath: '/colors/color-shock-7-18.jpeg', name_lt: 'Šalta šokoladinė ruda', name_en: 'Cool Chocolate Brown', name_ru: 'Холодный шоколадно-коричневый' },
 
-  // GOLDEN — šilta
-  { key: '9.3', num: '9.3', slug: 'color-shock-9-3', family: 'šviesi', tone: 'šilta', hex: '#C4A24E', name_lt: 'Auksinė blondinė', name_en: 'Golden Blonde', name_ru: 'Золотистый блонд' },
+  // GOLDEN — šilta (1)
+  { key: '9.3', num: '9.3', slug: 'color-shock-9-3', family: 'šviesi', tone: 'šilta', hex: '#C4A24E', imagePath: '/colors/color-shock-9-3.jpeg', name_lt: 'Labai šviesi auksinė blondinė', name_en: 'Very Light Golden Blonde', name_ru: 'Очень светлый золотистый блонд' },
 
-  // ASH PEARL — šalta
-  { key: '7.12', num: '7.12', slug: 'color-shock-7-12', family: 'šviesi', tone: 'šalta', hex: '#8A7872', name_lt: 'Pelenų perlinė blondinė',         name_en: 'Ash Pearl Blonde',           name_ru: 'Пепельно-перламутровый блонд' },
-  { key: '8.12', num: '8.12', slug: 'color-shock-8-12', family: 'šviesi', tone: 'šalta', hex: '#A8968F', name_lt: 'Šviesi pelenų perlinė',           name_en: 'Light Ash Pearl',            name_ru: 'Светлый пепельно-перламутровый' },
-  { key: '9.12', num: '9.12', slug: 'color-shock-9-12', family: 'šviesi', tone: 'šalta', hex: '#C4B5AE', name_lt: 'Labai šviesi pelenų perlinė',     name_en: 'Very Light Ash Pearl',       name_ru: 'Очень светлый пепельно-перламутровый' },
+  // ASH PEARL — šalta (3)
+  { key: '7.12', num: '7.12', slug: 'color-shock-7-12', family: 'šviesi', tone: 'šalta', hex: '#8A7872', imagePath: '/colors/color-shock-7-12.jpeg', name_lt: 'Perlinė blondinė',              name_en: 'Pearl Blonde',            name_ru: 'Жемчужный блонд' },
+  { key: '8.12', num: '8.12', slug: 'color-shock-8-12', family: 'šviesi', tone: 'šalta', hex: '#A8968F', imagePath: '/colors/color-shock-8-12.jpeg', name_lt: 'Šviesi perlinė blondinė',       name_en: 'Light Pearl Blonde',      name_ru: 'Светлый жемчужный блонд' },
+  { key: '9.12', num: '9.12', slug: 'color-shock-9-12', family: 'šviesi', tone: 'šalta', hex: '#C4B5AE', imagePath: '/colors/color-shock-9-12.jpeg', name_lt: 'Labai šviesi perlinė blondinė', name_en: 'Very Light Pearl Blonde', name_ru: 'Очень светлый жемчужный блонд' },
 
-  // VIOLET — šalta
-  { key: '5.22', num: '5.22', slug: 'color-shock-5-22', family: 'vidutinė', tone: 'šalta', hex: '#5C1A6E', name_lt: 'Intensyvi violetinė', name_en: 'Intense Violet', name_ru: 'Интенсивный фиолетовый' },
+  // VIOLET — šalta (1)
+  { key: '5.22', num: '5.22', slug: 'color-shock-5-22', family: 'vidutinė', tone: 'šalta', hex: '#5C1A6E', imagePath: '/colors/color-shock-5-22.jpeg', name_lt: 'Intensyvi šviesi violetinė ruda', name_en: 'Intense Light Violet Brown', name_ru: 'Интенсивный светлый фиолетово-коричневый' },
 
-  // VIOLET GOLD — neutrali (mišrus)
-  { key: '4.23', num: '4.23', slug: 'color-shock-4-23', family: 'vidutinė', tone: 'neutrali', hex: '#5A3828', name_lt: 'Violetinė auksinė kaštoninė', name_en: 'Violet Gold Chestnut', name_ru: 'Фиолетово-золотистый каштановый' },
+  // VIOLET GOLD — neutrali (1)
+  { key: '4.23', num: '4.23', slug: 'color-shock-4-23', family: 'vidutinė', tone: 'neutrali', hex: '#5A3828', imagePath: '/colors/color-shock-4-23.jpeg', name_lt: 'Tabako ruda', name_en: 'Tobacco Brown', name_ru: 'Табачно-коричневый' },
 
-  // WARM BEIGE — šilta
-  { key: '6.32',  num: '6.32',  slug: 'color-shock-6-32',  family: 'vidutinė', tone: 'šilta', hex: '#8A6E4E', name_lt: 'Tamsiai bežinė',         name_en: 'Dark Beige',                name_ru: 'Тёмно-бежевый' },
-  { key: '7.32',  num: '7.32',  slug: 'color-shock-7-32',  family: 'šviesi',   tone: 'šilta', hex: '#A08462', name_lt: 'Šiltai bežinė blondinė', name_en: 'Warm Beige Blonde',         name_ru: 'Тёплый бежевый блонд' },
-  { key: '8.32',  num: '8.32',  slug: 'color-shock-8-32',  family: 'šviesi',   tone: 'šilta', hex: '#C4A07A', name_lt: 'Šviesi bežinė blondinė', name_en: 'Light Beige Blonde',        name_ru: 'Светлый бежевый блонд' },
-  { key: '9.32',  num: '9.32',  slug: 'color-shock-9-32',  family: 'šviesi',   tone: 'šilta', hex: '#D8BFA0', name_lt: 'Labai šviesi bežinė',    name_en: 'Very Light Beige',          name_ru: 'Очень светлый бежевый' },
-  { key: '10.32', num: '10.32', slug: 'color-shock-10-32', family: 'šviesi',   tone: 'šilta', hex: '#E8D5B8', name_lt: 'Ekstra šviesi bežinė',   name_en: 'Extra Light Beige',         name_ru: 'Экстра светлый бежевый' },
+  // WARM BEIGE — šilta (5)
+  { key: '6.32',  num: '6.32',  slug: 'color-shock-6-32',  family: 'vidutinė', tone: 'šilta', hex: '#8A6E4E', imagePath: '/colors/color-shock-6-32.jpeg',  name_lt: 'Tamsi smėlinė blondinė',       name_en: 'Dark Beige Blonde',         name_ru: 'Тёмный бежевый блонд' },
+  { key: '7.32',  num: '7.32',  slug: 'color-shock-7-32',  family: 'šviesi',   tone: 'šilta', hex: '#A08462', imagePath: '/colors/color-shock-7-32.jpeg',  name_lt: 'Smėlinė blondinė',             name_en: 'Beige Blonde',              name_ru: 'Бежевый блонд' },
+  { key: '8.32',  num: '8.32',  slug: 'color-shock-8-32',  family: 'šviesi',   tone: 'šilta', hex: '#C4A07A', imagePath: '/colors/color-shock-8-32.jpeg',  name_lt: 'Šviesi smėlinė blondinė',      name_en: 'Light Beige Blonde',        name_ru: 'Светлый бежевый блонд' },
+  { key: '9.32',  num: '9.32',  slug: 'color-shock-9-32',  family: 'šviesi',   tone: 'šilta', hex: '#D8BFA0', imagePath: '/colors/color-shock-9-32.jpeg',  name_lt: 'Labai šviesi smėlinė blondinė', name_en: 'Very Light Beige Blonde',  name_ru: 'Очень светлый бежевый блонд' },
+  { key: '10.32', num: '10.32', slug: 'color-shock-10-32', family: 'šviesi',   tone: 'šilta', hex: '#E8D5B8', imagePath: '/colors/color-shock-10-32.jpeg', name_lt: 'Platininė smėlinė blondinė',   name_en: 'Platinum Beige Blonde',     name_ru: 'Платиновый бежевый блонд' },
 
-  // COPPER — šilta
-  { key: '7.444', num: '7.444', slug: 'color-shock-7-444', family: 'šviesi', tone: 'šilta', hex: '#C4622A', name_lt: 'Intensyvi varinė',        name_en: 'Intense Copper',       name_ru: 'Интенсивная медь' },
-  { key: '8.444', num: '8.444', slug: 'color-shock-8-444', family: 'šviesi', tone: 'šilta', hex: '#D4884A', name_lt: 'Šviesi intensyvi varinė', name_en: 'Light Intense Copper', name_ru: 'Светлая интенсивная медь' },
+  // COPPER — šilta (2)
+  { key: '7.444', num: '7.444', slug: 'color-shock-7-444', family: 'šviesi', tone: 'šilta', hex: '#C4622A', imagePath: '/colors/color-shock-7-444.jpeg', name_lt: 'Ypač intensyvi varinė blondinė',        name_en: 'Extra Intense Copper Blonde',       name_ru: 'Экстра интенсивный медный блонд' },
+  { key: '8.444', num: '8.444', slug: 'color-shock-8-444', family: 'šviesi', tone: 'šilta', hex: '#D4884A', imagePath: '/colors/color-shock-8-444.jpeg', name_lt: 'Ypač intensyvi šviesi varinė blondinė', name_en: 'Extra Intense Light Copper Blonde', name_ru: 'Экстра интенсивный светлый медный блонд' },
 
-  // MAHOGANY — šilta
-  { key: '6.5', num: '6.5', slug: 'color-shock-6-5', family: 'vidutinė', tone: 'šilta', hex: '#6E2244', name_lt: 'Raudonmedžio', name_en: 'Mahogany', name_ru: 'Махагон' },
+  // MAHOGANY — šilta (1)
+  { key: '6.5', num: '6.5', slug: 'color-shock-6-5', family: 'vidutinė', tone: 'šilta', hex: '#6E2244', imagePath: '/colors/color-shock-6-5.jpeg', name_lt: 'Tamsus raudonmedis', name_en: 'Dark Mahogany', name_ru: 'Тёмный махагон' },
 
-  // RED — šilta
-  { key: '6.66', num: '6.66', slug: 'color-shock-6-66', family: 'vidutinė', tone: 'šilta', hex: '#A52A2A', name_lt: 'Intensyvi raudona',        name_en: 'Intense Red',       name_ru: 'Интенсивный красный' },
-  { key: '7.66', num: '7.66', slug: 'color-shock-7-66', family: 'šviesi',   tone: 'šilta', hex: '#C44040', name_lt: 'Šviesi intensyvi raudona', name_en: 'Light Intense Red', name_ru: 'Светлый интенсивный красный' },
+  // RED — šilta (2)
+  { key: '6.66', num: '6.66', slug: 'color-shock-6-66', family: 'vidutinė', tone: 'šilta', hex: '#A52A2A', imagePath: '/colors/color-shock-6-66.jpeg', name_lt: 'Intensyvi tamsiai raudona blondinė', name_en: 'Intense Dark Red Blonde', name_ru: 'Интенсивный тёмно-красный блонд' },
+  { key: '7.66', num: '7.66', slug: 'color-shock-7-66', family: 'šviesi',   tone: 'šilta', hex: '#C44040', imagePath: '/colors/color-shock-7-66.jpeg', name_lt: 'Intensyvi raudona blondinė',         name_en: 'Intense Red Blonde',      name_ru: 'Интенсивный красный блонд' },
 
-  // CHOCOLATE — šilta
-  { key: '5.8', num: '5.8', slug: 'color-shock-5-8', family: 'vidutinė', tone: 'šilta', hex: '#5C3420', name_lt: 'Šokoladinė',        name_en: 'Chocolate',       name_ru: 'Шоколадный' },
-  { key: '6.8', num: '6.8', slug: 'color-shock-6-8', family: 'vidutinė', tone: 'šilta', hex: '#7A4A2E', name_lt: 'Šviesi šokoladinė', name_en: 'Light Chocolate', name_ru: 'Светло-шоколадный' },
+  // CHOCOLATE — šilta (2)
+  { key: '5.8', num: '5.8', slug: 'color-shock-5-8', family: 'vidutinė', tone: 'šilta', hex: '#5C3420', imagePath: '/colors/color-shock-5-8.jpeg', name_lt: 'Šokoladinė ruda',         name_en: 'Chocolate Brown',       name_ru: 'Шоколадно-коричневый' },
+  { key: '6.8', num: '6.8', slug: 'color-shock-6-8', family: 'vidutinė', tone: 'šilta', hex: '#7A4A2E', imagePath: '/colors/color-shock-6-8.jpeg', name_lt: 'Tamsi šokoladinė blondinė', name_en: 'Dark Chocolate Blonde', name_ru: 'Тёмный шоколадный блонд' },
 
-  // SUPERLIFT — šalta
-  { key: '11.11', num: '11.11', slug: 'color-shock-11-11', family: 'šviesi', tone: 'šalta', hex: '#C8B8A8', name_lt: 'Super šviesi pelenų',   name_en: 'Super Light Ash',     name_ru: 'Супер светлый пепельный' },
-  { key: '12.0',  num: '12.0',  slug: 'color-shock-12-0',  family: 'šviesi', tone: 'šalta', hex: '#D8CFC5', name_lt: 'Ultra šviesi natūrali', name_en: 'Ultra Light Natural', name_ru: 'Ультра светлый натуральный' },
-  { key: '12.2',  num: '12.2',  slug: 'color-shock-12-2',  family: 'šviesi', tone: 'šalta', hex: '#E0D2C8', name_lt: 'Ultra šviesi perlinė',  name_en: 'Ultra Light Pearl',   name_ru: 'Ультра светлый перламутровый' },
-  { key: '12.12', num: '12.12', slug: 'color-shock-12-12', family: 'šviesi', tone: 'šalta', hex: '#D8C8C0', name_lt: 'Ultra pelenų perlinė',  name_en: 'Ultra Ash Pearl',     name_ru: 'Ультра пепельно-перламутровый' },
-  { key: '12.21', num: '12.21', slug: 'color-shock-12-21', family: 'šviesi', tone: 'šalta', hex: '#DFD0C8', name_lt: 'Ultra perlinė pelenų',  name_en: 'Ultra Pearl Ash',     name_ru: 'Ультра перламутрово-пепельный' },
-  { key: '12.62', num: '12.62', slug: 'color-shock-12-62', family: 'šviesi', tone: 'šalta', hex: '#D8C4C0', name_lt: 'Ultra rožinė perlinė',  name_en: 'Ultra Pink Pearl',    name_ru: 'Ультра розово-перламутровый' },
+  // SUPERLIFT — šalta (6)
+  { key: '11.11', num: '11.11', slug: 'color-shock-11-11', family: 'šviesi', tone: 'šalta', hex: '#C8B8A8', imagePath: '/colors/color-shock-11-11.jpeg', name_lt: 'Intensyvi šviesi platininė pelenų blondinė', name_en: 'Intense Light Platinum Ash Blonde', name_ru: 'Интенсивный светлый платиновый пепельный блонд' },
+  { key: '12.0',  num: '12.0',  slug: 'color-shock-12-0',  family: 'šviesi', tone: 'šalta', hex: '#D8CFC5', imagePath: '/colors/color-shock-12-0.jpeg',  name_lt: 'Ypač šviesinanti natūrali blondinė',           name_en: 'Superlift Natural Blonde',           name_ru: 'Суперосветляющий натуральный блонд' },
+  { key: '12.2',  num: '12.2',  slug: 'color-shock-12-2',  family: 'šviesi', tone: 'šalta', hex: '#E0D2C8', imagePath: '/colors/color-shock-12-2.jpeg',  name_lt: 'Ypač šviesinanti violetinė blondinė',          name_en: 'Superlift Violet Blonde',            name_ru: 'Суперосветляющий фиолетовый блонд' },
+  { key: '12.12', num: '12.12', slug: 'color-shock-12-12', family: 'šviesi', tone: 'šalta', hex: '#D8C8C0', imagePath: '/colors/color-shock-12-12.jpeg', name_lt: 'Ypač šviesinanti perlinė blondinė',            name_en: 'Superlift Pearl Blonde',             name_ru: 'Суперосветляющий жемчужный блонд' },
+  { key: '12.21', num: '12.21', slug: 'color-shock-12-21', family: 'šviesi', tone: 'šalta', hex: '#DFD0C8', imagePath: '/colors/color-shock-12-21.jpeg', name_lt: 'Ypač šviesinanti violetinė pelenų blondinė', name_en: 'Superlift Violet Ash Blonde',        name_ru: 'Суперосветляющий фиолетовый пепельный блонд' },
+  { key: '12.62', num: '12.62', slug: 'color-shock-12-62', family: 'šviesi', tone: 'šalta', hex: '#D8C4C0', imagePath: '/colors/color-shock-12-62.jpeg', name_lt: 'Ypač šviesinanti rožinė blondinė',             name_en: 'Superlift Pink Blonde',              name_ru: 'Суперосветляющий розовый блонд' },
 
-  // TONER & CORRECTORS — be numerinio kodo
-  { key: 'silver-grey',  num: null, slug: 'color-shock-silver-grey',  family: 'vidutinė', tone: 'šalta',    hex: '#8A8A8A', name_lt: 'Sidabrinė pilka',   name_en: 'Silver Grey',   name_ru: 'Серебристо-серый' },
-  { key: 'light-grey',   num: null, slug: 'color-shock-light-grey',   family: 'šviesi',   tone: 'šalta',    hex: '#B0B0B0', name_lt: 'Šviesi pilka',      name_en: 'Light Grey',    name_ru: 'Светло-серый' },
-  { key: 'dark-grey',    num: null, slug: 'color-shock-dark-grey',    family: 'vidutinė', tone: 'neutrali', hex: '#6A6A6A', name_lt: 'Tamsiai pilka',     name_en: 'Dark Grey',     name_ru: 'Тёмно-серый' },
-  { key: 'silver-pearl', num: null, slug: 'color-shock-silver-pearl', family: 'šviesi',   tone: 'šalta',    hex: '#C0B8B0', name_lt: 'Sidabrinė perlinė', name_en: 'Silver Pearl',  name_ru: 'Серебристо-перламутровый' },
-  { key: 'silver-beige', num: null, slug: 'color-shock-silver-beige', family: 'šviesi',   tone: 'neutrali', hex: '#C8B8A0', name_lt: 'Sidabrinė bežinė',  name_en: 'Silver Beige',  name_ru: 'Серебристо-бежевый' },
-  { key: 'lilac',        num: null, slug: 'color-shock-lilac',        family: 'šviesi',   tone: 'šalta',    hex: '#C8A0B0', name_lt: 'Alyvinė',           name_en: 'Lilac',         name_ru: 'Сиреневый' },
+  // TONER & CORRECTORS — be numerinio kodo (6)
+  { key: 'silver-grey',  num: null, slug: 'color-shock-silver-grey',  family: 'vidutinė', tone: 'šalta',    hex: '#8A8A8A', imagePath: '/colors/color-shock-silver-grey.jpeg',  name_lt: 'Sidabriškai pilka', name_en: 'Silver Grey',  name_ru: 'Серебристо-серый' },
+  { key: 'light-grey',   num: null, slug: 'color-shock-light-grey',   family: 'šviesi',   tone: 'šalta',    hex: '#B0B0B0', imagePath: '/colors/color-shock-light-grey.jpeg',   name_lt: 'Šviesiai pilka',    name_en: 'Light Grey',   name_ru: 'Светло-серый' },
+  { key: 'dark-grey',    num: null, slug: 'color-shock-dark-grey',    family: 'vidutinė', tone: 'neutrali', hex: '#6A6A6A', imagePath: '/colors/color-shock-dark-grey.jpeg',    name_lt: 'Tamsiai pilka',     name_en: 'Dark Grey',    name_ru: 'Тёмно-серый' },
+  { key: 'silver-pearl', num: null, slug: 'color-shock-silver-pearl', family: 'šviesi',   tone: 'šalta',    hex: '#C0B8B0', imagePath: '/colors/color-shock-silver-pearl.jpeg', name_lt: 'Sidabrinis perlas', name_en: 'Silver Pearl', name_ru: 'Серебристый жемчуг' },
+  { key: 'silver-beige', num: null, slug: 'color-shock-silver-beige', family: 'šviesi',   tone: 'neutrali', hex: '#C8B8A0', imagePath: '/colors/color-shock-silver-beige.jpeg', name_lt: 'Sidabrinė smėlinė', name_en: 'Silver Beige', name_ru: 'Серебристо-бежевый' },
+  { key: 'lilac',        num: null, slug: 'color-shock-lilac',        family: 'šviesi',   tone: 'šalta',    hex: '#C8A0B0', imagePath: '/colors/color-shock-lilac.jpeg',        name_lt: 'Alyvinė',           name_en: 'Lilac',        name_ru: 'Сиреневый' },
 
-  // MEN — tamsūs atspalviai vyrams (4 spalvos — pilna paletė iki 50)
-  { key: '4-men', num: '4 MEN', slug: 'color-shock-4-men', family: 'tamsi', tone: 'neutrali', hex: '#2A1810', name_lt: 'Tamsiai kaštoninė (vyrams)', name_en: 'Dark Chestnut (Men)',  name_ru: 'Тёмно-каштановый (для мужчин)' },
-  { key: '5-men', num: '5 MEN', slug: 'color-shock-5-men', family: 'tamsi', tone: 'neutrali', hex: '#3B2314', name_lt: 'Kaštoninė (vyrams)',         name_en: 'Chestnut (Men)',       name_ru: 'Каштановый (для мужчин)' },
-  { key: '6-men', num: '6 MEN', slug: 'color-shock-6-men', family: 'tamsi', tone: 'neutrali', hex: '#4A3021', name_lt: 'Tamsiai blondinė (vyrams)',  name_en: 'Dark Blonde (Men)',    name_ru: 'Тёмный блонд (для мужчин)' },
-  { key: '7-men', num: '7 MEN', slug: 'color-shock-7-men', family: 'tamsi', tone: 'neutrali', hex: '#5C3D2E', name_lt: 'Vidutinė blondinė (vyrams)', name_en: 'Medium Blonde (Men)',  name_ru: 'Средний блонд (для мужчин)' },
+  // MEN — tamsūs atspalviai vyrams (4 spalvos — pilna paletė iki 50; nėra PDF swatch'o)
+  { key: '4-men', num: '4 MEN', slug: 'color-shock-4-men', family: 'tamsi', tone: 'neutrali', hex: '#2A1810', imagePath: null, name_lt: 'Tamsiai kaštoninė (vyrams)', name_en: 'Dark Chestnut (Men)',  name_ru: 'Тёмно-каштановый (для мужчин)' },
+  { key: '5-men', num: '5 MEN', slug: 'color-shock-5-men', family: 'tamsi', tone: 'neutrali', hex: '#3B2314', imagePath: null, name_lt: 'Kaštoninė (vyrams)',         name_en: 'Chestnut (Men)',       name_ru: 'Каштановый (для мужчин)' },
+  { key: '6-men', num: '6 MEN', slug: 'color-shock-6-men', family: 'tamsi', tone: 'neutrali', hex: '#4A3021', imagePath: null, name_lt: 'Tamsiai blondinė (vyrams)',  name_en: 'Dark Blonde (Men)',    name_ru: 'Тёмный блонд (для мужчин)' },
+  { key: '7-men', num: '7 MEN', slug: 'color-shock-7-men', family: 'tamsi', tone: 'neutrali', hex: '#5C3D2E', imagePath: null, name_lt: 'Vidutinė blondinė (vyrams)', name_en: 'Medium Blonde (Men)',  name_ru: 'Средний блонд (для мужчин)' },
 ]
 
 /** Featured produktai pagrindiniam puslapiui — 4 ryškūs, įvairaus tono atspalviai */
@@ -267,6 +275,7 @@ const hairDyes: Product[] = hairDyeColors.map((c, idx) => {
     color_tone: c.tone,
     color_family: c.family,
     is_featured: featuredSlugs.has(c.slug),
+    image_urls: c.imagePath ? [c.imagePath] : [],
   })
 })
 
@@ -312,7 +321,7 @@ const shampoos: Product[] = [
     name_lt: 'Silver Šampūnas',
     name_en: 'Silver Shampoo',
     name_ru: 'Серебряный шампунь',
-    desc_lt: 'Šampūnas šviesioms ir peleninėms spalvoms. Neutralizuoja geltoną atspalvį.',
+    desc_lt: 'Šampūnas šviesioms ir pelenų spalvoms. Neutralizuoja geltoną atspalvį.',
     desc_en: 'Shampoo for blonde and ash colors. Neutralizes yellow tones.',
     desc_ru: 'Шампунь для блонда и пепельных оттенков. Нейтрализует желтизну.',
     price: 1590,

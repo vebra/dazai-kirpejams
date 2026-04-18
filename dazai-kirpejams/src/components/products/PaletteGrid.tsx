@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Product } from '@/lib/types'
 import type { Locale } from '@/i18n/config'
 import { langPrefix } from '@/lib/utils'
@@ -122,15 +123,25 @@ export function PaletteGrid({ products, lang }: PaletteGridProps) {
             <Link
               key={product.id}
               href={`${langPrefix(lang)}/produktai/dazai/${product.slug}`}
-              className="group bg-brand-gray-50 rounded-xl p-5 text-center border border-transparent hover:border-brand-magenta hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
+              className="group bg-brand-gray-50 rounded-xl p-4 text-center border border-transparent hover:border-brand-magenta hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
             >
-              <div
-                className="w-20 h-20 mx-auto rounded-full mb-4 border border-[#E0E0E0] shadow-[inset_0_2px_8px_rgba(0,0,0,0.1)]"
-                style={{
-                  backgroundColor: product.color_hex || '#f5f5f7',
-                }}
-                aria-hidden
-              />
+              <div className="relative w-[108px] h-[180px] mx-auto mb-3 overflow-hidden rounded-md bg-white border border-[#E0E0E0] shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
+                {product.image_urls[0] ? (
+                  <Image
+                    src={product.image_urls[0]}
+                    alt={product.color_name || product.name_lt}
+                    fill
+                    sizes="108px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div
+                    className="w-full h-full"
+                    style={{ backgroundColor: product.color_hex || '#f5f5f7' }}
+                    aria-hidden
+                  />
+                )}
+              </div>
               <div className="text-[0.75rem] font-bold text-brand-magenta uppercase tracking-wider mb-1">
                 {product.color_number}
               </div>

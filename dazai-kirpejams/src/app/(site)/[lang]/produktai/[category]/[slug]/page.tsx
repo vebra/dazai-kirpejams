@@ -154,7 +154,7 @@ export default async function ProductPage({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14">
             {/* Gallery */}
             <div>
-              <div className="relative aspect-square bg-brand-gray-50 rounded-2xl overflow-hidden border border-[#E0E0E0]">
+              <div className="relative aspect-square bg-white rounded-2xl overflow-hidden border border-[#E0E0E0]">
                 {product.volume_ml === 180 && (
                   <span className="absolute top-5 left-5 z-10 px-4 py-1.5 bg-brand-magenta text-white text-[0.78rem] font-bold uppercase tracking-wider rounded-full">
                     180 ml
@@ -167,7 +167,7 @@ export default async function ProductPage({
                     fill
                     priority
                     sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover"
+                    className="object-contain p-10"
                   />
                 ) : product.color_hex ? (
                   <div className="absolute inset-0 flex items-center justify-center">
