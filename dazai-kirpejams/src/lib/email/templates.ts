@@ -786,6 +786,251 @@ ${input.siteUrl}
   return { subject, html, text }
 }
 
+// ============================================
+// B2B užklausa — admin pranešimas
+// ============================================
+
+type B2bInquiryAdminEmailInput = {
+  salonName: string
+  contactName: string
+  email: string
+  phone: string
+  address: string | null
+  monthlyVolume: string | null
+  message: string | null
+  locale: string
+  adminUrl: string
+  createdAt: string
+}
+
+const VOLUME_LT: Record<string, string> = {
+  'iki-10': 'Iki 10 pakuočių / mėn.',
+  '10-50': '10–50 pakuočių / mėn.',
+  '50-100': '50–100 pakuočių / mėn.',
+  '100+': 'Daugiau nei 100 pakuočių / mėn.',
+}
+
+export function buildB2bInquiryAdminEmail(input: B2bInquiryAdminEmailInput): {
+  subject: string
+  html: string
+  text: string
+} {
+  const subject = `Nauja B2B užklausa · ${input.salonName}`
+
+  const volumeLabel = input.monthlyVolume
+    ? VOLUME_LT[input.monthlyVolume] ?? input.monthlyVolume
+    : '—'
+
+  const messageBlock = input.message
+    ? `
+      <tr>
+        <td style="padding:16px 32px 0;">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:${GRAY_500};margin-bottom:8px;">
+            Žinutė
+          </div>
+          <div style="background:${GRAY_50};border-radius:12px;padding:16px 20px;font-size:14px;color:${GRAY_900};line-height:1.6;white-space:pre-wrap;">
+            ${escapeHtml(input.message)}
+          </div>
+        </td>
+      </tr>`
+    : ''
+
+  const html = `<!doctype html>
+<html lang="lt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${escapeHtml(subject)}</title>
+</head>
+<body style="margin:0;padding:0;background:${GRAY_50};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:${GRAY_900};">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">
+  Nauja B2B užklausa nuo ${escapeHtml(input.salonName)} · ${escapeHtml(input.contactName)}
+</div>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};padding:32px 16px;">
+  <tr>
+    <td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
+
+        <tr>
+          <td style="padding:24px 32px;background:${BRAND_MAGENTA};">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.8);">
+              Admin · Nauja B2B užklausa
+            </div>
+            <div style="font-size:22px;font-weight:700;color:#ffffff;margin-top:4px;">
+              ${escapeHtml(input.salonName)}
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:24px 32px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="padding:8px 0;color:${GRAY_500};font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;width:40%;">Data</td>
+                <td style="padding:8px 0;color:${GRAY_900};font-size:14px;">${escapeHtml(formatDate(input.createdAt))}</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 0;color:${GRAY_500};font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;border-top:1px solid ${BORDER};">Kontaktinis asmuo</td>
+                <td style="padding:8px 0;color:${GRAY_900};font-size:14px;border-top:1px solid ${BORDER};">${escapeHtml(input.contactName)}</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 0;color:${GRAY_500};font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;border-top:1px solid ${BORDER};">El. paštas</td>
+                <td style="padding:8px 0;color:${GRAY_900};font-size:14px;border-top:1px solid ${BORDER};">
+                  <a href="mailto:${escapeHtml(input.email)}" style="color:${BRAND_MAGENTA};text-decoration:none;">${escapeHtml(input.email)}</a>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:8px 0;color:${GRAY_500};font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;border-top:1px solid ${BORDER};">Telefonas</td>
+                <td style="padding:8px 0;color:${GRAY_900};font-size:14px;border-top:1px solid ${BORDER};">
+                  ${
+                    input.phone
+                      ? `<a href="tel:${escapeHtml(input.phone)}" style="color:${BRAND_MAGENTA};text-decoration:none;">${escapeHtml(input.phone)}</a>`
+                      : '—'
+                  }
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:8px 0;color:${GRAY_500};font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;border-top:1px solid ${BORDER};">Salono adresas</td>
+                <td style="padding:8px 0;color:${GRAY_900};font-size:14px;border-top:1px solid ${BORDER};">${input.address ? escapeHtml(input.address) : '—'}</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 0;color:${GRAY_500};font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;border-top:1px solid ${BORDER};">Mėnesinis poreikis</td>
+                <td style="padding:8px 0;color:${GRAY_900};font-size:14px;border-top:1px solid ${BORDER};">${escapeHtml(volumeLabel)}</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 0;color:${GRAY_500};font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;border-top:1px solid ${BORDER};">Svetainės kalba</td>
+                <td style="padding:8px 0;color:${GRAY_900};font-size:14px;border-top:1px solid ${BORDER};">${escapeHtml(input.locale.toUpperCase())}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        ${messageBlock}
+
+        <tr>
+          <td style="padding:24px 32px 32px;">
+            <a href="${input.adminUrl}" style="display:inline-block;background:${BRAND_MAGENTA};color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:700;font-size:14px;">
+              Peržiūrėti admin panelėje →
+            </a>
+            <p style="margin:16px 0 0;font-size:12px;color:${GRAY_500};line-height:1.6;">
+              Atsakyti klientui galite tiesiog paspaudę „Reply" — laiškas bus išsiųstas į <strong style="color:${GRAY_900};">${escapeHtml(input.email)}</strong>.
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>`
+
+  const text = `
+NAUJA B2B UŽKLAUSA · ${input.salonName}
+
+Data:              ${formatDate(input.createdAt)}
+Kontaktinis asmuo: ${input.contactName}
+El. paštas:        ${input.email}
+Telefonas:         ${input.phone || '—'}
+Salono adresas:    ${input.address || '—'}
+Mėnesinis poreikis: ${volumeLabel}
+Svetainės kalba:   ${input.locale.toUpperCase()}
+${input.message ? `\nŽINUTĖ:\n${input.message}\n` : ''}
+Peržiūrėti admin panelėje:
+${input.adminUrl}
+`.trim()
+
+  return { subject, html, text }
+}
+
+// ============================================
+// B2B užklausa — patvirtinimas klientui
+// ============================================
+
+type B2bInquiryCustomerEmailInput = {
+  contactName: string
+  salonName: string
+  siteUrl: string
+}
+
+export function buildB2bInquiryCustomerEmail(
+  input: B2bInquiryCustomerEmailInput
+): {
+  subject: string
+  html: string
+  text: string
+} {
+  const subject = 'Jūsų B2B užklausa gauta — Dažai Kirpėjams'
+
+  const html = `<!doctype html>
+<html lang="lt">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(subject)}</title></head>
+<body style="margin:0;padding:0;background:${GRAY_50};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:${GRAY_900};">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">
+  Ačiū už B2B užklausą. Susisieksime artimiausiu metu su individualiu pasiūlymu.
+</div>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};padding:32px 16px;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
+      <tr>
+        <td style="padding:32px;border-bottom:1px solid ${BORDER};">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:${BRAND_MAGENTA};">Dažai Kirpėjams</div>
+          <h1 style="margin:8px 0 0;font-size:24px;font-weight:700;color:${GRAY_900};line-height:1.2;">
+            Ačiū už užklausą
+          </h1>
+          <p style="margin:12px 0 0;font-size:14px;color:${GRAY_500};line-height:1.6;">
+            Sveiki, ${escapeHtml(input.contactName)}. Jūsų B2B užklausa nuo <strong style="color:${GRAY_900};">${escapeHtml(input.salonName)}</strong> sėkmingai gauta.
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:24px 32px;">
+          <p style="margin:0 0 16px;font-size:14px;color:${GRAY_900};line-height:1.6;">
+            Mūsų vadybininkas susisieks su Jumis artimiausiu metu (paprastai per 1 darbo dieną) ir pateiks individualų pasiūlymą jūsų salonui.
+          </p>
+          <p style="margin:0 0 16px;font-size:14px;color:${GRAY_900};line-height:1.6;">
+            Tuo tarpu galite peržiūrėti mūsų produktų asortimentą:
+          </p>
+          <a href="${input.siteUrl}" style="display:inline-block;padding:12px 24px;background:${BRAND_MAGENTA};color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">
+            Atidaryti parduotuvę →
+          </a>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:0 32px 32px;border-top:1px solid ${BORDER};padding-top:24px;">
+          <p style="margin:0;font-size:13px;color:${GRAY_500};line-height:1.6;">
+            Jei turite skubų klausimą — tiesiog atsakykite į šį laišką.
+          </p>
+          <p style="margin:12px 0 0;font-size:12px;color:${GRAY_500};">
+            <strong style="color:${GRAY_900};">Dažai Kirpėjams</strong><br>
+            Profesionalūs plaukų dažai kirpėjams · 180 ml<br>
+            <a href="${input.siteUrl}" style="color:${BRAND_MAGENTA};text-decoration:none;">${input.siteUrl.replace(/^https?:\/\//, '')}</a>
+          </p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body></html>`
+
+  const text = `
+Ačiū už užklausą — Dažai Kirpėjams
+
+Sveiki, ${input.contactName}.
+
+Jūsų B2B užklausa nuo ${input.salonName} sėkmingai gauta.
+
+Mūsų vadybininkas susisieks su Jumis artimiausiu metu (paprastai per 1 darbo dieną) ir pateiks individualų pasiūlymą jūsų salonui.
+
+Jei turite skubų klausimą — tiesiog atsakykite į šį laišką.
+
+Dažai Kirpėjams
+${input.siteUrl}
+`.trim()
+
+  return { subject, html, text }
+}
+
 function buildCancelledEmail(input: StatusChangeEmailInput): {
   subject: string
   html: string

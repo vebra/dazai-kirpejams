@@ -1,11 +1,18 @@
 'use server'
 
 import { createServerSupabase } from '@/lib/supabase/ssr'
+import { sendEmail, getB2bNotificationEmail } from '@/lib/email/resend'
+import {
+  buildB2bInquiryAdminEmail,
+  buildB2bInquiryCustomerEmail,
+} from '@/lib/email/templates'
 
 export type B2bFormState = {
   error?: string
   success?: boolean
 }
+
+const FALLBACK_ADMIN_EMAIL = 'info@dziuljetavebre.lt'
 
 export async function submitB2bInquiryAction(
   _prev: B2bFormState,
@@ -43,6 +50,54 @@ export async function submitB2bInquiryAction(
   if (error) {
     console.error('[b2b-form] insert error:', error.message)
     return { error: 'Nepavyko išsiųsti užklausos. Bandykite dar kartą.' }
+  }
+
+  // Email notifikacijos — adminui (info@dziuljetavebre.lt) ir patvirtinimas
+  // klientui. Email klaidos neturi trukdyti vartotojui pamatyti success
+  // ekrano — užklausa jau išsaugota DB'e.
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
+    'https://www.dazaikirpejams.lt'
+  const createdAtIso = new Date().toISOString()
+  const adminEmailAddress = getB2bNotificationEmail() ?? FALLBACK_ADMIN_EMAIL
+
+  try {
+    const adminPayload = buildB2bInquiryAdminEmail({
+      salonName,
+      contactName,
+      email,
+      phone,
+      address: address || null,
+      monthlyVolume: monthlyVolume || null,
+      message: message || null,
+      locale,
+      adminUrl: `${siteUrl}/admin/b2b`,
+      createdAt: createdAtIso,
+    })
+
+    const customerPayload = buildB2bInquiryCustomerEmail({
+      contactName,
+      salonName,
+      siteUrl,
+    })
+
+    await Promise.all([
+      sendEmail({
+        to: adminEmailAddress,
+        subject: adminPayload.subject,
+        html: adminPayload.html,
+        text: adminPayload.text,
+        replyTo: email,
+      }),
+      sendEmail({
+        to: email,
+        subject: customerPayload.subject,
+        html: customerPayload.html,
+        text: customerPayload.text,
+      }),
+    ])
+  } catch (emailErr) {
+    console.error('[b2b-form] email sending failed (non-blocking):', emailErr)
   }
 
   return { success: true }

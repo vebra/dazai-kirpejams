@@ -19,6 +19,7 @@ import { Resend } from 'resend'
 const apiKey = process.env.RESEND_API_KEY
 const fromAddress = process.env.RESEND_FROM
 const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL
+const b2bEmail = process.env.B2B_NOTIFICATION_EMAIL
 
 export const isResendConfigured = Boolean(
   apiKey &&
@@ -104,4 +105,14 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
 /** Admin email — naudoti "naujas užsakymas" pranešimams */
 export function getAdminNotificationEmail(): string | null {
   return adminEmail && !adminEmail.includes('xxxxxxxx') ? adminEmail : null
+}
+
+/**
+ * B2B email — atskiras srautas nuo užsakymų, nes salonų užklausos gali eiti
+ * kitam asmeniui/adresui nei e-shop notifikacijos. Jei `B2B_NOTIFICATION_EMAIL`
+ * nenustatytas, fallback'as į `ADMIN_NOTIFICATION_EMAIL`.
+ */
+export function getB2bNotificationEmail(): string | null {
+  if (b2bEmail && !b2bEmail.includes('xxxxxxxx')) return b2bEmail
+  return getAdminNotificationEmail()
 }
