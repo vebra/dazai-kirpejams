@@ -8,6 +8,7 @@ import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { VerificationProvider } from '@/components/auth/VerificationProvider'
+import { CookieConsent } from '@/components/cookies/CookieConsent'
 import { JsonLd } from '@/components/seo/JsonLd'
 import {
   organizationSchema,
@@ -116,6 +117,23 @@ export default async function RootLayout({
           <main className="flex-1 pt-[72px] lg:pt-[100px]">{children}</main>
           <Footer lang={lang} dict={dict} />
         </VerificationProvider>
+        <CookieConsent lang={lang} dict={dict.cookies} />
+        <Script id="gtag-consent-default" strategy="beforeInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            var stored = null;
+            try { stored = localStorage.getItem('cookie-consent-v1'); } catch(e) {}
+            var granted = stored === 'accepted' ? 'granted' : 'denied';
+            gtag('consent', 'default', {
+              ad_storage: granted,
+              ad_user_data: granted,
+              ad_personalization: granted,
+              analytics_storage: granted,
+              wait_for_update: 500
+            });
+          `}
+        </Script>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-DS608JQ7CV"
           strategy="afterInteractive"

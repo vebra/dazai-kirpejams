@@ -155,6 +155,13 @@
     "cta": "Pirkti dabar",
     "ctaSecondary": "Susisiekti"
   },
+  "cookies": {
+    "title": "Slapukai",
+    "message": "Naudojame slapukus, kad svetainė veiktų tinkamai, ir analitikos slapukus, kad gerintume Jūsų patirtį. Galite priimti arba atmesti analitinius slapukus. Būtinieji slapukai visada įjungti.",
+    "accept": "Priimti",
+    "reject": "Atmesti",
+    "privacyLink": "Privatumo politika"
+  },
   "footer": {
     "products": "Produktai",
     "information": "Informacija",

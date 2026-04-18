@@ -155,6 +155,13 @@
     "cta": "Shop Now",
     "ctaSecondary": "Contact Us"
   },
+  "cookies": {
+    "title": "Cookies",
+    "message": "We use cookies to make our website work properly and analytics cookies to improve your experience. You can accept or reject analytics cookies. Essential cookies are always enabled.",
+    "accept": "Accept",
+    "reject": "Reject",
+    "privacyLink": "Privacy policy"
+  },
   "footer": {
     "products": "Products",
     "information": "Information",
