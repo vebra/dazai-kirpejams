@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { Container } from '@/components/ui/Container'
 import type { Locale } from '@/i18n/config'
 import { langPrefix } from '@/lib/utils'
-import { CONTACT, phoneHref } from '@/lib/site'
+import { CONTACT, phoneHref, SOCIAL } from '@/lib/site'
 
 type FooterProps = {
   lang: Locale
@@ -64,22 +64,30 @@ export function Footer({ lang, dict }: FooterProps) {
               {footer.brandDescription}
             </p>
             <div className="flex gap-3 mt-4">
-              {[
-                { href: 'https://www.facebook.com/dazaikirpejams', label: 'Facebook', icon: 'f' },
-                { href: 'https://www.instagram.com/dazaikirpejams', label: 'Instagram', icon: 'ig' },
-              ].map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  title={social.label}
-                  aria-label={social.label}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-11 h-11 rounded-full border border-white/15 flex items-center justify-center text-base text-white/70 hover:bg-brand-magenta hover:border-brand-magenta hover:text-white transition-colors"
-                >
-                  {social.icon}
-                </a>
-              ))}
+              <a
+                href={SOCIAL.facebook}
+                title="Facebook"
+                aria-label="Facebook"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-11 h-11 rounded-full border border-white/15 flex items-center justify-center text-white/70 hover:bg-brand-magenta hover:border-brand-magenta hover:text-white transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/>
+                </svg>
+              </a>
+              <a
+                href={SOCIAL.instagram}
+                title="Instagram"
+                aria-label="Instagram"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-11 h-11 rounded-full border border-white/15 flex items-center justify-center text-white/70 hover:bg-brand-magenta hover:border-brand-magenta hover:text-white transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.849.07 1.366.062 2.633.332 3.608 1.308.975.975 1.246 2.242 1.308 3.608.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.062 1.366-.333 2.633-1.308 3.608-.975.975-2.242 1.246-3.608 1.308-1.265.058-1.645.069-4.849.069-3.204 0-3.584-.012-4.849-.069-1.366-.062-2.633-.333-3.608-1.308-.975-.975-1.246-2.242-1.308-3.608C2.175 15.647 2.163 15.267 2.163 12c0-3.204.012-3.584.07-4.849.062-1.366.332-2.633 1.308-3.608.975-.975 2.242-1.246 3.608-1.308C8.416 2.175 8.796 2.163 12 2.163zm0 1.838c-3.142 0-3.513.011-4.754.068-1.02.047-1.583.22-1.954.365-.491.191-.843.42-1.212.789-.369.369-.598.721-.789 1.212-.145.371-.318.934-.365 1.954-.057 1.241-.068 1.612-.068 4.754s.011 3.513.068 4.754c.047 1.02.22 1.583.365 1.954.191.491.42.843.789 1.212.369.369.721.598 1.212.789.371.145.934.318 1.954.365 1.241.057 1.612.068 4.754.068 3.142 0 3.513-.011 4.754-.068 1.02-.047 1.583-.22 1.954-.365.491-.191.843-.42 1.212-.789.369-.369.598-.721.789-1.212.145-.371.318-.934.365-1.954.057-1.241.068-1.612.068-4.754s-.011-3.513-.068-4.754c-.047-1.02-.22-1.583-.365-1.954-.191-.491-.42-.843-.789-1.212-.369-.369-.721-.598-1.212-.789-.371-.145-.934-.318-1.954-.365C15.513 4.012 15.142 4.001 12 4.001zm0 3.13a4.869 4.869 0 110 9.738 4.869 4.869 0 010-9.738zm0 8.03a3.162 3.162 0 100-6.324 3.162 3.162 0 000 6.324zm6.189-8.235a1.138 1.138 0 11-2.276 0 1.138 1.138 0 012.276 0z"/>
+                </svg>
+              </a>
             </div>
           </div>
 

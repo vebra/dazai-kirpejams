@@ -6,7 +6,7 @@ import { Container } from '@/components/ui/Container'
 import { buildPageMetadata, buildCanonicalUrl, SITE_URL } from '@/lib/seo'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumbSchema, localBusinessSchema } from '@/lib/schema'
-import { CONTACT, phoneHref } from '@/lib/site'
+import { CONTACT, phoneHref, SOCIAL } from '@/lib/site'
 import { ContactForm } from './ContactForm'
 
 export const revalidate = 300
@@ -169,8 +169,8 @@ export default async function ContactPage({
                 </h4>
                 <div className="flex gap-3 flex-wrap">
                   {[
-                    { label: 'Facebook', href: 'https://www.facebook.com/dazaikirpejams' },
-                    { label: 'Instagram', href: 'https://www.instagram.com/dazaikirpejams' },
+                    { label: 'Facebook', href: SOCIAL.facebook },
+                    { label: 'Instagram', href: SOCIAL.instagram },
                   ].map((social) => (
                     <a
                       key={social.label}

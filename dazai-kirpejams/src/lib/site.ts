@@ -40,6 +40,6 @@ export const phoneHref = `tel:${CONTACT.phone.replace(/\s+/g, '')}`
 export const phone2Href = `tel:${CONTACT.phone2.replace(/\s+/g, '')}`
 
 export const SOCIAL = {
-  facebook: 'https://www.facebook.com/dazaikirpejams',
+  facebook: 'https://www.facebook.com/profile.php?id=61586966053026',
   instagram: 'https://www.instagram.com/dazaikirpejams',
 } as const
