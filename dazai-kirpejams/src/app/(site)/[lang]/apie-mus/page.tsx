@@ -125,6 +125,60 @@ export default async function AboutPage({
         </Container>
       </section>
 
+      {/* 2.5. Įkūrėja — Džiuljeta Vėbrė */}
+      <section className="py-20 bg-brand-gray-50">
+        <Container>
+          <div className="max-w-[820px] mx-auto">
+            <div className="text-center mb-10">
+              <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
+                {t.founder.badge}
+              </span>
+              <h2 className="text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-brand-gray-900 mb-3 leading-tight">
+                {t.founder.title}
+              </h2>
+              <p className="text-[1.1rem] text-brand-gray-500 leading-[1.6] max-w-[640px] mx-auto">
+                {t.founder.subtitle}
+              </p>
+              <p className="text-[0.9rem] text-brand-gray-500 mt-2 italic">
+                {t.founder.jobTitle}
+              </p>
+            </div>
+
+            <div className="space-y-5 text-[1.05rem] leading-[1.8] text-brand-gray-500">
+              {t.founder.paragraphs.map((para: string, i: number) => (
+                <p key={i}>{para}</p>
+              ))}
+            </div>
+
+            <div className="my-10 border-l-4 border-brand-magenta bg-white rounded-r-lg p-7 shadow-[0_2px_16px_rgba(0,0,0,0.05)]">
+              <ul className="space-y-3">
+                {t.founder.manifesto.map((line: string, i: number) => (
+                  <li
+                    key={i}
+                    className="text-[1.05rem] font-semibold text-brand-gray-900 leading-[1.6]"
+                  >
+                    {line}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <p className="text-[1.05rem] leading-[1.8] text-brand-gray-500 mb-9">
+              {t.founder.closing}
+            </p>
+
+            <div className="text-center">
+              <Link
+                href={`${p}/autorius/dziuljeta-vebre`}
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-magenta text-white rounded-lg text-[1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
+              >
+                {t.founder.ctaLabel} →
+              </Link>
+            </div>
+          </div>
+        </Container>
+      </section>
+
       {/* 3. Misija — juodas blokas */}
       <section className="py-20 bg-brand-gray-900 text-white">
         <Container>

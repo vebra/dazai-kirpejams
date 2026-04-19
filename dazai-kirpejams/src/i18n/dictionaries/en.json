@@ -300,7 +300,31 @@
     "stat2": "our standard",
     "stat3": "satisfied clients",
     "stat4": "country of manufacture",
-    "stat4Number": "Italy"
+    "stat4Number": "Italy",
+    "founder": {
+      "badge": "About the founder",
+      "title": "Džiuljeta Vėbrė",
+      "subtitle": "Experience that turns into professional solutions for hairdressers",
+      "jobTitle": "Hairstylist, image designer, lecturer",
+      "paragraphs": [
+        "Džiuljeta Vėbrė is a leading figure in the Lithuanian beauty industry — a name associated with professionalism, decades of experience, a strong aesthetic sense and real solutions for beauty specialists. She is known as a hairstylist, makeup artist, image designer, lecturer, book author and creator who has consistently shaped a higher standard of work for the beauty professional for many years.",
+        "More than three decades of accumulated experience have allowed her to know the beauty industry from within, not from the surface. Through these years she has worked on client image, trained both aspiring and practising specialists, delivered seminars, built a professional direction and helped hairdressers understand that real professionalism does not start with a beautiful photo — it starts with knowledge, practice, discipline and the right choice of working tools.",
+        "Džiuljeta Vėbrė\u2019s work has always been broader than just cutting or colouring. Her view of beauty rests on the whole picture: facial features, personal character, colour type, lifestyle, styling — and the professional\u2019s ability to turn it all into a clear, aesthetic and client-fitting result. This is not an accidental sense of beauty. It is a refined philosophy of experience in which every detail matters.",
+        "It is for this reason that her name is naturally connected with the professional hairdressing market and with what truly matters in everyday salon work. The same logic is reflected directly in the direction of DažaiKirpėjams.lt. This is not an ordinary store. It is a place built around the hairdresser-professional who chooses not just anything, but what helps to work efficiently, with quality and economically.",
+        "In a hairdresser\u2019s work, everything matters: colour accuracy, product stability, reliable coverage, cost control and trust in what you use every single day. That is why professional dyes are not just a tool. They are part of the result. They are part of the master\u2019s reputation. They are part of the business.",
+        "This is exactly where Džiuljeta Vėbrė\u2019s professional philosophy and the direction of DažaiKirpėjams.lt come together very clearly. Both rest on the same principle: a professional needs not noise but quality; not promises but results; not a pretty label but a solution that actually works in real life.",
+        "DažaiKirpėjams.lt offers professional hair dyes and supplies for hairdressers, where what matters is not only the result but the practical benefit to the salon. The larger 180 ml capacity, the professional formula, the focus on daily use and rational salon work — this is a direction that perfectly matches the modern hairdresser\u2019s need to work smartly, steadily and profitably.",
+        "This is especially important today, when the beauty specialist must be not only a creator but also a strategist. They must be able to manage the result, the time, the cost base and client expectations. This is the very approach that Džiuljeta Vėbrė reflects in her own professional path. Years of practice taught her one very important thing: quality in the salon starts with choices. With what you choose to wear. With the tools you choose to work with. With how much you trust your own system.",
+        "That is why Džiuljeta Vėbrė is not only a beauty specialist. She is an authority whose experience helps shape a more professional, stronger and higher-value approach to the hairdresser\u2019s work. And DažaiKirpėjams.lt is a natural continuation of this approach — a platform for those who want to work not just somehow, but professionally."
+      ],
+      "manifesto": [
+        "It is a space for hairdressers who value quality.",
+        "It is a direction for salons that count not only today, but the long-term benefit.",
+        "It is the choice of those who understand that a strong result is born when talent meets the right tools."
+      ],
+      "closing": "Džiuljeta Vėbrė and DažaiKirpėjams.lt are more than a name and an online store. They are a connection between professionalism, experience and a real understanding of salon work. They are an approach to the beauty industry where it matters not only to look professional — but to actually be one, every single day.",
+      "ctaLabel": "Read full bio"
+    }
   },
   "contactPage": {
     "metaTitle": "Contact — Dažai Kirpėjams",

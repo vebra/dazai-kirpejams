@@ -300,7 +300,31 @@
     "stat2": "mūsų standartas",
     "stat3": "patenkintų klientų",
     "stat4": "gamybos šalis",
-    "stat4Number": "Italija"
+    "stat4Number": "Italija",
+    "founder": {
+      "badge": "Apie įkūrėją",
+      "title": "Džiuljeta Vėbrė",
+      "subtitle": "Patirtis, kuri virsta profesionaliais sprendimais kirpėjams",
+      "jobTitle": "Kirpėja-stilistė, įvaizdžio dizainerė, lektorė",
+      "paragraphs": [
+        "Džiuljeta Vėbrė – ryški asmenybė Lietuvos grožio pasaulyje, kurios vardas siejamas su profesionalumu, ilgamete patirtimi, stipriu estetiniu pajautimu ir realiais sprendimais grožio specialistams. Ji žinoma kaip kirpėja-stilistė, vizažistė, įvaizdžio dizainerė, lektorė, knygos autorė ir kūrėja, daugelį metų nuosekliai formuojanti aukštesnį požiūrį į grožio profesionalo darbą.",
+        "Daugiau nei tris dešimtmečius kaupta patirtis leido jai pažinti grožio industriją iš esmės – ne paviršiumi, o iš vidaus. Per šiuos metus ji dirbo su klientų įvaizdžiu, mokė būsimus ir jau dirbančius specialistus, vedė seminarus, kūrė profesinę kryptį ir padėjo kirpėjams suprasti, kad tikras profesionalumas prasideda ne nuo gražios nuotraukos, o nuo žinių, praktikos, disciplinos ir teisingų darbo priemonių pasirinkimo.",
+        "Džiuljetos Vėbrės veikla visada buvo platesnė nei vien kirpimas ar spalva. Jos požiūris į grožį remiasi visuma: veido bruožai, žmogaus charakteris, spalvinis tipas, gyvenimo būdas, stilistika ir profesionalo gebėjimas visa tai paversti aiškiu, estetišku ir klientui tinkamu rezultatu. Tai nėra atsitiktinis grožio suvokimas. Tai – išgryninta patirties filosofija, kurioje svarbi kiekviena detalė.",
+        "Būtent todėl jos vardas natūraliai siejasi su profesionalia kirpėjų rinka ir su tuo, kas iš tiesų svarbu kasdieniam darbui salone. Ši logika tiesiogiai atsispindi ir DažaiKirpėjams.lt kryptyje. Tai ne eilinė parduotuvė. Tai vieta, orientuota į kirpėją profesionalą, kuris renkasi ne bet ką, o tai, kas padeda dirbti efektyviai, kokybiškai ir ekonomiškai.",
+        "Kirpėjo darbe svarbu viskas: spalvos tikslumas, produkto stabilumas, patikimas padengimas, sąnaudų kontrolė ir pasitikėjimas tuo, ką naudoji kiekvieną dieną. Todėl profesionalūs dažai nėra tik priemonė. Jie yra darbo rezultato dalis. Jie yra meistro reputacijos dalis. Jie yra verslo dalis.",
+        "Šioje vietoje Džiuljetos Vėbrės profesinė filosofija ir DažaiKirpėjams.lt kryptis susijungia labai aiškiai. Abi remiasi tuo pačiu principu: profesionalui reikia ne triukšmo, o kokybės; ne pažadų, o rezultato; ne gražios etiketės, o sprendimo, kuris veikia realiame darbe.",
+        "DažaiKirpėjams.lt siūlo profesionalius plaukų dažus ir priemones kirpėjams, kur svarbus ne tik rezultatas, bet ir praktinė nauda salonui. Didesnė 180 ml talpa, profesionali formulė, orientacija į kasdienį naudojimą ir racionalų darbą salone – tai kryptis, kuri puikiai atitinka šiuolaikinio kirpėjo poreikį dirbti protingai, stabiliai ir pelningai.",
+        "Tai ypač svarbu šiandien, kai grožio specialistas turi būti ne tik kūrėjas, bet ir strategas. Jis turi gebėti valdyti rezultatą, laiką, savikainą ir klientų lūkesčius. Būtent tokį požiūrį savo profesiniame kelyje atspindi Džiuljeta Vėbrė. Ilgametė praktika išmokė ją vieno labai svarbaus dalyko: kokybė salone prasideda nuo pasirinkimų. Nuo to, ką renkiesi vilkėti. Nuo to, kokiomis priemonėmis dirbi. Nuo to, kiek pasitiki savo sistema.",
+        "Todėl Džiuljeta Vėbrė yra ne tik grožio specialistė. Ji yra autoritetas, kurio patirtis padeda formuoti profesionalesnį, tvirtesnį ir aukštesnės vertės požiūrį į kirpėjo darbą. O DažaiKirpėjams.lt yra natūrali šio požiūrio tąsa – platforma tiems, kurie nori dirbti ne bet kaip, o profesionaliai."
+      ],
+      "manifesto": [
+        "Tai erdvė kirpėjams, kurie vertina kokybę.",
+        "Tai kryptis salonams, kurie skaičiuoja ne tik šiandieną, bet ir ilgalaikę naudą.",
+        "Tai pasirinkimas tiems, kurie supranta, kad stiprus rezultatas gimsta tada, kai talentas susitinka su teisingomis priemonėmis."
+      ],
+      "closing": "Džiuljeta Vėbrė ir DažaiKirpėjams.lt – tai daugiau nei vardas ir elektroninė parduotuvė. Tai profesionalumo, patirties ir tikro darbo salone supratimo jungtis. Tai požiūris į grožio industriją, kuriame svarbu ne tik atrodyti profesionaliai, bet ir tokiu būti kiekvieną dieną.",
+      "ctaLabel": "Skaityti pilną biografiją"
+    }
   },
   "contactPage": {
     "metaTitle": "Kontaktai — Dažai Kirpėjams",
