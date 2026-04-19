@@ -18,12 +18,12 @@ export async function generateMetadata({
 }: PageProps<'/[lang]/spalvu-palete'>): Promise<Metadata> {
   const { lang } = await params
   if (!hasLocale(lang)) return {}
+  const dict = await getDictionary(lang)
   return buildPageMetadata({
     lang,
     path: '/spalvu-palete',
-    title: 'Color SHOCK spalvų paletė — 50 profesionalių atspalvių',
-    description:
-      'Color SHOCK profesionalių plaukų dažų spalvų paletė. 50+ atspalvių 180 ml pakuotėse. Filtruokite pagal šeimą ar ieškokite pagal numerį.',
+    title: dict.colorPalettePage.metaTitle,
+    description: dict.colorPalettePage.metaDesc,
   })
 }
 

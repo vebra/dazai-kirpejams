@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
-import { hasLocale } from '@/i18n/dictionaries'
+import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Section } from '@/components/ui/Section'
@@ -16,12 +16,13 @@ export async function generateMetadata({
 }: PageProps<'/[lang]/paskyra'>): Promise<Metadata> {
   const { lang } = await params
   if (!hasLocale(lang)) return {}
+  const dict = await getDictionary(lang)
   return {
     ...buildPageMetadata({
       lang,
       path: '/paskyra',
-      title: 'Mano paskyra',
-      description: 'Jūsų profesionalo paskyros informacija ir dokumento įkėlimas.',
+      title: dict.accountPage.metaTitle,
+      description: dict.accountPage.metaDesc,
     }),
     robots: { index: false, follow: false },
   }
@@ -40,7 +41,8 @@ export default async function AccountPage({
 
   if (!user) redirect(`${langPrefix(lang)}/prisijungimas`)
 
-  const [status, profileResult, invoices] = await Promise.all([
+  const [dict, status, profileResult, invoices] = await Promise.all([
+    getDictionary(lang),
     getVerificationStatus(),
     supabase.from('user_profiles').select('*').eq('id', user.id).single(),
     user.email ? getInvoicesForEmail(user.email) : Promise.resolve([]),
@@ -48,7 +50,7 @@ export default async function AccountPage({
 
   return (
     <>
-      <PageHeader title="Mano paskyra" />
+      <PageHeader title={dict.accountPage.headerTitle} />
       <Section background="gray">
         <Container size="narrow">
           <AccountView

@@ -309,13 +309,13 @@
       "paragraphs": [
         "Džiuljeta Vėbrė is a leading figure in the Lithuanian beauty industry — a name associated with professionalism, decades of experience, a strong aesthetic sense and real solutions for beauty specialists. She is known as a hairstylist, makeup artist, image designer, lecturer, book author and creator who has consistently shaped a higher standard of work for the beauty professional for many years.",
         "More than three decades of accumulated experience have allowed her to know the beauty industry from within, not from the surface. Through these years she has worked on client image, trained both aspiring and practising specialists, delivered seminars, built a professional direction and helped hairdressers understand that real professionalism does not start with a beautiful photo — it starts with knowledge, practice, discipline and the right choice of working tools.",
-        "Džiuljeta Vėbrė\u2019s work has always been broader than just cutting or colouring. Her view of beauty rests on the whole picture: facial features, personal character, colour type, lifestyle, styling — and the professional\u2019s ability to turn it all into a clear, aesthetic and client-fitting result. This is not an accidental sense of beauty. It is a refined philosophy of experience in which every detail matters.",
+        "Džiuljeta Vėbrė’s work has always been broader than just cutting or colouring. Her view of beauty rests on the whole picture: facial features, personal character, colour type, lifestyle, styling — and the professional’s ability to turn it all into a clear, aesthetic and client-fitting result. This is not an accidental sense of beauty. It is a refined philosophy of experience in which every detail matters.",
         "It is for this reason that her name is naturally connected with the professional hairdressing market and with what truly matters in everyday salon work. The same logic is reflected directly in the direction of DažaiKirpėjams.lt. This is not an ordinary store. It is a place built around the hairdresser-professional who chooses not just anything, but what helps to work efficiently, with quality and economically.",
-        "In a hairdresser\u2019s work, everything matters: colour accuracy, product stability, reliable coverage, cost control and trust in what you use every single day. That is why professional dyes are not just a tool. They are part of the result. They are part of the master\u2019s reputation. They are part of the business.",
-        "This is exactly where Džiuljeta Vėbrė\u2019s professional philosophy and the direction of DažaiKirpėjams.lt come together very clearly. Both rest on the same principle: a professional needs not noise but quality; not promises but results; not a pretty label but a solution that actually works in real life.",
-        "DažaiKirpėjams.lt offers professional hair dyes and supplies for hairdressers, where what matters is not only the result but the practical benefit to the salon. The larger 180 ml capacity, the professional formula, the focus on daily use and rational salon work — this is a direction that perfectly matches the modern hairdresser\u2019s need to work smartly, steadily and profitably.",
+        "In a hairdresser’s work, everything matters: colour accuracy, product stability, reliable coverage, cost control and trust in what you use every single day. That is why professional dyes are not just a tool. They are part of the result. They are part of the master’s reputation. They are part of the business.",
+        "This is exactly where Džiuljeta Vėbrė’s professional philosophy and the direction of DažaiKirpėjams.lt come together very clearly. Both rest on the same principle: a professional needs not noise but quality; not promises but results; not a pretty label but a solution that actually works in real life.",
+        "DažaiKirpėjams.lt offers professional hair dyes and supplies for hairdressers, where what matters is not only the result but the practical benefit to the salon. The larger 180 ml capacity, the professional formula, the focus on daily use and rational salon work — this is a direction that perfectly matches the modern hairdresser’s need to work smartly, steadily and profitably.",
         "This is especially important today, when the beauty specialist must be not only a creator but also a strategist. They must be able to manage the result, the time, the cost base and client expectations. This is the very approach that Džiuljeta Vėbrė reflects in her own professional path. Years of practice taught her one very important thing: quality in the salon starts with choices. With what you choose to wear. With the tools you choose to work with. With how much you trust your own system.",
-        "That is why Džiuljeta Vėbrė is not only a beauty specialist. She is an authority whose experience helps shape a more professional, stronger and higher-value approach to the hairdresser\u2019s work. And DažaiKirpėjams.lt is a natural continuation of this approach — a platform for those who want to work not just somehow, but professionally."
+        "That is why Džiuljeta Vėbrė is not only a beauty specialist. She is an authority whose experience helps shape a more professional, stronger and higher-value approach to the hairdresser’s work. And DažaiKirpėjams.lt is a natural continuation of this approach — a platform for those who want to work not just somehow, but professionally."
       ],
       "manifesto": [
         "It is a space for hairdressers who value quality.",
@@ -809,7 +809,9 @@
     "calcSavingsMonth": "Monthly savings",
     "calcSavingsYear": "Annual savings",
     "calcPackagesReduction": "Fewer packages per month",
-    "calcDisclaimer": "* Calculations are approximate and depend on actual prices and usage habits."
+    "calcDisclaimer": "* Calculations are approximate and depend on actual prices and usage habits.",
+    "stdPackages": "~60 pcs.",
+    "ourPackages": "~20 pcs. (3× fewer)"
   },
   "trustBar": {
     "volumeTitle": "180 ml volume",
@@ -906,5 +908,28 @@
     "ctaSecondary": "Contact Us",
     "showMore": "Show more",
     "showingOf": "Showing {visible} of {total}"
+  },
+  "loginPage": {
+    "metaTitle": "Sign in",
+    "metaDesc": "Sign in to your professional account and view product prices.",
+    "headerTitle": "Sign in",
+    "cardTitle": "Professional account",
+    "cardDesc": "Sign in to see prices and place orders."
+  },
+  "registerPage": {
+    "metaTitle": "Register as a professional",
+    "metaDesc": "Register as a professional hairstylist or salon and get access to product prices.",
+    "headerTitle": "Register as a professional",
+    "cardTitle": "Create your professional account",
+    "cardDesc": "Prices are visible only to verified professionals. After registration we will review your document and activate your account within 1 business day."
+  },
+  "accountPage": {
+    "metaTitle": "My account",
+    "metaDesc": "Your professional account details and document upload.",
+    "headerTitle": "My account"
+  },
+  "colorPalettePage": {
+    "metaTitle": "Color SHOCK palette — 50 professional shades",
+    "metaDesc": "Color SHOCK professional hair dye palette. 50+ shades in 180 ml packaging. Filter by family or search by number."
   }
 }

@@ -12,13 +12,13 @@ export async function generateMetadata({
 }: PageProps<'/[lang]/registracija'>): Promise<Metadata> {
   const { lang } = await params
   if (!hasLocale(lang)) return {}
+  const dict = await getDictionary(lang)
   return {
     ...buildPageMetadata({
       lang,
       path: '/registracija',
-      title: 'Registracija profesionalams',
-      description:
-        'Prisiregistruokite kaip profesionalus kirpėjas arba salonas ir gaukite prieigą prie produktų kainų.',
+      title: dict.registerPage.metaTitle,
+      description: dict.registerPage.metaDesc,
     }),
     robots: { index: false, follow: true },
   }
@@ -33,18 +33,16 @@ export default async function RegisterPage({
 
   return (
     <>
-      <PageHeader title="Registracija profesionalams" />
+      <PageHeader title={dict.registerPage.headerTitle} />
       <Section background="gray">
         <Container size="narrow">
           <div className="bg-white rounded-2xl p-8 lg:p-10 shadow-sm">
             <div className="text-center mb-8">
               <h2 className="text-xl font-bold text-brand-gray-900 mb-2">
-                Sukurkite profesionalo paskyrą
+                {dict.registerPage.cardTitle}
               </h2>
               <p className="text-sm text-brand-gray-500 max-w-md mx-auto leading-relaxed">
-                Kainos matomos tik patvirtintiems profesionalams. Po
-                registracijos peržiūrėsime Jūsų dokumentą ir suaktyvinsime
-                paskyrą per 1 darbo dieną.
+                {dict.registerPage.cardDesc}
               </p>
             </div>
 

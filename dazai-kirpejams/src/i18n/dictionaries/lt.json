@@ -809,7 +809,9 @@
     "calcSavingsMonth": "Sutaupymas per mėnesį",
     "calcSavingsYear": "Sutaupymas per metus",
     "calcPackagesReduction": "Pakuočių sumažėjimas per mėnesį",
-    "calcDisclaimer": "* Skaičiavimai yra orientaciniai ir priklauso nuo faktinių kainų bei naudojimo įpročių."
+    "calcDisclaimer": "* Skaičiavimai yra orientaciniai ir priklauso nuo faktinių kainų bei naudojimo įpročių.",
+    "stdPackages": "~60 vnt.",
+    "ourPackages": "~20 vnt. (3× mažiau)"
   },
   "trustBar": {
     "volumeTitle": "180 ml talpa",
@@ -906,5 +908,28 @@
     "ctaSecondary": "Susisiekti",
     "showMore": "Rodyti daugiau",
     "showingOf": "Rodoma {visible} iš {total}"
+  },
+  "loginPage": {
+    "metaTitle": "Prisijungimas",
+    "metaDesc": "Prisijunkite prie savo profesionalo paskyros ir peržiūrėkite produktų kainas.",
+    "headerTitle": "Prisijungimas",
+    "cardTitle": "Profesionalo paskyra",
+    "cardDesc": "Prisijunkite, kad matytumėte kainas ir galėtumėte pirkti."
+  },
+  "registerPage": {
+    "metaTitle": "Registracija profesionalams",
+    "metaDesc": "Prisiregistruokite kaip profesionalus kirpėjas arba salonas ir gaukite prieigą prie produktų kainų.",
+    "headerTitle": "Registracija profesionalams",
+    "cardTitle": "Sukurkite profesionalo paskyrą",
+    "cardDesc": "Kainos matomos tik patvirtintiems profesionalams. Po registracijos peržiūrėsime Jūsų dokumentą ir suaktyvinsime paskyrą per 1 darbo dieną."
+  },
+  "accountPage": {
+    "metaTitle": "Mano paskyra",
+    "metaDesc": "Jūsų profesionalo paskyros informacija ir dokumento įkėlimas.",
+    "headerTitle": "Mano paskyra"
+  },
+  "colorPalettePage": {
+    "metaTitle": "Color SHOCK spalvų paletė — 50 profesionalių atspalvių",
+    "metaDesc": "Color SHOCK profesionalių plaukų dažų spalvų paletė. 50+ atspalvių 180 ml pakuotėse. Filtruokite pagal šeimą ar ieškokite pagal numerį."
   }
 }

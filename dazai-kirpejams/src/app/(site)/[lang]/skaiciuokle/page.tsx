@@ -124,8 +124,8 @@ export default async function CalculatorPage({
                     },
                     {
                       label: t.rowPackages,
-                      std: '~60 vnt.',
-                      ours: '~20 vnt. (3× mažiau)',
+                      std: t.stdPackages,
+                      ours: t.ourPackages,
                     },
                   ].map((row) => (
                     <tr
