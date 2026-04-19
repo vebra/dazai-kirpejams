@@ -45,11 +45,31 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: '12mb',
     },
+    // Reikalingas, nes turim kelis root layout'us ((admin)/admin + (site)/[lang])
+    // ir top-level dynamic segmentą [lang]. Be šio flag'o nežinomi URL'ai
+    // gauna 500 vietoj 404 (Next.js 16 docs / not-found.md).
+    globalNotFound: true,
   },
   // @react-pdf/renderer naudoja Node-specific API (pdfkit, fs, fonts) —
   // Next.js negali jo bundle'inti į server components build'ą. Paliekam jį
   // kaip išorinį paketą, kad server runtime jį resolve'intų per require().
   serverExternalPackages: ['@react-pdf/renderer'],
+  async redirects() {
+    return [
+      // Senas slug, į kurį rodo išoriniai linkai / Google indeksas. Be šito
+      // crawler'is gauna 404 ir prarandam visą URL equity.
+      {
+        source: '/blogas/dazymo-technikos-profesionalams',
+        destination: '/blogas/dazymo-technikos',
+        permanent: true,
+      },
+      {
+        source: '/:lang(lt|en|ru)/blogas/dazymo-technikos-profesionalams',
+        destination: '/:lang/blogas/dazymo-technikos',
+        permanent: true,
+      },
+    ]
+  },
   async headers() {
     return [
       {
