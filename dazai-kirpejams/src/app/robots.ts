@@ -15,21 +15,11 @@ export default function robots(): MetadataRoute.Robots {
           '/admin/',
         ],
       },
+      // Bulk training-only crawler'iai be aiškios B2B vertės — paliekam užblokuotus.
+      // CCBot = Common Crawl (feed'ina daug modelių, jokio referral'o atgal).
+      // Bytespider = ByteDance/TikTok (agresyvus, prastas fit'as profesionaliai nišai).
       {
-        userAgent: [
-          'GPTBot',
-          'ChatGPT-User',
-          'CCBot',
-          'anthropic-ai',
-          'Claude-Web',
-          'Bytespider',
-          'PerplexityBot',
-          'Applebot-Extended',
-        ],
-        disallow: '/',
-      },
-      {
-        userAgent: 'Google-Extended',
+        userAgent: ['CCBot', 'Bytespider'],
         disallow: '/',
       },
     ],
