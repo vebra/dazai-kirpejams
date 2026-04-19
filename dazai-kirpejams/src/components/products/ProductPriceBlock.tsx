@@ -43,6 +43,9 @@ type Props = {
     accountPendingDesc?: string
     accountRejectedTitle?: string
     accountRejectedDesc?: string
+    priceLoadingTitle?: string
+    priceLoadingDesc?: string
+    refreshPage?: string
     goToAccount?: string
   }
 }
@@ -69,6 +72,11 @@ export function ProductPriceBlock({
   const rejectedDesc =
     labels.accountRejectedDesc ??
     'Jūsų dokumentas buvo atmestas. Įkelkite naują dokumentą ir bandykite dar kartą.'
+  const loadingTitle = labels.priceLoadingTitle ?? 'Kainos kraunamos'
+  const loadingDesc =
+    labels.priceLoadingDesc ??
+    'Jei kainos nepasirodo per kelias sekundes, atnaujinkite puslapį arba susisiekite su mumis.'
+  const refreshLabel = labels.refreshPage ?? 'Atnaujinti puslapį'
   const goToAccount = labels.goToAccount ?? 'Į mano paskyrą'
 
   return (
@@ -141,6 +149,22 @@ export function ProductPriceBlock({
           >
             {goToAccount}
           </Link>
+        </div>
+      ) : isLoggedIn ? (
+        <div className="mb-5 px-5 py-5 bg-brand-gray-50 rounded-xl border border-[#E0E0E0]">
+          <p className="text-[0.95rem] text-brand-gray-900 font-semibold mb-1.5">
+            {loadingTitle}
+          </p>
+          <p className="text-[0.88rem] text-brand-gray-500 mb-4 leading-[1.5]">
+            {loadingDesc}
+          </p>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="inline-flex items-center justify-center min-h-[44px] px-6 py-3 bg-brand-magenta text-white rounded-lg text-[0.95rem] font-semibold hover:bg-brand-magenta-dark transition-colors"
+          >
+            {refreshLabel}
+          </button>
         </div>
       ) : (
         <div className="mb-5 px-5 py-5 bg-brand-gray-50 rounded-xl border border-[#E0E0E0]">

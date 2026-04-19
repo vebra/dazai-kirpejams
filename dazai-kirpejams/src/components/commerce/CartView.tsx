@@ -286,14 +286,15 @@ export function CartView({ lang, dict }: CartViewProps) {
                 </>
               ) : (
                 <>
-                  Norėdami pirkti,{' '}
-                  <Link
-                    href={`${langPrefix(lang)}/prisijungimas`}
+                  Verifikacijos statusas dar nepasiektas.{' '}
+                  <button
+                    type="button"
+                    onClick={() => window.location.reload()}
                     className="font-semibold text-brand-magenta hover:underline"
                   >
-                    prisijunkite
-                  </Link>
-                  .
+                    Atnaujinti puslapį
+                  </button>{' '}
+                  — jei problema kartojasi, susisiekite su mumis.
                 </>
               )}
             </div>

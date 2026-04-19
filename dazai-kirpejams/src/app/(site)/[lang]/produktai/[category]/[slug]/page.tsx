@@ -248,6 +248,9 @@ export default async function ProductPage({
                   accountPendingDesc: t.accountPendingDesc,
                   accountRejectedTitle: t.accountRejectedTitle,
                   accountRejectedDesc: t.accountRejectedDesc,
+                  priceLoadingTitle: t.priceLoadingTitle,
+                  priceLoadingDesc: t.priceLoadingDesc,
+                  refreshPage: t.refreshPage,
                   goToAccount: t.goToAccount,
                 }}
               />
