@@ -72,5 +72,10 @@ export function buildPageMetadata({
       url: canonical,
       type: 'website',
     },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
   }
 }

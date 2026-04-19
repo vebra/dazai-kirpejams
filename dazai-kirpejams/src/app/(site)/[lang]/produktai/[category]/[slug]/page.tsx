@@ -56,6 +56,11 @@ export async function generateMetadata({
       url: canonical,
       type: 'article',
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: name,
+      description: description || undefined,
+    },
   }
 }
 

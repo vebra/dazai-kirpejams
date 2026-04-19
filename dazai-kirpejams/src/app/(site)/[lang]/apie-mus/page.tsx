@@ -36,6 +36,10 @@ export async function generateMetadata({
       ...base.openGraph,
       images: [{ url: `${SITE_URL}${ogImage}`, width: 1262, height: 1577, alt: t.metaTitle }],
     },
+    twitter: {
+      ...base.twitter,
+      images: [`${SITE_URL}${ogImage}`],
+    },
   }
 }
 

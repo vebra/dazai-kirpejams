@@ -50,6 +50,7 @@ export function Header({ lang, dict }: HeaderProps) {
               width={87}
               height={80}
               sizes="80px"
+              priority
               className="h-[56px] lg:h-[80px] w-auto"
             />
           </Link>

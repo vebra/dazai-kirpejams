@@ -15,6 +15,11 @@ import { langPrefix } from '@/lib/utils'
  * AI paieškos varikliams (ChatGPT, Perplexity).
  */
 
+function toAbsoluteUrl(url: string): string {
+  if (/^https?:\/\//i.test(url)) return url
+  return `${SITE_URL}${url.startsWith('/') ? url : `/${url}`}`
+}
+
 export function organizationSchema(): Record<string, unknown> {
   return {
     '@context': 'https://schema.org',
@@ -145,7 +150,7 @@ export function productSchema(
     '@type': 'Product',
     name,
     description,
-    ...(hasImages && { image: product.image_urls }),
+    ...(hasImages && { image: product.image_urls.map(toAbsoluteUrl) }),
     sku: product.sku || product.id,
     ...(product.color_number && { mpn: product.color_number }),
     brand: {
@@ -238,7 +243,7 @@ export function blogPostingSchema({
     headline: title,
     description,
     url,
-    image: imageUrl || `${SITE_URL}/og-image.jpg`,
+    image: imageUrl ? toAbsoluteUrl(imageUrl) : `${SITE_URL}/og-image.jpg`,
     datePublished,
     dateModified: datePublished,
     author: authorNode,
