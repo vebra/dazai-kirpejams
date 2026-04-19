@@ -33,17 +33,17 @@ export async function FeaturedProducts({ lang, dict }: FeaturedProductsProps) {
         <div className="flex flex-wrap items-end justify-between gap-6 mb-10">
           <div>
             <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-              Populiariausi
+              {dict.featured.label}
             </span>
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 leading-tight">
-              Dažniausiai užsakomi produktai
+              {dict.featured.title}
             </h2>
           </div>
           <Link
             href={`${langPrefix(lang)}/produktai`}
             className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-brand-magenta text-brand-magenta rounded-lg text-[0.9rem] font-semibold hover:bg-brand-magenta hover:text-white transition-all"
           >
-            Visi produktai →
+            {dict.featured.allProducts} →
           </Link>
         </div>
 

@@ -1,50 +1,24 @@
 import { Container } from '@/components/ui/Container'
 
-/**
- * "Kam skirta" — šviesiai pilkas fonas, centruota antraštė, 4 kortelės
- * su dideliu emoji viršuje, h4 ir aprašymu.
- */
+type Card = { icon: string; title: string; desc: string }
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function Audience({ dict: _dict }: { dict: any }) {
-  const cards = [
-    {
-      icon: '✂',
-      title: 'Kirpėjams',
-      desc:
-        'Patikimi darbo įrankiai kasdieniam naudojimui. Ekonomiška 180 ml pakuotė — mažiau rūpesčių, daugiau darbo.',
-    },
-    {
-      icon: '🎨',
-      title: 'Koloristams',
-      desc:
-        'Plati spalvų paletė ir profesionali formulė leidžia kurti tikslias spalvas pagal kiekvieno kliento poreikius.',
-    },
-    {
-      icon: '🏪',
-      title: 'Grožio salonams',
-      desc:
-        'B2B sąlygos, reguliarus tiekimas ir ekonomiškas kainos modelis — idealus sprendimas salono biudžetui.',
-    },
-    {
-      icon: '💪',
-      title: 'Profesionalams',
-      desc:
-        'Dirbantiems kasdien, kurie vertina patikimą rezultatą, kokybę ir protingą kainos ir vertės santykį.',
-    },
-  ]
+export function Audience({ dict }: { dict: any }) {
+  const t = dict.audience
+  const cards: Card[] = t.cards
 
   return (
     <section id="kam-skirta" className="py-20 bg-brand-gray-50">
       <Container>
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-            Auditorija
+            {t.label}
           </span>
           <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-3 leading-tight">
-            Kam skirta?
+            {t.titleFull}
           </h2>
           <p className="text-[1.1rem] text-brand-gray-500">
-            Mūsų produktai sukurti tiems, kuriems svarbus darbo rezultatas
+            {t.subtitle}
           </p>
         </div>
 

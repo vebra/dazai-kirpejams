@@ -7,19 +7,9 @@ type B2BCtaProps = {
   dict: any
 }
 
-/**
- * B2B kvietimas — mėlynas gradientas, 2-col išdėstymas:
- *  - kairėje tekstas + checklist su apskritomis ✓ ikonomis
- *  - dešinėje glass morphism užklausos forma
- */
-export function B2BCta({ lang: _lang, dict: _dict }: B2BCtaProps) {
-  const features = [
-    'Individualios kainos pagal apimtis',
-    'Reguliarus tiekimas pagal poreikį',
-    'Asmeninis vadybininkas',
-    'Galimybė testuoti produktus',
-    '180 ml ekonominė nauda salonui',
-  ]
+export function B2BCta({ lang: _lang, dict }: B2BCtaProps) {
+  const t = dict.b2bHome
+  const features: string[] = t.features
 
   return (
     <section
@@ -28,18 +18,15 @@ export function B2BCta({ lang: _lang, dict: _dict }: B2BCtaProps) {
     >
       <Container>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-[60px] items-center">
-          {/* Kairė — tekstas ir checklist */}
           <div>
             <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-white/60 mb-3">
-              Bendradarbiavimas
+              {t.label}
             </span>
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-white leading-tight">
-              Dirbate salone? Gaukite specialų pasiūlymą
+              {t.title}
             </h2>
             <p className="mt-3 text-white/80 leading-[1.7]">
-              Siūlome individualias sąlygas grožio salonams, kirpykloms ir
-              profesionaliems koloristams. Reguliarus tiekimas, asmeninis
-              aptarnavimas ir geriausia kaina.
+              {t.desc}
             </p>
 
             <div className="grid gap-4 mt-6">
@@ -57,37 +44,36 @@ export function B2BCta({ lang: _lang, dict: _dict }: B2BCtaProps) {
             </div>
           </div>
 
-          {/* Dešinė — glass morphism forma */}
           <div className="bg-white/10 border border-white/15 rounded-xl p-9">
             <h3 className="text-[clamp(1.15rem,2.5vw,1.5rem)] font-bold text-white mb-6">
-              Pateikite užklausą
+              {t.formTitle}
             </h3>
             <form className="space-y-4">
               <input
                 type="text"
-                placeholder="Salono pavadinimas"
+                placeholder={t.formSalonName}
                 required
                 className="w-full px-4 py-3 bg-white/[0.08] border border-white/20 rounded-lg text-white placeholder:text-white/45 text-[0.95rem] focus:outline-none focus:border-brand-magenta transition-colors"
               />
               <input
                 type="text"
-                placeholder="Jūsų vardas"
+                placeholder={t.formYourName}
                 required
                 className="w-full px-4 py-3 bg-white/[0.08] border border-white/20 rounded-lg text-white placeholder:text-white/45 text-[0.95rem] focus:outline-none focus:border-brand-magenta transition-colors"
               />
               <input
                 type="email"
-                placeholder="El. paštas"
+                placeholder={t.formEmail}
                 required
                 className="w-full px-4 py-3 bg-white/[0.08] border border-white/20 rounded-lg text-white placeholder:text-white/45 text-[0.95rem] focus:outline-none focus:border-brand-magenta transition-colors"
               />
               <input
                 type="tel"
-                placeholder="Telefono numeris"
+                placeholder={t.formPhone}
                 className="w-full px-4 py-3 bg-white/[0.08] border border-white/20 rounded-lg text-white placeholder:text-white/45 text-[0.95rem] focus:outline-none focus:border-brand-magenta transition-colors"
               />
               <textarea
-                placeholder="Papildoma informacija (mėnesinis poreikis, pageidavimai...)"
+                placeholder={t.formMessage}
                 rows={3}
                 className="w-full px-4 py-3 bg-white/[0.08] border border-white/20 rounded-lg text-white placeholder:text-white/45 text-[0.95rem] focus:outline-none focus:border-brand-magenta transition-colors resize-vertical"
               />
@@ -95,7 +81,7 @@ export function B2BCta({ lang: _lang, dict: _dict }: B2BCtaProps) {
                 type="submit"
                 className="w-full px-8 py-[14px] bg-brand-magenta text-white rounded-lg font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
               >
-                Gauti pasiūlymą →
+                {t.formSubmit} →
               </button>
             </form>
           </div>

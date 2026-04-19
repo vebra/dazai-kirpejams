@@ -65,12 +65,12 @@ export default async function ColorPalettePage({
 
           <div className="text-center max-w-[820px] mx-auto">
             <h1 className="text-[clamp(2rem,5vw,3.25rem)] font-bold text-brand-gray-900 mb-5 leading-[1.2]">
-              <span className="text-brand-magenta">Color SHOCK</span> spalvų
-              paletė
+              <span className="text-brand-magenta">{dict.colorPaletteHero.titlePart1}</span>{' '}
+              {dict.colorPaletteHero.titlePart2}
             </h1>
             <p className="text-[1.15rem] text-brand-gray-500 leading-[1.7] mb-8">
-              Raskite tobulą spalvą iš {products.length || '50+'} profesionalių
-              atspalvių. Kiekvienas atspalvis — 180 ml profesionali pakuotė.
+              {dict.colorPaletteHero.heroDescStart} {products.length || '50+'}{' '}
+              {dict.colorPaletteHero.heroDescEnd}
             </p>
 
             <div className="inline-flex items-center flex-wrap justify-center gap-x-6 gap-y-3 px-8 py-4 bg-white rounded-full border border-[#E0E0E0] shadow-[0_2px_16px_rgba(0,0,0,0.07)]">
@@ -78,7 +78,7 @@ export default async function ColorPalettePage({
                 <span className="text-brand-magenta text-[1.25rem] font-extrabold">
                   {products.length || 50}
                 </span>{' '}
-                spalvų
+                {dict.colorPaletteHero.statColors}
               </div>
               <span className="text-[#E0E0E0]" aria-hidden>
                 |
@@ -93,7 +93,7 @@ export default async function ColorPalettePage({
                 |
               </span>
               <div className="text-[0.95rem] text-brand-gray-500">
-                Nuo{' '}
+                {dict.colorPaletteHero.statFrom}{' '}
                 <span className="text-brand-magenta text-[1.25rem] font-extrabold">
                   €{minPrice.toFixed(2)}
                 </span>
@@ -115,24 +115,23 @@ export default async function ColorPalettePage({
         <Container>
           <div className="bg-[linear-gradient(135deg,#1a1a1a_0%,#2a2a2a_100%)] rounded-2xl p-10 lg:p-16 text-center">
             <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-white mb-4 leading-tight">
-              Radote savo spalvą?
+              {dict.colorPaletteHero.ctaTitle}
             </h2>
             <p className="text-[1.05rem] text-white/75 mb-8 max-w-[600px] mx-auto leading-[1.7]">
-              Užsisakykite profesionalius Color SHOCK dažus su 180 ml talpa ir
-              gaukite daugiau vertės kiekvienam dažymui.
+              {dict.colorPaletteHero.ctaDesc}
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
                 href={`${langPrefix(lang)}/produktai/dazai`}
                 className="inline-flex items-center justify-center gap-2 px-8 py-[14px] bg-brand-magenta text-white rounded-lg text-[1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
               >
-                Pirkti dabar →
+                {dict.colorPaletteHero.ctaBuy} →
               </Link>
               <Link
                 href={`${langPrefix(lang)}/salonams`}
                 className="inline-flex items-center justify-center gap-2 px-8 py-[14px] border-2 border-white/30 text-white rounded-lg text-[1rem] font-semibold hover:bg-white hover:text-brand-gray-900 hover:border-white hover:-translate-y-0.5 transition-all"
               >
-                Pasiūlymas salonams
+                {dict.colorPaletteHero.ctaSalons}
               </Link>
             </div>
           </div>

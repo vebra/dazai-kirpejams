@@ -9,58 +9,32 @@ type CategoriesProps = {
   dict: any
 }
 
-/**
- * Produktų kategorijos — šviesiai pilkas fonas, centruota antraštė
- * su magenta section-label, 4 kortelės (balta, gradient emoji image).
- */
-export function Categories({ lang, dict: _dict }: CategoriesProps) {
-  const categories = [
-    {
-      href: `${langPrefix(lang)}/produktai/dazai`,
-      icon: '🎨',
-      title: 'Plaukų dažai',
-      count: 'Color SHOCK • 180 ml',
-    },
-    {
-      href: `${langPrefix(lang)}/produktai/oksidantai`,
-      icon: '⚗',
-      title: 'Oksidantai',
-      count: 'Profesionali linija',
-    },
-    {
-      href: `${langPrefix(lang)}/produktai/sampunai`,
-      icon: '🧴',
-      title: 'Šampūnai ir priežiūra',
-      count: 'RosaNera Cosmetic',
-    },
-    {
-      href: `${langPrefix(lang)}/produktai/priemones`,
-      icon: '✂',
-      title: 'Pagalbinės priemonės',
-      count: 'Kirpėjams',
-    },
-  ]
+type Item = { slug: string; icon: string; title: string; count: string }
+
+export function Categories({ lang, dict }: CategoriesProps) {
+  const t = dict.categories
+  const items: Item[] = t.items
 
   return (
     <section id="produktai" className="py-20 bg-brand-gray-50">
       <Container>
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-            Asortimentas
+            {t.label}
           </span>
           <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-3 leading-tight">
-            Produktų kategorijos
+            {t.title}
           </h2>
           <p className="text-[1.1rem] text-brand-gray-500">
-            Viskas, ko reikia profesionaliam darbui salone
+            {t.subtitle}
           </p>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-          {categories.map((cat) => (
+          {items.map((cat) => (
             <Link
-              key={cat.href}
-              href={cat.href}
+              key={cat.slug}
+              href={`${langPrefix(lang)}/produktai/${cat.slug}`}
               className="group bg-white rounded-xl overflow-hidden border border-[#E0E0E0] hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
             >
               <div className="aspect-square bg-[linear-gradient(135deg,#f5f5f7_0%,#e8e8ec_100%)] flex items-center justify-center text-5xl">

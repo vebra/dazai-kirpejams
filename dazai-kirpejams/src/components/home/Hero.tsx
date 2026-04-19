@@ -21,11 +21,10 @@ export async function Hero({ lang, dict }: HeroProps) {
   const banner: Banner | null = banners[0] ?? null
 
   // Naudojame DB banerį jei yra, kitaip fallback
-  const badge = banner?.badge ?? `Color SHOCK & Pasirinkimas iš 50 spalvų`
+  const badge = banner?.badge ?? hero.badgeFallback
   const title = banner?.title ?? null // null = naudosim hardcoded JSX
   const subtitle =
-    banner?.subtitle ??
-    `${hero.subtitle} Profesionali formulė, plati spalvų paletė ir ekonomiška kaina — viskas, ko reikia Jūsų salonui.`
+    banner?.subtitle ?? `${hero.subtitle} ${hero.subtitleSuffix}`
   const ctaText = banner?.ctaText ?? hero.cta
   const ctaUrl = banner?.ctaUrl ? `${langPrefix(lang)}${banner.ctaUrl}` : `${langPrefix(lang)}/produktai`
   const ctaSecondaryText = banner?.ctaSecondaryText ?? hero.ctaSecondary
@@ -51,8 +50,8 @@ export async function Hero({ lang, dict }: HeroProps) {
               </h1>
             ) : (
               <h1 className="text-[clamp(2rem,5vw,3.25rem)] font-bold leading-[1.2] text-brand-gray-900 mb-5">
-                Profesionalūs plaukų dažai{' '}
-                <span className="text-brand-magenta">kirpėjams</span>
+                {hero.titleMain}{' '}
+                <span className="text-brand-magenta">{hero.titleAccent}</span>
               </h1>
             )}
 

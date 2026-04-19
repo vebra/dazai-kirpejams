@@ -2,7 +2,34 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import { Container } from '@/components/ui/Container'
+
+const errorText = {
+  lt: {
+    title: 'Kažkas nutiko ne taip',
+    desc: 'Atsiprašome — įvyko netikėta klaida. Pabandykite dar kartą arba grįžkite į pagrindinį puslapį.',
+    code: 'Klaidos kodas:',
+    retry: 'Bandyti dar kartą',
+    home: 'Grįžti į pradžią',
+  },
+  en: {
+    title: 'Something went wrong',
+    desc: 'Sorry — an unexpected error occurred. Try again or return to the home page.',
+    code: 'Error code:',
+    retry: 'Try again',
+    home: 'Back to home',
+  },
+  ru: {
+    title: 'Что-то пошло не так',
+    desc: 'Извините — произошла непредвиденная ошибка. Попробуйте ещё раз или вернитесь на главную.',
+    code: 'Код ошибки:',
+    retry: 'Попробовать снова',
+    home: 'На главную',
+  },
+} as const
+
+type Lang = keyof typeof errorText
 
 export default function Error({
   error,
@@ -14,6 +41,11 @@ export default function Error({
   useEffect(() => {
     console.error('[site-error]', error)
   }, [error])
+
+  const params = useParams()
+  const rawLang = (params?.lang as string | undefined) ?? 'lt'
+  const lang: Lang = rawLang in errorText ? (rawLang as Lang) : 'lt'
+  const t = errorText[lang]
 
   return (
     <section className="py-24 md:py-32 bg-white">
@@ -35,15 +67,12 @@ export default function Error({
             </svg>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-brand-gray-900 mb-4">
-            Kažkas nutiko ne taip
+            {t.title}
           </h1>
-          <p className="text-brand-gray-500 mb-8 leading-relaxed">
-            Atsiprašome — įvyko netikėta klaida. Pabandykite dar kartą arba
-            grįžkite į pagrindinį puslapį.
-          </p>
+          <p className="text-brand-gray-500 mb-8 leading-relaxed">{t.desc}</p>
           {error.digest && (
             <p className="text-xs text-brand-gray-400 mb-6 font-mono">
-              Klaidos kodas: {error.digest}
+              {t.code} {error.digest}
             </p>
           )}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -51,13 +80,13 @@ export default function Error({
               onClick={() => unstable_retry()}
               className="px-8 py-3.5 bg-brand-magenta text-white rounded-lg font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
             >
-              Bandyti dar kartą
+              {t.retry}
             </button>
             <Link
-              href="/"
+              href={lang === 'lt' ? '/' : `/${lang}`}
               className="px-8 py-3.5 border border-[#E0E0E0] text-brand-gray-900 rounded-lg font-semibold hover:border-brand-magenta hover:text-brand-magenta transition-all"
             >
-              Grįžti į pradžią
+              {t.home}
             </Link>
           </div>
         </div>

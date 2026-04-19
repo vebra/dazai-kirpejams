@@ -21,10 +21,14 @@
     "privacy": "Privacy Policy"
   },
   "hero": {
-    "title": "Professional Hair Dyes for Hairdressers",
-    "subtitle": "Larger 180 ml volume. More value for salon work.",
-    "cta": "View Products",
-    "ctaSecondary": "Get a Salon Quote"
+    "title": "Professional hair dyes for hairdressers",
+    "subtitle": "Larger 180 ml capacity. More value for salon work.",
+    "cta": "Browse products",
+    "ctaSecondary": "Get a salon offer",
+    "badgeFallback": "Color SHOCK — 50 shades to choose from",
+    "titleMain": "Professional hair dyes",
+    "titleAccent": "for hairdressers",
+    "subtitleSuffix": "A professional formula, a wide colour palette and an economical price — everything your salon needs."
   },
   "trust": {
     "volume": "180 ml Volume",
@@ -57,7 +61,42 @@
     "b2b": {
       "title": "Special B2B Terms",
       "desc": "Individual pricing and terms for regular salons and business clients"
-    }
+    },
+    "label": "Advantages",
+    "titleFull": "Why hairdressers choose us",
+    "subtitle": "Professional products built for everyday salon work",
+    "cards": [
+      {
+        "icon": "📦",
+        "title": "180 ml — twice as much",
+        "desc": "The market standard is 60–100 ml. Ours is 180 ml. That means a lower cost per colouring."
+      },
+      {
+        "icon": "🎨",
+        "title": "Professional formula",
+        "desc": "Quality ingredients deliver even coverage, long-lasting colour and hair protection during colouring."
+      },
+      {
+        "icon": "💰",
+        "title": "More economical for your salon",
+        "desc": "A larger pack — less waste, lower cost per colouring. A rational daily choice."
+      },
+      {
+        "icon": "🌈",
+        "title": "Wide colour palette",
+        "desc": "Dozens of professional shades — from natural to bold. Every colourist will find what they need."
+      },
+      {
+        "icon": "🚚",
+        "title": "Fast and easy ordering",
+        "desc": "Order online and receive within 1–3 working days. Courier, parcel locker or in-store pickup."
+      },
+      {
+        "icon": "🤝",
+        "title": "B2B terms for salons",
+        "desc": "Special pricing, regular supply and a dedicated account manager for salons and chains."
+      }
+    ]
   },
   "categories": {
     "title": "Product Categories",
@@ -68,19 +107,72 @@
     "shampoos": "Shampoos & Care",
     "shampoosDesc": "Hair care products after colouring",
     "accessories": "Accessories",
-    "accessoriesDesc": "Professional work tools"
+    "accessoriesDesc": "Professional work tools",
+    "label": "Range",
+    "subtitle": "Everything you need for professional salon work",
+    "items": [
+      {
+        "slug": "dazai",
+        "icon": "🎨",
+        "title": "Hair dyes",
+        "count": "Color SHOCK • 180 ml"
+      },
+      {
+        "slug": "oksidantai",
+        "icon": "⚗",
+        "title": "Oxidants",
+        "count": "Professional line"
+      },
+      {
+        "slug": "sampunai",
+        "icon": "🧴",
+        "title": "Shampoos & care",
+        "count": "RosaNera Cosmetic"
+      },
+      {
+        "slug": "priemones",
+        "icon": "✂",
+        "title": "Tools & accessories",
+        "count": "For hairdressers"
+      }
+    ]
   },
   "comparison": {
     "title": "Why Does 180 ml Change the Game?",
     "ourProduct": "Color SHOCK 180 ml",
-    "standard": "Standard 60 ml",
+    "standard": "Standard",
     "volume": "Volume",
     "pricePerMl": "Price per ml",
     "sessionsPerTube": "Sessions per tube",
     "packagesPerMonth": "Packages per month",
     "cta": "Calculate Your Savings",
     "less": "less",
-    "more": "more"
+    "more": "more",
+    "label": "The key advantage",
+    "titleFull": "Why 180 ml changes the rules of the game",
+    "subtitle": "A side-by-side comparison with the standard market pack",
+    "ours": "Ours",
+    "rightTitle": "More product. Lower cost.",
+    "rightDesc": "One of our packs equals three standard ones. That means fewer orders, less waste and a significantly lower cost per colouring for your salon.",
+    "stats": [
+      {
+        "number": "3×",
+        "label": "More product in one pack"
+      },
+      {
+        "number": "~40%",
+        "label": "Lower price per ml"
+      },
+      {
+        "number": "↓ 3×",
+        "label": "Less packaging waste"
+      },
+      {
+        "number": "↑",
+        "label": "Higher profitability for the salon"
+      }
+    ],
+    "ctaFull": "Calculate your savings"
   },
   "popular": {
     "title": "Most Popular Products",
@@ -108,7 +200,32 @@
     "professionals": {
       "title": "Professionals",
       "desc": "For specialists who work daily and value quality and price"
-    }
+    },
+    "label": "Who it is for",
+    "titleFull": "Who it is for",
+    "subtitle": "Our products are built for those who care about the working result",
+    "cards": [
+      {
+        "icon": "✂",
+        "title": "Hairdressers",
+        "desc": "Reliable tools for daily work. An economical 180 ml pack — less hassle, more work done."
+      },
+      {
+        "icon": "🎨",
+        "title": "Colourists",
+        "desc": "A wide palette and a professional formula let you deliver precise colour for every client."
+      },
+      {
+        "icon": "🏪",
+        "title": "Beauty salons",
+        "desc": "B2B terms, regular supply and an economical pricing model — the ideal fit for a salon budget."
+      },
+      {
+        "icon": "💪",
+        "title": "Professionals",
+        "desc": "For those working every day who value a reliable result, quality and a smart price-to-value ratio."
+      }
+    ]
   },
   "testimonials": {
     "badge": "Testimonials",
@@ -931,5 +1048,48 @@
   "colorPalettePage": {
     "metaTitle": "Color SHOCK palette — 50 professional shades",
     "metaDesc": "Color SHOCK professional hair dye palette. 50+ shades in 180 ml packaging. Filter by family or search by number."
+  },
+  "b2bHome": {
+    "label": "Partnership",
+    "title": "Working in a salon? Get a dedicated offer",
+    "desc": "We offer tailored terms to beauty salons, hairdressing studios and professional colourists. Regular supply, personal service and the best price.",
+    "features": [
+      "Individual pricing by volume",
+      "Regular supply on demand",
+      "A dedicated account manager",
+      "Option to test products",
+      "180 ml economic benefit for the salon"
+    ],
+    "formTitle": "Submit a request",
+    "formSalonName": "Salon name",
+    "formYourName": "Your name",
+    "formEmail": "Email",
+    "formPhone": "Phone number",
+    "formMessage": "Additional info (monthly needs, preferences…)",
+    "formSubmit": "Get an offer"
+  },
+  "finalCtaFull": {
+    "label": "Start now",
+    "title": "Ready to try?",
+    "desc": "Professional dyes in a 180 ml pack — more value for every colouring in your salon.",
+    "cta": "Buy now",
+    "ctaSecondary": "Contact us"
+  },
+  "featured": {
+    "label": "Bestsellers",
+    "title": "Most ordered products",
+    "allProducts": "All products"
+  },
+  "colorPaletteHero": {
+    "titlePart1": "Color SHOCK",
+    "titlePart2": "colour palette",
+    "heroDescStart": "Find the perfect shade from",
+    "heroDescEnd": "professional shades. Each shade in a 180 ml professional pack.",
+    "statColors": "shades",
+    "statFrom": "From",
+    "ctaTitle": "Found your shade?",
+    "ctaDesc": "Order professional Color SHOCK dyes in 180 ml packs and get more value from every colouring.",
+    "ctaBuy": "Buy now",
+    "ctaSalons": "Salon offer"
   }
 }
