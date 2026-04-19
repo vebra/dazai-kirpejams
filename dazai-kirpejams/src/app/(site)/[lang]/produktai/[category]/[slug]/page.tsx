@@ -41,10 +41,11 @@ export async function generateMetadata({
   const description = getProductDescription(product, lang)
   const path = `/produktai/${categorySlug}/${slug}`
   const canonical = buildCanonicalUrl(lang, path)
+  const dict = await getDictionary(lang)
 
   return {
     title: name,
-    description: description || `${name} — profesionalūs plaukų dažai kirpėjams`,
+    description: description || `${name} — ${dict.productPage.metaFallback}`,
     alternates: {
       canonical,
       languages: buildLanguageAlternates(path),
@@ -242,7 +243,7 @@ export default async function ProductPage({
                   registerPro: t.registerPro,
                   b2bPrice: t.b2bPrice,
                   addToCart: dict.popular.addToCart,
-                  addedToCart: dict.popular.added ?? 'Pridėta į krepšelį',
+                  addedToCart: dict.popular.added,
                   youSave: t.youSave,
                   accountPendingTitle: t.accountPendingTitle,
                   accountPendingDesc: t.accountPendingDesc,

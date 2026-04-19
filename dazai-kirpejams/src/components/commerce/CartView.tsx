@@ -255,46 +255,46 @@ export function CartView({ lang, dict }: CartViewProps) {
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
               {!user ? (
                 <>
-                  Norėdami pirkti,{' '}
+                  {dict.cart.authGateLoginPrefix}{' '}
                   <Link
                     href={`${langPrefix(lang)}/prisijungimas`}
                     className="font-semibold text-brand-magenta hover:underline"
                   >
-                    prisijunkite
+                    {dict.cart.authGateLoginCta}
                   </Link>{' '}
-                  arba{' '}
+                  {dict.cart.authGateOr}{' '}
                   <Link
                     href={`${langPrefix(lang)}/registracija`}
                     className="font-semibold text-brand-magenta hover:underline"
                   >
-                    registruokitės
+                    {dict.cart.authGateRegisterCta}
                   </Link>
-                  .
+                  {dict.cart.authGateEnd}
                 </>
               ) : status === 'pending' ? (
-                'Jūsų paskyra dar nepatvirtinta. Laukiame, kol administratorius peržiūrės dokumentą.'
+                dict.cart.authGatePending
               ) : status === 'rejected' ? (
                 <>
-                  Jūsų dokumentas buvo atmestas.{' '}
+                  {dict.cart.authGateRejectedPrefix}{' '}
                   <Link
                     href={`${langPrefix(lang)}/paskyra`}
                     className="font-semibold text-brand-magenta hover:underline"
                   >
-                    Įkelkite naują dokumentą
+                    {dict.cart.authGateRejectedCta}
                   </Link>
-                  .
+                  {dict.cart.authGateEnd}
                 </>
               ) : (
                 <>
-                  Verifikacijos statusas dar nepasiektas.{' '}
+                  {dict.cart.authGateUnknownPrefix}{' '}
                   <button
                     type="button"
                     onClick={() => window.location.reload()}
                     className="font-semibold text-brand-magenta hover:underline"
                   >
-                    Atnaujinti puslapį
+                    {dict.cart.authGateUnknownCta}
                   </button>{' '}
-                  — jei problema kartojasi, susisiekite su mumis.
+                  {dict.cart.authGateUnknownSuffix}
                 </>
               )}
             </div>

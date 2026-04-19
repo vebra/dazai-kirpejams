@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og'
 import { getProductBySlug } from '@/lib/data/queries'
 import { getProductName } from '@/lib/types'
-import { hasLocale } from '@/i18n/dictionaries'
+import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import {
   OG_SIZE,
   OgLayout,
@@ -24,6 +24,7 @@ export default async function Image({
 }) {
   const { lang, slug } = await params
   const locale = hasLocale(lang) ? lang : 'lt'
+  const dict = await getDictionary(locale)
 
   const product = await getProductBySlug(slug)
   if (!product) {
@@ -31,7 +32,7 @@ export default async function Image({
       (
         <OgLayout>
           <div style={{ fontSize: 48, fontWeight: 700, color: DARK }}>
-            Produktas nerastas
+            {dict.og.productNotFound}
           </div>
         </OgLayout>
       ),

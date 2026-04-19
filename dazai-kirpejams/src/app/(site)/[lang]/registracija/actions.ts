@@ -2,25 +2,21 @@
 
 import { createServerSupabase } from '@/lib/supabase/ssr'
 import { createServerClient as createServiceClient } from '@/lib/supabase/server'
+import { locales, type Locale, defaultLocale } from '@/i18n/config'
+import { getDictionary } from '@/i18n/dictionaries'
 
 export type RegisterState = {
   error?: string
   success?: boolean
 }
 
-/**
- * Kliento registracija:
- *   1) Supabase Auth signUp (email + password)
- *   2) Sukuria `user_profiles` eilutę su verification_status='pending'
- *   3) Jei pateiktas dokumentas — jau bus įkeltas per atskirą client-side
- *      upload'ą (Storage RLS leidžia authenticated user'iui rašyti į
- *      `verification-docs/{user_id}/` path'ą).
- *
- * Po sėkmingo signUp:
- *   - Supabase automatiškai siunčia email patvirtinimo laišką (jei Supabase
- *     Auth > Email Confirmations yra enabled)
- *   - Vartotojas turi laukti, kol admin'as peržiūrės dokumentą ir patvirtins
- */
+function resolveLang(raw: FormDataEntryValue | null): Locale {
+  if (typeof raw === 'string' && (locales as readonly string[]).includes(raw)) {
+    return raw as Locale
+  }
+  return defaultLocale
+}
+
 export async function registerAction(
   _prev: RegisterState,
   formData: FormData
@@ -36,25 +32,25 @@ export async function registerAction(
   const verificationNotes = (
     (formData.get('verification_notes') as string) ?? ''
   ).trim()
+  const lang = resolveLang(formData.get('lang'))
+  const { errors } = await getDictionary(lang)
 
-  // Validacijos
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { error: 'Įveskite teisingą el. paštą.' }
+    return { error: errors.emailInvalid }
   }
   if (!password || password.length < 6) {
-    return { error: 'Slaptažodis turi būti bent 6 simbolių.' }
+    return { error: errors.passwordTooShort }
   }
   if (!firstName) {
-    return { error: 'Įveskite vardą.' }
+    return { error: errors.firstNameRequired }
   }
   if (!lastName) {
-    return { error: 'Įveskite pavardę.' }
+    return { error: errors.lastNameRequired }
   }
   if (!businessType || !['hairdresser', 'salon', 'other'].includes(businessType)) {
-    return { error: 'Pasirinkite veiklos tipą.' }
+    return { error: errors.businessTypeRequired }
   }
 
-  // 1) signUp per SSR Supabase klientą (anon key)
   const supabase = await createServerSupabase()
   const { data: signUpData, error: signUpError } =
     await supabase.auth.signUp({
@@ -65,19 +61,15 @@ export async function registerAction(
   if (signUpError) {
     console.error('[register] signUp error:', signUpError.message)
     if (signUpError.message.includes('already registered')) {
-      return {
-        error: 'Šis el. paštas jau užregistruotas. Bandykite prisijungti.',
-      }
+      return { error: errors.emailAlreadyRegistered }
     }
-    return { error: 'Nepavyko užregistruoti. Bandykite dar kartą.' }
+    return { error: errors.registerGeneric }
   }
 
   if (!signUpData.user) {
-    return { error: 'Nepavyko sukurti paskyros.' }
+    return { error: errors.createAccountFailed }
   }
 
-  // 2) user_profiles eilutė — per service role, nes naujas user'is dar neturi
-  // sesijos (email dar nepatvirtintas).
   const serviceClient = createServiceClient()
   const { error: profileError } = await serviceClient
     .from('user_profiles')
@@ -95,10 +87,6 @@ export async function registerAction(
 
   if (profileError) {
     console.error('[register] profile insert error:', profileError.message)
-    // Jei profilis nepavyko, bet user sukurtas — nėra gera situacija,
-    // bet user galės prisijungti ir profilis bus sukurtas vėliau (admin arba
-    // per atnaujintą registracijos formą). Negrąžinam error, nes signUp jau
-    // pavyko.
   }
 
   return { success: true }

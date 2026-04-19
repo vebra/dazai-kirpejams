@@ -31,9 +31,9 @@ export function ProductCard({
   const primaryImage = product.image_urls?.[0]
 
   const p = dict.popular
-  const loginForPrice = p.loginForPrice ?? 'Prisijungti dėl kainos'
-  const accountPending = p.accountPending ?? 'Paskyra peržiūrima'
-  const accountRejected = p.accountRejected ?? 'Įkelti dokumentą'
+  const loginForPrice = p.loginForPrice
+  const accountPending = p.accountPending
+  const accountRejected = p.accountRejected
 
   let ctaHref = `${langPrefix(lang)}/prisijungimas`
   let ctaLabel = loginForPrice
@@ -113,7 +113,7 @@ export function ProductCard({
             <AddToCartButton
               variant="icon"
               label={p.addToCart}
-              labelAdded={p.added ?? 'Pridėta'}
+              labelAdded={p.added}
               item={{
                 productId: product.id,
                 slug: product.slug,

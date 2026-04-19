@@ -313,7 +313,18 @@
     "remove": "Pašalinti",
     "proceedToCheckout": "Pereiti prie apmokėjimo",
     "clearCart": "Išvalyti krepšelį",
-    "itemCount": "{count} prekė(s)"
+    "itemCount": "{count} prekė(s)",
+    "authGateLoginPrefix": "Norėdami pirkti,",
+    "authGateLoginCta": "prisijunkite",
+    "authGateOr": "arba",
+    "authGateRegisterCta": "registruokitės",
+    "authGateEnd": ".",
+    "authGatePending": "Jūsų paskyra dar nepatvirtinta. Laukiame, kol administratorius peržiūrės dokumentą.",
+    "authGateRejectedPrefix": "Jūsų dokumentas buvo atmestas.",
+    "authGateRejectedCta": "Įkelkite naują dokumentą",
+    "authGateUnknownPrefix": "Verifikacijos statusas dar nepasiektas.",
+    "authGateUnknownCta": "Atnaujinti puslapį",
+    "authGateUnknownSuffix": "— jei problema kartojasi, susisiekite su mumis."
   },
   "checkout": {
     "title": "Apmokėjimas",
@@ -356,7 +367,8 @@
     "discountCode": "Kupono kodas",
     "applyDiscount": "Pritaikyti",
     "removeDiscount": "Pašalinti kuponą",
-    "discountLabel": "Nuolaida"
+    "discountLabel": "Nuolaida",
+    "enterCouponCode": "Įveskite kupono kodą."
   },
   "common": {
     "home": "Pradžia",
@@ -841,7 +853,10 @@
     "itemsTitle": "Užsakytos prekės",
     "deliveryTitle": "Pristatymas",
     "contactTitle": "Kontaktiniai duomenys",
-    "continueShopping": "Grįžti į parduotuvę"
+    "continueShopping": "Grįžti į parduotuvę",
+    "bankName": "Bankas",
+    "bankInfoPending": "Mokėjimo instrukcijas atsiųsime atskiru laišku per artimiausią darbo dieną.",
+    "discountLabel": "Nuolaida"
   },
   "blogPage": {
     "metaTitle": "Blogas — profesionalūs patarimai kirpėjams",
@@ -1000,7 +1015,8 @@
     "relatedTitle": "Tinka prie šio produkto",
     "ctaTitle": "Dirbate salone? Gaukite specialų pasiūlymą",
     "ctaDesc": "Individualios kainos, reguliarus tiekimas ir asmeninis vadybininkas.",
-    "ctaPrimary": "Gauti pasiūlymą →"
+    "ctaPrimary": "Gauti pasiūlymą →",
+    "metaFallback": "profesionalūs plaukų dažai kirpėjams"
   },
   "categoryPage": {
     "dyeTitle": "Plaukų dažai — Color SHOCK",
@@ -1031,19 +1047,115 @@
     "metaDesc": "Prisijunkite prie savo profesionalo paskyros ir peržiūrėkite produktų kainas.",
     "headerTitle": "Prisijungimas",
     "cardTitle": "Profesionalo paskyra",
-    "cardDesc": "Prisijunkite, kad matytumėte kainas ir galėtumėte pirkti."
+    "cardDesc": "Prisijunkite, kad matytumėte kainas ir galėtumėte pirkti.",
+    "emailLabel": "El. paštas",
+    "emailPlaceholder": "jusu@paštas.lt",
+    "passwordLabel": "Slaptažodis",
+    "passwordPlaceholder": "Jūsų slaptažodis",
+    "submit": "Prisijungti",
+    "submitting": "Jungiamasi…",
+    "noAccount": "Neturite paskyros?",
+    "registerCta": "Registruotis"
   },
   "registerPage": {
     "metaTitle": "Registracija profesionalams",
     "metaDesc": "Prisiregistruokite kaip profesionalus kirpėjas arba salonas ir gaukite prieigą prie produktų kainų.",
     "headerTitle": "Registracija profesionalams",
     "cardTitle": "Sukurkite profesionalo paskyrą",
-    "cardDesc": "Kainos matomos tik patvirtintiems profesionalams. Po registracijos peržiūrėsime Jūsų dokumentą ir suaktyvinsime paskyrą per 1 darbo dieną."
+    "cardDesc": "Kainos matomos tik patvirtintiems profesionalams. Po registracijos peržiūrėsime Jūsų dokumentą ir suaktyvinsime paskyrą per 1 darbo dieną.",
+    "success": {
+      "title": "Registracija sėkminga!",
+      "desc": "Jūsų paskyra sukurta. Patvirtinkite el. paštą (patikrinkite inbox'ą ir spam'ą), tada laukite, kol mūsų komanda peržiūrės Jūsų dokumentą ir patvirtins paskyrą. Tai užtrunka iki 1 darbo dienos.",
+      "loginCta": "Prisijungti"
+    },
+    "auth": {
+      "legend": "Prisijungimo duomenys",
+      "email": "El. paštas",
+      "emailPlaceholder": "jusu@paštas.lt",
+      "password": "Slaptažodis",
+      "passwordPlaceholder": "Min. 6 simboliai"
+    },
+    "personal": {
+      "legend": "Asmeninė informacija",
+      "firstName": "Vardas",
+      "firstNamePlaceholder": "Jonas",
+      "lastName": "Pavardė",
+      "lastNamePlaceholder": "Jonaitis",
+      "phone": "Telefonas",
+      "phonePlaceholder": "+370 600 00000"
+    },
+    "business": {
+      "legend": "Profesinė veikla",
+      "typeLabel": "Veiklos tipas",
+      "options": {
+        "hairdresser": "Kirpėjas / koloristas (sertifikatas)",
+        "salon": "Grožio salonas (verslo liudijimas)",
+        "other": "Kita profesinė veikla"
+      },
+      "salonName": "Salono / įmonės pavadinimas",
+      "salonNamePlaceholder": "Grožio salonas „Stilius\"",
+      "companyCode": "Įmonės kodas",
+      "companyCodePlaceholder": "305123456",
+      "notes": "Papildoma informacija",
+      "notesPlaceholder": "Pvz. dirbu salone „Stilius\", Kaune, 5+ metų patirtis...",
+      "noticeStrong": "Svarbu:",
+      "noticeText": "Po registracijos Jums reikės įkelti profesinės kvalifikacijos dokumentą (kirpėjo sertifikatą arba verslo liudijimą). Tai galėsite padaryti prisijungę prie paskyros. Be dokumento kainos nebus matomos."
+    },
+    "submit": "Registruotis",
+    "submitting": "Registruojama…",
+    "haveAccount": "Jau turite paskyrą?",
+    "loginCta": "Prisijungti"
   },
   "accountPage": {
     "metaTitle": "Mano paskyra",
     "metaDesc": "Jūsų profesionalo paskyros informacija ir dokumento įkėlimas.",
-    "headerTitle": "Mano paskyra"
+    "headerTitle": "Mano paskyra",
+    "statusLabels": {
+      "pending": "Laukia patvirtinimo",
+      "approved": "Patvirtinta",
+      "rejected": "Atmesta"
+    },
+    "statusDescriptions": {
+      "pending": "Jūsų paskyra peržiūrima. Kai administratorius patvirtins dokumentą, galėsite matyti kainas ir pirkti. Tai užtrunka iki 1 darbo dienos.",
+      "approved": "Jūsų paskyra patvirtinta. Galite matyti kainas ir pirkti produktus.",
+      "rejected": "Jūsų dokumentas buvo atmestas. Įkelkite naują dokumentą ir bandykite dar kartą."
+    },
+    "rejectionReason": "Priežastis:",
+    "businessTypes": {
+      "hairdresser": "Kirpėjas / koloristas",
+      "salon": "Grožio salonas",
+      "other": "Kita profesinė veikla"
+    },
+    "labels": {
+      "businessType": "Veiklos tipas",
+      "phone": "Telefonas",
+      "salon": "Salonas",
+      "companyCode": "Įmonės kodas"
+    },
+    "document": {
+      "title": "Profesinės kvalifikacijos dokumentas",
+      "desc": "Įkelkite kirpėjo sertifikatą arba verslo liudijimą. Leidžiami formatai: JPG, PNG, WebP, PDF. Maksimalus dydis — 10 MB.",
+      "alreadyUploaded": "Dokumentas jau įkeltas.",
+      "canUploadNew": "Galite įkelti naują.",
+      "waitingApproval": "Laukiame patvirtinimo.",
+      "uploadSuccess": "Dokumentas sėkmingai įkeltas!",
+      "fileLabel": "Pasirinkite failą",
+      "uploading": "Įkeliama…",
+      "uploadCta": "Įkelti dokumentą"
+    },
+    "invoices": {
+      "title": "Mano sąskaitos",
+      "desc": "PVM sąskaitos faktūros, išrašytos pagal jūsų užsakymus. Sąskaita paprastai atsiranda iš karto po apmokėjimo.",
+      "empty": "Sąskaitų dar nėra. Kai užsakymas bus apmokėtas, sąskaita atsiras čia ir bus išsiųsta jums el. paštu.",
+      "orderPrefix": "Užsakymas",
+      "downloadPdf": "Parsisiųsti PDF",
+      "pdfPending": "PDF ruošiamas"
+    },
+    "logout": {
+      "title": "Atsijungti",
+      "desc": "Atsijungsite nuo savo paskyros.",
+      "cta": "Atsijungti"
+    }
   },
   "colorPalettePage": {
     "metaTitle": "Color SHOCK spalvų paletė — 50 profesionalių atspalvių",
@@ -1091,5 +1203,44 @@
     "ctaDesc": "Užsisakykite profesionalius Color SHOCK dažus su 180 ml talpa ir gaukite daugiau vertės kiekvienam dažymui.",
     "ctaBuy": "Pirkti dabar",
     "ctaSalons": "Pasiūlymas salonams"
+  },
+  "errors": {
+    "loginMissing": "Įveskite el. paštą ir slaptažodį.",
+    "loginInvalid": "Neteisingas el. paštas arba slaptažodis.",
+    "loginUnconfirmedEmail": "El. paštas dar nepatvirtintas. Patikrinkite savo inbox ir spam.",
+    "loginGeneric": "Nepavyko prisijungti. Bandykite dar kartą.",
+    "emailInvalid": "Įveskite teisingą el. paštą.",
+    "passwordTooShort": "Slaptažodis turi būti bent 6 simbolių.",
+    "firstNameRequired": "Įveskite vardą.",
+    "lastNameRequired": "Įveskite pavardę.",
+    "businessTypeRequired": "Pasirinkite veiklos tipą.",
+    "emailAlreadyRegistered": "Šis el. paštas jau užregistruotas. Bandykite prisijungti.",
+    "registerGeneric": "Nepavyko užregistruoti. Bandykite dar kartą.",
+    "createAccountFailed": "Nepavyko sukurti paskyros.",
+    "mustBeLoggedIn": "Turite būti prisijungę.",
+    "selectFile": "Pasirinkite failą.",
+    "allowedFormats": "Leidžiami formatai: JPG, PNG, WebP, PDF.",
+    "fileTooLarge": "Failas per didelis. Maksimalus dydis — 10 MB.",
+    "uploadFailed": "Nepavyko įkelti failo. Bandykite dar kartą.",
+    "profileUpdateFailed": "Failas įkeltas, bet nepavyko atnaujinti profilio.",
+    "nameRequired": "Įveskite vardą.",
+    "messageRequired": "Įveskite žinutę.",
+    "contactSendFailed": "Nepavyko išsiųsti žinutės. Bandykite dar kartą.",
+    "salonNameRequired": "Įveskite salono pavadinimą.",
+    "contactPersonRequired": "Įveskite kontaktinį asmenį.",
+    "b2bSendFailed": "Nepavyko išsiųsti užklausos. Bandykite dar kartą."
+  },
+  "og": {
+    "alt": "Dažai Kirpėjams — Profesionalūs plaukų dažai kirpėjams",
+    "titleMain": "Profesionalūs plaukų dažai",
+    "titleAccent": "kirpėjams",
+    "subtitle": "Didesnė 180 ml talpa. Daugiau vertės darbui salone.",
+    "pill1": "180 ml talpa",
+    "pill2": "Profesionali formulė",
+    "pill3": "Greitas pristatymas",
+    "blogBadge": "Blogas",
+    "articleNotFound": "Straipsnis nerastas",
+    "blogAlt": "Straipsnio vaizdas",
+    "productNotFound": "Produktas nerastas"
   }
 }

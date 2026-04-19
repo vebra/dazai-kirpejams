@@ -1,6 +1,33 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+
+const messages = {
+  lt: {
+    title: 'Kažkas nutiko ne taip',
+    desc: 'Atsiprašome — įvyko netikėta klaida. Pabandykite dar kartą.',
+    retry: 'Bandyti dar kartą',
+  },
+  en: {
+    title: 'Something went wrong',
+    desc: 'Sorry — an unexpected error occurred. Please try again.',
+    retry: 'Try again',
+  },
+  ru: {
+    title: 'Что-то пошло не так',
+    desc: 'Извините — произошла непредвиденная ошибка. Попробуйте ещё раз.',
+    retry: 'Попробовать ещё раз',
+  },
+} as const
+
+type Lang = keyof typeof messages
+
+function detectLang(): Lang {
+  if (typeof window === 'undefined') return 'lt'
+  const seg = window.location.pathname.split('/')[1]
+  if (seg === 'en' || seg === 'ru') return seg
+  return 'lt'
+}
 
 export default function GlobalError({
   error,
@@ -9,12 +36,17 @@ export default function GlobalError({
   error: Error & { digest?: string }
   unstable_retry: () => void
 }) {
+  const [lang, setLang] = useState<Lang>('lt')
+
   useEffect(() => {
     console.error('[global-error]', error)
+    setLang(detectLang())
   }, [error])
 
+  const t = messages[lang]
+
   return (
-    <html lang="lt">
+    <html lang={lang}>
       <body
         style={{
           margin: 0,
@@ -30,10 +62,10 @@ export default function GlobalError({
       >
         <div style={{ textAlign: 'center', padding: '2rem', maxWidth: 480 }}>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.75rem' }}>
-            Kažkas nutiko ne taip
+            {t.title}
           </h1>
           <p style={{ color: '#6B6B6B', lineHeight: 1.6, marginBottom: '1.5rem' }}>
-            Atsiprašome — įvyko netikėta klaida. Pabandykite dar kartą.
+            {t.desc}
           </p>
           <button
             onClick={() => unstable_retry()}
@@ -48,7 +80,7 @@ export default function GlobalError({
               cursor: 'pointer',
             }}
           >
-            Bandyti dar kartą
+            {t.retry}
           </button>
         </div>
       </body>

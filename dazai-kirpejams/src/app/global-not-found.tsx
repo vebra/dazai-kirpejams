@@ -3,8 +3,8 @@ import Link from 'next/link'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Puslapis nerastas — Dažai Kirpėjams',
-  description: 'Ieškomas puslapis neegzistuoja arba buvo perkeltas.',
+  title: 'Page not found — Dažai Kirpėjams',
+  description: 'The page you are looking for does not exist or has moved.',
 }
 
 export default function GlobalNotFound() {
@@ -38,12 +38,16 @@ export default function GlobalNotFound() {
           </p>
           <h1
             style={{
-              fontSize: '1.875rem',
+              fontSize: '1.5rem',
               fontWeight: 700,
-              marginBottom: '0.75rem',
+              marginBottom: '0.5rem',
+              lineHeight: 1.3,
             }}
           >
             Puslapis nerastas
+            <span style={{ display: 'block', fontSize: '1.1rem', color: '#6B6B6B', fontWeight: 600 }}>
+              Page not found · Страница не найдена
+            </span>
           </h1>
           <p
             style={{
@@ -52,8 +56,11 @@ export default function GlobalNotFound() {
               marginBottom: '1.75rem',
             }}
           >
-            Ieškomas puslapis neegzistuoja arba buvo perkeltas. Grįžkite į
-            pradinį puslapį ir tęskite naršymą.
+            Ieškomas puslapis neegzistuoja arba buvo perkeltas.
+            <br />
+            The page you are looking for does not exist or has moved.
+            <br />
+            Запрашиваемая страница не существует или была перемещена.
           </p>
           <Link
             href="/"
@@ -68,7 +75,7 @@ export default function GlobalNotFound() {
               fontSize: '0.95rem',
             }}
           >
-            Grįžti į pradžią
+            Grįžti į pradžią · Back home · На главную
           </Link>
         </div>
       </body>

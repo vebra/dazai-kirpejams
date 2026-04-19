@@ -313,7 +313,18 @@
     "remove": "Remove",
     "proceedToCheckout": "Proceed to Checkout",
     "clearCart": "Clear Cart",
-    "itemCount": "{count} item(s)"
+    "itemCount": "{count} item(s)",
+    "authGateLoginPrefix": "To make a purchase,",
+    "authGateLoginCta": "sign in",
+    "authGateOr": "or",
+    "authGateRegisterCta": "register",
+    "authGateEnd": ".",
+    "authGatePending": "Your account is not yet approved. We are waiting for an administrator to review your document.",
+    "authGateRejectedPrefix": "Your document was rejected.",
+    "authGateRejectedCta": "Upload a new document",
+    "authGateUnknownPrefix": "Verification status is not available yet.",
+    "authGateUnknownCta": "Refresh the page",
+    "authGateUnknownSuffix": "— if the issue persists, please contact us."
   },
   "checkout": {
     "title": "Checkout",
@@ -356,7 +367,8 @@
     "discountCode": "Coupon code",
     "applyDiscount": "Apply",
     "removeDiscount": "Remove coupon",
-    "discountLabel": "Discount"
+    "discountLabel": "Discount",
+    "enterCouponCode": "Please enter a coupon code."
   },
   "common": {
     "home": "Home",
@@ -841,7 +853,10 @@
     "itemsTitle": "Items Ordered",
     "deliveryTitle": "Delivery",
     "contactTitle": "Contact Details",
-    "continueShopping": "Back to Shop"
+    "continueShopping": "Back to Shop",
+    "bankName": "Bank",
+    "bankInfoPending": "We will send payment instructions in a separate email within the next business day.",
+    "discountLabel": "Discount"
   },
   "blogPage": {
     "metaTitle": "Blog — Professional Tips for Hairdressers",
@@ -1000,7 +1015,8 @@
     "relatedTitle": "Goes well with this product",
     "ctaTitle": "Work in a salon? Get a special offer",
     "ctaDesc": "Individual pricing, regular supply and a personal account manager.",
-    "ctaPrimary": "Get an offer →"
+    "ctaPrimary": "Get an offer →",
+    "metaFallback": "professional hair dyes for hairdressers"
   },
   "categoryPage": {
     "dyeTitle": "Hair Dyes — Color SHOCK",
@@ -1031,19 +1047,115 @@
     "metaDesc": "Sign in to your professional account and view product prices.",
     "headerTitle": "Sign in",
     "cardTitle": "Professional account",
-    "cardDesc": "Sign in to see prices and place orders."
+    "cardDesc": "Sign in to see prices and place orders.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "your@email.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Your password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "noAccount": "Don't have an account?",
+    "registerCta": "Register"
   },
   "registerPage": {
-    "metaTitle": "Register as a professional",
-    "metaDesc": "Register as a professional hairstylist or salon and get access to product prices.",
-    "headerTitle": "Register as a professional",
-    "cardTitle": "Create your professional account",
-    "cardDesc": "Prices are visible only to verified professionals. After registration we will review your document and activate your account within 1 business day."
+    "metaTitle": "Registration for professionals",
+    "metaDesc": "Register as a professional hairdresser or salon to access product prices.",
+    "headerTitle": "Registration for professionals",
+    "cardTitle": "Create a professional account",
+    "cardDesc": "Prices are visible only to approved professionals. After registration we review your document and activate your account within one business day.",
+    "success": {
+      "title": "Registration successful!",
+      "desc": "Your account has been created. Confirm your email (check inbox and spam), then wait while our team reviews your document and approves your account. This takes up to one business day.",
+      "loginCta": "Sign in"
+    },
+    "auth": {
+      "legend": "Login details",
+      "email": "Email",
+      "emailPlaceholder": "your@email.com",
+      "password": "Password",
+      "passwordPlaceholder": "Min. 6 characters"
+    },
+    "personal": {
+      "legend": "Personal information",
+      "firstName": "First name",
+      "firstNamePlaceholder": "John",
+      "lastName": "Last name",
+      "lastNamePlaceholder": "Smith",
+      "phone": "Phone",
+      "phonePlaceholder": "+370 600 00000"
+    },
+    "business": {
+      "legend": "Professional activity",
+      "typeLabel": "Activity type",
+      "options": {
+        "hairdresser": "Hairdresser / colorist (certificate)",
+        "salon": "Beauty salon (business license)",
+        "other": "Other professional activity"
+      },
+      "salonName": "Salon / company name",
+      "salonNamePlaceholder": "Beauty salon \"Stilius\"",
+      "companyCode": "Company code",
+      "companyCodePlaceholder": "305123456",
+      "notes": "Additional information",
+      "notesPlaceholder": "E.g. I work at \"Stilius\" salon in Kaunas, 5+ years of experience...",
+      "noticeStrong": "Important:",
+      "noticeText": "After registration you will need to upload a professional qualification document (hairdresser certificate or business license). You can do this once signed in. Without a document, prices will not be visible."
+    },
+    "submit": "Register",
+    "submitting": "Registering…",
+    "haveAccount": "Already have an account?",
+    "loginCta": "Sign in"
   },
   "accountPage": {
     "metaTitle": "My account",
     "metaDesc": "Your professional account details and document upload.",
-    "headerTitle": "My account"
+    "headerTitle": "My account",
+    "statusLabels": {
+      "pending": "Awaiting approval",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "statusDescriptions": {
+      "pending": "Your account is being reviewed. Once an administrator approves your document, you will see prices and be able to purchase. This takes up to one business day.",
+      "approved": "Your account is approved. You can view prices and purchase products.",
+      "rejected": "Your document was rejected. Please upload a new one and try again."
+    },
+    "rejectionReason": "Reason:",
+    "businessTypes": {
+      "hairdresser": "Hairdresser / colorist",
+      "salon": "Beauty salon",
+      "other": "Other professional activity"
+    },
+    "labels": {
+      "businessType": "Activity type",
+      "phone": "Phone",
+      "salon": "Salon",
+      "companyCode": "Company code"
+    },
+    "document": {
+      "title": "Professional qualification document",
+      "desc": "Upload your hairdresser certificate or business license. Accepted formats: JPG, PNG, WebP, PDF. Max size — 10 MB.",
+      "alreadyUploaded": "Document already uploaded.",
+      "canUploadNew": "You can upload a new one.",
+      "waitingApproval": "Waiting for approval.",
+      "uploadSuccess": "Document uploaded successfully!",
+      "fileLabel": "Select a file",
+      "uploading": "Uploading…",
+      "uploadCta": "Upload document"
+    },
+    "invoices": {
+      "title": "My invoices",
+      "desc": "VAT invoices issued for your orders. The invoice usually appears right after payment.",
+      "empty": "No invoices yet. Once an order is paid, the invoice will appear here and be sent to you by email.",
+      "orderPrefix": "Order",
+      "downloadPdf": "Download PDF",
+      "pdfPending": "PDF is being prepared"
+    },
+    "logout": {
+      "title": "Log out",
+      "desc": "You will be signed out of your account.",
+      "cta": "Log out"
+    }
   },
   "colorPalettePage": {
     "metaTitle": "Color SHOCK palette — 50 professional shades",
@@ -1091,5 +1203,44 @@
     "ctaDesc": "Order professional Color SHOCK dyes in 180 ml packs and get more value from every colouring.",
     "ctaBuy": "Buy now",
     "ctaSalons": "Salon offer"
+  },
+  "errors": {
+    "loginMissing": "Enter your email and password.",
+    "loginInvalid": "Incorrect email or password.",
+    "loginUnconfirmedEmail": "Email is not confirmed yet. Please check your inbox and spam folder.",
+    "loginGeneric": "Sign-in failed. Please try again.",
+    "emailInvalid": "Enter a valid email address.",
+    "passwordTooShort": "Password must be at least 6 characters.",
+    "firstNameRequired": "Enter your first name.",
+    "lastNameRequired": "Enter your last name.",
+    "businessTypeRequired": "Select an activity type.",
+    "emailAlreadyRegistered": "This email is already registered. Try signing in.",
+    "registerGeneric": "Registration failed. Please try again.",
+    "createAccountFailed": "Could not create the account.",
+    "mustBeLoggedIn": "You must be signed in.",
+    "selectFile": "Please select a file.",
+    "allowedFormats": "Accepted formats: JPG, PNG, WebP, PDF.",
+    "fileTooLarge": "File is too large. Maximum size — 10 MB.",
+    "uploadFailed": "Upload failed. Please try again.",
+    "profileUpdateFailed": "The file was uploaded, but the profile could not be updated.",
+    "nameRequired": "Enter your name.",
+    "messageRequired": "Enter a message.",
+    "contactSendFailed": "Could not send the message. Please try again.",
+    "salonNameRequired": "Enter the salon name.",
+    "contactPersonRequired": "Enter a contact person.",
+    "b2bSendFailed": "Could not send the inquiry. Please try again."
+  },
+  "og": {
+    "alt": "Dažai Kirpėjams — Professional hair dyes for hairdressers",
+    "titleMain": "Professional hair dyes",
+    "titleAccent": "for hairdressers",
+    "subtitle": "Larger 180 ml bottle. More value for your salon work.",
+    "pill1": "180 ml bottle",
+    "pill2": "Professional formula",
+    "pill3": "Fast shipping",
+    "blogBadge": "Blog",
+    "articleNotFound": "Article not found",
+    "blogAlt": "Article image",
+    "productNotFound": "Product not found"
   }
 }

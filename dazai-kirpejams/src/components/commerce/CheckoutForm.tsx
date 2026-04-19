@@ -115,7 +115,7 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
     setDiscountError(null)
     const code = discountInput.trim().toUpperCase()
     if (!code) {
-      setDiscountError('Įveskite kupono kodą.')
+      setDiscountError(dict.checkout.enterCouponCode)
       return
     }
     setDiscountValidating(true)

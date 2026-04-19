@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og'
 import { getBlogPostBySlug } from '@/lib/data/queries'
-import { hasLocale } from '@/i18n/dictionaries'
+import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import {
   OG_SIZE,
   OgLayout,
@@ -21,6 +21,8 @@ export default async function Image({
 }) {
   const { lang, slug } = await params
   const locale = hasLocale(lang) ? (lang as 'lt' | 'en' | 'ru') : 'lt'
+  const dict = await getDictionary(locale)
+  const t = dict.og
 
   const post = await getBlogPostBySlug(slug, locale)
   if (!post) {
@@ -28,7 +30,7 @@ export default async function Image({
       (
         <OgLayout>
           <div style={{ fontSize: 48, fontWeight: 700, color: DARK }}>
-            Straipsnis nerastas
+            {t.articleNotFound}
           </div>
         </OgLayout>
       ),
@@ -38,7 +40,7 @@ export default async function Image({
 
   return new ImageResponse(
     (
-      <OgLayout badge="Blogas">
+      <OgLayout badge={t.blogBadge}>
         <div style={{ display: 'flex', gap: 48, alignItems: 'center', flex: 1 }}>
           {/* Cover image */}
           {post.coverImageUrl && (

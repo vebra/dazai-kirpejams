@@ -1,10 +1,19 @@
 'use server'
 
 import { createServerSupabase } from '@/lib/supabase/ssr'
+import { locales, type Locale, defaultLocale } from '@/i18n/config'
+import { getDictionary } from '@/i18n/dictionaries'
 
 export type ContactFormState = {
   error?: string
   success?: boolean
+}
+
+function resolveLang(raw: FormDataEntryValue | null): Locale {
+  if (typeof raw === 'string' && (locales as readonly string[]).includes(raw)) {
+    return raw as Locale
+  }
+  return defaultLocale
 }
 
 export async function submitContactAction(
@@ -16,13 +25,14 @@ export async function submitContactAction(
   const phone = ((formData.get('phone') as string) ?? '').trim()
   const subject = ((formData.get('subject') as string) ?? '').trim()
   const message = ((formData.get('message') as string) ?? '').trim()
-  const locale = ((formData.get('locale') as string) ?? 'lt').trim()
+  const locale = resolveLang(formData.get('locale'))
+  const { errors } = await getDictionary(locale)
 
-  if (!name) return { error: 'Įveskite vardą.' }
+  if (!name) return { error: errors.nameRequired }
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { error: 'Įveskite teisingą el. paštą.' }
+    return { error: errors.emailInvalid }
   }
-  if (!message) return { error: 'Įveskite žinutę.' }
+  if (!message) return { error: errors.messageRequired }
 
   const supabase = await createServerSupabase()
 
@@ -37,7 +47,7 @@ export async function submitContactAction(
 
   if (error) {
     console.error('[contact-form] insert error:', error.message)
-    return { error: 'Nepavyko išsiųsti žinutės. Bandykite dar kartą.' }
+    return { error: errors.contactSendFailed }
   }
 
   return { success: true }

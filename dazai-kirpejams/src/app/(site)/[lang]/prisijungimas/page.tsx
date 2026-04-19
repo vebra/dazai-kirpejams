@@ -46,7 +46,7 @@ export default async function LoginPage({
               </p>
             </div>
 
-            <LoginForm lang={lang} />
+            <LoginForm lang={lang} dict={dict.loginPage} />
           </div>
         </Container>
       </Section>

@@ -60,6 +60,7 @@ export default async function AccountPage({
             status={status}
             profile={profileResult.data}
             invoices={invoices}
+            dict={dict.accountPage}
           />
         </Container>
       </Section>

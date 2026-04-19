@@ -8,12 +8,49 @@ import { langPrefix } from '@/lib/utils'
 
 const initialState: RegisterState = {}
 
+type RegisterFormDict = {
+  success: { title: string; desc: string; loginCta: string }
+  auth: {
+    legend: string
+    email: string
+    emailPlaceholder: string
+    password: string
+    passwordPlaceholder: string
+  }
+  personal: {
+    legend: string
+    firstName: string
+    firstNamePlaceholder: string
+    lastName: string
+    lastNamePlaceholder: string
+    phone: string
+    phonePlaceholder: string
+  }
+  business: {
+    legend: string
+    typeLabel: string
+    options: { hairdresser: string; salon: string; other: string }
+    salonName: string
+    salonNamePlaceholder: string
+    companyCode: string
+    companyCodePlaceholder: string
+    notes: string
+    notesPlaceholder: string
+    noticeStrong: string
+    noticeText: string
+  }
+  submit: string
+  submitting: string
+  haveAccount: string
+  loginCta: string
+}
+
 export function RegisterForm({
   lang,
+  dict,
 }: {
   lang: Locale
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  dict: any
+  dict: RegisterFormDict
 }) {
   const [state, formAction, isPending] = useActionState(
     registerAction,
@@ -28,18 +65,16 @@ export function RegisterForm({
           <span className="text-3xl">✓</span>
         </div>
         <h3 className="text-lg font-bold text-brand-gray-900">
-          Registracija sėkminga!
+          {dict.success.title}
         </h3>
         <p className="text-sm text-brand-gray-500 max-w-sm mx-auto leading-relaxed">
-          Jūsų paskyra sukurta. Patvirtinkite el. paštą (patikrinkite inbox'ą ir
-          spam'ą), tada laukite, kol mūsų komanda peržiūrės Jūsų dokumentą ir
-          patvirtins paskyrą. Tai užtrunka iki 1 darbo dienos.
+          {dict.success.desc}
         </p>
         <Link
           href={`${langPrefix(lang)}/prisijungimas`}
           className="inline-flex px-6 py-3 bg-brand-magenta text-white rounded-xl font-semibold hover:bg-brand-magenta/90 transition-colors"
         >
-          Prisijungti
+          {dict.success.loginCta}
         </Link>
       </div>
     )
@@ -47,68 +82,66 @@ export function RegisterForm({
 
   return (
     <form action={formAction} className="space-y-6">
+      <input type="hidden" name="lang" value={lang} />
       {state.error && (
         <div className="px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
           {state.error}
         </div>
       )}
 
-      {/* Prisijungimo duomenys */}
       <fieldset className="space-y-4">
         <legend className="text-[13px] font-bold text-brand-gray-900 uppercase tracking-[0.5px] mb-2">
-          Prisijungimo duomenys
+          {dict.auth.legend}
         </legend>
         <div className="grid sm:grid-cols-2 gap-4">
           <Field
-            label="El. paštas"
+            label={dict.auth.email}
             name="email"
             type="email"
             required
-            placeholder="jusu@paštas.lt"
+            placeholder={dict.auth.emailPlaceholder}
           />
           <Field
-            label="Slaptažodis"
+            label={dict.auth.password}
             name="password"
             type="password"
             required
-            placeholder="Min. 6 simboliai"
+            placeholder={dict.auth.passwordPlaceholder}
           />
         </div>
       </fieldset>
 
-      {/* Asmeninė informacija */}
       <fieldset className="space-y-4">
         <legend className="text-[13px] font-bold text-brand-gray-900 uppercase tracking-[0.5px] mb-2">
-          Asmeninė informacija
+          {dict.personal.legend}
         </legend>
         <div className="grid sm:grid-cols-2 gap-4">
           <Field
-            label="Vardas"
+            label={dict.personal.firstName}
             name="first_name"
             required
             autoComplete="given-name"
-            placeholder="Jonas"
+            placeholder={dict.personal.firstNamePlaceholder}
           />
           <Field
-            label="Pavardė"
+            label={dict.personal.lastName}
             name="last_name"
             required
             autoComplete="family-name"
-            placeholder="Jonaitis"
+            placeholder={dict.personal.lastNamePlaceholder}
           />
           <Field
-            label="Telefonas"
+            label={dict.personal.phone}
             name="phone"
             type="tel"
-            placeholder="+370 600 00000"
+            placeholder={dict.personal.phonePlaceholder}
           />
         </div>
       </fieldset>
 
-      {/* Veiklos informacija */}
       <fieldset className="space-y-4">
         <legend className="text-[13px] font-bold text-brand-gray-900 uppercase tracking-[0.5px] mb-2">
-          Profesinė veikla
+          {dict.business.legend}
         </legend>
 
         <div>
@@ -116,7 +149,7 @@ export function RegisterForm({
             htmlFor="business_type"
             className="block text-xs font-medium text-brand-gray-500 mb-1.5"
           >
-            Veiklos tipas <span className="text-brand-magenta">*</span>
+            {dict.business.typeLabel} <span className="text-brand-magenta">*</span>
           </label>
           <select
             id="business_type"
@@ -126,26 +159,24 @@ export function RegisterForm({
             onChange={(e) => setBusinessType(e.target.value)}
             className="w-full px-4 py-3 border border-brand-gray-50 rounded-xl text-sm focus:outline-none focus:border-brand-magenta transition-colors bg-white"
           >
-            <option value="hairdresser">
-              Kirpėjas / koloristas (sertifikatas)
-            </option>
-            <option value="salon">Grožio salonas (verslo liudijimas)</option>
-            <option value="other">Kita profesinė veikla</option>
+            <option value="hairdresser">{dict.business.options.hairdresser}</option>
+            <option value="salon">{dict.business.options.salon}</option>
+            <option value="other">{dict.business.options.other}</option>
           </select>
         </div>
 
         {(businessType === 'salon' || businessType === 'other') && (
           <div className="grid sm:grid-cols-2 gap-4">
             <Field
-              label="Salono / įmonės pavadinimas"
+              label={dict.business.salonName}
               name="salon_name"
               autoComplete="organization"
-              placeholder={'Grožio salonas „Stilius"'}
+              placeholder={dict.business.salonNamePlaceholder}
             />
             <Field
-              label="Įmonės kodas"
+              label={dict.business.companyCode}
               name="company_code"
-              placeholder="305123456"
+              placeholder={dict.business.companyCodePlaceholder}
             />
           </div>
         )}
@@ -155,22 +186,19 @@ export function RegisterForm({
             htmlFor="verification_notes"
             className="block text-xs font-medium text-brand-gray-500 mb-1.5"
           >
-            Papildoma informacija
+            {dict.business.notes}
           </label>
           <textarea
             id="verification_notes"
             name="verification_notes"
             rows={2}
-            placeholder={'Pvz. dirbu salone „Stilius", Kaune, 5+ metų patirtis...'}
+            placeholder={dict.business.notesPlaceholder}
             className="w-full px-4 py-3 border border-brand-gray-50 rounded-xl text-sm focus:outline-none focus:border-brand-magenta transition-colors resize-none"
           />
         </div>
 
         <div className="px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-[12px] text-amber-800 leading-relaxed">
-          <strong>Svarbu:</strong> Po registracijos Jums reikės įkelti
-          profesinės kvalifikacijos dokumentą (kirpėjo sertifikatą arba verslo
-          liudijimą). Tai galėsite padaryti prisijungę prie paskyros. Be
-          dokumento kainos nebus matomos.
+          <strong>{dict.business.noticeStrong}</strong> {dict.business.noticeText}
         </div>
       </fieldset>
 
@@ -179,16 +207,16 @@ export function RegisterForm({
         disabled={isPending}
         className="w-full px-6 py-4 bg-brand-magenta text-white font-semibold rounded-xl hover:bg-brand-magenta/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isPending ? 'Registruojama…' : 'Registruotis'}
+        {isPending ? dict.submitting : dict.submit}
       </button>
 
       <p className="text-center text-xs text-brand-gray-500">
-        Jau turite paskyrą?{' '}
+        {dict.haveAccount}{' '}
         <Link
           href={`${langPrefix(lang)}/prisijungimas`}
           className="text-brand-magenta font-semibold hover:underline"
         >
-          Prisijungti
+          {dict.loginCta}
         </Link>
       </p>
     </form>

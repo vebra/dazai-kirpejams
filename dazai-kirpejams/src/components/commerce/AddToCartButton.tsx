@@ -23,10 +23,11 @@ export function AddToCartButton({
   item,
   quantity = 1,
   label,
-  labelAdded = 'Pridėta',
+  labelAdded,
   variant = 'small',
   className = '',
 }: AddToCartButtonProps) {
+  const addedLabel = labelAdded ?? label
   const addItem = useCartStore((s) => s.addItem)
   const [added, setAdded] = useState(false)
 
@@ -66,7 +67,7 @@ export function AddToCartButton({
         {added ? (
           <>
             <Check className="w-5 h-5" />
-            {labelAdded}
+            {addedLabel}
           </>
         ) : (
           <>
@@ -89,7 +90,7 @@ export function AddToCartButton({
       } ${className}`}
       aria-label={label}
     >
-      {added ? labelAdded : label}
+      {added ? addedLabel : label}
     </button>
   )
 }

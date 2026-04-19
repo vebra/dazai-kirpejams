@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabase } from '@/lib/supabase/ssr'
 import { locales, type Locale, defaultLocale } from '@/i18n/config'
+import { getDictionary } from '@/i18n/dictionaries'
 import { langPrefix } from '@/lib/utils'
 
 export type LoginState = {
@@ -23,9 +24,10 @@ export async function loginAction(
   const email = ((formData.get('email') as string) ?? '').trim().toLowerCase()
   const password = (formData.get('password') as string) ?? ''
   const lang = resolveLang(formData.get('lang'))
+  const { errors } = await getDictionary(lang)
 
   if (!email || !password) {
-    return { error: 'Įveskite el. paštą ir slaptažodį.' }
+    return { error: errors.loginMissing }
   }
 
   const supabase = await createServerSupabase()
@@ -37,15 +39,12 @@ export async function loginAction(
       error.message.includes('Invalid login') ||
       error.message.includes('invalid_credentials')
     ) {
-      return { error: 'Neteisingas el. paštas arba slaptažodis.' }
+      return { error: errors.loginInvalid }
     }
     if (error.message.includes('Email not confirmed')) {
-      return {
-        error:
-          'El. paštas dar nepatvirtintas. Patikrinkite savo inbox ir spam.',
-      }
+      return { error: errors.loginUnconfirmedEmail }
     }
-    return { error: 'Nepavyko prisijungti. Bandykite dar kartą.' }
+    return { error: errors.loginGeneric }
   }
 
   redirect(`${langPrefix(lang)}/paskyra`)

@@ -6,6 +6,8 @@ import {
   buildB2bInquiryAdminEmail,
   buildB2bInquiryCustomerEmail,
 } from '@/lib/email/templates'
+import { locales, type Locale, defaultLocale } from '@/i18n/config'
+import { getDictionary } from '@/i18n/dictionaries'
 
 export type B2bFormState = {
   error?: string
@@ -13,6 +15,13 @@ export type B2bFormState = {
 }
 
 const FALLBACK_ADMIN_EMAIL = 'info@dziuljetavebre.lt'
+
+function resolveLang(raw: FormDataEntryValue | null): Locale {
+  if (typeof raw === 'string' && (locales as readonly string[]).includes(raw)) {
+    return raw as Locale
+  }
+  return defaultLocale
+}
 
 export async function submitB2bInquiryAction(
   _prev: B2bFormState,
@@ -25,12 +34,13 @@ export async function submitB2bInquiryAction(
   const address = ((formData.get('address') as string) ?? '').trim()
   const monthlyVolume = ((formData.get('monthly_volume') as string) ?? '').trim()
   const message = ((formData.get('message') as string) ?? '').trim()
-  const locale = ((formData.get('locale') as string) ?? 'lt').trim()
+  const locale = resolveLang(formData.get('locale'))
+  const { errors } = await getDictionary(locale)
 
-  if (!salonName) return { error: 'Įveskite salono pavadinimą.' }
-  if (!contactName) return { error: 'Įveskite kontaktinį asmenį.' }
+  if (!salonName) return { error: errors.salonNameRequired }
+  if (!contactName) return { error: errors.contactPersonRequired }
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { error: 'Įveskite teisingą el. paštą.' }
+    return { error: errors.emailInvalid }
   }
 
   const supabase = await createServerSupabase()
@@ -49,7 +59,7 @@ export async function submitB2bInquiryAction(
 
   if (error) {
     console.error('[b2b-form] insert error:', error.message)
-    return { error: 'Nepavyko išsiųsti užklausos. Bandykite dar kartą.' }
+    return { error: errors.b2bSendFailed }
   }
 
   // Email notifikacijos — adminui (info@dziuljetavebre.lt) ir patvirtinimas

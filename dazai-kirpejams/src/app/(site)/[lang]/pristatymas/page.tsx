@@ -305,7 +305,7 @@ export default async function DeliveryPage({
             {[
               {
                 icon: '✉',
-                label: dict.contactPage?.email || 'El. paštas',
+                label: dict.contactPage.email,
                 value: CONTACT.email,
                 href: `mailto:${CONTACT.email}`,
               },
@@ -313,7 +313,7 @@ export default async function DeliveryPage({
                 ? [
                     {
                       icon: '☎',
-                      label: dict.contactPage?.phone || 'Telefonas',
+                      label: dict.contactPage.phone,
                       value: CONTACT.phone,
                       href: phoneHref,
                     },
@@ -321,7 +321,7 @@ export default async function DeliveryPage({
                 : []),
               {
                 icon: '🕓',
-                label: dict.contactPage?.workingHours || 'Darbo laikas',
+                label: dict.contactPage.workingHours,
                 value: CONTACT.workingHours,
               },
             ].map((method) => (

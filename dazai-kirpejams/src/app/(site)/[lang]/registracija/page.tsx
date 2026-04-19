@@ -46,7 +46,7 @@ export default async function RegisterPage({
               </p>
             </div>
 
-            <RegisterForm lang={lang} dict={dict} />
+            <RegisterForm lang={lang} dict={dict.registerPage} />
           </div>
         </Container>
       </Section>

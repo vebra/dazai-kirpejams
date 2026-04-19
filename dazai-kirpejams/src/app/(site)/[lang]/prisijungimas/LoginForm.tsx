@@ -8,7 +8,18 @@ import { langPrefix } from '@/lib/utils'
 
 const initialState: LoginState = {}
 
-export function LoginForm({ lang }: { lang: Locale }) {
+type LoginFormDict = {
+  emailLabel: string
+  emailPlaceholder: string
+  passwordLabel: string
+  passwordPlaceholder: string
+  submit: string
+  submitting: string
+  noAccount: string
+  registerCta: string
+}
+
+export function LoginForm({ lang, dict }: { lang: Locale; dict: LoginFormDict }) {
   const [state, formAction, isPending] = useActionState(
     loginAction,
     initialState
@@ -25,7 +36,7 @@ export function LoginForm({ lang }: { lang: Locale }) {
 
       <label className="block">
         <span className="block text-xs font-medium text-brand-gray-500 mb-1.5">
-          El. paštas <span className="text-brand-magenta">*</span>
+          {dict.emailLabel} <span className="text-brand-magenta">*</span>
         </span>
         <input
           type="email"
@@ -33,21 +44,21 @@ export function LoginForm({ lang }: { lang: Locale }) {
           required
           autoComplete="email"
           inputMode="email"
-          placeholder="jusu@paštas.lt"
+          placeholder={dict.emailPlaceholder}
           className="w-full px-4 py-3 border border-brand-gray-50 rounded-xl text-sm focus:outline-none focus:border-brand-magenta transition-colors bg-white"
         />
       </label>
 
       <label className="block">
         <span className="block text-xs font-medium text-brand-gray-500 mb-1.5">
-          Slaptažodis <span className="text-brand-magenta">*</span>
+          {dict.passwordLabel} <span className="text-brand-magenta">*</span>
         </span>
         <input
           type="password"
           name="password"
           required
           autoComplete="current-password"
-          placeholder="Jūsų slaptažodis"
+          placeholder={dict.passwordPlaceholder}
           className="w-full px-4 py-3 border border-brand-gray-50 rounded-xl text-sm focus:outline-none focus:border-brand-magenta transition-colors bg-white"
         />
       </label>
@@ -57,16 +68,16 @@ export function LoginForm({ lang }: { lang: Locale }) {
         disabled={isPending}
         className="w-full px-6 py-4 bg-brand-magenta text-white font-semibold rounded-xl hover:bg-brand-magenta/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isPending ? 'Jungiamasi…' : 'Prisijungti'}
+        {isPending ? dict.submitting : dict.submit}
       </button>
 
       <p className="text-center text-xs text-brand-gray-500">
-        Neturite paskyros?{' '}
+        {dict.noAccount}{' '}
         <Link
           href={`${langPrefix(lang)}/registracija`}
           className="text-brand-magenta font-semibold hover:underline"
         >
-          Registruotis
+          {dict.registerCta}
         </Link>
       </p>
     </form>

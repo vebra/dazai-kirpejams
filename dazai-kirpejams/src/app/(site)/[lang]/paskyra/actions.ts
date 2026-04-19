@@ -5,34 +5,40 @@ import { redirect } from 'next/navigation'
 import { createServerSupabase } from '@/lib/supabase/ssr'
 import { createServerClient } from '@/lib/supabase/server'
 import { getInvoiceSignedUrl } from '@/lib/invoices/queries'
+import { locales, type Locale, defaultLocale } from '@/i18n/config'
+import { getDictionary } from '@/i18n/dictionaries'
 
 export type UploadDocState = {
   error?: string
   success?: boolean
 }
 
-/**
- * Upload verification document.
- * The file is uploaded to Supabase Storage `verification-docs/{userId}/` bucket,
- * then the URL is saved to user_profiles.verification_document_url.
- */
+function resolveLang(raw: FormDataEntryValue | null): Locale {
+  if (typeof raw === 'string' && (locales as readonly string[]).includes(raw)) {
+    return raw as Locale
+  }
+  return defaultLocale
+}
+
 export async function uploadDocumentAction(
   _prev: UploadDocState,
   formData: FormData
 ): Promise<UploadDocState> {
+  const lang = resolveLang(formData.get('lang'))
+  const { errors } = await getDictionary(lang)
+
   const supabase = await createServerSupabase()
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) return { error: 'Turite būti prisijungę.' }
+  if (!user) return { error: errors.mustBeLoggedIn }
 
   const file = formData.get('document') as File | null
   if (!file || file.size === 0) {
-    return { error: 'Pasirinkite failą.' }
+    return { error: errors.selectFile }
   }
 
-  // Validate file
   const allowedTypes = [
     'image/jpeg',
     'image/png',
@@ -40,10 +46,10 @@ export async function uploadDocumentAction(
     'application/pdf',
   ]
   if (!allowedTypes.includes(file.type)) {
-    return { error: 'Leidžiami formatai: JPG, PNG, WebP, PDF.' }
+    return { error: errors.allowedFormats }
   }
   if (file.size > 10 * 1024 * 1024) {
-    return { error: 'Failas per didelis. Maksimalus dydis — 10 MB.' }
+    return { error: errors.fileTooLarge }
   }
 
   const ext = file.name.split('.').pop() ?? 'bin'
@@ -64,12 +70,9 @@ export async function uploadDocumentAction(
       uploadError.message,
       uploadError
     )
-    return { error: 'Nepavyko įkelti failo. Bandykite dar kartą.' }
+    return { error: errors.uploadFailed }
   }
 
-  // verification-docs bucket'as privatus (migration 010). Saugome storage
-  // PATH'ą (ne publicUrl), nes privataus bucket'o public URL'as negalioja.
-  // Admin'as gauna signed URL on-demand per viewVerificationDocumentAction.
   const profilePayload = {
     id: user.id,
     verification_document_url: path,
@@ -82,28 +85,20 @@ export async function uploadDocumentAction(
 
   if (upsertError) {
     console.error('[upload-doc] profile upsert error:', upsertError.message)
-    return { error: 'Failas įkeltas, bet nepavyko atnaujinti profilio.' }
+    return { error: errors.profileUpdateFailed }
   }
 
   revalidatePath('/paskyra', 'page')
   return { success: true }
 }
 
-export async function logoutAction(): Promise<never> {
+export async function logoutAction(formData: FormData): Promise<never> {
+  const lang = resolveLang(formData.get('lang'))
   const supabase = await createServerSupabase()
   await supabase.auth.signOut()
-  redirect('/lt')
+  redirect(`/${lang}`)
 }
 
-/**
- * Kliento sąskaitos parsisiuntimas. Saugumas:
- *   1. Vartotojas turi būti prisijungęs (auth user.email).
- *   2. Sąskaita per `orders` turi priklausyti tam pačiam email'ui.
- * Jei abu praeina — generuojam 1 val. galiojantį signed URL ir redirect'inam.
- *
- * Naudojam service role klientą sąskaitos tikrinimui, nes `invoices` lentelė
- * neturi RLS, tačiau prieš tai patys patikrinom ownership per email.
- */
 export async function downloadCustomerInvoiceAction(
   formData: FormData
 ): Promise<void> {
@@ -112,12 +107,13 @@ export async function downloadCustomerInvoiceAction(
     data: { user },
   } = await sessionClient.auth.getUser()
 
-  if (!user || !user.email) {
-    redirect('/lt/prisijungimas')
-  }
-
   const langRaw = formData.get('lang')
   const lang = typeof langRaw === 'string' && langRaw.length > 0 ? langRaw : 'lt'
+
+  if (!user || !user.email) {
+    redirect(`/${lang}/prisijungimas`)
+  }
+
   const accountUrl = `/${lang}/paskyra`
 
   const invoiceId = formData.get('invoice_id')

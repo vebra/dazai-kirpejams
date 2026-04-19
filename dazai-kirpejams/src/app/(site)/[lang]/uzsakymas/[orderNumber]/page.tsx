@@ -175,7 +175,7 @@ export default async function OrderConfirmationPage({
                   mono
                 />
                 {companyInfo!.bankName && (
-                  <BankRow label="Bankas" value={companyInfo!.bankName} />
+                  <BankRow label={dict.order.bankName} value={companyInfo!.bankName} />
                 )}
                 <BankRow
                   label={dict.order.amount}
@@ -194,8 +194,7 @@ export default async function OrderConfirmationPage({
           {order.paymentMethod === 'bank_transfer' && !hasBankInfo && (
             <div className="bg-brand-gray-50 border border-brand-gray-50 rounded-2xl p-6 mb-8">
               <p className="text-sm text-brand-gray-900 leading-relaxed">
-                Mokėjimo instrukcijas atsiųsime atskiru laišku per artimiausią
-                darbo dieną.
+                {dict.order.bankInfoPending}
               </p>
             </div>
           )}
@@ -265,7 +264,7 @@ export default async function OrderConfirmationPage({
               />
               {order.discountCents && order.discountCents > 0 ? (
                 <SummaryRow
-                  label={`Nuolaida${order.discountCode ? ` (${order.discountCode})` : ''}`}
+                  label={`${dict.order.discountLabel}${order.discountCode ? ` (${order.discountCode})` : ''}`}
                   value={`−${formatPrice(order.discountCents / 100, lang)}`}
                   accent
                 />
