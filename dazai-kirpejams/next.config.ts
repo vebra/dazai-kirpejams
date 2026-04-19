@@ -56,6 +56,15 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['@react-pdf/renderer'],
   async redirects() {
     return [
+      // Non-www → www kanoninė versija. Be šito abi atsiveria su status 200,
+      // Google gauna dubliuotą turinį, o svetainės canonical signal'ai
+      // skyla tarp dviejų hostnamų.
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'dazaikirpejams.lt' }],
+        destination: 'https://www.dazaikirpejams.lt/:path*',
+        permanent: true,
+      },
       // Senas slug, į kurį rodo išoriniai linkai / Google indeksas. Be šito
       // crawler'is gauna 404 ir prarandam visą URL equity.
       {
