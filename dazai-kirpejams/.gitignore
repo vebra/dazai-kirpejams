@@ -45,3 +45,14 @@ tmp/
 supabase/.temp/
 
 .vercel
+
+# debug / one-off skriptai (lokalūs, nereikia repo'je)
+scripts/check-*.ts
+scripts/test-*.ts
+scripts/backfill-*.ts
+scripts/probe-*
+scripts/*.png
+
+# debug docs
+docs/extracted/
+docs/preview-*.html
