@@ -10,6 +10,7 @@ import { getBlogPostBySlug, getBlogPosts } from '@/lib/data/queries'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { blogPostingSchema, breadcrumbSchema } from '@/lib/schema'
 import { CATEGORY_STYLES, type ArticleCategory } from '@/lib/data/articles'
+import { getAuthorByName } from '@/lib/data/authors'
 import { langPrefix } from '@/lib/utils'
 import { sanitizeHtml } from '@/lib/sanitize'
 
@@ -73,6 +74,12 @@ export default async function ArticlePage({
     .slice(0, 2)
 
   const postUrl = buildCanonicalUrl(lang, `/blogas/${slug}`)
+  const authorEntry = getAuthorByName(post.author)
+  const authorUrl = authorEntry
+    ? buildCanonicalUrl(lang, `/autorius/${authorEntry.slug}`)
+    : null
+  const authorBio = authorEntry ? authorEntry.bio[lang] : null
+  const authorJobTitle = authorEntry ? authorEntry.jobTitle[lang] : null
 
   return (
     <>
@@ -84,6 +91,7 @@ export default async function ArticlePage({
           imageUrl: post.coverImageUrl,
           datePublished: post.publishedAt ?? post.createdAt,
           author: post.author,
+          authorUrl,
         })}
       />
       <JsonLd
@@ -141,7 +149,16 @@ export default async function ArticlePage({
                       className="inline-block w-1 h-1 rounded-full bg-[#D0D0D0] mx-3 align-middle"
                       aria-hidden
                     />
-                    <span>{post.author}</span>
+                    {authorUrl ? (
+                      <Link
+                        href={authorUrl.replace(SITE_URL, '')}
+                        className="font-medium hover:text-brand-magenta transition-colors"
+                      >
+                        {post.author}
+                      </Link>
+                    ) : (
+                      <span>{post.author}</span>
+                    )}
                   </>
                 )}
               </div>
@@ -197,6 +214,63 @@ export default async function ArticlePage({
           </div>
         </Container>
       </section>
+
+      {/* Author bio block — E-E-A-T signal Google'iui */}
+      {authorEntry && authorBio && authorJobTitle && (
+        <section className="pb-16 bg-white">
+          <Container>
+            <div className="max-w-[760px] mx-auto">
+              <div className="rounded-xl border border-[#E8E8E8] bg-brand-gray-50 p-6 lg:p-8">
+                <div className="flex flex-col sm:flex-row gap-5 sm:gap-6 items-start">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-white ring-2 ring-white shadow-sm flex-shrink-0">
+                    {authorEntry.imagePath ? (
+                      <Image
+                        src={authorEntry.imagePath}
+                        alt={authorEntry.name}
+                        fill
+                        sizes="96px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-2xl font-bold text-brand-magenta/40">
+                        {authorEntry.name
+                          .split(' ')
+                          .map((s) => s[0])
+                          .join('')}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <span className="block text-[0.7rem] font-bold uppercase tracking-wider text-brand-magenta mb-1">
+                      {t.aboutAuthor}
+                    </span>
+                    <h3 className="text-[1.1rem] font-bold text-brand-gray-900 mb-1">
+                      <Link
+                        href={`${langPrefix(lang)}/autorius/${authorEntry.slug}`}
+                        className="hover:text-brand-magenta transition-colors"
+                      >
+                        {authorEntry.name}
+                      </Link>
+                    </h3>
+                    <p className="text-[0.9rem] text-brand-gray-500 mb-3 font-medium">
+                      {authorJobTitle}
+                    </p>
+                    <p className="text-[0.95rem] text-brand-gray-700 leading-[1.7]">
+                      {authorBio.tagline}
+                    </p>
+                    <Link
+                      href={`${langPrefix(lang)}/autorius/${authorEntry.slug}`}
+                      className="inline-block mt-4 text-[0.85rem] font-semibold text-brand-magenta hover:underline"
+                    >
+                      {t.readBio} →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Container>
+        </section>
+      )}
 
       {/* Related articles */}
       {related.length > 0 && (

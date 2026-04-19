@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next'
 import { locales, defaultLocale } from '@/i18n/config'
 import { SITE_URL } from '@/lib/seo'
 import { getCategories, getProducts, getBlogPosts } from '@/lib/data/queries'
+import { AUTHORS } from '@/lib/data/authors'
 
 /**
  * Statinių puslapių sąrašas — pathai BE lokalės prefikso.
@@ -105,5 +106,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return expandLocales(`/blogas/${post.slug}`, lastMod, 'monthly', 0.6)
   })
 
-  return [...staticEntries, ...categoryEntries, ...productEntries, ...blogEntries]
+  // 5. Autorių puslapiai (E-E-A-T)
+  const authorEntries: MetadataRoute.Sitemap = AUTHORS.flatMap((a) =>
+    expandLocales(`/autorius/${a.slug}`, undefined, 'monthly', 0.5)
+  )
+
+  return [
+    ...staticEntries,
+    ...categoryEntries,
+    ...productEntries,
+    ...blogEntries,
+    ...authorEntries,
+  ]
 }

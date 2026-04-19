@@ -196,6 +196,10 @@ export function itemListSchema(
 /**
  * BlogPosting schema — naudojama straipsnio puslapyje, kad Google galėtų
  * rodyti rich result'us su straipsnio antrašte, autoriumi ir data.
+ *
+ * Jei perduodamas `authorUrl`, autorius linkuojamas į `Person` įrašą per
+ * `@id` — tai sustiprina E-E-A-T signalą (Google supranta, kad tai ne tik
+ * vardas string'as, o profilio puslapis su biografija ir credentials'ais).
  */
 export function blogPostingSchema({
   title,
@@ -204,6 +208,7 @@ export function blogPostingSchema({
   imageUrl,
   datePublished,
   author,
+  authorUrl,
 }: {
   title: string
   description: string
@@ -211,7 +216,22 @@ export function blogPostingSchema({
   imageUrl?: string | null
   datePublished: string
   author?: string | null
+  authorUrl?: string | null
 }): Record<string, unknown> {
+  const authorNode = author
+    ? {
+        '@type': 'Person',
+        name: author,
+        ...(authorUrl
+          ? { '@id': `${authorUrl}#person`, url: authorUrl }
+          : {}),
+      }
+    : {
+        '@type': 'Organization',
+        name: SITE_NAME,
+        '@id': `${SITE_URL}/#organization`,
+      }
+
   return {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -221,16 +241,49 @@ export function blogPostingSchema({
     image: imageUrl || `${SITE_URL}/og-image.jpg`,
     datePublished,
     dateModified: datePublished,
-    author: {
-      '@type': author ? 'Person' : 'Organization',
-      name: author || SITE_NAME,
-      ...(author ? {} : { '@id': `${SITE_URL}/#organization` }),
-    },
+    author: authorNode,
     publisher: { '@id': `${SITE_URL}/#organization` },
     mainEntityOfPage: {
       '@type': 'WebPage',
       '@id': url,
     },
+  }
+}
+
+/**
+ * Person schema — autoriaus puslapyje. Pateikiamas pilnas profilis su
+ * jobTitle, knowsAbout, sameAs, worksFor — Google naudoja šią info E-E-A-T
+ * vertinimui ir gali rodyti Knowledge Panel'us paieškos rezultatuose.
+ */
+export function personSchema({
+  url,
+  name,
+  jobTitle,
+  description,
+  imageUrl,
+  sameAs,
+  knowsAbout,
+}: {
+  url: string
+  name: string
+  jobTitle: string
+  description: string
+  imageUrl?: string | null
+  sameAs?: string[]
+  knowsAbout?: string[]
+}): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': `${url}#person`,
+    url,
+    name,
+    jobTitle,
+    description,
+    ...(imageUrl ? { image: imageUrl } : {}),
+    ...(sameAs && sameAs.length > 0 ? { sameAs } : {}),
+    ...(knowsAbout && knowsAbout.length > 0 ? { knowsAbout } : {}),
+    worksFor: { '@id': `${SITE_URL}/#organization` },
   }
 }
 

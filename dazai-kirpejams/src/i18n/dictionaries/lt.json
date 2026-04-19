@@ -728,7 +728,18 @@
     "ctaBadge": "Profesionalūs produktai",
     "ctaTitle": "Peržiūrėkite mūsų produktus",
     "ctaDesc": "Skaičiai kalba patys už save. Išbandykite Color SHOCK 180 ml dažus ir įvertinkite skirtumą savo darbe — nuo pirmo dažymo.",
-    "ctaCta": "Peržiūrėti produktus →"
+    "ctaCta": "Peržiūrėti produktus →",
+    "aboutAuthor": "Apie autorių",
+    "readBio": "Skaityti pilną biografiją"
+  },
+  "authorPage": {
+    "badge": "Autorius",
+    "breadcrumb": "Autorius",
+    "bioTitle": "Apie",
+    "highlightsTitle": "Trumpai apie",
+    "publicationsTitle": "Publikacijos",
+    "postsTitle": "Autoriaus straipsniai",
+    "allPosts": "Visi straipsniai"
   },
   "calculatorPage": {
     "metaTitle": "Kainų skaičiuoklė — 180 ml vs standartinė pakuotė",

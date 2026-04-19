@@ -728,7 +728,18 @@
     "ctaBadge": "Professional products",
     "ctaTitle": "Browse our products",
     "ctaDesc": "The numbers speak for themselves. Try Color SHOCK 180 ml dyes and feel the difference in Your work — from the very first application.",
-    "ctaCta": "View products →"
+    "ctaCta": "View products →",
+    "aboutAuthor": "About the author",
+    "readBio": "Read full bio"
+  },
+  "authorPage": {
+    "badge": "Author",
+    "breadcrumb": "Author",
+    "bioTitle": "About",
+    "highlightsTitle": "Quick facts",
+    "publicationsTitle": "Publications",
+    "postsTitle": "Articles by this author",
+    "allPosts": "All articles"
   },
   "calculatorPage": {
     "metaTitle": "Price Calculator — 180 ml vs Standard Package",
