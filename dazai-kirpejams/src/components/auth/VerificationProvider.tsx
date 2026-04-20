@@ -18,17 +18,26 @@ const VerificationContext = createContext<VerificationContextValue>({
   status: null,
 })
 
+type VerificationProviderProps = {
+  children: React.ReactNode
+  initialStatus?: VerificationStatus
+  initialIsLoggedIn?: boolean
+}
+
 export function VerificationProvider({
   children,
-}: {
-  children: React.ReactNode
-}) {
-  const { isVerified, user, status, isLoading } = useVerifiedUser()
+  initialStatus = null,
+  initialIsLoggedIn = false,
+}: VerificationProviderProps) {
+  const { isVerified, user, status, isLoading } = useVerifiedUser({
+    initialStatus,
+    initialIsLoggedIn,
+  })
   return (
     <VerificationContext.Provider
       value={{
         isVerified,
-        isLoggedIn: !!user,
+        isLoggedIn: !!user || (isLoading && initialIsLoggedIn),
         isLoading,
         status,
       }}
@@ -38,18 +47,10 @@ export function VerificationProvider({
   )
 }
 
-/**
- * Kliento pusės hook'as — grąžina `true` jei vartotojas yra patvirtintas
- * profesionalas (status === 'approved').
- */
 export function useIsVerified(): boolean {
   return useContext(VerificationContext).isVerified
 }
 
-/**
- * Praplėstas hook'as — grąžina pilną verifikacijos būseną.
- * Naudoti, kai reikia atskirti: neprisijungęs / prisijungęs-laukia / atmestas / patvirtintas.
- */
 export function useVerification(): VerificationContextValue {
   return useContext(VerificationContext)
 }
