@@ -20,6 +20,14 @@ Sentry.init({
     "Load failed",
     /AbortError/,
     /^Script error\.?$/,
+    // Hydration mismatches production'e beveik visada atsiranda dėl
+    // browser extensions (Grammarly, Dashlane, DeepL, Kaspersky),
+    // kurie mutuoja DOM prieš React hydratuoja. React auto-recover'ina,
+    // user'iui problema nematoma, bet Sentry gauna triukšmą.
+    /Hydration failed/i,
+    /Text content does not match server-rendered HTML/i,
+    /There was an error while hydrating/i,
+    /Minified React error #(418|419|421|422|423|425)/,
   ],
 
   denyUrls: [
