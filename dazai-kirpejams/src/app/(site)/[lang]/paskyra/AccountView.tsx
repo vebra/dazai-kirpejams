@@ -6,10 +6,10 @@ import type { VerificationStatus } from '@/lib/auth/verification'
 import type { CustomerInvoice } from '@/lib/invoices/queries'
 import {
   uploadDocumentAction,
-  logoutAction,
   downloadCustomerInvoiceAction,
   type UploadDocState,
 } from './actions'
+import { LogoutButton } from '@/components/auth/LogoutButton'
 
 const LOCALE_MAP: Record<string, string> = { lt: 'lt-LT', en: 'en-GB', ru: 'ru-RU' }
 
@@ -249,15 +249,7 @@ export function AccountView({
             </h3>
             <p className="text-sm text-brand-gray-500">{dict.logout.desc}</p>
           </div>
-          <form action={logoutAction}>
-            <input type="hidden" name="lang" value={lang} />
-            <button
-              type="submit"
-              className="px-5 py-2.5 border border-[#E0E0E0] rounded-xl text-sm font-semibold text-brand-gray-900 hover:bg-brand-gray-50 transition-colors"
-            >
-              {dict.logout.cta}
-            </button>
-          </form>
+          <LogoutButton lang={lang} label={dict.logout.cta} />
         </div>
       </div>
     </div>
