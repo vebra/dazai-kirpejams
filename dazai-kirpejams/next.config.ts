@@ -52,10 +52,12 @@ const nextConfig: NextConfig = {
     // gauna 500 vietoj 404 (Next.js 16 docs / not-found.md).
     globalNotFound: true,
   },
-  // @react-pdf/renderer naudoja Node-specific API (pdfkit, fs, fonts) —
-  // Next.js negali jo bundle'inti į server components build'ą. Paliekam jį
-  // kaip išorinį paketą, kad server runtime jį resolve'intų per require().
-  serverExternalPackages: ['@react-pdf/renderer'],
+  // Packages that use Node-specific APIs and cannot be bundled:
+  // - @react-pdf/renderer — pdfkit, fs, fonts
+  // - isomorphic-dompurify — ships jsdom, which Vercel serverless
+  //   cannot bundle; bundling breaks blog post render at runtime
+  //   while leaving build + adjacent routes (OG image) intact.
+  serverExternalPackages: ['@react-pdf/renderer', 'isomorphic-dompurify'],
   async redirects() {
     return [
       // Non-www → www kanoninė versija. Be šito abi atsiveria su status 200,
