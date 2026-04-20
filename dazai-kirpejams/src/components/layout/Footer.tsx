@@ -21,6 +21,7 @@ type FooterProps = {
 export function Footer({ lang, dict }: FooterProps) {
   const nav = dict.nav
   const footer = dict.footer
+  const common = dict.common
 
   const p = langPrefix(lang)
   const products = [
@@ -157,10 +158,10 @@ export function Footer({ lang, dict }: FooterProps) {
               )}
               <li className="flex items-center gap-2 py-2">
                 <span aria-hidden>📍</span>
-                {CONTACT.address}
+                {common.addressDisplay}
               </li>
               <li className="text-[0.8rem] text-white/50 mt-2">
-                {CONTACT.workingHours}
+                {common.workingHoursDisplay}
               </li>
             </ul>
           </div>

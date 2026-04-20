@@ -386,7 +386,9 @@
     "startNow": "Начните сейчас",
     "readyCtaDesc": "Профессиональные краски объёмом 180 мл — больше пользы для каждого окрашивания в Вашем салоне.",
     "legalBadge": "Юридическая информация",
-    "closeMenu": "Закрыть меню"
+    "closeMenu": "Закрыть меню",
+    "addressDisplay": "Taikos pr. 32, LT-50246 Каунас, Литва",
+    "workingHoursDisplay": "Пн–Пт: 9:00 – 18:00"
   },
   "aboutPage": {
     "metaTitle": "О нас — Dažai Kirpėjams",

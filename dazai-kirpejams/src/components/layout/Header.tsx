@@ -71,7 +71,11 @@ export function Header({ lang, dict }: HeaderProps) {
           {/* Right side */}
           <div className="flex items-center gap-3">
             <LocaleSwitcher currentLocale={lang} />
-            <HeaderAuth lang={lang} />
+            <HeaderAuth
+              lang={lang}
+              myAccountLabel={nav.myAccount}
+              loginLabel={nav.login}
+            />
             <HeaderCart lang={lang} label={nav.cart} />
             <MobileMenu
               lang={lang}

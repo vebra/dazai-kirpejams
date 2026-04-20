@@ -386,7 +386,9 @@
     "startNow": "Pradėkite dabar",
     "readyCtaDesc": "Profesionalūs dažai su 180 ml talpa — daugiau vertės kiekvienam dažymui Jūsų salone.",
     "legalBadge": "Teisinė informacija",
-    "closeMenu": "Uždaryti meniu"
+    "closeMenu": "Uždaryti meniu",
+    "addressDisplay": "Taikos pr. 32, LT-50246 Kaunas, Lietuva",
+    "workingHoursDisplay": "I–V: 9:00 – 18:00"
   },
   "aboutPage": {
     "metaTitle": "Apie mus — Dažai Kirpėjams",

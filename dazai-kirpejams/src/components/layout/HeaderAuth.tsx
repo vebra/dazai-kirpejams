@@ -8,13 +8,15 @@ import { langPrefix } from '@/lib/utils'
 
 type HeaderAuthProps = {
   lang: string
+  myAccountLabel: string
+  loginLabel: string
 }
 
 /**
- * Header auth button — shows "Prisijungti" for guests, user icon for logged-in.
+ * Header auth button — shows login link for guests, user icon for logged-in.
  * Uses client-side Supabase session check to avoid blocking SSR.
  */
-export function HeaderAuth({ lang }: HeaderAuthProps) {
+export function HeaderAuth({ lang, myAccountLabel, loginLabel }: HeaderAuthProps) {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null)
 
   useEffect(() => {
@@ -45,7 +47,7 @@ export function HeaderAuth({ lang }: HeaderAuthProps) {
       <Link
         href={`${langPrefix(lang)}/paskyra`}
         className="p-2 text-brand-gray-900 hover:text-brand-magenta transition-colors"
-        aria-label="Mano paskyra"
+        aria-label={myAccountLabel}
       >
         <User className="w-5 h-5" />
       </Link>
@@ -57,7 +59,7 @@ export function HeaderAuth({ lang }: HeaderAuthProps) {
       href={`${langPrefix(lang)}/prisijungimas`}
       className="hidden sm:inline-flex px-4 py-2 text-[0.85rem] font-semibold text-brand-magenta border border-brand-magenta rounded-lg hover:bg-brand-magenta hover:text-white transition-all"
     >
-      Prisijungti
+      {loginLabel}
     </Link>
   )
 }

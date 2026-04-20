@@ -99,12 +99,12 @@ export default async function ContactPage({
               {
                 icon: '📍',
                 title: t.address,
-                value: CONTACT.address,
+                value: c.addressDisplay,
               },
               {
                 icon: '🕓',
                 title: t.workingHours,
-                value: CONTACT.workingHours,
+                value: c.workingHoursDisplay,
               },
             ].map((card) => (
               <div

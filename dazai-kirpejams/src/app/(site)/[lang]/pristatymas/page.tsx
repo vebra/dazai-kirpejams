@@ -322,7 +322,7 @@ export default async function DeliveryPage({
               {
                 icon: '🕓',
                 label: dict.contactPage.workingHours,
-                value: CONTACT.workingHours,
+                value: dict.common.workingHoursDisplay,
               },
             ].map((method) => (
               <div

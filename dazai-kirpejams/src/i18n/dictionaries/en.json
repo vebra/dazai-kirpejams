@@ -386,7 +386,9 @@
     "startNow": "Start Now",
     "readyCtaDesc": "Professional dyes with 180 ml volume — more value for every colouring session in Your salon.",
     "legalBadge": "Legal information",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "addressDisplay": "Taikos pr. 32, LT-50246 Kaunas, Lithuania",
+    "workingHoursDisplay": "Mon–Fri: 9:00 – 18:00"
   },
   "aboutPage": {
     "metaTitle": "About Us — Dažai Kirpėjams",
