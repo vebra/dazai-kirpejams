@@ -33,22 +33,26 @@ export async function generateMetadata({
   const description = getCategoryDescription(category, lang)
   const path = `/produktai/${categorySlug}`
   const canonical = buildCanonicalUrl(lang, path)
+  const dict = await getDictionary(lang)
+  const c = dict.common
+
+  const title = `${name} ${c.seoCategoryAudienceSuffix} | ${c.seoBrandSuffix}`
 
   return {
-    title: name,
+    title,
     description: description || undefined,
     alternates: {
       canonical,
       languages: buildLanguageAlternates(path),
     },
     openGraph: {
-      title: name,
+      title,
       description: description || undefined,
       url: canonical,
     },
     twitter: {
       card: 'summary_large_image',
-      title: name,
+      title,
       description: description || undefined,
     },
   }

@@ -42,24 +42,33 @@ export async function generateMetadata({
   const path = `/produktai/${categorySlug}/${slug}`
   const canonical = buildCanonicalUrl(lang, path)
   const dict = await getDictionary(lang)
+  const c = dict.common
+
+  const categoryName = getCategoryName(category, lang)
+  const volumePart = product.volume_ml
+    ? `, ${product.volume_ml} ${c.seoVolumeMl}`
+    : ''
+  const title = `${name}${volumePart} — ${categoryName} | ${c.seoBrandSuffix}`
+  const fallbackDesc = c.seoProductDescFallback.replace('{name}', name)
+  const metaDescription = description || fallbackDesc
 
   return {
-    title: name,
-    description: description || `${name} — ${dict.productPage.metaFallback}`,
+    title,
+    description: metaDescription,
     alternates: {
       canonical,
       languages: buildLanguageAlternates(path),
     },
     openGraph: {
-      title: name,
-      description: description || undefined,
+      title,
+      description: metaDescription,
       url: canonical,
       type: 'article',
     },
     twitter: {
       card: 'summary_large_image',
-      title: name,
-      description: description || undefined,
+      title,
+      description: metaDescription,
     },
   }
 }

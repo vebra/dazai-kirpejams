@@ -39,7 +39,7 @@ export async function generateMetadata({
   return buildPageMetadata({
     lang,
     path: `/blogas/${slug}`,
-    title: `${post.title} | Dažai Kirpėjams blogas`,
+    title: `${post.title} | Dažai Kirpėjams`,
     description: post.excerpt ?? '',
   })
 }

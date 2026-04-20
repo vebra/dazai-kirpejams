@@ -415,7 +415,11 @@
     "workingHoursDisplay": "Пн–Пт: 9:00 – 18:00",
     "whatsappAria": "Написать в WhatsApp",
     "whatsappTooltip": "Есть вопрос? Напишите нам",
-    "whatsappPrefill": "Здравствуйте! У меня вопрос по Вашей продукции."
+    "whatsappPrefill": "Здравствуйте! У меня вопрос по Вашей продукции.",
+    "seoCategoryAudienceSuffix": "для парикмахеров",
+    "seoBrandSuffix": "Dažai Kirpėjams",
+    "seoVolumeMl": "мл",
+    "seoProductDescFallback": "{name} — профессиональные товары для парикмахеров, 180 мл. Dažai Kirpėjams: краски для волос, оксиданты и средства ухода для салонов."
   },
   "aboutPage": {
     "metaTitle": "О нас — Dažai Kirpėjams",
@@ -1203,7 +1207,7 @@
     }
   },
   "colorPalettePage": {
-    "metaTitle": "Палитра Color SHOCK — 50 профессиональных оттенков",
+    "metaTitle": "Палитра Color SHOCK — 50 оттенков, 180 мл | Dažai Kirpėjams",
     "metaDesc": "Палитра профессиональных красок для волос Color SHOCK. 50+ оттенков в упаковке 180 мл. Фильтруйте по семье или ищите по номеру.",
     "searchPlaceholder": "Поиск по номеру или названию цвета...",
     "filterAll": "Все",

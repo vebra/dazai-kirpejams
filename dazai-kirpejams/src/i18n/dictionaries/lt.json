@@ -415,7 +415,11 @@
     "workingHoursDisplay": "I–V: 9:00 – 18:00",
     "whatsappAria": "Rašyti per WhatsApp",
     "whatsappTooltip": "Klausimai? Rašykite mums",
-    "whatsappPrefill": "Sveiki! Turiu klausimą dėl Jūsų produktų."
+    "whatsappPrefill": "Sveiki! Turiu klausimą dėl Jūsų produktų.",
+    "seoCategoryAudienceSuffix": "kirpėjams",
+    "seoBrandSuffix": "Dažai Kirpėjams",
+    "seoVolumeMl": "ml",
+    "seoProductDescFallback": "{name} — profesionalūs kirpėjų produktai, 180 ml talpa. Dažai Kirpėjams: plaukų dažai, oksidantai ir priežiūros priemonės salonams."
   },
   "aboutPage": {
     "metaTitle": "Apie mus — Dažai Kirpėjams",
@@ -1203,7 +1207,7 @@
     }
   },
   "colorPalettePage": {
-    "metaTitle": "Color SHOCK spalvų paletė — 50 profesionalių atspalvių",
+    "metaTitle": "Color SHOCK spalvų paletė — 50 atspalvių, 180 ml | Dažai Kirpėjams",
     "metaDesc": "Color SHOCK profesionalių plaukų dažų spalvų paletė. 50+ atspalvių 180 ml pakuotėse. Filtruokite pagal šeimą ar ieškokite pagal numerį.",
     "searchPlaceholder": "Ieškoti pagal spalvos numerį arba pavadinimą...",
     "filterAll": "Visi",

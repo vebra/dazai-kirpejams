@@ -415,7 +415,11 @@
     "workingHoursDisplay": "Mon–Fri: 9:00 – 18:00",
     "whatsappAria": "Message us on WhatsApp",
     "whatsappTooltip": "Questions? Message us",
-    "whatsappPrefill": "Hello! I have a question about Your products."
+    "whatsappPrefill": "Hello! I have a question about Your products.",
+    "seoCategoryAudienceSuffix": "for hairdressers",
+    "seoBrandSuffix": "Dažai Kirpėjams",
+    "seoVolumeMl": "ml",
+    "seoProductDescFallback": "{name} — professional products for hairdressers, 180 ml. Dažai Kirpėjams: hair dyes, oxidants and care products for salons."
   },
   "aboutPage": {
     "metaTitle": "About Us — Dažai Kirpėjams",
@@ -1203,7 +1207,7 @@
     }
   },
   "colorPalettePage": {
-    "metaTitle": "Color SHOCK palette — 50 professional shades",
+    "metaTitle": "Color SHOCK palette — 50 shades, 180 ml | Dažai Kirpėjams",
     "metaDesc": "Color SHOCK professional hair dye palette. 50+ shades in 180 ml packaging. Filter by family or search by number.",
     "searchPlaceholder": "Search by colour number or name...",
     "filterAll": "All",
