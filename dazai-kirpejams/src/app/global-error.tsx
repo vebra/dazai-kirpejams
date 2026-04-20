@@ -1,5 +1,6 @@
 'use client'
 
+import * as Sentry from '@sentry/nextjs'
 import { useEffect, useState } from 'react'
 
 const messages = {
@@ -39,6 +40,7 @@ export default function GlobalError({
   const [lang, setLang] = useState<Lang>('lt')
 
   useEffect(() => {
+    Sentry.captureException(error)
     console.error('[global-error]', error)
     setLang(detectLang())
   }, [error])
