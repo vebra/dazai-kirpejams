@@ -7,9 +7,26 @@ import type { Product } from '@/lib/types'
 import type { Locale } from '@/i18n/config'
 import { langPrefix } from '@/lib/utils'
 
+export type PaletteGridLabels = {
+  searchPlaceholder: string
+  filterAll: string
+  filterNatural: string
+  filterWarm: string
+  filterCool: string
+  filterLight: string
+  filterMedium: string
+  filterDark: string
+  familyLight: string
+  familyMedium: string
+  familyDark: string
+  viewMore: string
+  noResults: string
+}
+
 type PaletteGridProps = {
   products: Product[]
   lang: Locale
+  labels: PaletteGridLabels
 }
 
 type FilterValue =
@@ -27,41 +44,29 @@ type FilterDef = {
   match: (p: Product) => boolean
 }
 
-const FILTERS: FilterDef[] = [
-  { value: 'all', label: 'Visi', match: () => true },
-  {
-    value: 'neutrali',
-    label: 'Natūralūs',
-    match: (p) => p.color_tone === 'neutrali',
-  },
-  { value: 'šilta', label: 'Šilti', match: (p) => p.color_tone === 'šilta' },
-  { value: 'šalta', label: 'Šalti', match: (p) => p.color_tone === 'šalta' },
-  {
-    value: 'šviesi',
-    label: 'Šviesūs',
-    match: (p) => p.color_family === 'šviesi',
-  },
-  {
-    value: 'vidutinė',
-    label: 'Vidutiniai',
-    match: (p) => p.color_family === 'vidutinė',
-  },
-  { value: 'tamsi', label: 'Tamsūs', match: (p) => p.color_family === 'tamsi' },
-]
-
-const FAMILY_LABELS: Record<string, string> = {
-  'šviesi': 'Šviesūs',
-  'vidutinė': 'Vidutiniai',
-  'tamsi': 'Tamsūs',
-}
-
-export function PaletteGrid({ products, lang }: PaletteGridProps) {
+export function PaletteGrid({ products, lang, labels }: PaletteGridProps) {
   const [search, setSearch] = useState('')
   const [activeFilter, setActiveFilter] = useState<FilterValue>('all')
 
+  const filters: FilterDef[] = [
+    { value: 'all', label: labels.filterAll, match: () => true },
+    { value: 'neutrali', label: labels.filterNatural, match: (p) => p.color_tone === 'neutrali' },
+    { value: 'šilta', label: labels.filterWarm, match: (p) => p.color_tone === 'šilta' },
+    { value: 'šalta', label: labels.filterCool, match: (p) => p.color_tone === 'šalta' },
+    { value: 'šviesi', label: labels.filterLight, match: (p) => p.color_family === 'šviesi' },
+    { value: 'vidutinė', label: labels.filterMedium, match: (p) => p.color_family === 'vidutinė' },
+    { value: 'tamsi', label: labels.filterDark, match: (p) => p.color_family === 'tamsi' },
+  ]
+
+  const familyLabels: Record<string, string> = {
+    'šviesi': labels.familyLight,
+    'vidutinė': labels.familyMedium,
+    'tamsi': labels.familyDark,
+  }
+
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase()
-    const filterDef = FILTERS.find((f) => f.value === activeFilter) || FILTERS[0]
+    const filterDef = filters.find((f) => f.value === activeFilter) || filters[0]
 
     return products.filter((p) => {
       if (!filterDef.match(p)) return false
@@ -70,6 +75,7 @@ export function PaletteGrid({ products, lang }: PaletteGridProps) {
       const name = (p.color_name || '').toLowerCase()
       return num.includes(query) || name.includes(query)
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products, search, activeFilter])
 
   return (
@@ -86,14 +92,14 @@ export function PaletteGrid({ products, lang }: PaletteGridProps) {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Ieškoti pagal spalvos numerį arba pavadinimą..."
+          placeholder={labels.searchPlaceholder}
           className="w-full pl-14 pr-5 py-[16px] border border-[#E0E0E0] rounded-full bg-brand-gray-50 text-brand-gray-900 text-[0.95rem] placeholder:text-brand-gray-500 focus:outline-none focus:border-brand-magenta focus:bg-white focus:shadow-[0_0_0_3px_rgba(233,30,140,0.1)] transition-all"
         />
       </div>
 
       {/* Filter pills */}
       <div className="flex flex-wrap gap-2.5 justify-center mb-10">
-        {FILTERS.map((filter) => {
+        {filters.map((filter) => {
           const active = activeFilter === filter.value
           return (
             <button
@@ -115,7 +121,7 @@ export function PaletteGrid({ products, lang }: PaletteGridProps) {
       {/* Color grid */}
       {filtered.length === 0 ? (
         <div className="text-center py-16 text-brand-gray-500">
-          Nerasta jokių atspalvių pagal Jūsų paiešką. Pabandykite kitą užklausą.
+          {labels.noResults}
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
@@ -150,11 +156,11 @@ export function PaletteGrid({ products, lang }: PaletteGridProps) {
               </div>
               {product.color_family && (
                 <div className="text-[0.72rem] text-brand-gray-500 mb-3">
-                  {FAMILY_LABELS[product.color_family] || product.color_family}
+                  {familyLabels[product.color_family] || product.color_family}
                 </div>
               )}
               <span className="text-[0.78rem] font-semibold text-brand-magenta group-hover:translate-x-1 inline-block transition-transform">
-                Peržiūrėti →
+                {labels.viewMore} →
               </span>
             </Link>
           ))}

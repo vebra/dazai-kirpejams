@@ -18,7 +18,13 @@
     "shampoos": "Šampūnai ir priežiūra",
     "accessories": "Pagalbinės priemonės",
     "terms": "Pirkimo sąlygos",
-    "privacy": "Privatumo politika"
+    "privacy": "Privatumo politika",
+    "myAccount": "Mano paskyra",
+    "login": "Prisijungti",
+    "language": "Kalba",
+    "mainMenu": "Pagrindinis meniu",
+    "openMenu": "Atidaryti meniu",
+    "closeMenu": "Uždaryti meniu"
   },
   "hero": {
     "title": "Profesionalūs plaukų dažai kirpėjams",
@@ -265,7 +271,9 @@
     "cta": "Prenumeruoti",
     "sending": "Siunčiama…",
     "success": "Prenumerata sėkminga! Dėkojame.",
-    "consent": "Sutinku gauti naujienlaiškius. Galėsite atsisakyti bet kada."
+    "consent": "Sutinku gauti naujienlaiškius. Galėsite atsisakyti bet kada.",
+    "errorInvalidEmail": "Įveskite teisingą el. paštą.",
+    "errorSubscribeFailed": "Nepavyko užprenumeruoti. Bandykite dar kartą."
   },
   "finalCta": {
     "title": "Pasiruošę išbandyti?",
@@ -377,7 +385,8 @@
     "readyToTry": "Pasiruošę išbandyti?",
     "startNow": "Pradėkite dabar",
     "readyCtaDesc": "Profesionalūs dažai su 180 ml talpa — daugiau vertės kiekvienam dažymui Jūsų salone.",
-    "legalBadge": "Teisinė informacija"
+    "legalBadge": "Teisinė informacija",
+    "closeMenu": "Uždaryti meniu"
   },
   "aboutPage": {
     "metaTitle": "Apie mus — Dažai Kirpėjams",
@@ -1040,7 +1049,14 @@
     "ctaPrimary": "Gauti pasiūlymą →",
     "ctaSecondary": "Susisiekti",
     "showMore": "Rodyti daugiau",
-    "showingOf": "Rodoma {visible} iš {total}"
+    "showingOf": "Rodoma {visible} iš {total}",
+    "filterCategoryLabel": "Kategorija:",
+    "filterSortLabel": "Rūšiuoti:",
+    "filterAllColors": "Visos spalvos",
+    "filterShowingCount": "Rodomi: {count} produktai",
+    "sortByNumber": "Pagal numerį",
+    "sortByName": "Pagal pavadinimą",
+    "sortByPopular": "Populiariausi"
   },
   "loginPage": {
     "metaTitle": "Prisijungimas",
@@ -1159,7 +1175,20 @@
   },
   "colorPalettePage": {
     "metaTitle": "Color SHOCK spalvų paletė — 50 profesionalių atspalvių",
-    "metaDesc": "Color SHOCK profesionalių plaukų dažų spalvų paletė. 50+ atspalvių 180 ml pakuotėse. Filtruokite pagal šeimą ar ieškokite pagal numerį."
+    "metaDesc": "Color SHOCK profesionalių plaukų dažų spalvų paletė. 50+ atspalvių 180 ml pakuotėse. Filtruokite pagal šeimą ar ieškokite pagal numerį.",
+    "searchPlaceholder": "Ieškoti pagal spalvos numerį arba pavadinimą...",
+    "filterAll": "Visi",
+    "filterNatural": "Natūralūs",
+    "filterWarm": "Šilti",
+    "filterCool": "Šalti",
+    "filterLight": "Šviesūs",
+    "filterMedium": "Vidutiniai",
+    "filterDark": "Tamsūs",
+    "familyLight": "Šviesūs",
+    "familyMedium": "Vidutiniai",
+    "familyDark": "Tamsūs",
+    "viewMore": "Peržiūrėti",
+    "noResults": "Nerasta jokių atspalvių pagal Jūsų paiešką. Pabandykite kitą užklausą."
   },
   "b2bHome": {
     "label": "Bendradarbiavimas",

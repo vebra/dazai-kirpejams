@@ -18,7 +18,13 @@
     "shampoos": "Shampoos & Care",
     "accessories": "Accessories",
     "terms": "Terms & Conditions",
-    "privacy": "Privacy Policy"
+    "privacy": "Privacy Policy",
+    "myAccount": "My Account",
+    "login": "Sign in",
+    "language": "Language",
+    "mainMenu": "Main menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "hero": {
     "title": "Professional hair dyes for hairdressers",
@@ -265,7 +271,9 @@
     "cta": "Subscribe",
     "sending": "Sending…",
     "success": "Subscribed successfully! Thank you.",
-    "consent": "I agree to receive newsletters. You can unsubscribe at any time."
+    "consent": "I agree to receive newsletters. You can unsubscribe at any time.",
+    "errorInvalidEmail": "Please enter a valid email address.",
+    "errorSubscribeFailed": "Subscription failed. Please try again."
   },
   "finalCta": {
     "title": "Ready to Try?",
@@ -377,7 +385,8 @@
     "readyToTry": "Ready to Try?",
     "startNow": "Start Now",
     "readyCtaDesc": "Professional dyes with 180 ml volume — more value for every colouring session in Your salon.",
-    "legalBadge": "Legal information"
+    "legalBadge": "Legal information",
+    "closeMenu": "Close menu"
   },
   "aboutPage": {
     "metaTitle": "About Us — Dažai Kirpėjams",
@@ -1040,7 +1049,14 @@
     "ctaPrimary": "Get a Quote →",
     "ctaSecondary": "Contact Us",
     "showMore": "Show more",
-    "showingOf": "Showing {visible} of {total}"
+    "showingOf": "Showing {visible} of {total}",
+    "filterCategoryLabel": "Category:",
+    "filterSortLabel": "Sort:",
+    "filterAllColors": "All colours",
+    "filterShowingCount": "Showing: {count} products",
+    "sortByNumber": "By number",
+    "sortByName": "By name",
+    "sortByPopular": "Most popular"
   },
   "loginPage": {
     "metaTitle": "Sign in",
@@ -1159,7 +1175,20 @@
   },
   "colorPalettePage": {
     "metaTitle": "Color SHOCK palette — 50 professional shades",
-    "metaDesc": "Color SHOCK professional hair dye palette. 50+ shades in 180 ml packaging. Filter by family or search by number."
+    "metaDesc": "Color SHOCK professional hair dye palette. 50+ shades in 180 ml packaging. Filter by family or search by number.",
+    "searchPlaceholder": "Search by colour number or name...",
+    "filterAll": "All",
+    "filterNatural": "Naturals",
+    "filterWarm": "Warm",
+    "filterCool": "Cool",
+    "filterLight": "Light",
+    "filterMedium": "Medium",
+    "filterDark": "Dark",
+    "familyLight": "Light",
+    "familyMedium": "Medium",
+    "familyDark": "Dark",
+    "viewMore": "View",
+    "noResults": "No shades found for Your search. Try a different query."
   },
   "b2bHome": {
     "label": "Partnership",

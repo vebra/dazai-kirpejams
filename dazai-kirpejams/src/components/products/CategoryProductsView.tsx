@@ -109,6 +109,15 @@ export function CategoryProductsView({
             allGroupsCount={DYE_PALETTE_TARGET_COUNT}
             groupOptions={groupOptions}
             defaultSort={defaultSort}
+            labels={{
+              categoryLabel: dict.categoryPage.filterCategoryLabel,
+              sortLabel: dict.categoryPage.filterSortLabel,
+              allColors: dict.categoryPage.filterAllColors,
+              showingCount: dict.categoryPage.filterShowingCount,
+              sortByNumber: dict.categoryPage.sortByNumber,
+              sortByName: dict.categoryPage.sortByName,
+              sortByPopular: dict.categoryPage.sortByPopular,
+            }}
           />
         </Container>
       </section>

@@ -1,10 +1,19 @@
 'use server'
 
 import { createServerSupabase } from '@/lib/supabase/ssr'
+import { locales, type Locale, defaultLocale } from '@/i18n/config'
+import { getDictionary } from '@/i18n/dictionaries'
 
 export type NewsletterState = {
   error?: string
   success?: boolean
+}
+
+function resolveLang(raw: FormDataEntryValue | null): Locale {
+  if (typeof raw === 'string' && (locales as readonly string[]).includes(raw)) {
+    return raw as Locale
+  }
+  return defaultLocale
 }
 
 export async function subscribeNewsletterAction(
@@ -12,10 +21,11 @@ export async function subscribeNewsletterAction(
   formData: FormData
 ): Promise<NewsletterState> {
   const email = ((formData.get('email') as string) ?? '').trim().toLowerCase()
-  const locale = ((formData.get('locale') as string) ?? 'lt').trim()
+  const locale = resolveLang(formData.get('locale'))
+  const { newsletter } = await getDictionary(locale)
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { error: 'Įveskite teisingą el. paštą.' }
+    return { error: newsletter.errorInvalidEmail }
   }
 
   const supabase = await createServerSupabase()
@@ -33,7 +43,7 @@ export async function subscribeNewsletterAction(
 
   if (error) {
     console.error('[newsletter] insert error:', error.message)
-    return { error: 'Nepavyko užprenumeruoti. Bandykite dar kartą.' }
+    return { error: newsletter.errorSubscribeFailed }
   }
 
   return { success: true }

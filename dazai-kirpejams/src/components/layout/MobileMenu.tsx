@@ -10,12 +10,22 @@ import { langPrefix } from '@/lib/utils'
 import { LocaleSwitcher } from './LocaleSwitcher'
 import type { Locale } from '@/i18n/config'
 
+export type MobileMenuLabels = {
+  myAccount: string
+  login: string
+  language: string
+  mainMenu: string
+  openMenu: string
+  closeMenu: string
+}
+
 type MobileMenuProps = {
   lang: Locale
   links: { href: string; label: string }[]
+  labels: MobileMenuLabels
 }
 
-export function MobileMenu({ lang, links }: MobileMenuProps) {
+export function MobileMenu({ lang, links, labels }: MobileMenuProps) {
   const [open, setOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -76,7 +86,7 @@ export function MobileMenu({ lang, links }: MobileMenuProps) {
         id="mobile-menu"
         role="dialog"
         aria-modal="true"
-        aria-label="Pagrindinis meniu"
+        aria-label={labels.mainMenu}
         className={`lg:hidden fixed top-0 right-0 bottom-0 z-[70] w-[85%] max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-out flex flex-col ${
           open ? 'translate-x-0' : 'translate-x-full'
         }`}
@@ -95,7 +105,7 @@ export function MobileMenu({ lang, links }: MobileMenuProps) {
             type="button"
             onClick={() => setOpen(false)}
             className="flex items-center justify-center min-w-[44px] min-h-[44px] p-2.5 text-brand-gray-900 hover:text-brand-magenta transition-colors"
-            aria-label="Uždaryti meniu"
+            aria-label={labels.closeMenu}
           >
             <X className="w-6 h-6" />
           </button>
@@ -134,7 +144,7 @@ export function MobileMenu({ lang, links }: MobileMenuProps) {
               className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-brand-gray-900 hover:bg-brand-gray-50 transition-colors"
             >
               <User className="w-5 h-5" />
-              Mano paskyra
+              {labels.myAccount}
             </Link>
           ) : (
             <Link
@@ -142,7 +152,7 @@ export function MobileMenu({ lang, links }: MobileMenuProps) {
               className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold text-brand-magenta hover:bg-brand-magenta/10 transition-colors"
             >
               <LogIn className="w-5 h-5" />
-              Prisijungti
+              {labels.login}
             </Link>
           )}
         </div>
@@ -150,7 +160,7 @@ export function MobileMenu({ lang, links }: MobileMenuProps) {
         {/* Footer — kalbos */}
         <div className="px-6 py-6 border-t border-brand-gray-50">
           <div className="text-xs font-bold uppercase tracking-wider text-brand-gray-500 mb-3">
-            Kalba
+            {labels.language}
           </div>
           <LocaleSwitcher currentLocale={lang} variant="mobile" />
         </div>
@@ -164,7 +174,7 @@ export function MobileMenu({ lang, links }: MobileMenuProps) {
         type="button"
         onClick={() => setOpen(true)}
         className="lg:hidden flex items-center justify-center min-w-[44px] min-h-[44px] p-2.5 text-brand-gray-900 hover:text-brand-magenta transition-colors"
-        aria-label="Atidaryti meniu"
+        aria-label={labels.openMenu}
         aria-expanded={open}
         aria-controls="mobile-menu"
       >

@@ -106,7 +106,25 @@ export default async function ColorPalettePage({
       {/* Search + filters + grid — interaktyvus client komponentas */}
       <section className="py-12 lg:py-16 bg-white">
         <Container>
-          <PaletteGrid products={products} lang={lang} />
+          <PaletteGrid
+            products={products}
+            lang={lang}
+            labels={{
+              searchPlaceholder: dict.colorPalettePage.searchPlaceholder,
+              filterAll: dict.colorPalettePage.filterAll,
+              filterNatural: dict.colorPalettePage.filterNatural,
+              filterWarm: dict.colorPalettePage.filterWarm,
+              filterCool: dict.colorPalettePage.filterCool,
+              filterLight: dict.colorPalettePage.filterLight,
+              filterMedium: dict.colorPalettePage.filterMedium,
+              filterDark: dict.colorPalettePage.filterDark,
+              familyLight: dict.colorPalettePage.familyLight,
+              familyMedium: dict.colorPalettePage.familyMedium,
+              familyDark: dict.colorPalettePage.familyDark,
+              viewMore: dict.colorPalettePage.viewMore,
+              noResults: dict.colorPalettePage.noResults,
+            }}
+          />
         </Container>
       </section>
 

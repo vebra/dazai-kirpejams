@@ -73,7 +73,18 @@ export function Header({ lang, dict }: HeaderProps) {
             <LocaleSwitcher currentLocale={lang} />
             <HeaderAuth lang={lang} />
             <HeaderCart lang={lang} label={nav.cart} />
-            <MobileMenu lang={lang} links={links} />
+            <MobileMenu
+              lang={lang}
+              links={links}
+              labels={{
+                myAccount: nav.myAccount,
+                login: nav.login,
+                language: nav.language,
+                mainMenu: nav.mainMenu,
+                openMenu: nav.openMenu,
+                closeMenu: nav.closeMenu,
+              }}
+            />
           </div>
         </div>
       </Container>
