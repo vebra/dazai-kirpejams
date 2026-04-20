@@ -412,7 +412,10 @@
     "legalBadge": "Legal information",
     "closeMenu": "Close menu",
     "addressDisplay": "Taikos pr. 32, LT-50246 Kaunas, Lithuania",
-    "workingHoursDisplay": "Mon–Fri: 9:00 – 18:00"
+    "workingHoursDisplay": "Mon–Fri: 9:00 – 18:00",
+    "whatsappAria": "Message us on WhatsApp",
+    "whatsappTooltip": "Questions? Message us",
+    "whatsappPrefill": "Hello! I have a question about Your products."
   },
   "aboutPage": {
     "metaTitle": "About Us — Dažai Kirpėjams",

@@ -412,7 +412,10 @@
     "legalBadge": "Юридическая информация",
     "closeMenu": "Закрыть меню",
     "addressDisplay": "Taikos pr. 32, LT-50246 Каунас, Литва",
-    "workingHoursDisplay": "Пн–Пт: 9:00 – 18:00"
+    "workingHoursDisplay": "Пн–Пт: 9:00 – 18:00",
+    "whatsappAria": "Написать в WhatsApp",
+    "whatsappTooltip": "Есть вопрос? Напишите нам",
+    "whatsappPrefill": "Здравствуйте! У меня вопрос по Вашей продукции."
   },
   "aboutPage": {
     "metaTitle": "О нас — Dažai Kirpėjams",

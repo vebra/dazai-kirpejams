@@ -7,6 +7,7 @@ import { locales } from '@/i18n/config'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
+import { WhatsAppButton } from '@/components/layout/WhatsAppButton'
 import { VerificationProvider } from '@/components/auth/VerificationProvider'
 import { getVerificationDetails } from '@/lib/auth/verification'
 import { CookieConsent } from '@/components/cookies/CookieConsent'
@@ -122,6 +123,11 @@ export default async function RootLayout({
           <main className="flex-1 pt-[72px] lg:pt-[100px]">{children}</main>
           <Footer lang={lang} dict={dict} />
         </VerificationProvider>
+        <WhatsAppButton
+          ariaLabel={dict.common.whatsappAria}
+          tooltip={dict.common.whatsappTooltip}
+          prefill={dict.common.whatsappPrefill}
+        />
         <CookieConsent lang={lang} dict={dict.cookies} />
         <Script id="gtag-consent-default" strategy="beforeInteractive">
           {`
