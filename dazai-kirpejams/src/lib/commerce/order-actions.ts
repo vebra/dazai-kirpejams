@@ -14,6 +14,7 @@ import {
   buildAdminOrderEmail,
 } from '@/lib/email/templates'
 import { getCompanyInfo } from '@/lib/admin/queries'
+import { getDictionary } from '@/i18n/dictionaries'
 
 /**
  * Serializuota užsakymo prekė iš kliento (zustand store snapshot'o).
@@ -75,21 +76,23 @@ function generateOrderNumber(): string {
 export async function createOrder(
   input: CreateOrderInput
 ): Promise<CreateOrderResult> {
+  const errs = (await getDictionary(input.locale)).checkout.errors
+
   // Validacija
   if (!input.items.length) {
-    return { ok: false, error: 'Krepšelis tuščias.' }
+    return { ok: false, error: errs.cartEmpty }
   }
   if (!input.email || !input.firstName || !input.lastName || !input.phone) {
-    return { ok: false, error: 'Užpildykite visus privalomus laukus.' }
+    return { ok: false, error: errs.missingFields }
   }
   if (
     input.deliveryMethod === 'courier' &&
     (!input.deliveryAddress || !input.deliveryCity || !input.deliveryPostalCode)
   ) {
-    return { ok: false, error: 'Užpildykite pristatymo adresą.' }
+    return { ok: false, error: errs.missingAddress }
   }
   if (input.deliveryMethod === 'parcel_locker' && !input.deliveryAddress) {
-    return { ok: false, error: 'Pasirinkite paštomatą.' }
+    return { ok: false, error: errs.missingParcelLocker }
   }
 
   // Skaičiavimai server-side (klientu nepasitikime)
@@ -99,7 +102,7 @@ export async function createOrder(
   )
 
   if (!meetsMinimumOrder(subtotalCents)) {
-    return { ok: false, error: 'Nepasiekta minimali užsakymo suma.' }
+    return { ok: false, error: errs.minOrderNotMet }
   }
 
   let orderNumber = generateOrderNumber()
@@ -156,7 +159,7 @@ export async function createOrder(
         console.error('[order] apply_discount_code error:', discountError)
         return {
           ok: false,
-          error: 'Nepavyko pritaikyti kupono. Bandykite dar kartą.',
+          error: errs.couponApplyFailed,
         }
       }
 
@@ -169,23 +172,22 @@ export async function createOrder(
       } | null
 
       if (!dr || !dr.ok) {
-        // Gražinam user-friendly LT žinutę pagal reason kodą
         const reasonMap: Record<string, string> = {
-          not_found: 'Toks kuponas neegzistuoja.',
-          inactive: 'Kuponas nebegalioja.',
-          too_early: 'Kuponas dar neaktyvus.',
-          expired: 'Kuponas nebegalioja — pasibaigė galiojimo laikas.',
-          max_uses_reached:
-            'Kuponas jau panaudotas maksimalų skaičių kartų.',
+          not_found: errs.couponNotFound,
+          inactive: errs.couponInactive,
+          too_early: errs.couponTooEarly,
+          expired: errs.couponExpired,
+          max_uses_reached: errs.couponMaxUses,
           min_order_not_met: dr?.min_order_cents
-            ? `Kuponui reikia bent ${(dr.min_order_cents / 100)
-                .toFixed(2)
-                .replace('.', ',')} € užsakymo sumos.`
-            : 'Nepasiekta minimali kupono suma.',
+            ? errs.couponMinOrder.replace(
+                '{amount}',
+                (dr.min_order_cents / 100).toFixed(2).replace('.', ',')
+              )
+            : errs.couponMinOrderGeneric,
         }
         return {
           ok: false,
-          error: reasonMap[dr?.reason ?? ''] ?? 'Nepavyko pritaikyti kupono.',
+          error: reasonMap[dr?.reason ?? ''] ?? errs.couponGeneric,
         }
       }
 
@@ -216,7 +218,7 @@ export async function createOrder(
       }
       return {
         ok: false,
-        error: stockError.message || 'Nepakanka likučio. Pabandykite vėliau.',
+        error: stockError.message || errs.stockShortageGeneric,
       }
     }
 
@@ -288,7 +290,7 @@ export async function createOrder(
         }
         return {
           ok: false,
-          error: 'Nepavyko sukurti užsakymo. Bandykite dar kartą.',
+          error: errs.orderCreateFailed,
         }
       }
 
@@ -303,7 +305,7 @@ export async function createOrder(
         }
         return {
           ok: false,
-          error: 'Nepavyko sukurti užsakymo. Bandykite dar kartą.',
+          error: errs.orderCreateFailed,
         }
       }
 
@@ -332,7 +334,7 @@ export async function createOrder(
         }
         return {
           ok: false,
-          error: 'Nepavyko išsaugoti prekių. Bandykite dar kartą.',
+          error: errs.itemsSaveFailed,
         }
       }
 
@@ -348,7 +350,7 @@ export async function createOrder(
           .rpc('revert_discount_code', { p_code: appliedDiscountCode })
           .then(() => {}, () => {})
       }
-      return { ok: false, error: 'Serverio klaida. Bandykite dar kartą.' }
+      return { ok: false, error: errs.serverError }
     }
   }
 

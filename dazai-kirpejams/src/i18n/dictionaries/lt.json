@@ -376,7 +376,31 @@
     "applyDiscount": "Pritaikyti",
     "removeDiscount": "Pašalinti kuponą",
     "discountLabel": "Nuolaida",
-    "enterCouponCode": "Įveskite kupono kodą."
+    "enterCouponCode": "Įveskite kupono kodą.",
+    "errors": {
+      "cartEmpty": "Krepšelis tuščias.",
+      "missingFields": "Užpildykite visus privalomus laukus.",
+      "missingAddress": "Užpildykite pristatymo adresą.",
+      "missingParcelLocker": "Pasirinkite paštomatą.",
+      "minOrderNotMet": "Nepasiekta minimali užsakymo suma.",
+      "couponApplyFailed": "Nepavyko pritaikyti kupono. Bandykite dar kartą.",
+      "couponNotFound": "Toks kuponas neegzistuoja. Patikrinkite, ar nėra rašybos klaidų.",
+      "couponInactive": "Kuponas nebegalioja.",
+      "couponTooEarly": "Kuponas dar neaktyvus.",
+      "couponExpired": "Kuponas nebegalioja — pasibaigė galiojimo laikas.",
+      "couponMaxUses": "Šis kuponas jau panaudotas maksimalų skaičių kartų.",
+      "couponMinOrder": "Kuponui pritaikyti reikia mažiausiai {amount} € užsakymo sumos.",
+      "couponMinOrderGeneric": "Nepasiekta minimali kupono suma.",
+      "couponInvalidCart": "Neteisingi krepšelio duomenys.",
+      "couponGeneric": "Nepavyko pritaikyti kupono.",
+      "couponCodeLength": "Kupono kodas yra 3–32 simbolių ilgio.",
+      "discountSystemUnavailable": "Nuolaidų sistema šiuo metu neprieinama.",
+      "couponCheckFailed": "Nepavyko patikrinti kupono. Bandykite dar kartą.",
+      "stockShortageGeneric": "Nepakanka likučio. Pabandykite vėliau.",
+      "orderCreateFailed": "Nepavyko sukurti užsakymo. Bandykite dar kartą.",
+      "itemsSaveFailed": "Nepavyko išsaugoti prekių. Bandykite dar kartą.",
+      "serverError": "Serverio klaida. Bandykite dar kartą."
+    }
   },
   "common": {
     "home": "Pradžia",

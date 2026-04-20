@@ -4,6 +4,8 @@ import {
   createServerClient,
   isSupabaseServerConfigured,
 } from '@/lib/supabase/server'
+import { getDictionary } from '@/i18n/dictionaries'
+import type { Locale } from '@/i18n/config'
 
 /**
  * Nuolaidų kodų validacija krepšelyje.
@@ -28,58 +30,63 @@ export type ValidateDiscountResult =
     }
   | { ok: false; error: string }
 
-/**
- * LT vartotojo žinutės pagal backend'o `reason` kodą. Visos žinutės yra
- * aiškios, be jargono, kad klientas iš karto suprastų ką daryti.
- */
+type CheckoutErrors = Awaited<
+  ReturnType<typeof getDictionary>
+>['checkout']['errors']
+
 function reasonToMessage(
+  errs: CheckoutErrors,
   reason: string | undefined,
   extra?: { minOrderCents?: number }
 ): string {
   switch (reason) {
     case 'not_found':
-      return 'Toks kuponas neegzistuoja. Patikrinkite, ar nėra rašybos klaidų.'
+      return errs.couponNotFound
     case 'inactive':
-      return 'Kuponas nebegalioja.'
+      return errs.couponInactive
     case 'too_early':
-      return 'Kuponas dar neaktyvus.'
+      return errs.couponTooEarly
     case 'expired':
-      return 'Kuponas nebegalioja — pasibaigė galiojimo laikas.'
+      return errs.couponExpired
     case 'max_uses_reached':
-      return 'Šis kuponas jau panaudotas maksimalų skaičių kartų.'
+      return errs.couponMaxUses
     case 'min_order_not_met': {
       const eur = extra?.minOrderCents
         ? (extra.minOrderCents / 100).toFixed(2).replace('.', ',')
         : null
       return eur
-        ? `Kuponui pritaikyti reikia mažiausiai ${eur} € užsakymo sumos.`
-        : 'Nepasiekta minimali kupono suma.'
+        ? errs.couponMinOrder.replace('{amount}', eur)
+        : errs.couponMinOrderGeneric
     }
     case 'invalid_cart':
-      return 'Neteisingi krepšelio duomenys.'
+      return errs.couponInvalidCart
     default:
-      return 'Nepavyko pritaikyti kupono.'
+      return errs.couponGeneric
   }
 }
 
 export async function validateDiscountCodeAction(
   code: string,
-  subtotalCents: number
+  subtotalCents: number,
+  locale: Locale
 ): Promise<ValidateDiscountResult> {
+  const checkout = (await getDictionary(locale)).checkout
+  const errs = checkout.errors
+
   // Greita client-side-like validacija prieš network call'ą
   const trimmed = code.trim().toUpperCase()
   if (!trimmed) {
-    return { ok: false, error: 'Įveskite kupono kodą.' }
+    return { ok: false, error: checkout.enterCouponCode }
   }
   if (trimmed.length < 3 || trimmed.length > 32) {
-    return { ok: false, error: 'Kupono kodas yra 3–32 simbolių ilgio.' }
+    return { ok: false, error: errs.couponCodeLength }
   }
   if (!Number.isFinite(subtotalCents) || subtotalCents < 0) {
-    return { ok: false, error: 'Neteisingi krepšelio duomenys.' }
+    return { ok: false, error: errs.couponInvalidCart }
   }
 
   if (!isSupabaseServerConfigured) {
-    return { ok: false, error: 'Nuolaidų sistema šiuo metu neprieinama.' }
+    return { ok: false, error: errs.discountSystemUnavailable }
   }
 
   const supabase = createServerClient()
@@ -90,7 +97,7 @@ export async function validateDiscountCodeAction(
 
   if (error) {
     console.error('[discount] validate RPC error:', error)
-    return { ok: false, error: 'Nepavyko patikrinti kupono. Bandykite dar kartą.' }
+    return { ok: false, error: errs.couponCheckFailed }
   }
 
   // RPC grąžina jsonb — Supabase pateikia kaip objektą
@@ -107,7 +114,7 @@ export async function validateDiscountCodeAction(
   if (!result || !result.ok) {
     return {
       ok: false,
-      error: reasonToMessage(result?.reason, {
+      error: reasonToMessage(errs, result?.reason, {
         minOrderCents: result?.min_order_cents,
       }),
     }

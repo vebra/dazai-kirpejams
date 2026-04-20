@@ -376,7 +376,31 @@
     "applyDiscount": "Apply",
     "removeDiscount": "Remove coupon",
     "discountLabel": "Discount",
-    "enterCouponCode": "Please enter a coupon code."
+    "enterCouponCode": "Please enter a coupon code.",
+    "errors": {
+      "cartEmpty": "Your cart is empty.",
+      "missingFields": "Please fill in all required fields.",
+      "missingAddress": "Please fill in the delivery address.",
+      "missingParcelLocker": "Please select a parcel locker.",
+      "minOrderNotMet": "Minimum order amount has not been reached.",
+      "couponApplyFailed": "Failed to apply coupon. Please try again.",
+      "couponNotFound": "This coupon does not exist. Please check for typos.",
+      "couponInactive": "This coupon is no longer valid.",
+      "couponTooEarly": "This coupon is not active yet.",
+      "couponExpired": "This coupon has expired.",
+      "couponMaxUses": "This coupon has already been used the maximum number of times.",
+      "couponMinOrder": "This coupon requires a minimum order of {amount} €.",
+      "couponMinOrderGeneric": "Minimum order amount for this coupon has not been reached.",
+      "couponInvalidCart": "Invalid cart data.",
+      "couponGeneric": "Failed to apply coupon.",
+      "couponCodeLength": "Coupon code must be 3–32 characters long.",
+      "discountSystemUnavailable": "The discount system is currently unavailable.",
+      "couponCheckFailed": "Failed to validate coupon. Please try again.",
+      "stockShortageGeneric": "Not enough stock. Please try again later.",
+      "orderCreateFailed": "Failed to create the order. Please try again.",
+      "itemsSaveFailed": "Failed to save order items. Please try again.",
+      "serverError": "Server error. Please try again."
+    }
   },
   "common": {
     "home": "Home",

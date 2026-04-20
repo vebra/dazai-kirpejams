@@ -120,7 +120,7 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
     }
     setDiscountValidating(true)
     try {
-      const result = await validateDiscountCodeAction(code, subtotalCents)
+      const result = await validateDiscountCodeAction(code, subtotalCents, lang)
       if (!result.ok) {
         setDiscountError(result.error)
         setAppliedDiscount(null)
