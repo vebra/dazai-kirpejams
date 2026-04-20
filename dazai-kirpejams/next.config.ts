@@ -34,6 +34,7 @@ const securityHeaders = [
       "img-src 'self' data: blob: https://*.supabase.co https://www.google-analytics.com",
       "font-src 'self'",
       "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://region1.google-analytics.com",
+      "frame-src https://www.google.com https://maps.google.com",
       "frame-ancestors 'none'",
     ].join('; '),
   },
