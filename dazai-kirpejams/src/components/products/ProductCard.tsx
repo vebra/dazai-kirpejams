@@ -51,7 +51,7 @@ export function ProductCard({
   }
 
   return (
-    <div className="group bg-white rounded-xl border border-[#E0E0E0] overflow-hidden hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all">
+    <div className="group bg-white rounded-xl border border-[#E0E0E0] overflow-hidden hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] transition-shadow duration-300 ease-out">
       {/* Image area */}
       <Link
         href={href}

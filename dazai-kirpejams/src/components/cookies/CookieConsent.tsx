@@ -36,18 +36,24 @@ function updateGoogleConsent(value: ConsentValue) {
   })
 }
 
+type Phase = 'hidden' | 'entering' | 'visible' | 'exiting'
+
 export function CookieConsent({ lang, dict }: { lang: Locale; dict: Dict }) {
-  const [visible, setVisible] = useState(false)
+  const [phase, setPhase] = useState<Phase>('hidden')
 
   useEffect(() => {
+    let raf = 0
     try {
       const existing = localStorage.getItem(STORAGE_KEY)
       if (existing !== 'accepted' && existing !== 'rejected') {
-        setVisible(true)
+        setPhase('entering')
+        raf = requestAnimationFrame(() => setPhase('visible'))
       }
     } catch {
-      setVisible(true)
+      setPhase('entering')
+      raf = requestAnimationFrame(() => setPhase('visible'))
     }
+    return () => cancelAnimationFrame(raf)
   }, [])
 
   function decide(value: ConsentValue) {
@@ -55,10 +61,13 @@ export function CookieConsent({ lang, dict }: { lang: Locale; dict: Dict }) {
       localStorage.setItem(STORAGE_KEY, value)
     } catch {}
     updateGoogleConsent(value)
-    setVisible(false)
+    setPhase('exiting')
+    setTimeout(() => setPhase('hidden'), 350)
   }
 
-  if (!visible) return null
+  if (phase === 'hidden') return null
+
+  const isShown = phase === 'visible'
 
   return (
     <div
@@ -67,7 +76,11 @@ export function CookieConsent({ lang, dict }: { lang: Locale; dict: Dict }) {
       aria-describedby="cookie-consent-desc"
       className="fixed bottom-0 left-0 right-0 z-[100] pb-4 px-4 sm:pb-6 sm:px-6 pointer-events-none"
     >
-      <div className="mx-auto max-w-[760px] bg-white border border-[#E0E0E0] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.15)] p-6 sm:p-7 pointer-events-auto">
+      <div
+        className={`mx-auto max-w-[760px] bg-white border border-[#E0E0E0] rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.15)] p-6 sm:p-7 pointer-events-auto transition-[transform,opacity] duration-[350ms] ease-out ${
+          isShown ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+        }`}
+      >
         <h2
           id="cookie-consent-title"
           className="text-[1rem] font-bold text-brand-gray-900 mb-2"
