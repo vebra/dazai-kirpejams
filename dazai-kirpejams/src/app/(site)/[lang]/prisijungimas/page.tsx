@@ -46,7 +46,16 @@ export default async function LoginPage({
               </p>
             </div>
 
-            <LoginForm lang={lang} dict={dict.loginPage} />
+            <LoginForm
+              lang={lang}
+              dict={dict.loginPage}
+              errorDict={{
+                loginMissing: dict.errors.loginMissing,
+                loginInvalid: dict.errors.loginInvalid,
+                loginUnconfirmedEmail: dict.errors.loginUnconfirmedEmail,
+                loginGeneric: dict.errors.loginGeneric,
+              }}
+            />
           </div>
         </Container>
       </Section>

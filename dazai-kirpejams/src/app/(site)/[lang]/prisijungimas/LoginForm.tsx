@@ -1,12 +1,11 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { loginAction, type LoginState } from './actions'
+import { useRouter } from 'next/navigation'
 import type { Locale } from '@/i18n/config'
 import { langPrefix } from '@/lib/utils'
-
-const initialState: LoginState = {}
+import { createBrowserSupabase } from '@/lib/supabase/browser'
 
 type LoginFormDict = {
   emailLabel: string
@@ -19,18 +18,74 @@ type LoginFormDict = {
   registerCta: string
 }
 
-export function LoginForm({ lang, dict }: { lang: Locale; dict: LoginFormDict }) {
-  const [state, formAction, isPending] = useActionState(
-    loginAction,
-    initialState
-  )
+type ErrorDict = {
+  loginMissing: string
+  loginInvalid: string
+  loginUnconfirmedEmail: string
+  loginGeneric: string
+}
+
+export function LoginForm({
+  lang,
+  dict,
+  errorDict,
+}: {
+  lang: Locale
+  dict: LoginFormDict
+  errorDict: ErrorDict
+}) {
+  const router = useRouter()
+  const [error, setError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (isPending) return
+    setError(null)
+
+    const form = e.currentTarget
+    const fd = new FormData(form)
+    const email = ((fd.get('email') as string) ?? '').trim().toLowerCase()
+    const password = (fd.get('password') as string) ?? ''
+
+    if (!email || !password) {
+      setError(errorDict.loginMissing)
+      return
+    }
+
+    startTransition(async () => {
+      const supabase = createBrowserSupabase()
+      const { error: signInErr } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (signInErr) {
+        const msg = signInErr.message
+        if (
+          msg.includes('Invalid login') ||
+          msg.includes('invalid_credentials')
+        ) {
+          setError(errorDict.loginInvalid)
+        } else if (msg.includes('Email not confirmed')) {
+          setError(errorDict.loginUnconfirmedEmail)
+        } else {
+          console.error('[login] signIn error:', msg)
+          setError(errorDict.loginGeneric)
+        }
+        return
+      }
+
+      router.replace(`${langPrefix(lang)}/paskyra`)
+      router.refresh()
+    })
+  }
 
   return (
-    <form action={formAction} className="space-y-5">
-      <input type="hidden" name="lang" value={lang} />
-      {state.error && (
+    <form onSubmit={handleSubmit} className="space-y-5">
+      {error && (
         <div className="px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
-          {state.error}
+          {error}
         </div>
       )}
 
