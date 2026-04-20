@@ -198,7 +198,7 @@ export default async function ContactPage({
       <section className="pb-20 bg-brand-gray-50">
         <Container>
           <iframe
-            title="Dažai Kirpėjams — Taikos pr. 32, Kaunas"
+            title={`Dažai Kirpėjams — ${c.addressDisplay}`}
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2294.8!2d23.9415!3d54.8985!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46e7187b3b3f0001%3A0x1!2sTaikos+pr.+32%2C+Kaunas!5e0!3m2!1slt!2slt!4v1"
             className="w-full h-[280px] lg:h-[380px] rounded-xl border border-[#E0E0E0]"
             loading="lazy"
