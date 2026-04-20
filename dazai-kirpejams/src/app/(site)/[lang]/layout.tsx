@@ -9,7 +9,6 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { WhatsAppButton } from '@/components/layout/WhatsAppButton'
 import { VerificationProvider } from '@/components/auth/VerificationProvider'
-import { getVerificationDetails } from '@/lib/auth/verification'
 import { CookieConsent } from '@/components/cookies/CookieConsent'
 import { JsonLd } from '@/components/seo/JsonLd'
 import {
@@ -101,7 +100,6 @@ export default async function RootLayout({
   if (!hasLocale(lang)) notFound()
 
   const dict = await getDictionary(lang)
-  const verification = await getVerificationDetails()
 
   return (
     <html lang={lang} className={`${inter.variable} h-full`}>
@@ -115,10 +113,7 @@ export default async function RootLayout({
         <JsonLd data={websiteSchema(lang)} />
         <JsonLd data={shippingDetailsSchema()} />
         <JsonLd data={returnPolicySchema()} />
-        <VerificationProvider
-          initialStatus={verification.status}
-          initialIsLoggedIn={verification.isLoggedIn}
-        >
+        <VerificationProvider>
           <Header lang={lang} dict={dict} />
           <main className="flex-1 pt-[72px] lg:pt-[100px]">{children}</main>
           <Footer lang={lang} dict={dict} />
