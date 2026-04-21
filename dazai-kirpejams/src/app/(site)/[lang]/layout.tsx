@@ -81,6 +81,11 @@ export async function generateMetadata({
         'max-snippet': -1,
       },
     },
+    verification: {
+      other: {
+        'facebook-domain-verification': 'x9gp3k08zznrunuqeey31bxwne795t',
+      },
+    },
     icons: {
       icon: [
         { url: '/favicon.ico', sizes: '32x32' },
