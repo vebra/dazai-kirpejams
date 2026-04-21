@@ -1,7 +1,18 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { SITE_URL } from '@/lib/seo'
 
 export const OG_SIZE = { width: 1200, height: 630 }
+
+/**
+ * @vercel/og runs on edge runtime ir negali resolve'inti relative path'ų
+ * (pvz. `/colors/foo.jpg`). Grąžinam absoliučią formą arba null, jei nėra.
+ */
+export function absoluteOgImage(url: string | null | undefined): string | null {
+  if (!url) return null
+  if (/^https?:\/\//i.test(url)) return url
+  return `${SITE_URL}${url.startsWith('/') ? '' : '/'}${url}`
+}
 
 /** Brand colours from CLAUDE.md */
 const MAGENTA = '#E91E8C'

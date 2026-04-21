@@ -6,6 +6,7 @@ import {
   OgLayout,
   loadFonts,
   truncate,
+  absoluteOgImage,
   DARK,
   GRAY,
 } from '@/lib/og'
@@ -38,12 +39,14 @@ export default async function Image({
     )
   }
 
+  const coverImageUrl = absoluteOgImage(post.coverImageUrl)
+
   return new ImageResponse(
     (
       <OgLayout badge={t.blogBadge}>
         <div style={{ display: 'flex', gap: 48, alignItems: 'center', flex: 1 }}>
           {/* Cover image */}
-          {post.coverImageUrl && (
+          {coverImageUrl && (
             <div
               style={{
                 width: 340,
@@ -60,7 +63,7 @@ export default async function Image({
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={post.coverImageUrl}
+                src={coverImageUrl}
                 alt={post.title}
                 width={340}
                 height={340}
@@ -73,7 +76,7 @@ export default async function Image({
           <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
             <div
               style={{
-                fontSize: post.coverImageUrl ? 36 : 48,
+                fontSize: coverImageUrl ? 36 : 48,
                 fontWeight: 700,
                 color: DARK,
                 lineHeight: 1.25,

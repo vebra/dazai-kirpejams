@@ -8,6 +8,7 @@ import {
   loadFonts,
   truncate,
   formatPriceOg,
+  absoluteOgImage,
   MAGENTA,
   DARK,
   GRAY,
@@ -41,7 +42,7 @@ export default async function Image({
   }
 
   const name = getProductName(product, locale as 'lt' | 'en' | 'ru')
-  const imageUrl = product.image_urls?.[0] ?? null
+  const imageUrl = absoluteOgImage(product.image_urls?.[0])
 
   return new ImageResponse(
     (
