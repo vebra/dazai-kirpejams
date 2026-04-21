@@ -60,6 +60,22 @@ export function Newsletter({
               className="flex flex-col sm:flex-row gap-3 w-full md:w-auto flex-shrink-0"
             >
               <input type="hidden" name="locale" value={lang} />
+              {/* Honeypot — paslėptas nuo vartotojų, matomas bot'ams */}
+              <div
+                aria-hidden="true"
+                className="absolute -left-[9999px] w-px h-px overflow-hidden"
+              >
+                <label>
+                  Website
+                  <input
+                    type="text"
+                    name="website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    defaultValue=""
+                  />
+                </label>
+              </div>
 
               <div className="relative">
                 <input

@@ -3,6 +3,7 @@
 import { createServerSupabase } from '@/lib/supabase/ssr'
 import { locales, type Locale, defaultLocale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
+import { checkRateLimit, isHoneypotTriggered } from '@/lib/rate-limit'
 
 export type NewsletterState = {
   error?: string
@@ -20,12 +21,27 @@ export async function subscribeNewsletterAction(
   _prev: NewsletterState,
   formData: FormData
 ): Promise<NewsletterState> {
-  const email = ((formData.get('email') as string) ?? '').trim().toLowerCase()
   const locale = resolveLang(formData.get('locale'))
   const { newsletter } = await getDictionary(locale)
 
+  // Honeypot: bot'ams apsimetam sėkme, kad nesidomėtų
+  if (isHoneypotTriggered(formData)) {
+    return { success: true }
+  }
+
+  const email = ((formData.get('email') as string) ?? '').trim().toLowerCase()
+
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { error: newsletter.errorInvalidEmail }
+  }
+
+  const rl = await checkRateLimit({
+    action: 'newsletter',
+    windowSeconds: 3600,
+    max: 10,
+  })
+  if (!rl.allowed) {
+    return { error: newsletter.errorRateLimited }
   }
 
   const supabase = await createServerSupabase()

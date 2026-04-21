@@ -56,6 +56,19 @@ export function B2bForm({ lang, labels }: { lang: Locale; labels: B2bLabels }) {
   return (
     <form action={formAction} className="space-y-5">
       <input type="hidden" name="locale" value={lang} />
+      {/* Honeypot — paslėptas nuo vartotojų, matomas bot'ams */}
+      <div aria-hidden="true" className="absolute -left-[9999px] w-px h-px overflow-hidden">
+        <label>
+          Website
+          <input
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            defaultValue=""
+          />
+        </label>
+      </div>
 
       {state.error && (
         <div className="px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">

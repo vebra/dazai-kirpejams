@@ -8,6 +8,7 @@ import {
 } from '@/lib/email/templates'
 import { locales, type Locale, defaultLocale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
+import { checkRateLimit, isHoneypotTriggered } from '@/lib/rate-limit'
 
 export type B2bFormState = {
   error?: string
@@ -27,6 +28,13 @@ export async function submitB2bInquiryAction(
   _prev: B2bFormState,
   formData: FormData
 ): Promise<B2bFormState> {
+  const locale = resolveLang(formData.get('locale'))
+  const { errors } = await getDictionary(locale)
+
+  if (isHoneypotTriggered(formData)) {
+    return { success: true }
+  }
+
   const salonName = ((formData.get('salon_name') as string) ?? '').trim()
   const contactName = ((formData.get('contact_name') as string) ?? '').trim()
   const email = ((formData.get('email') as string) ?? '').trim().toLowerCase()
@@ -34,13 +42,22 @@ export async function submitB2bInquiryAction(
   const address = ((formData.get('address') as string) ?? '').trim()
   const monthlyVolume = ((formData.get('monthly_volume') as string) ?? '').trim()
   const message = ((formData.get('message') as string) ?? '').trim()
-  const locale = resolveLang(formData.get('locale'))
-  const { errors } = await getDictionary(locale)
 
   if (!salonName) return { error: errors.salonNameRequired }
   if (!contactName) return { error: errors.contactPersonRequired }
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { error: errors.emailInvalid }
+  }
+
+  // B2B griežčiau — kiekvienas pateikimas siunčia 2 Resend email'us,
+  // tad 3/h per IP yra saugu.
+  const rl = await checkRateLimit({
+    action: 'b2b',
+    windowSeconds: 3600,
+    max: 3,
+  })
+  if (!rl.allowed) {
+    return { error: errors.rateLimited }
   }
 
   const supabase = await createServerSupabase()

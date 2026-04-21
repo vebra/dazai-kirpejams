@@ -273,7 +273,8 @@
     "success": "Prenumerata sėkminga! Dėkojame.",
     "consent": "Sutinku gauti naujienlaiškius. Galėsite atsisakyti bet kada.",
     "errorInvalidEmail": "Įveskite teisingą el. paštą.",
-    "errorSubscribeFailed": "Nepavyko užprenumeruoti. Bandykite dar kartą."
+    "errorSubscribeFailed": "Nepavyko užprenumeruoti. Bandykite dar kartą.",
+    "errorRateLimited": "Per daug bandymų. Pabandykite vėliau."
   },
   "finalCta": {
     "title": "Pasiruošę išbandyti?",
@@ -1290,7 +1291,8 @@
     "contactSendFailed": "Nepavyko išsiųsti žinutės. Bandykite dar kartą.",
     "salonNameRequired": "Įveskite salono pavadinimą.",
     "contactPersonRequired": "Įveskite kontaktinį asmenį.",
-    "b2bSendFailed": "Nepavyko išsiųsti užklausos. Bandykite dar kartą."
+    "b2bSendFailed": "Nepavyko išsiųsti užklausos. Bandykite dar kartą.",
+    "rateLimited": "Per daug bandymų. Pabandykite vėliau."
   },
   "og": {
     "alt": "Dažai Kirpėjams — Profesionalūs plaukų dažai kirpėjams",

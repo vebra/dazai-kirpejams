@@ -273,7 +273,8 @@
     "success": "Subscribed successfully! Thank you.",
     "consent": "I agree to receive newsletters. You can unsubscribe at any time.",
     "errorInvalidEmail": "Please enter a valid email address.",
-    "errorSubscribeFailed": "Subscription failed. Please try again."
+    "errorSubscribeFailed": "Subscription failed. Please try again.",
+    "errorRateLimited": "Too many attempts. Please try again later."
   },
   "finalCta": {
     "title": "Ready to Try?",
@@ -1290,7 +1291,8 @@
     "contactSendFailed": "Could not send the message. Please try again.",
     "salonNameRequired": "Enter the salon name.",
     "contactPersonRequired": "Enter a contact person.",
-    "b2bSendFailed": "Could not send the inquiry. Please try again."
+    "b2bSendFailed": "Could not send the inquiry. Please try again.",
+    "rateLimited": "Too many attempts. Please try again later."
   },
   "og": {
     "alt": "Dažai Kirpėjams — Professional hair dyes for hairdressers",
