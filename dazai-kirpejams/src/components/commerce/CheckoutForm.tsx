@@ -8,7 +8,6 @@ import {
   Truck,
   Package,
   Building2,
-  CreditCard,
   Banknote,
   Tag,
   X,
@@ -401,15 +400,6 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
               title={dict.checkout.bankTransfer}
               desc={dict.checkout.bankTransferDesc}
             />
-            <PaymentOption
-              value="paysera"
-              selected={paymentMethod === 'paysera'}
-              onSelect={() => setPaymentMethod('paysera')}
-              icon={CreditCard}
-              title={dict.checkout.paysera}
-              desc={dict.checkout.payseraDesc}
-              disabled
-            />
           </div>
         </Fieldset>
 
@@ -651,7 +641,7 @@ function PaymentOption({
   value: PaymentMethod
   selected: boolean
   onSelect: () => void
-  icon: typeof CreditCard
+  icon: typeof Banknote
   title: string
   desc: string
   disabled?: boolean
