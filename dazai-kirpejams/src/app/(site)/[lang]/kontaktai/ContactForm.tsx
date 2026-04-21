@@ -1,7 +1,8 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
 import { submitContactAction, type ContactFormState } from './actions'
+import { trackLead } from '@/lib/analytics'
 import type { Locale } from '@/i18n/config'
 
 type ContactLabels = {
@@ -31,6 +32,12 @@ export function ContactForm({ lang, labels }: { lang: Locale; labels: ContactLab
     submitContactAction,
     initialState
   )
+
+  useEffect(() => {
+    if (state.success) {
+      trackLead({ leadType: 'contact', locale: lang })
+    }
+  }, [state.success, lang])
 
   if (state.success) {
     return (

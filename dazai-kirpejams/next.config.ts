@@ -17,6 +17,20 @@ function getSupabaseHost(): string | null {
 
 const supabaseHost = getSupabaseHost()
 
+const isDev = process.env.NODE_ENV !== 'production'
+
+// React dev mode + Turbopack naudoja eval() debug callstack'ams. Be
+// 'unsafe-eval' dev'e gaunam console error'us ir dalis HMR funkcijų lūžta.
+// Produkcijoje jis būtinai pašalinamas.
+const scriptSrc = [
+  "'self'",
+  "'unsafe-inline'",
+  ...(isDev ? ["'unsafe-eval'"] : []),
+  'https://www.googletagmanager.com',
+  'https://www.google-analytics.com',
+  'https://connect.facebook.net',
+].join(' ')
+
 const securityHeaders = [
   { key: 'X-DNS-Prefetch-Control', value: 'on' },
   { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
@@ -28,12 +42,12 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com",
+      `script-src ${scriptSrc}`,
       "worker-src 'self' blob:",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://*.supabase.co https://www.google-analytics.com",
+      "img-src 'self' data: blob: https://*.supabase.co https://www.google-analytics.com https://www.facebook.com",
       "font-src 'self'",
-      "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://region1.google-analytics.com",
+      "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://region1.google-analytics.com https://www.facebook.com",
       "frame-src https://www.google.com https://maps.google.com",
       "frame-ancestors 'none'",
     ].join('; '),

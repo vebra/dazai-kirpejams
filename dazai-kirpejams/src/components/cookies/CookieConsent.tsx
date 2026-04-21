@@ -21,6 +21,7 @@ declare global {
   interface Window {
     dataLayer?: unknown[]
     gtag?: (...args: unknown[]) => void
+    fbq?: (...args: unknown[]) => void
   }
 }
 
@@ -34,6 +35,12 @@ function updateGoogleConsent(value: ConsentValue) {
     ad_personalization: granted,
     analytics_storage: granted,
   })
+}
+
+function updateFacebookConsent(value: ConsentValue) {
+  if (typeof window === 'undefined') return
+  if (typeof window.fbq !== 'function') return
+  window.fbq('consent', value === 'accepted' ? 'grant' : 'revoke')
 }
 
 type Phase = 'hidden' | 'entering' | 'visible' | 'exiting'
@@ -61,6 +68,7 @@ export function CookieConsent({ lang, dict }: { lang: Locale; dict: Dict }) {
       localStorage.setItem(STORAGE_KEY, value)
     } catch {}
     updateGoogleConsent(value)
+    updateFacebookConsent(value)
     setPhase('exiting')
     setTimeout(() => setPhase('hidden'), 350)
   }

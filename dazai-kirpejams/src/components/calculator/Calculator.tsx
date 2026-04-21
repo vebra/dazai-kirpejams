@@ -1,6 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type { Locale } from '@/i18n/config'
+import { trackCalculatorUsed } from '@/lib/analytics'
 
 const OUR_PRICE = 7.9
 const OUR_VOLUME = 180
@@ -29,11 +31,18 @@ type CalculatorDict = {
   calcDisclaimer: string
 }
 
-export function Calculator({ dict }: { dict: CalculatorDict }) {
+export function Calculator({
+  lang,
+  dict,
+}: {
+  lang: Locale
+  dict: CalculatorDict
+}) {
   const [dyeingsStr, setDyeingsStr] = useState('15')
   const [mlStr, setMlStr] = useState('60')
   const [priceStr, setPriceStr] = useState('11')
   const [volumeStr, setVolumeStr] = useState('60')
+  const didInteract = useRef(false)
 
   const dyeingsPerWeek = parseFloat(dyeingsStr) || 0
   const mlPerDyeing = parseFloat(mlStr) || 0
@@ -74,6 +83,30 @@ export function Calculator({ dict }: { dict: CalculatorDict }) {
     }
   }, [dyeingsPerWeek, mlPerDyeing, competitorPrice, competitorVolume])
 
+  useEffect(() => {
+    if (!didInteract.current) return
+    trackCalculatorUsed({
+      dyeingsPerWeek,
+      mlPerDyeing,
+      savingsPerMonth: Math.round(results.savingsPerMonth * 100) / 100,
+      locale: lang,
+    })
+  }, [
+    dyeingsPerWeek,
+    mlPerDyeing,
+    competitorPrice,
+    competitorVolume,
+    results.savingsPerMonth,
+    lang,
+  ])
+
+  function markInteract(setter: (val: string) => void) {
+    return (val: string) => {
+      didInteract.current = true
+      setter(val)
+    }
+  }
+
   return (
     <div className="bg-white rounded-2xl p-8 lg:p-12 border border-[#E0E0E0] shadow-[0_4px_24px_rgba(0,0,0,0.08)]">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-[60px]">
@@ -88,7 +121,7 @@ export function Calculator({ dict }: { dict: CalculatorDict }) {
               id="dyeingsPerWeek"
               label={dict.calcDyeingsLabel}
               value={dyeingsStr}
-              onChange={setDyeingsStr}
+              onChange={markInteract(setDyeingsStr)}
               min={1}
               max={200}
               step={1}
@@ -97,7 +130,7 @@ export function Calculator({ dict }: { dict: CalculatorDict }) {
               id="mlPerDyeing"
               label={dict.calcMlLabel}
               value={mlStr}
-              onChange={setMlStr}
+              onChange={markInteract(setMlStr)}
               min={10}
               max={500}
               step={5}
@@ -106,7 +139,7 @@ export function Calculator({ dict }: { dict: CalculatorDict }) {
               id="competitorPrice"
               label={dict.calcPriceLabel}
               value={priceStr}
-              onChange={setPriceStr}
+              onChange={markInteract(setPriceStr)}
               min={0.01}
               max={100}
               step={0.01}
@@ -115,7 +148,7 @@ export function Calculator({ dict }: { dict: CalculatorDict }) {
               id="competitorVolume"
               label={dict.calcVolumeLabel}
               value={volumeStr}
-              onChange={setVolumeStr}
+              onChange={markInteract(setVolumeStr)}
               min={10}
               max={500}
               step={5}

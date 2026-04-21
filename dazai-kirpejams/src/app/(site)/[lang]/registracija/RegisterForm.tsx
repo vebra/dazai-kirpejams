@@ -1,8 +1,9 @@
 'use client'
 
-import { useActionState, useState } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { registerAction, type RegisterState } from './actions'
+import { trackCompleteRegistration } from '@/lib/analytics'
 import type { Locale } from '@/i18n/config'
 import { langPrefix } from '@/lib/utils'
 
@@ -57,6 +58,15 @@ export function RegisterForm({
     initialState
   )
   const [businessType, setBusinessType] = useState('hairdresser')
+
+  useEffect(() => {
+    if (state.success) {
+      trackCompleteRegistration({
+        businessType: businessType as 'hairdresser' | 'salon' | 'other',
+        locale: lang,
+      })
+    }
+  }, [state.success, businessType, lang])
 
   if (state.success) {
     return (

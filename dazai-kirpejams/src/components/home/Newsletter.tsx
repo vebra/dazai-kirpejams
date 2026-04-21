@@ -1,11 +1,12 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
 import { Container } from '@/components/ui/Container'
 import {
   subscribeNewsletterAction,
   type NewsletterState,
 } from './newsletter-action'
+import { trackSubscribe } from '@/lib/analytics'
 import type { Locale } from '@/i18n/config'
 
 const initialState: NewsletterState = {}
@@ -35,6 +36,12 @@ export function Newsletter({
     subscribeNewsletterAction,
     initialState
   )
+
+  useEffect(() => {
+    if (state.success) {
+      trackSubscribe({ source: 'newsletter', locale: lang })
+    }
+  }, [state.success, lang])
 
   return (
     <section className="py-[60px] bg-brand-gray-50">

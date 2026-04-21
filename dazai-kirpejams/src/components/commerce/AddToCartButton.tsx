@@ -1,8 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { useParams } from 'next/navigation'
 import { Check, ShoppingCart } from 'lucide-react'
 import { useCartStore, type CartItem } from '@/lib/commerce/cart-store'
+import { useVerification } from '@/components/auth/VerificationProvider'
+import { trackAddToCart } from '@/lib/analytics'
+import type { LocaleCode } from '@/lib/analytics-types'
 
 type AddToCartButtonProps = {
   item: Omit<CartItem, 'quantity'>
@@ -30,11 +34,25 @@ export function AddToCartButton({
   const addedLabel = labelAdded ?? label
   const addItem = useCartStore((s) => s.addItem)
   const [added, setAdded] = useState(false)
+  const { isVerified } = useVerification()
+  const params = useParams<{ lang?: string }>()
+  const locale = (params?.lang as LocaleCode | undefined) ?? undefined
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
     addItem(item, quantity)
+    trackAddToCart({
+      productId: item.productId,
+      name: item.name,
+      category: item.categorySlug,
+      price: item.priceCents / 100,
+      quantity,
+      currency: 'EUR',
+      locale,
+      userType: isVerified ? 'professional' : 'guest',
+      packSize: item.volumeMl === 180 ? '180ml' : 'other',
+    })
     setAdded(true)
     setTimeout(() => setAdded(false), 1500)
   }

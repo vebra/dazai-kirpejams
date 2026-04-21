@@ -8,6 +8,7 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumbSchema, localBusinessSchema } from '@/lib/schema'
 import { CONTACT, phoneHref, SOCIAL } from '@/lib/site'
 import { ContactForm } from './ContactForm'
+import { TrackedContactLink } from '@/components/analytics/TrackedContactLink'
 
 export const revalidate = 300
 import { langPrefix } from '@/lib/utils'
@@ -79,34 +80,44 @@ export default async function ContactPage({
           <div
             className={`grid ${CONTACT.phone ? 'grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 sm:grid-cols-3'} gap-6`}
           >
-            {[
-              {
-                icon: '✉',
-                title: t.email,
-                value: CONTACT.email,
-                href: `mailto:${CONTACT.email}`,
-              },
-              ...(CONTACT.phone
-                ? [
-                    {
-                      icon: '☎',
-                      title: t.phone,
-                      value: CONTACT.phone,
-                      href: phoneHref,
-                    },
-                  ]
-                : []),
-              {
-                icon: '📍',
-                title: t.address,
-                value: c.addressDisplay,
-              },
-              {
-                icon: '🕓',
-                title: t.workingHours,
-                value: c.workingHoursDisplay,
-              },
-            ].map((card) => (
+            {(
+              [
+                {
+                  icon: '✉',
+                  title: t.email,
+                  value: CONTACT.email,
+                  href: `mailto:${CONTACT.email}`,
+                  kind: 'email' as const,
+                },
+                ...(CONTACT.phone
+                  ? [
+                      {
+                        icon: '☎',
+                        title: t.phone,
+                        value: CONTACT.phone,
+                        href: phoneHref,
+                        kind: 'phone' as const,
+                      },
+                    ]
+                  : []),
+                {
+                  icon: '📍',
+                  title: t.address,
+                  value: c.addressDisplay,
+                },
+                {
+                  icon: '🕓',
+                  title: t.workingHours,
+                  value: c.workingHoursDisplay,
+                },
+              ] as Array<{
+                icon: string
+                title: string
+                value: string
+                href?: string
+                kind?: 'email' | 'phone'
+              }>
+            ).map((card) => (
               <div
                 key={card.title}
                 className="bg-brand-gray-50 rounded-xl p-8 px-6 text-center border border-transparent hover:border-[#E0E0E0] hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
@@ -117,13 +128,16 @@ export default async function ContactPage({
                 <h4 className="text-base font-bold text-brand-gray-900 mb-2">
                   {card.title}
                 </h4>
-                {card.href ? (
-                  <a
+                {card.href && card.kind ? (
+                  <TrackedContactLink
+                    kind={card.kind}
                     href={card.href}
+                    location="contact_page"
+                    locale={lang}
                     className="text-[0.92rem] text-brand-blue font-medium hover:text-brand-magenta transition-colors break-all"
                   >
                     {card.value}
-                  </a>
+                  </TrackedContactLink>
                 ) : (
                   <p className="text-[0.92rem] text-brand-gray-500">
                     {card.value}

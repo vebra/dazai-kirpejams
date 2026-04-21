@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import type { Locale } from '@/i18n/config'
 import { langPrefix } from '@/lib/utils'
 import { createBrowserSupabase } from '@/lib/supabase/browser'
+import { trackLogin } from '@/lib/analytics'
 
 type LoginFormDict = {
   emailLabel: string
@@ -76,6 +77,7 @@ export function LoginForm({
         return
       }
 
+      trackLogin({ locale: lang })
       router.replace(`${langPrefix(lang)}/paskyra`)
       router.refresh()
     })

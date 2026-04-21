@@ -1,7 +1,8 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
 import { submitB2bInquiryAction, type B2bFormState } from './actions'
+import { trackLead } from '@/lib/analytics'
 import type { Locale } from '@/i18n/config'
 
 type B2bLabels = {
@@ -36,6 +37,12 @@ export function B2bForm({ lang, labels }: { lang: Locale; labels: B2bLabels }) {
     submitB2bInquiryAction,
     initialState
   )
+
+  useEffect(() => {
+    if (state.success) {
+      trackLead({ leadType: 'b2b', locale: lang, userType: 'guest' })
+    }
+  }, [state.success, lang])
 
   if (state.success) {
     return (

@@ -1,9 +1,15 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { useVerification } from '@/components/auth/VerificationProvider'
 import { AddToCartButton } from '@/components/commerce/AddToCartButton'
 import { formatPrice } from '@/lib/utils'
+import {
+  trackViewContent,
+  trackPriceView,
+  trackPriceUnlockClick,
+} from '@/lib/analytics'
 import type { Locale } from '@/i18n/config'
 
 type Props = {
@@ -62,6 +68,51 @@ export function ProductPriceBlock({
   labels,
 }: Props) {
   const { isVerified, isLoggedIn, status } = useVerification()
+
+  // ViewContent — visada, nepriklausomai nuo user type. Meta optimizuoja
+  // reklamą ant peržiūrų, todėl svarbu siųsti ir guest'ams (be price) ir
+  // profesionalams (su tikra kaina).
+  useEffect(() => {
+    trackViewContent({
+      productId: cartItem.productId,
+      name: cartItem.name,
+      category: cartItem.categorySlug,
+      price: isVerified ? price : undefined,
+      currency: 'EUR',
+      locale: lang,
+      userType: isVerified ? 'professional' : 'guest',
+      packSize: volumeMl === 180 ? '180ml' : 'other',
+    })
+
+    if (isVerified) {
+      trackPriceView({
+        productId: cartItem.productId,
+        name: cartItem.name,
+        category: cartItem.categorySlug,
+        price,
+        currency: 'EUR',
+        locale: lang,
+        packSize: volumeMl === 180 ? '180ml' : 'other',
+      })
+    }
+  }, [
+    cartItem.productId,
+    cartItem.name,
+    cartItem.categorySlug,
+    isVerified,
+    lang,
+    price,
+    volumeMl,
+  ])
+
+  const handlePriceUnlock = (source: 'login' | 'register') => {
+    trackPriceUnlockClick({
+      productId: cartItem.productId,
+      category: cartItem.categorySlug,
+      source,
+      locale: lang,
+    })
+  }
 
   return (
     <>
@@ -161,12 +212,14 @@ export function ProductPriceBlock({
           <div className="flex flex-col sm:flex-row gap-2.5">
             <Link
               href={`${langPrefixStr}/prisijungimas`}
+              onClick={() => handlePriceUnlock('login')}
               className="flex-1 flex items-center justify-center min-h-[48px] px-6 py-3 bg-brand-magenta text-white rounded-lg text-[0.95rem] font-semibold hover:bg-brand-magenta-dark transition-colors"
             >
               {labels.login}
             </Link>
             <Link
               href={`${langPrefixStr}/registracija`}
+              onClick={() => handlePriceUnlock('register')}
               className="flex-1 flex items-center justify-center min-h-[48px] px-6 py-3 border-2 border-brand-magenta text-brand-magenta rounded-lg text-[0.95rem] font-semibold hover:bg-brand-magenta hover:text-white transition-all"
             >
               {labels.register}
@@ -196,6 +249,7 @@ export function ProductPriceBlock({
         <div className="flex flex-col sm:flex-row gap-3 mb-8">
           <Link
             href={`${langPrefixStr}/registracija`}
+            onClick={() => handlePriceUnlock('register')}
             className="flex-1 flex items-center justify-center gap-2 px-10 py-[18px] bg-brand-magenta text-white rounded-lg text-[1.05rem] font-semibold hover:bg-brand-magenta/90 transition-colors"
           >
             {labels.registerPro}

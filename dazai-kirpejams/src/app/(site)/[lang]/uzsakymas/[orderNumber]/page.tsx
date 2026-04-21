@@ -15,6 +15,7 @@ import {
 } from '@/lib/supabase/server'
 import { getCompanyInfo } from '@/lib/admin/queries'
 import type { DeliveryMethod, PaymentMethod } from '@/lib/commerce/constants'
+import { PurchaseTracker } from '@/components/analytics/PurchaseTracker'
 
 export async function generateMetadata({
   params,
@@ -130,6 +131,19 @@ export default async function OrderConfirmationPage({
 
   return (
     <>
+      <PurchaseTracker
+        orderNumber={order.orderNumber}
+        items={order.items.map((i) => ({
+          productId: i.productId,
+          name: i.name,
+          price: i.priceCents / 100,
+          quantity: i.quantity,
+        }))}
+        value={order.totalCents / 100}
+        shipping={order.shippingCents / 100}
+        tax={order.vatCents / 100}
+        locale={lang}
+      />
       <PageHeader title={dict.order.confirmationTitle} />
 
       <Section background="white">

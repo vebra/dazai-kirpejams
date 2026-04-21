@@ -8,8 +8,10 @@ import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { WhatsAppButton } from '@/components/layout/WhatsAppButton'
+import { Suspense } from 'react'
 import { VerificationProvider } from '@/components/auth/VerificationProvider'
 import { CookieConsent } from '@/components/cookies/CookieConsent'
+import { RouteTracker } from '@/components/analytics/RouteTracker'
 import { JsonLd } from '@/components/seo/JsonLd'
 import {
   organizationSchema,
@@ -117,8 +119,12 @@ export default async function RootLayout({
           <Header lang={lang} dict={dict} />
           <main className="flex-1 pt-[72px] lg:pt-[100px]">{children}</main>
           <Footer lang={lang} dict={dict} />
+          <Suspense fallback={null}>
+            <RouteTracker />
+          </Suspense>
         </VerificationProvider>
         <WhatsAppButton
+          lang={lang}
           ariaLabel={dict.common.whatsappAria}
           tooltip={dict.common.whatsappTooltip}
           prefill={dict.common.whatsappPrefill}
@@ -152,6 +158,31 @@ export default async function RootLayout({
             gtag('config', 'G-DS608JQ7CV');
           `}
         </Script>
+        <Script id="fb-pixel" strategy="afterInteractive">
+          {`
+            !function(f,b,e,v,n,t,s)
+            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}(window, document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+            var stored = null;
+            try { stored = localStorage.getItem('cookie-consent-v1'); } catch(e) {}
+            if (stored !== 'accepted') fbq('consent', 'revoke');
+            fbq('init', '2154254675399528');
+          `}
+        </Script>
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: 'none' }}
+            alt=""
+            src="https://www.facebook.com/tr?id=2154254675399528&ev=PageView&noscript=1"
+          />
+        </noscript>
       </body>
     </html>
   )

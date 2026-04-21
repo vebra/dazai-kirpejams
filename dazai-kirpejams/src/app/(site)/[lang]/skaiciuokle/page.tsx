@@ -76,7 +76,7 @@ export default async function CalculatorPage({
       {/* Calculator */}
       <section className="py-16 bg-white">
         <Container>
-          <Calculator dict={t} />
+          <Calculator lang={lang} dict={t} />
         </Container>
       </section>
 

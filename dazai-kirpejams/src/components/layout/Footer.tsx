@@ -4,6 +4,7 @@ import { Container } from '@/components/ui/Container'
 import type { Locale } from '@/i18n/config'
 import { langPrefix } from '@/lib/utils'
 import { CONTACT, phoneHref, SOCIAL } from '@/lib/site'
+import { TrackedContactLink } from '@/components/analytics/TrackedContactLink'
 
 type FooterProps = {
   lang: Locale
@@ -137,23 +138,29 @@ export function Footer({ lang, dict }: FooterProps) {
             </h4>
             <ul className="text-[0.9rem] text-white/70">
               <li>
-                <a
+                <TrackedContactLink
+                  kind="email"
                   href={`mailto:${CONTACT.email}`}
+                  location="footer"
+                  locale={lang}
                   className="flex items-center gap-2 min-h-[44px] py-2 hover:text-brand-magenta transition-colors"
                 >
                   <span aria-hidden>✉</span>
                   {CONTACT.email}
-                </a>
+                </TrackedContactLink>
               </li>
               {CONTACT.phone && (
                 <li>
-                  <a
+                  <TrackedContactLink
+                    kind="phone"
                     href={phoneHref}
+                    location="footer"
+                    locale={lang}
                     className="flex items-center gap-2 min-h-[44px] py-2 hover:text-brand-magenta transition-colors"
                   >
                     <span aria-hidden>☎</span>
                     {CONTACT.phone}
-                  </a>
+                  </TrackedContactLink>
                 </li>
               )}
               <li className="flex items-center gap-2 py-2">

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react'
-import { useCartStore } from '@/lib/commerce/cart-store'
+import { useCartStore, type CartItem } from '@/lib/commerce/cart-store'
 import { useVerifiedUser } from '@/lib/auth/useVerifiedUser'
 import {
   FREE_SHIPPING_THRESHOLD_CENTS,
@@ -12,6 +12,8 @@ import {
   meetsMinimumOrder,
 } from '@/lib/commerce/constants'
 import { formatPrice, langPrefix } from '@/lib/utils'
+import { trackViewCart, trackBeginCheckout } from '@/lib/analytics'
+import type { CheckoutItem } from '@/lib/analytics-types'
 import type { Locale } from '@/i18n/config'
 
 type CartViewProps = {
@@ -35,6 +37,23 @@ export function CartView({ lang, dict }: CartViewProps) {
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // ViewCart — kartą per sesiją, kai vartotojas pasiekia krepšelį su prekėmis
+  useEffect(() => {
+    if (!mounted || items.length === 0) return
+    const value = items.reduce((s, i) => s + (i.priceCents * i.quantity) / 100, 0)
+    trackViewCart({
+      items: items.map(mapCartItem),
+      value,
+      currency: 'EUR',
+      locale: lang,
+      userType: isVerified ? 'professional' : 'guest',
+    })
+    // Tik pirma mount'u su prekėmis — user'iui keičiant kiekius event'o
+    // nebeshootinam (dedupe per sesiją nereikia, nes efektas vien nuo
+    // `mounted` flag'o)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted])
 
   if (!mounted) {
     return <CartSkeleton />
@@ -306,7 +325,17 @@ export function CartView({ lang, dict }: CartViewProps) {
               href={meetsMin ? `${langPrefix(lang)}/apmokejimas` : '#'}
               aria-disabled={!meetsMin}
               onClick={(e) => {
-                if (!meetsMin) e.preventDefault()
+                if (!meetsMin) {
+                  e.preventDefault()
+                  return
+                }
+                trackBeginCheckout({
+                  items: items.map(mapCartItem),
+                  value: subtotalCents / 100,
+                  currency: 'EUR',
+                  locale: lang,
+                  userType: 'professional',
+                })
               }}
               className={`flex items-center justify-center gap-2 w-full px-6 py-4 font-semibold rounded-xl transition-colors ${
                 meetsMin
@@ -327,6 +356,17 @@ export function CartView({ lang, dict }: CartViewProps) {
       </aside>
     </div>
   )
+}
+
+function mapCartItem(item: CartItem): CheckoutItem {
+  return {
+    productId: item.productId,
+    name: item.name,
+    price: item.priceCents / 100,
+    quantity: item.quantity,
+    category: item.categorySlug,
+    packSize: item.volumeMl === 180 ? '180ml' : 'other',
+  }
 }
 
 function EmptyCart({ lang, dict }: { lang: Locale; dict: CartViewProps['dict'] }) {
