@@ -301,28 +301,30 @@ export default async function ProductPage({
                   {description}
                 </p>
               ) : null}
-              <ul className="space-y-2.5 text-[0.92rem] text-brand-gray-500 leading-[1.6]">
-                <li>
-                  <strong className="text-brand-gray-900">{t.feat180ml}</strong>{' '}
-                  — {t.feat180mlDesc}
-                </li>
-                <li>
-                  <strong className="text-brand-gray-900">{t.featArgan}</strong>{' '}
-                  — {t.featArganDesc}
-                </li>
-                <li>
-                  <strong className="text-brand-gray-900">{t.featRose}</strong>{' '}
-                  — {t.featRoseDesc}
-                </li>
-                <li>
-                  <strong className="text-brand-gray-900">{t.featGray}</strong>{' '}
-                  — {t.featGrayDesc}
-                </li>
-                <li>
-                  <strong className="text-brand-gray-900">{t.featColor}</strong>{' '}
-                  — {t.featColorDesc}
-                </li>
-              </ul>
+              {categorySlug === 'dazai' && (
+                <ul className="space-y-2.5 text-[0.92rem] text-brand-gray-500 leading-[1.6]">
+                  <li>
+                    <strong className="text-brand-gray-900">{t.feat180ml}</strong>{' '}
+                    — {t.feat180mlDesc}
+                  </li>
+                  <li>
+                    <strong className="text-brand-gray-900">{t.featArgan}</strong>{' '}
+                    — {t.featArganDesc}
+                  </li>
+                  <li>
+                    <strong className="text-brand-gray-900">{t.featRose}</strong>{' '}
+                    — {t.featRoseDesc}
+                  </li>
+                  <li>
+                    <strong className="text-brand-gray-900">{t.featGray}</strong>{' '}
+                    — {t.featGrayDesc}
+                  </li>
+                  <li>
+                    <strong className="text-brand-gray-900">{t.featColor}</strong>{' '}
+                    — {t.featColorDesc}
+                  </li>
+                </ul>
+              )}
             </div>
 
             {usage && (

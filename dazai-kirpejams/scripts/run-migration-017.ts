@@ -31,11 +31,11 @@ async function main() {
   let fail = 0
 
   for (const c of targets) {
-    const codeLabel = c.num ?? c.name_en
+    const prefix = c.num ? `${c.num} Color SHOCK` : `Color SHOCK ${c.name_en}`
     const payload = {
-      name_lt: `Color SHOCK ${codeLabel} — ${c.name_lt}`,
-      name_en: `Color SHOCK ${codeLabel} — ${c.name_en}`,
-      name_ru: `Color SHOCK ${codeLabel} — ${c.name_ru}`,
+      name_lt: `${prefix} — ${c.name_lt}`,
+      name_en: `${prefix} — ${c.name_en}`,
+      name_ru: `${prefix} — ${c.name_ru}`,
       color_name: c.name_lt,
       image_urls: c.imagePath ? [c.imagePath] : [],
     }

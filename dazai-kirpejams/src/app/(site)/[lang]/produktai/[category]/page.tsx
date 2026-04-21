@@ -159,10 +159,12 @@ export default async function CategoryPage({
               </strong>{' '}
               {isDazai ? dict.categoryPage.colorsLabel : dict.categoryPage.productsLabel}
             </div>
-            <div className="inline-flex items-center gap-1.5 text-[0.85rem] lg:text-[0.95rem] text-brand-gray-500 px-3.5 lg:px-5 py-1.5 lg:py-2 bg-brand-gray-50 rounded-full">
-              <strong className="text-brand-magenta font-bold">180 ml</strong>{' '}
-              {dict.categoryPage.volumeLabel}
-            </div>
+            {isDazai && (
+              <div className="inline-flex items-center gap-1.5 text-[0.85rem] lg:text-[0.95rem] text-brand-gray-500 px-3.5 lg:px-5 py-1.5 lg:py-2 bg-brand-gray-50 rounded-full">
+                <strong className="text-brand-magenta font-bold">180 ml</strong>{' '}
+                {dict.categoryPage.volumeLabel}
+              </div>
+            )}
             <div className="inline-flex items-center gap-1.5 text-[0.85rem] lg:text-[0.95rem] text-brand-gray-500 px-3.5 lg:px-5 py-1.5 lg:py-2 bg-brand-gray-50 rounded-full">
               <strong className="text-brand-magenta font-bold">
                 Nuo €{minPrice.toFixed(2)}
@@ -184,46 +186,48 @@ export default async function CategoryPage({
         />
       </Suspense>
 
-      {/* Advantage bar */}
-      <section className="py-10 bg-brand-gray-900 text-white">
-        <Container>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
-            <div>
-              <strong className="block text-brand-magenta text-[1.2rem] font-extrabold mb-1">
-                {isDazai ? DYE_PALETTE_TARGET_COUNT : products.length}{' '}
-                {isDazai ? dict.categoryPage.colorsLabel : dict.categoryPage.productsLabel}
-              </strong>
-              <span className="text-[0.85rem] text-white/60">
-                {dict.categoryPage.advPalette}
-              </span>
+      {/* Advantage bar — tik dažų kategorijai; kitos kategorijos turi skirtingus
+          privalumus (oksidantai — 1000 ml, be argano/jojoba ir t.t.) */}
+      {isDazai && (
+        <section className="py-10 bg-brand-gray-900 text-white">
+          <Container>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+              <div>
+                <strong className="block text-brand-magenta text-[1.2rem] font-extrabold mb-1">
+                  {DYE_PALETTE_TARGET_COUNT} {dict.categoryPage.colorsLabel}
+                </strong>
+                <span className="text-[0.85rem] text-white/60">
+                  {dict.categoryPage.advPalette}
+                </span>
+              </div>
+              <div>
+                <strong className="block text-brand-magenta text-[1.2rem] font-extrabold mb-1">
+                  180 ml
+                </strong>
+                <span className="text-[0.85rem] text-white/60">
+                  {dict.categoryPage.advPerPackage}
+                </span>
+              </div>
+              <div>
+                <strong className="block text-brand-magenta text-[1.2rem] font-extrabold mb-1">
+                  Nuo €{minPrice.toFixed(2)}
+                </strong>
+                <span className="text-[0.85rem] text-white/60">
+                  {dict.categoryPage.advPerUnit}
+                </span>
+              </div>
+              <div>
+                <strong className="block text-brand-magenta text-[1.2rem] font-extrabold mb-1">
+                  Argan &amp; Jojoba
+                </strong>
+                <span className="text-[0.85rem] text-white/60">
+                  {dict.categoryPage.advOils}
+                </span>
+              </div>
             </div>
-            <div>
-              <strong className="block text-brand-magenta text-[1.2rem] font-extrabold mb-1">
-                180 ml
-              </strong>
-              <span className="text-[0.85rem] text-white/60">
-                {dict.categoryPage.advPerPackage}
-              </span>
-            </div>
-            <div>
-              <strong className="block text-brand-magenta text-[1.2rem] font-extrabold mb-1">
-                Nuo €{minPrice.toFixed(2)}
-              </strong>
-              <span className="text-[0.85rem] text-white/60">
-                {dict.categoryPage.advPerUnit}
-              </span>
-            </div>
-            <div>
-              <strong className="block text-brand-magenta text-[1.2rem] font-extrabold mb-1">
-                Argan &amp; Jojoba
-              </strong>
-              <span className="text-[0.85rem] text-white/60">
-                {dict.categoryPage.advOils}
-              </span>
-            </div>
-          </div>
-        </Container>
-      </section>
+          </Container>
+        </section>
+      )}
 
       {/* Final CTA */}
       <section className="py-20 bg-white text-center">

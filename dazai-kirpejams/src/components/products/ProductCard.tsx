@@ -90,7 +90,7 @@ export function ProductCard({
         <Link href={href}>
           <h3 className="text-[0.95rem] font-semibold text-brand-gray-900 mb-1 leading-[1.4] line-clamp-1 hover:text-brand-magenta transition-colors">
             {product.color_number
-              ? `Color SHOCK ${product.color_number}`
+              ? `${product.color_number} Color SHOCK`
               : name}
           </h3>
         </Link>

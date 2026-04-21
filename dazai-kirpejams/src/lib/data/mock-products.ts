@@ -238,17 +238,21 @@ const featuredSlugs = new Set([
 ])
 
 const hairDyes: Product[] = hairDyeColors.map((c, idx) => {
-  // Toneriams (be skaitinio numerio) — naudojam EN pavadinimą vietoj kodo
-  const codeLabel = c.num ?? c.name_en
+  // Numeruoti dažai — „{num} Color SHOCK — {spalva}" (skaičius pradžioje, kad
+  // koloristai greitai atpažintų atspalvio kodą). Toneriai be numerio lieka
+  // klasikiniu „Color SHOCK {name}" formatu.
+  const namePrefixLt = c.num ? `${c.num} Color SHOCK` : `Color SHOCK ${c.name_en}`
+  const namePrefixEn = c.num ? `${c.num} Color SHOCK` : `Color SHOCK ${c.name_en}`
+  const namePrefixRu = c.num ? `${c.num} Color SHOCK` : `Color SHOCK ${c.name_en}`
   return makeProduct({
     id: `prod-dye-${idx + 1}`,
     slug: c.slug,
     sku: c.num ? `CS-${c.num}` : `CS-${c.key.toUpperCase()}`,
     category_id: 'cat-1',
     brand_id: 'brand-1',
-    name_lt: `Color SHOCK ${codeLabel} — ${c.name_lt}`,
-    name_en: `Color SHOCK ${codeLabel} — ${c.name_en}`,
-    name_ru: `Color SHOCK ${codeLabel} — ${c.name_ru}`,
+    name_lt: `${namePrefixLt} — ${c.name_lt}`,
+    name_en: `${namePrefixEn} — ${c.name_en}`,
+    name_ru: `${namePrefixRu} — ${c.name_ru}`,
     description_lt: `Profesionalus kreminės tekstūros plaukų dažas ${c.name_lt.toLowerCase()} atspalvio. Stabili formulė, ilgalaikis rezultatas, didelė 180 ml talpa.`,
     description_en: `Professional cream-textured hair dye in ${c.name_en.toLowerCase()} shade. Stable formula, long-lasting result, large 180 ml volume.`,
     description_ru: `Профессиональная кремовая краска для волос оттенка «${c.name_ru.toLowerCase()}». Стабильная формула, долговечный результат, большой объём 180 мл.`,

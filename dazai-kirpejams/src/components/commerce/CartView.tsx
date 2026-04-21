@@ -122,7 +122,7 @@ export function CartView({ lang, dict }: CartViewProps) {
                   <div className="min-w-0 flex-1">
                     {item.colorNumber && (
                       <div className="text-xs font-medium text-brand-magenta uppercase tracking-wider mb-1">
-                        Color SHOCK · {item.colorNumber}
+                        {item.colorNumber} · Color SHOCK
                       </div>
                     )}
                     <Link
