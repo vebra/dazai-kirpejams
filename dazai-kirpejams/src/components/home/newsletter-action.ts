@@ -1,6 +1,6 @@
 'use server'
 
-import { createServerSupabase } from '@/lib/supabase/ssr'
+import { createServerClient } from '@/lib/supabase/server'
 import { locales, type Locale, defaultLocale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 import { checkRateLimit, isHoneypotTriggered } from '@/lib/rate-limit'
@@ -44,7 +44,10 @@ export async function subscribeNewsletterAction(
     return { error: newsletter.errorRateLimited }
   }
 
-  const supabase = await createServerSupabase()
+  // Service-role klientas — vieša forma, neturi user context'o.
+  // Anon client + RLS upsert'as blokuoja PostgreSQL'e net su leidžiamomis
+  // INSERT+UPDATE policies (PostgREST'o keistenybė), todėl apeinam RLS.
+  const supabase = createServerClient()
 
   const { error } = await supabase.from('newsletter_subscribers').upsert(
     {
