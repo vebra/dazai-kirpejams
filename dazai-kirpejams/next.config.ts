@@ -29,6 +29,8 @@ const scriptSrc = [
   'https://www.googletagmanager.com',
   'https://www.google-analytics.com',
   'https://connect.facebook.net',
+  // Vercel Live feedback widget (preview/production comments tool)
+  'https://vercel.live',
 ].join(' ')
 
 const securityHeaders = [
@@ -45,10 +47,10 @@ const securityHeaders = [
       `script-src ${scriptSrc}`,
       "worker-src 'self' blob:",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://*.supabase.co https://www.google-analytics.com https://www.facebook.com",
-      "font-src 'self'",
-      "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://region1.google-analytics.com https://www.facebook.com",
-      "frame-src https://www.google.com https://maps.google.com",
+      "img-src 'self' data: blob: https://*.supabase.co https://www.google-analytics.com https://www.facebook.com https://vercel.live https://vercel.com",
+      "font-src 'self' https://assets.vercel.com",
+      "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://region1.google-analytics.com https://www.facebook.com https://vercel.live wss://ws-us3.pusher.com",
+      "frame-src https://www.google.com https://maps.google.com https://vercel.live",
       "frame-ancestors 'none'",
     ].join('; '),
   },
