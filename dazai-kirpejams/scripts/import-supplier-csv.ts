@@ -471,16 +471,45 @@ async function main() {
 
   let created = 0
   let updated = 0
+  let unchanged = 0
   let failed = 0
   const errors: string[] = []
 
+  // Laukai, pagal kuriuos sprendžiam ar reikia `updated_at` liesti.
+  // Praleidžiam `stock_quantity`/`is_active` (nekeičiami CSV import'e, žr. žemiau).
+  const COMPARE_FIELDS = [
+    'slug',
+    'sku',
+    'category_id',
+    'name_lt',
+    'name_en',
+    'name_ru',
+    'price_cents',
+    'b2b_price_cents',
+    'cost_price_cents',
+    'volume_ml',
+    'weight_g',
+    'color_number',
+    'color_name',
+    'color_hex',
+    'color_tone',
+    'color_family',
+    'is_in_stock',
+    'is_featured',
+  ] as const
+
+  // Konkretus select string'as, kad Supabase tipų inferencija nesuluoštų
+  // ir TS'as matytų visus laukus kaip string|number.
+  const SELECT_WITH_FIELDS = `id, ${COMPARE_FIELDS.join(', ')}`
+
   for (const p of stats.toUpsert) {
-    // Tikrinam ar produktas su šiuo EAN jau yra
+    // Tikrinam ar produktas su šiuo EAN jau yra — ir iškart pasiimam laukus
+    // dėl diff palyginimo (kad `updated_at` nelietume, kai niekas nesikeičia).
     const { data: byEan, error: eanErr } = await supabase
       .from('products')
-      .select('id')
+      .select(SELECT_WITH_FIELDS)
       .eq('ean', p.ean)
-      .maybeSingle()
+      .maybeSingle<{ id: string } & Record<string, unknown>>()
 
     if (eanErr) {
       failed++
@@ -494,9 +523,9 @@ async function main() {
     if (!existing) {
       const { data: bySlug, error: slugErr } = await supabase
         .from('products')
-        .select('id')
+        .select(SELECT_WITH_FIELDS)
         .eq('slug', p.slug)
-        .maybeSingle()
+        .maybeSingle<{ id: string } & Record<string, unknown>>()
       if (slugErr) {
         failed++
         errors.push(`EAN ${p.ean}: slug fetch error — ${slugErr.message}`)
@@ -505,7 +534,7 @@ async function main() {
       existing = bySlug
     }
 
-    const payload = {
+    const basePayload = {
       ean: p.ean,
       slug: p.slug,
       sku: p.sku,
@@ -527,16 +556,26 @@ async function main() {
       is_in_stock: p.stock_quantity > 0,
       is_active: p.is_active,
       is_featured: p.is_featured,
-      updated_at: new Date().toISOString(),
     }
 
     if (existing) {
+      // Palyginam tik COMPARE_FIELDS — jei sutampa, praleidžiam UPDATE (kitaip
+      // `updated_at` klasterizuotųsi bulk import'e ir sugadintų sitemap lastmod).
+      const existingRow = existing as unknown as Record<string, unknown>
+      const hasChanges = COMPARE_FIELDS.some((field) => {
+        return existingRow[field] !== (basePayload as Record<string, unknown>)[field]
+      })
+
+      if (!hasChanges) {
+        unchanged++
+        continue
+      }
+
       // UPDATE — nekeičiam stock_quantity/is_active, kad neužtušuotų admin'o pakeitimų
-      const { id: _id, stock_quantity: _s, is_active: _a, ...updatePayload } =
-        { ...payload, id: existing.id }
+      const { stock_quantity: _s, is_active: _a, ...updatePayload } = basePayload
       const { error } = await supabase
         .from('products')
-        .update(updatePayload)
+        .update({ ...updatePayload, updated_at: new Date().toISOString() })
         .eq('id', existing.id)
       if (error) {
         failed++
@@ -545,8 +584,8 @@ async function main() {
         updated++
       }
     } else {
-      // INSERT
-      const { error } = await supabase.from('products').insert(payload)
+      // INSERT — updated_at default'as DB'e (now()) pats pasirūpins
+      const { error } = await supabase.from('products').insert(basePayload)
       if (error) {
         failed++
         errors.push(`EAN ${p.ean}: insert — ${error.message}`)
@@ -562,10 +601,11 @@ async function main() {
   console.log('\n═══════════════════════════════════════')
   console.log('📊 IMPORTAS BAIGTAS')
   console.log('═══════════════════════════════════════')
-  console.log(`   Sukurta:   ${created}`)
-  console.log(`   Atnaujinta: ${updated}`)
-  console.log(`   Nepavyko:  ${failed}`)
-  console.log(`   Praleista: ${stats.skipped.length}`)
+  console.log(`   Sukurta:     ${created}`)
+  console.log(`   Atnaujinta:  ${updated}`)
+  console.log(`   Be pokyčių:  ${unchanged}`)
+  console.log(`   Nepavyko:    ${failed}`)
+  console.log(`   Praleista:   ${stats.skipped.length}`)
   console.log('═══════════════════════════════════════')
 
   if (errors.length > 0) {
