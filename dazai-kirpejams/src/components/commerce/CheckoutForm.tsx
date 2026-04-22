@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -41,6 +41,7 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
 
   const items = useCartStore((s) => s.items)
   const clear = useCartStore((s) => s.clear)
+  const submittedRef = useRef(false)
 
   // Forma
   const [firstName, setFirstName] = useState('')
@@ -73,9 +74,11 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
     setMounted(true)
   }, [])
 
-  // Jei krepšelis tuščias po hydration — redirect atgal į krepšelį
+  // Jei krepšelis tuščias po hydration — redirect atgal į krepšelį.
+  // Išimtis: ką tik pateiktas užsakymas (submittedRef) — tada jau navigate'inam
+  // į confirmation page'ą, ir šis useEffect'as NEturi trukdyti.
   useEffect(() => {
-    if (mounted && items.length === 0) {
+    if (mounted && items.length === 0 && !submittedRef.current) {
       router.replace(`${langPrefix(lang)}/krepselis`)
     }
   }, [mounted, items.length, lang, router])
@@ -183,8 +186,9 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
       })
 
       if (result.ok) {
+        submittedRef.current = true
         clear()
-        router.push(result.redirectTo)
+        window.location.assign(result.redirectTo)
       } else {
         setErrorMsg(result.error)
       }
