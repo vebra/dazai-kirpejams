@@ -17,23 +17,27 @@ const translations = {
     title_ru: 'Как выбрать подходящий оксидант',
     excerpt_en: 'The right oxidant is the foundation for a quality colouring result. Learn how to select the concentration based on the desired effect and hair condition.',
     excerpt_ru: 'Правильный оксидант — основа качественного результата окрашивания. Узнайте, как подобрать концентрацию в зависимости от желаемого эффекта и состояния волос.',
-    content_en: `<p>The oxidant concentration determines whether the dye only covers or also lightens the hair. The wrong choice means an unpredictable result, dry hair and an unsatisfied client. In this article, we will review when to use 3%, 6%, 9% and 12% oxidant, and how to choose the right concentration based on the client's hair condition.</p>
-<h2>3% Oxidant (10 vol.)</h2>
-<p>The gentlest concentration, designed for <strong>toning and colour refreshing</strong>. Use it when you want to revive already coloured hair, intensify the shade, or cover individual grey hairs without any lightening effect.</p>
-<h2>6% Oxidant (20 vol.)</h2>
+    content_en: `<p>The oxidant concentration determines whether the dye only covers or also lightens the hair. The wrong choice means an unpredictable result, dry hair and an unsatisfied client. In this article, we will review when to use 1.5%, 3%, 6% and 9% oxidant, and how to choose the right concentration based on the client's hair condition.</p>
+<h2>1.5% Oxidant (5 VOL)</h2>
+<p>The weakest concentration, designed for <strong>gentle toning without a lightening effect</strong>. Use it when working with demi-permanent tones, refreshing colour, or softening a shade without any impact on the hair structure.</p>
+<h2>3% Oxidant (10 VOL)</h2>
+<p>A gentle concentration, designed for <strong>toning and colour refreshing</strong>. Use it when you want to revive already coloured hair, intensify the shade, or cover individual grey hairs without any lightening effect.</p>
+<h2>6% Oxidant (20 VOL)</h2>
 <p>A universal concentration. Suitable for <strong>standard tone-on-tone colouring</strong>, grey hair coverage and lightening hair by 1–2 tones. This is the most commonly used oxidant in the salon.</p>
-<h2>9% and 12% Oxidant</h2>
-<p>Stronger concentrations are used for lightening hair by 2–4 tones or bleaching procedures. Important: the stronger the oxidant, the more attention to hair condition is needed — always assess porosity and elasticity before the procedure.</p>
+<h2>9% Oxidant (30 VOL)</h2>
+<p>The strongest concentration in our line, designed for <strong>lightening hair by 2–3 tones</strong>. Important: the stronger the oxidant, the more attention to hair condition is needed — always assess porosity and elasticity before the procedure.</p>
 <h2>Practical Recommendations</h2>
 <ul><li>Always perform a strand test before the first colouring</li><li>Use proportions according to the manufacturer's instructions (Color SHOCK — 1:2)</li><li>Do not use old, opened oxidant — it loses its activity</li><li>Store the oxidant in a dark, cool place</li></ul>
 <p>The correct oxidant choice is not just about the colouring result, but also about the client's long-term hair health.</p>`,
-    content_ru: `<p>Концентрация оксиданта определяет, будет ли краска только покрывать волосы или также осветлять их. Неправильный выбор — это непредсказуемый результат, сухие волосы и недовольный клиент. В этой статье мы рассмотрим, когда использовать 3%, 6%, 9% и 12% оксидант, и как выбрать подходящую концентрацию в зависимости от состояния волос клиента.</p>
-<h2>3% оксидант (10 vol.)</h2>
-<p>Самая мягкая концентрация, предназначенная для <strong>тонирования и обновления цвета</strong>. Используйте, когда хотите освежить уже окрашенные волосы, усилить оттенок или закрасить единичные седые волосы без эффекта осветления.</p>
-<h2>6% оксидант (20 vol.)</h2>
+    content_ru: `<p>Концентрация оксиданта определяет, будет ли краска только покрывать волосы или также осветлять их. Неправильный выбор — это непредсказуемый результат, сухие волосы и недовольный клиент. В этой статье мы рассмотрим, когда использовать 1.5%, 3%, 6% и 9% оксидант, и как выбрать подходящую концентрацию в зависимости от состояния волос клиента.</p>
+<h2>1.5% оксидант (5 VOL)</h2>
+<p>Самая слабая концентрация, предназначенная для <strong>мягкого тонирования без эффекта осветления</strong>. Используйте при работе с demi-permanent тонами, для обновления цвета или смягчения оттенка без какого-либо воздействия на структуру волос.</p>
+<h2>3% оксидант (10 VOL)</h2>
+<p>Мягкая концентрация, предназначенная для <strong>тонирования и обновления цвета</strong>. Используйте, когда хотите освежить уже окрашенные волосы, усилить оттенок или закрасить единичные седые волосы без эффекта осветления.</p>
+<h2>6% оксидант (20 VOL)</h2>
 <p>Универсальная концентрация. Подходит для <strong>стандартного окрашивания тон в тон</strong>, закрашивания седины и осветления волос на 1–2 тона. Это наиболее часто используемый оксидант в салоне.</p>
-<h2>9% и 12% оксидант</h2>
-<p>Более сильные концентрации используются для осветления волос на 2–4 тона или процедур обесцвечивания. Важно: чем сильнее оксидант, тем больше внимания нужно уделять состоянию волос — всегда оценивайте пористость и эластичность перед процедурой.</p>
+<h2>9% оксидант (30 VOL)</h2>
+<p>Самая сильная концентрация в нашей линии, предназначенная для <strong>осветления волос на 2–3 тона</strong>. Важно: чем сильнее оксидант, тем больше внимания нужно уделять состоянию волос — всегда оценивайте пористость и эластичность перед процедурой.</p>
 <h2>Практические рекомендации</h2>
 <ul><li>Всегда проводите тест на пряди перед первым окрашиванием</li><li>Используйте пропорции согласно инструкциям производителя (Color SHOCK — 1:2)</li><li>Не используйте старый, открытый оксидант — он теряет активность</li><li>Храните оксидант в тёмном прохладном месте</li></ul>
 <p>Правильный выбор оксиданта — это не только результат окрашивания, но и здоровье волос клиента в долгосрочной перспективе.</p>`,

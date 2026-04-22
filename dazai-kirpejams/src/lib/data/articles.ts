@@ -64,22 +64,27 @@ export const articles: Article[] = [
     body: [
       {
         type: 'p',
-        html: 'Oksidanto koncentracija lemia, ar dažai tik dengia, ar šviesina plaukus. Neteisingas pasirinkimas — tai nenuspėjamas rezultatas, sausi plaukai ir nepatenkintas klientas. Šiame straipsnyje apžvelgsime, kada naudoti 3%, 6%, 9% ir 12% oksidantą bei kaip pasirinkti tinkamą koncentraciją pagal klientės plaukų būklę.',
+        html: 'Oksidanto koncentracija lemia, ar dažai tik dengia, ar šviesina plaukus. Neteisingas pasirinkimas — tai nenuspėjamas rezultatas, sausi plaukai ir nepatenkintas klientas. Šiame straipsnyje apžvelgsime, kada naudoti 1.5%, 3%, 6% ir 9% oksidantą bei kaip pasirinkti tinkamą koncentraciją pagal klientės plaukų būklę.',
       },
-      { type: 'h2', text: '3% oksidantas (10 vol.)' },
+      { type: 'h2', text: '1.5% oksidantas (5 VOL)' },
       {
         type: 'p',
-        html: 'Švelniausia koncentracija, skirta <strong>toninimui ir spalvos atnaujinimui</strong>. Naudokite, kai norite atgaivinti jau dažytus plaukus, sustiprinti atspalvį arba uždengti pavienius žilus plaukus be šviesinimo efekto.',
+        html: 'Silpniausia koncentracija, skirta <strong>švelniam toninimui be šviesinimo efekto</strong>. Naudokite, kai dirbate su demi-permanent tonais, norite atnaujinti spalvą arba suminkštinti atspalvį be jokio plaukų struktūros poveikio.',
       },
-      { type: 'h2', text: '6% oksidantas (20 vol.)' },
+      { type: 'h2', text: '3% oksidantas (10 VOL)' },
+      {
+        type: 'p',
+        html: 'Švelni koncentracija, skirta <strong>toninimui ir spalvos atnaujinimui</strong>. Naudokite, kai norite atgaivinti jau dažytus plaukus, sustiprinti atspalvį arba uždengti pavienius žilus plaukus be šviesinimo efekto.',
+      },
+      { type: 'h2', text: '6% oksidantas (20 VOL)' },
       {
         type: 'p',
         html: 'Universali koncentracija. Tinka <strong>standartiniam dažymui tonu į toną</strong>, žilų plaukų dengimui ir plaukų pašviesinimui 1–2 tonais. Tai dažniausiai naudojamas oksidantas salone.',
       },
-      { type: 'h2', text: '9% ir 12% oksidantas' },
+      { type: 'h2', text: '9% oksidantas (30 VOL)' },
       {
         type: 'p',
-        html: 'Stipresnės koncentracijos naudojamos plaukų pašviesinimui 2–4 tonais arba balinimo procedūroms. Svarbu: kuo stipresnis oksidantas, tuo daugiau dėmesio plaukų būklei — visada įvertinkite porosity ir elastingumą prieš procedūrą.',
+        html: 'Stipriausia mūsų linijos koncentracija, skirta <strong>plaukų šviesinimui 2–3 tonais</strong>. Svarbu: kuo stipresnis oksidantas, tuo daugiau dėmesio plaukų būklei — visada įvertinkite porosity ir elastingumą prieš procedūrą.',
       },
       { type: 'h2', text: 'Praktinės rekomendacijos' },
       {

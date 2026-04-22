@@ -775,10 +775,10 @@
             "q": "Koks oksidantas tinka jūsų dažams?",
             "intro": "Mūsų dažams tinka oksidantai šių koncentracijų:",
             "list": [
-              "3% (10 vol.) — tonavimui ir švelniam dažymui",
-              "6% (20 vol.) — standartiniam dažymui ir žilų dengimui",
-              "9% (30 vol.) — šviesinimui 2–3 tonais",
-              "12% (40 vol.) — intensyviam šviesinimui"
+              "1.5% (5 VOL) — švelniam toninimui be šviesinimo efekto",
+              "3% (10 VOL) — tonavimui ir spalvos atnaujinimui",
+              "6% (20 VOL) — standartiniam dažymui ir žilų dengimui",
+              "9% (30 VOL) — šviesinimui 2–3 tonais"
             ],
             "outro": "Maišymo proporcija: 1+2 (1 dalis dažų + 2 dalys oksidanto)."
           }

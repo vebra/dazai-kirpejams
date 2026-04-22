@@ -12,33 +12,39 @@ SELECT 'kaip-pasirinkti-oksidanta',
        'Tinkamas oksidantas — pagrindas kokybiškam dažymo rezultatui. Sužinokite, kaip parinkti koncentraciją pagal norimą efektą ir plaukų būklę.',
        'Tinkamas oksidantas — pagrindas kokybiškam dažymo rezultatui. Sužinokite, kaip parinkti koncentraciją pagal norimą efektą ir plaukų būklę.',
        'Tinkamas oksidantas — pagrindas kokybiškam dažymo rezultatui. Sužinokite, kaip parinkti koncentraciją pagal norimą efektą ir plaukų būklę.',
-       '<p>Oksidanto koncentracija lemia, ar dažai tik dengia, ar šviesina plaukus. Neteisingas pasirinkimas — tai nenuspėjamas rezultatas, sausi plaukai ir nepatenkintas klientas. Šiame straipsnyje apžvelgsime, kada naudoti 3%, 6%, 9% ir 12% oksidantą bei kaip pasirinkti tinkamą koncentraciją pagal klientės plaukų būklę.</p>
-<h2>3% oksidantas (10 vol.)</h2>
-<p>Švelniausia koncentracija, skirta <strong>toninimui ir spalvos atnaujinimui</strong>. Naudokite, kai norite atgaivinti jau dažytus plaukus, sustiprinti atspalvį arba uždengti pavienius žilus plaukus be šviesinimo efekto.</p>
-<h2>6% oksidantas (20 vol.)</h2>
+       '<p>Oksidanto koncentracija lemia, ar dažai tik dengia, ar šviesina plaukus. Neteisingas pasirinkimas — tai nenuspėjamas rezultatas, sausi plaukai ir nepatenkintas klientas. Šiame straipsnyje apžvelgsime, kada naudoti 1.5%, 3%, 6% ir 9% oksidantą bei kaip pasirinkti tinkamą koncentraciją pagal klientės plaukų būklę.</p>
+<h2>1.5% oksidantas (5 VOL)</h2>
+<p>Silpniausia koncentracija, skirta <strong>švelniam toninimui be šviesinimo efekto</strong>. Naudokite, kai dirbate su demi-permanent tonais, norite atnaujinti spalvą arba suminkštinti atspalvį be jokio plaukų struktūros poveikio.</p>
+<h2>3% oksidantas (10 VOL)</h2>
+<p>Švelni koncentracija, skirta <strong>toninimui ir spalvos atnaujinimui</strong>. Naudokite, kai norite atgaivinti jau dažytus plaukus, sustiprinti atspalvį arba uždengti pavienius žilus plaukus be šviesinimo efekto.</p>
+<h2>6% oksidantas (20 VOL)</h2>
 <p>Universali koncentracija. Tinka <strong>standartiniam dažymui tonu į toną</strong>, žilų plaukų dengimui ir plaukų pašviesinimui 1–2 tonais. Tai dažniausiai naudojamas oksidantas salone.</p>
-<h2>9% ir 12% oksidantas</h2>
-<p>Stipresnės koncentracijos naudojamos plaukų pašviesinimui 2–4 tonais arba balinimo procedūroms. Svarbu: kuo stipresnis oksidantas, tuo daugiau dėmesio plaukų būklei — visada įvertinkite porosity ir elastingumą prieš procedūrą.</p>
+<h2>9% oksidantas (30 VOL)</h2>
+<p>Stipriausia mūsų linijos koncentracija, skirta <strong>plaukų šviesinimui 2–3 tonais</strong>. Svarbu: kuo stipresnis oksidantas, tuo daugiau dėmesio plaukų būklei — visada įvertinkite porosity ir elastingumą prieš procedūrą.</p>
 <h2>Praktinės rekomendacijos</h2>
 <ul><li>Visada atlikite sruogelės testą prieš pirmą dažymą</li><li>Naudokite proporcijas pagal gamintojo nurodymus (Color SHOCK — 1:2)</li><li>Nenaudokite seno, atidaryto oksidanto — jis praranda aktyvumą</li><li>Saugokite oksidantą tamsioje, vėsioje vietoje</li></ul>
 <p>Teisingas oksidanto pasirinkimas — tai ne tik dažymo rezultatas, bet ir klientės plaukų sveikata ilgalaikėje perspektyvoje.</p>',
-       '<p>Oksidanto koncentracija lemia, ar dažai tik dengia, ar šviesina plaukus. Neteisingas pasirinkimas — tai nenuspėjamas rezultatas, sausi plaukai ir nepatenkintas klientas. Šiame straipsnyje apžvelgsime, kada naudoti 3%, 6%, 9% ir 12% oksidantą bei kaip pasirinkti tinkamą koncentraciją pagal klientės plaukų būklę.</p>
-<h2>3% oksidantas (10 vol.)</h2>
-<p>Švelniausia koncentracija, skirta <strong>toninimui ir spalvos atnaujinimui</strong>. Naudokite, kai norite atgaivinti jau dažytus plaukus, sustiprinti atspalvį arba uždengti pavienius žilus plaukus be šviesinimo efekto.</p>
-<h2>6% oksidantas (20 vol.)</h2>
+       '<p>Oksidanto koncentracija lemia, ar dažai tik dengia, ar šviesina plaukus. Neteisingas pasirinkimas — tai nenuspėjamas rezultatas, sausi plaukai ir nepatenkintas klientas. Šiame straipsnyje apžvelgsime, kada naudoti 1.5%, 3%, 6% ir 9% oksidantą bei kaip pasirinkti tinkamą koncentraciją pagal klientės plaukų būklę.</p>
+<h2>1.5% oksidantas (5 VOL)</h2>
+<p>Silpniausia koncentracija, skirta <strong>švelniam toninimui be šviesinimo efekto</strong>. Naudokite, kai dirbate su demi-permanent tonais, norite atnaujinti spalvą arba suminkštinti atspalvį be jokio plaukų struktūros poveikio.</p>
+<h2>3% oksidantas (10 VOL)</h2>
+<p>Švelni koncentracija, skirta <strong>toninimui ir spalvos atnaujinimui</strong>. Naudokite, kai norite atgaivinti jau dažytus plaukus, sustiprinti atspalvį arba uždengti pavienius žilus plaukus be šviesinimo efekto.</p>
+<h2>6% oksidantas (20 VOL)</h2>
 <p>Universali koncentracija. Tinka <strong>standartiniam dažymui tonu į toną</strong>, žilų plaukų dengimui ir plaukų pašviesinimui 1–2 tonais. Tai dažniausiai naudojamas oksidantas salone.</p>
-<h2>9% ir 12% oksidantas</h2>
-<p>Stipresnės koncentracijos naudojamos plaukų pašviesinimui 2–4 tonais arba balinimo procedūroms. Svarbu: kuo stipresnis oksidantas, tuo daugiau dėmesio plaukų būklei — visada įvertinkite porosity ir elastingumą prieš procedūrą.</p>
+<h2>9% oksidantas (30 VOL)</h2>
+<p>Stipriausia mūsų linijos koncentracija, skirta <strong>plaukų šviesinimui 2–3 tonais</strong>. Svarbu: kuo stipresnis oksidantas, tuo daugiau dėmesio plaukų būklei — visada įvertinkite porosity ir elastingumą prieš procedūrą.</p>
 <h2>Praktinės rekomendacijos</h2>
 <ul><li>Visada atlikite sruogelės testą prieš pirmą dažymą</li><li>Naudokite proporcijas pagal gamintojo nurodymus (Color SHOCK — 1:2)</li><li>Nenaudokite seno, atidaryto oksidanto — jis praranda aktyvumą</li><li>Saugokite oksidantą tamsioje, vėsioje vietoje</li></ul>
 <p>Teisingas oksidanto pasirinkimas — tai ne tik dažymo rezultatas, bet ir klientės plaukų sveikata ilgalaikėje perspektyvoje.</p>',
-       '<p>Oksidanto koncentracija lemia, ar dažai tik dengia, ar šviesina plaukus. Neteisingas pasirinkimas — tai nenuspėjamas rezultatas, sausi plaukai ir nepatenkintas klientas. Šiame straipsnyje apžvelgsime, kada naudoti 3%, 6%, 9% ir 12% oksidantą bei kaip pasirinkti tinkamą koncentraciją pagal klientės plaukų būklę.</p>
-<h2>3% oksidantas (10 vol.)</h2>
-<p>Švelniausia koncentracija, skirta <strong>toninimui ir spalvos atnaujinimui</strong>. Naudokite, kai norite atgaivinti jau dažytus plaukus, sustiprinti atspalvį arba uždengti pavienius žilus plaukus be šviesinimo efekto.</p>
-<h2>6% oksidantas (20 vol.)</h2>
+       '<p>Oksidanto koncentracija lemia, ar dažai tik dengia, ar šviesina plaukus. Neteisingas pasirinkimas — tai nenuspėjamas rezultatas, sausi plaukai ir nepatenkintas klientas. Šiame straipsnyje apžvelgsime, kada naudoti 1.5%, 3%, 6% ir 9% oksidantą bei kaip pasirinkti tinkamą koncentraciją pagal klientės plaukų būklę.</p>
+<h2>1.5% oksidantas (5 VOL)</h2>
+<p>Silpniausia koncentracija, skirta <strong>švelniam toninimui be šviesinimo efekto</strong>. Naudokite, kai dirbate su demi-permanent tonais, norite atnaujinti spalvą arba suminkštinti atspalvį be jokio plaukų struktūros poveikio.</p>
+<h2>3% oksidantas (10 VOL)</h2>
+<p>Švelni koncentracija, skirta <strong>toninimui ir spalvos atnaujinimui</strong>. Naudokite, kai norite atgaivinti jau dažytus plaukus, sustiprinti atspalvį arba uždengti pavienius žilus plaukus be šviesinimo efekto.</p>
+<h2>6% oksidantas (20 VOL)</h2>
 <p>Universali koncentracija. Tinka <strong>standartiniam dažymui tonu į toną</strong>, žilų plaukų dengimui ir plaukų pašviesinimui 1–2 tonais. Tai dažniausiai naudojamas oksidantas salone.</p>
-<h2>9% ir 12% oksidantas</h2>
-<p>Stipresnės koncentracijos naudojamos plaukų pašviesinimui 2–4 tonais arba balinimo procedūroms. Svarbu: kuo stipresnis oksidantas, tuo daugiau dėmesio plaukų būklei — visada įvertinkite porosity ir elastingumą prieš procedūrą.</p>
+<h2>9% oksidantas (30 VOL)</h2>
+<p>Stipriausia mūsų linijos koncentracija, skirta <strong>plaukų šviesinimui 2–3 tonais</strong>. Svarbu: kuo stipresnis oksidantas, tuo daugiau dėmesio plaukų būklei — visada įvertinkite porosity ir elastingumą prieš procedūrą.</p>
 <h2>Praktinės rekomendacijos</h2>
 <ul><li>Visada atlikite sruogelės testą prieš pirmą dažymą</li><li>Naudokite proporcijas pagal gamintojo nurodymus (Color SHOCK — 1:2)</li><li>Nenaudokite seno, atidaryto oksidanto — jis praranda aktyvumą</li><li>Saugokite oksidantą tamsioje, vėsioje vietoje</li></ul>
 <p>Teisingas oksidanto pasirinkimas — tai ne tik dažymo rezultatas, bet ir klientės plaukų sveikata ilgalaikėje perspektyvoje.</p>',

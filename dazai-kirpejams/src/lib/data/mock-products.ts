@@ -29,11 +29,11 @@ export const mockCategories: Category[] = [
     name_en: 'Oxidants',
     name_ru: 'Оксиданты',
     description_lt:
-      'Profesionalūs oksidantai skirtingoms koncentracijoms: 3%, 6%, 9%, 12%.',
+      'Profesionalūs oksidantai skirtingoms koncentracijoms: 1.5% (5 VOL), 3% (10 VOL), 6% (20 VOL), 9% (30 VOL).',
     description_en:
-      'Professional oxidants in different concentrations: 3%, 6%, 9%, 12%.',
+      'Professional oxidants in different concentrations: 1.5% (5 VOL), 3% (10 VOL), 6% (20 VOL), 9% (30 VOL).',
     description_ru:
-      'Профессиональные оксиданты разных концентраций: 3%, 6%, 9%, 12%.',
+      'Профессиональные оксиданты разных концентраций: 1.5% (5 VOL), 3% (10 VOL), 6% (20 VOL), 9% (30 VOL).',
     image_url: null,
     sort_order: 2,
     is_active: true,
@@ -285,26 +285,26 @@ const hairDyes: Product[] = hairDyeColors.map((c, idx) => {
 
 // Oksidantai
 const oxidants: Product[] = [
-  { pct: '3', desc_lt: 'toninimui ir tamsinimui', desc_en: 'for toning and darkening', desc_ru: 'для тонирования и затемнения' },
-  { pct: '6', desc_lt: 'dažymui iki 2 tonų', desc_en: 'for coloring up to 2 tones', desc_ru: 'для окрашивания до 2 тонов' },
-  { pct: '9', desc_lt: 'šviesinimui iki 3 tonų', desc_en: 'for lightening up to 3 tones', desc_ru: 'для осветления до 3 тонов' },
-  { pct: '12', desc_lt: 'maksimaliam šviesinimui', desc_en: 'for maximum lightening', desc_ru: 'для максимального осветления' },
+  { pct: '1.5', vol: '5', slugSuffix: '1-5', skuSuffix: '1-5', desc_lt: 'švelniam toninimui be šviesinimo efekto', desc_en: 'for gentle toning without lightening', desc_ru: 'для мягкого тонирования без осветления' },
+  { pct: '3', vol: '10', slugSuffix: '3', skuSuffix: '3', desc_lt: 'toninimui ir spalvos atnaujinimui', desc_en: 'for toning and color refreshing', desc_ru: 'для тонирования и обновления цвета' },
+  { pct: '6', vol: '20', slugSuffix: '6', skuSuffix: '6', desc_lt: 'standartiniam dažymui ir žilų plaukų dengimui', desc_en: 'for standard coloring and grey coverage', desc_ru: 'для стандартного окрашивания и закрашивания седины' },
+  { pct: '9', vol: '30', slugSuffix: '9', skuSuffix: '9', desc_lt: 'šviesinimui 2–3 tonais', desc_en: 'for lightening by 2–3 tones', desc_ru: 'для осветления на 2–3 тона' },
 ].map((o, idx) =>
   makeProduct({
     id: `prod-ox-${idx + 1}`,
-    slug: `oxidant-${o.pct}`,
-    sku: `OX-${o.pct}`,
+    slug: `oxidant-${o.slugSuffix}`,
+    sku: `OX-${o.skuSuffix}`,
     category_id: 'cat-2',
     brand_id: 'brand-1',
-    name_lt: `Oksidantas ${o.pct}%`,
-    name_en: `Oxidant ${o.pct}%`,
-    name_ru: `Оксидант ${o.pct}%`,
-    description_lt: `Profesionalus ${o.pct}% oksidantas ${o.desc_lt}. Stabilus, lengvai maišomas.`,
-    description_en: `Professional ${o.pct}% oxidant ${o.desc_en}. Stable, easy to mix.`,
-    description_ru: `Профессиональный ${o.pct}% оксидант ${o.desc_ru}. Стабильный, легко смешивается.`,
+    name_lt: `Oksidantas ${o.pct}% (${o.vol} VOL)`,
+    name_en: `Oxidant ${o.pct}% (${o.vol} VOL)`,
+    name_ru: `Оксидант ${o.pct}% (${o.vol} VOL)`,
+    description_lt: `Profesionalus ${o.pct}% (${o.vol} VOL) oksidantas ${o.desc_lt}. Stabilus, lengvai maišomas.`,
+    description_en: `Professional ${o.pct}% (${o.vol} VOL) oxidant ${o.desc_en}. Stable, easy to mix.`,
+    description_ru: `Профессиональный ${o.pct}% (${o.vol} VOL) оксидант ${o.desc_ru}. Стабильный, легко смешивается.`,
     price_cents: 890,
     volume_ml: 1000,
-    is_featured: o.pct === '3',
+    is_featured: o.pct === '6',
   })
 )
 

@@ -775,10 +775,10 @@
             "q": "Which oxidant is suitable for your dyes?",
             "intro": "Our dyes work with oxidants of the following concentrations:",
             "list": [
-              "3% (10 vol.) — for toning and gentle colouring",
-              "6% (20 vol.) — for standard colouring and grey coverage",
-              "9% (30 vol.) — for lightening by 2–3 tones",
-              "12% (40 vol.) — for intensive lightening"
+              "1.5% (5 VOL) — for gentle toning without a lightening effect",
+              "3% (10 VOL) — for toning and colour refreshing",
+              "6% (20 VOL) — for standard colouring and grey coverage",
+              "9% (30 VOL) — for lightening by 2–3 tones"
             ],
             "outro": "Mixing ratio: 1+2 (1 part dye + 2 parts oxidant)."
           }
