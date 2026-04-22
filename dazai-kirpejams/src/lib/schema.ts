@@ -134,6 +134,19 @@ export function breadcrumbSchema(
   }
 }
 
+function productDescriptionFallback(
+  name: string,
+  volumeMl: number | null | undefined,
+  categoryName: string | null
+): string {
+  const parts: string[] = []
+  if (categoryName) parts.push(categoryName)
+  else parts.push('Profesionalus produktas')
+  if (volumeMl) parts.push(`${volumeMl} ml`)
+  parts.push(`${name} — profesionalus pasirinkimas kirpėjams ir grožio salonams.`)
+  return parts.join(' · ')
+}
+
 export function productSchema(
   product: Product,
   category: Category | null,
@@ -141,7 +154,14 @@ export function productSchema(
   productUrl: string
 ): Record<string, unknown> {
   const name = getProductName(product, lang)
-  const description = getProductDescription(product, lang)
+  const rawDescription = getProductDescription(product, lang).trim()
+  const description =
+    rawDescription ||
+    productDescriptionFallback(
+      name,
+      product.volume_ml,
+      category ? getCategoryName(category, lang) : null
+    )
   const priceEur = (product.price_cents / 100).toFixed(2)
   const hasImages = product.image_urls && product.image_urls.length > 0
 
@@ -175,8 +195,42 @@ export function productSchema(
         ? 'https://schema.org/InStock'
         : 'https://schema.org/OutOfStock',
       seller: { '@id': `${SITE_URL}/#organization` },
-      shippingDetails: { '@id': `${SITE_URL}/#shipping` },
-      hasMerchantReturnPolicy: { '@id': `${SITE_URL}/#return-policy` },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: {
+          '@type': 'MonetaryAmount',
+          value: '0',
+          currency: 'EUR',
+        },
+        shippingDestination: {
+          '@type': 'DefinedRegion',
+          addressCountry: 'LT',
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 0,
+            maxValue: 1,
+            unitCode: 'DAY',
+          },
+          transitTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 1,
+            maxValue: 3,
+            unitCode: 'DAY',
+          },
+        },
+      },
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'LT',
+        returnPolicyCategory:
+          'https://schema.org/MerchantReturnFiniteReturnWindow',
+        merchantReturnDays: 14,
+        returnMethod: 'https://schema.org/ReturnByMail',
+        returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+      },
     },
   }
 }
