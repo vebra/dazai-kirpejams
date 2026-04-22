@@ -1241,7 +1241,10 @@
     "formEmail": "Email",
     "formPhone": "Phone number",
     "formMessage": "Additional info (monthly needs, preferences…)",
-    "formSubmit": "Get an offer"
+    "formSubmit": "Get an offer",
+    "formSubmitting": "Sending...",
+    "formSuccessTitle": "Thank you for your request!",
+    "formSuccessDesc": "Thanks for your interest in our products. Our manager will contact you shortly."
   },
   "finalCtaFull": {
     "label": "Start now",

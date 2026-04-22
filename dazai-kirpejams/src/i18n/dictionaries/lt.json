@@ -1241,7 +1241,10 @@
     "formEmail": "El. paštas",
     "formPhone": "Telefono numeris",
     "formMessage": "Papildoma informacija (mėnesinis poreikis, pageidavimai...)",
-    "formSubmit": "Gauti pasiūlymą"
+    "formSubmit": "Gauti pasiūlymą",
+    "formSubmitting": "Siunčiama...",
+    "formSuccessTitle": "Ačiū už užklausą!",
+    "formSuccessDesc": "Dėkojame, kad domitės mūsų prekėmis. Mūsų vadybininkas su Jumis susisieks greitu metu."
   },
   "finalCtaFull": {
     "label": "Pradėkite dabar",
