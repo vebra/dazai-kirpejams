@@ -258,19 +258,26 @@ export function trackBeginCheckout(payload: BeginCheckoutPayload): void {
  * Purchase fire'inamas TIK sėkmingo užsakymo success puslapyje, su
  * dedupe apsauga per `orderNumber` — refresh'as / back / tiesioginis URL
  * užsuko nedubliuos event'o.
+ *
+ * `orderNumber` naudojamas ir kaip Pixel↔CAPI `eventID` — server'io
+ * siunčiamas Purchase CAPI event'as gauna tą patį ID, Meta juos match'ina.
  */
 export function trackPurchase(payload: PurchasePayload): void {
   if (!canTrack()) return
   if (!dedupeOncePerSession(`tracked_order_${payload.orderNumber}`)) return
 
-  metaTrack('Purchase', {
-    ...metaItemsFromCheckout(payload.items),
-    value: payload.value,
-    currency: payload.currency,
-    order_id: payload.orderNumber,
-    locale: payload.locale,
-    user_type: payload.userType,
-  })
+  metaTrack(
+    'Purchase',
+    {
+      ...metaItemsFromCheckout(payload.items),
+      value: payload.value,
+      currency: payload.currency,
+      order_id: payload.orderNumber,
+      locale: payload.locale,
+      user_type: payload.userType,
+    },
+    payload.orderNumber
+  )
 
   ga4Event('purchase', {
     transaction_id: payload.orderNumber,
@@ -291,11 +298,15 @@ export function trackPurchase(payload: PurchasePayload): void {
 export function trackLead(payload: LeadPayload): void {
   if (!canTrack()) return
 
-  metaTrack('Lead', {
-    lead_type: payload.leadType,
-    locale: payload.locale,
-    user_type: payload.userType,
-  })
+  metaTrack(
+    'Lead',
+    {
+      lead_type: payload.leadType,
+      locale: payload.locale,
+      user_type: payload.userType,
+    },
+    payload.eventId
+  )
 
   ga4Event('generate_lead', {
     lead_type: payload.leadType,

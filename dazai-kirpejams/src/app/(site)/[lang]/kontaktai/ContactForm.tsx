@@ -35,9 +35,9 @@ export function ContactForm({ lang, labels }: { lang: Locale; labels: ContactLab
 
   useEffect(() => {
     if (state.success) {
-      trackLead({ leadType: 'contact', locale: lang })
+      trackLead({ leadType: 'contact', locale: lang, eventId: state.eventId })
     }
-  }, [state.success, lang])
+  }, [state.success, state.eventId, lang])
 
   if (state.success) {
     return (

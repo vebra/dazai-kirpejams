@@ -1,13 +1,17 @@
 'use server'
 
+import { randomUUID } from 'node:crypto'
 import { createServerSupabase } from '@/lib/supabase/ssr'
 import { locales, type Locale, defaultLocale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 import { checkRateLimit, isHoneypotTriggered } from '@/lib/rate-limit'
+import { sendMetaCapiEvent } from '@/lib/analytics-capi'
 
 export type ContactFormState = {
   error?: string
   success?: boolean
+  /** Naudojamas Pixel↔CAPI dedupe (žr. salonams/actions.ts). */
+  eventId?: string
 }
 
 function resolveLang(raw: FormDataEntryValue | null): Locale {
@@ -65,5 +69,26 @@ export async function submitContactAction(
     return { error: errors.contactSendFailed }
   }
 
-  return { success: true }
+  const eventId = randomUUID()
+  // Vardą skaidom į first/last, kad CAPI match quality būtų aukštesnis.
+  const [firstName, ...rest] = name.split(/\s+/)
+  const lastName = rest.join(' ') || undefined
+  await sendMetaCapiEvent({
+    eventName: 'Lead',
+    eventId,
+    userData: {
+      email,
+      phone: phone || null,
+      firstName: firstName || null,
+      lastName: lastName ?? null,
+      country: 'lt',
+    },
+    customData: {
+      lead_type: 'contact',
+      locale,
+      content_name: subject || undefined,
+    },
+  })
+
+  return { success: true, eventId }
 }

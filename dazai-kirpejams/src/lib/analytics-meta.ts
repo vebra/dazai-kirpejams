@@ -22,12 +22,22 @@ function getFbq(): FbqFunction | null {
  * reklamą ant šių event'ų — naudoti būtent šiuos pavadinimus:
  * PageView, ViewContent, AddToCart, InitiateCheckout, Purchase,
  * Lead, CompleteRegistration, Subscribe, Search, Contact.
+ *
+ * `eventId` (neprivaloma) — naudojama CAPI dedupe. Tie patys Purchase/
+ * Lead event'ai siunčiami ir iš server'io per Conversions API; Meta
+ * match'ina abu signalus per 48h langą ir palieka tik vieną.
  */
-export function metaTrack(eventName: string, params?: Record<string, unknown>): void {
+export function metaTrack(
+  eventName: string,
+  params?: Record<string, unknown>,
+  eventId?: string
+): void {
   const fbq = getFbq()
   if (!fbq) return
   safeCall(() => {
-    if (params) {
+    if (eventId) {
+      fbq('track', eventName, params ?? {}, { eventID: eventId })
+    } else if (params) {
       fbq('track', eventName, params)
     } else {
       fbq('track', eventName)

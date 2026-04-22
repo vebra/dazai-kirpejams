@@ -1,5 +1,6 @@
 'use server'
 
+import { randomUUID } from 'node:crypto'
 import { createServerSupabase } from '@/lib/supabase/ssr'
 import { sendEmail, getB2bNotificationEmail } from '@/lib/email/resend'
 import {
@@ -9,10 +10,16 @@ import {
 import { locales, type Locale, defaultLocale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 import { checkRateLimit, isHoneypotTriggered } from '@/lib/rate-limit'
+import { sendMetaCapiEvent } from '@/lib/analytics-capi'
 
 export type B2bFormState = {
   error?: string
   success?: boolean
+  /**
+   * Grąžinamas klientui, kad `trackLead()` Pixel event'as gautų tą patį
+   * ID kaip čia iššautas CAPI — Meta dedupe'ina abu signalus.
+   */
+  eventId?: string
 }
 
 const FALLBACK_ADMIN_EMAIL = 'info@dziuljetavebre.lt'
@@ -127,5 +134,24 @@ export async function submitB2bInquiryAction(
     console.error('[b2b-form] email sending failed (non-blocking):', emailErr)
   }
 
-  return { success: true }
+  // Meta CAPI Lead event. Su tuo pačiu `eventId` grąžinsim klientui,
+  // kad Pixel `fbq('track', 'Lead', ..., { eventID })` dedupe'intųsi.
+  const eventId = randomUUID()
+  await sendMetaCapiEvent({
+    eventName: 'Lead',
+    eventId,
+    userData: {
+      email,
+      phone: phone || null,
+      firstName: contactName,
+      country: 'lt',
+    },
+    customData: {
+      lead_type: 'b2b',
+      locale,
+      content_name: salonName,
+    },
+  })
+
+  return { success: true, eventId }
 }

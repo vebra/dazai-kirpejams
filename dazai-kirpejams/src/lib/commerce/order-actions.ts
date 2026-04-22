@@ -15,6 +15,7 @@ import {
 } from '@/lib/email/templates'
 import { getCompanyInfo } from '@/lib/admin/queries'
 import { getDictionary } from '@/i18n/dictionaries'
+import { sendMetaCapiEvent } from '@/lib/analytics-capi'
 
 /**
  * Serializuota užsakymo prekė iš kliento (zustand store snapshot'o).
@@ -470,6 +471,40 @@ export async function createOrder(
   } catch (emailErr) {
     console.error('[order] Email sending failed (non-blocking):', emailErr)
   }
+
+  // ============================================
+  // Meta CAPI Purchase event (server-side)
+  // ============================================
+  //
+  // event_id = orderNumber — tas pats ID naudojamas ir client Pixel'yje
+  // (trackPurchase), todėl Meta dedupe'ina abu signalus per 48h.
+  // CAPI padengia iOS 14.5+, Safari ITP ir ad-blocker'ių prarastus event'us.
+  await sendMetaCapiEvent({
+    eventName: 'Purchase',
+    eventId: orderNumber,
+    userData: {
+      email: input.email,
+      phone: input.phone,
+      firstName: input.firstName,
+      lastName: input.lastName,
+      city: input.deliveryCity,
+      postalCode: input.deliveryPostalCode,
+      country: 'lt',
+    },
+    customData: {
+      currency: 'EUR',
+      value: totals.totalCents / 100,
+      content_ids: input.items.map((i) => i.productId),
+      content_type: 'product',
+      contents: input.items.map((i) => ({
+        id: i.productId,
+        quantity: i.quantity,
+        item_price: i.priceCents / 100,
+      })),
+      num_items: input.items.reduce((sum, i) => sum + i.quantity, 0),
+      order_id: orderNumber,
+    },
+  })
 
   // Nustatome sausainuką su užsakymo snapshot'u — leidžia confirmation
   // puslapiui veikti net kai Supabase nėra sukonfigūruotas (dev aplinka).

@@ -40,9 +40,14 @@ export function B2bForm({ lang, labels }: { lang: Locale; labels: B2bLabels }) {
 
   useEffect(() => {
     if (state.success) {
-      trackLead({ leadType: 'b2b', locale: lang, userType: 'guest' })
+      trackLead({
+        leadType: 'b2b',
+        locale: lang,
+        userType: 'guest',
+        eventId: state.eventId,
+      })
     }
-  }, [state.success, lang])
+  }, [state.success, state.eventId, lang])
 
   if (state.success) {
     return (

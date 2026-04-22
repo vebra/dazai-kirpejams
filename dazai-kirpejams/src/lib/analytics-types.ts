@@ -91,6 +91,12 @@ export type LeadPayload = {
   leadType: LeadType
   locale?: LocaleCode
   userType?: UserType
+  /**
+   * Jei perduotas — naudojamas Pixel↔CAPI dedupe. Server action'as po
+   * sėkmingo įrašo grąžina jį klientui, o klientas tą patį ID perduoda
+   * `fbq()` kvietime.
+   */
+  eventId?: string
 }
 
 export type RegistrationContext = {
