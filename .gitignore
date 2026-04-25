@@ -6,3 +6,6 @@
 # Local dev/debug artifacts
 /screenshots/
 /scripts/
+
+# Marketing materials (sensitive: salon contacts)
+/marketing/
