@@ -5,7 +5,16 @@ import {
   formatEventDateLt,
   isEventPast,
 } from '@/lib/events/config'
+import { getEventWidgetPrefs } from '@/lib/admin/event-widgets'
 import { EventRegistrationsTable } from './EventRegistrationsTable'
+import { Countdown } from './Countdown'
+import {
+  CapacityBar,
+  ReminderStatus,
+  RoleDistribution,
+  RegistrationsTimeline,
+} from './Widgets'
+import { WidgetSettings } from './WidgetSettings'
 
 export const metadata = {
   title: 'Renginiai',
@@ -33,15 +42,16 @@ export default async function AdminEventsPage({
             ? 'Neteisingas statusas.'
             : null
 
-  const registrations = await getEventRegistrations(EVENT.slug)
+  const [registrations, prefs] = await Promise.all([
+    getEventRegistrations(EVENT.slug),
+    getEventWidgetPrefs(),
+  ])
 
-  // KPI skaičiavimai
   const confirmed = registrations.filter((r) => r.status === 'confirmed')
   const attended = registrations.filter((r) => r.status === 'attended')
   const cancelled = registrations.filter((r) => r.status === 'cancelled')
   const noShow = registrations.filter((r) => r.status === 'no_show')
 
-  // Bendras žmonių skaičius — pats + svečiai (tik patvirtintoms/atvykusioms)
   const totalPeople = [...confirmed, ...attended].reduce(
     (sum, r) => sum + 1 + r.guestsCount,
     0
@@ -51,11 +61,14 @@ export default async function AdminEventsPage({
 
   return (
     <div className="space-y-6 max-w-6xl">
-      <div>
-        <h2 className="text-2xl font-bold text-brand-gray-900">Renginiai</h2>
-        <p className="mt-1 text-sm text-brand-gray-500">
-          Registracijos viešiems renginiams ir prezentacijoms.
-        </p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h2 className="text-2xl font-bold text-brand-gray-900">Renginiai</h2>
+          <p className="mt-1 text-sm text-brand-gray-500">
+            Registracijos viešiems renginiams ir prezentacijoms.
+          </p>
+        </div>
+        <WidgetSettings prefs={prefs} />
       </div>
 
       {errorMessage && (
@@ -64,7 +77,7 @@ export default async function AdminEventsPage({
         </div>
       )}
 
-      {/* Aktyvaus renginio kortelė */}
+      {/* Aktyvaus renginio kortelė — visada matoma */}
       <section className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
@@ -98,25 +111,70 @@ export default async function AdminEventsPage({
         </div>
       </section>
 
-      {/* KPI kortelės */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <KpiCard
-          label="Patvirtinta"
-          value={confirmed.length}
-          color="blue"
-        />
-        <KpiCard label="Dalyvavo" value={attended.length} color="emerald" />
-        <KpiCard label="Atšaukta" value={cancelled.length} color="gray" />
-        <KpiCard label="Neatvyko" value={noShow.length} color="red" />
-        <KpiCard
-          label={`Iš viso žmonių / ${EVENT.capacityMax}`}
-          value={totalPeople}
-          color="magenta"
-        />
-      </div>
+      {/* Apžvalgos eilė: Countdown + Capacity + ReminderStatus */}
+      {(prefs.countdown || prefs.capacity || prefs.reminderStatus) && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {prefs.countdown && (
+            <Countdown
+              startsAtIso={EVENT.startsAtIso}
+              endsAtIso={EVENT.endsAtIso}
+            />
+          )}
+          {prefs.capacity && (
+            <CapacityBar
+              totalPeople={totalPeople}
+              capacityMax={EVENT.capacityMax}
+              capacityMin={EVENT.capacityMin}
+            />
+          )}
+          {prefs.reminderStatus && (
+            <ReminderStatus
+              registrations={registrations}
+              startsAtIso={EVENT.startsAtIso}
+            />
+          )}
+        </div>
+      )}
 
+      {/* KPI kortelės */}
+      {prefs.kpi && (
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <KpiCard label="Patvirtinta" value={confirmed.length} color="blue" />
+          <KpiCard label="Dalyvavo" value={attended.length} color="emerald" />
+          <KpiCard label="Atšaukta" value={cancelled.length} color="gray" />
+          <KpiCard label="Neatvyko" value={noShow.length} color="red" />
+          <KpiCard
+            label={`Iš viso žmonių / ${EVENT.capacityMax}`}
+            value={totalPeople}
+            color="magenta"
+          />
+        </div>
+      )}
+
+      {/* Statistikos eilė */}
+      {(prefs.roleDistribution || prefs.timeline) && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {prefs.roleDistribution && (
+            <RoleDistribution registrations={registrations} />
+          )}
+          {prefs.timeline && (
+            <RegistrationsTimeline registrations={registrations} />
+          )}
+        </div>
+      )}
+
+      {/* Registracijų lentelė */}
       <section className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6">
-        <EventRegistrationsTable registrations={registrations} />
+        <EventRegistrationsTable
+          registrations={registrations}
+          features={{
+            bulkActions: prefs.bulkActions,
+            manualEmail: prefs.manualEmail,
+            notes: prefs.notes,
+            csvExport: prefs.csvExport,
+            printView: prefs.printView,
+          }}
+        />
       </section>
     </div>
   )
