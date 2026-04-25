@@ -121,30 +121,77 @@ export default async function EventPage({
       <section className="py-16 lg:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16">
           <div className="lg:col-span-3 space-y-10">
+            <div className="space-y-4 text-brand-gray-500 leading-relaxed">
+              <p>
+                Kviečiame į gyvą profesionalių{' '}
+                <strong className="text-brand-gray-900">
+                  Color SHOCK plaukų dažų
+                </strong>{' '}
+                prezentaciją Kaune, kurios metu vyks praktinė dažymo technikų
+                demonstracija su{' '}
+                <strong className="text-brand-gray-900">gyvu modeliu</strong>.
+              </p>
+              <p>
+                Renginio metu pamatysite realų dažymo procesą nuo pradžios iki
+                galutinio rezultato: spalvos parinkimą, dažų mišinio paruošimą,
+                aplikavimo eigą, darbo su oksidantais principus ir rezultato
+                įvertinimą.
+              </p>
+              <p>
+                Prezentaciją ves{' '}
+                <strong className="text-brand-gray-900">
+                  {EVENT.presenterName}
+                </strong>{' '}
+                –{' '}
+                <strong className="text-brand-gray-900">
+                  Color SHOCK technologė-atstovė
+                </strong>
+                , ilgametę patirtį turinti plaukų stilistė, įvaizdžio kūrėja ir
+                profesionalių mokymų lektorė.
+              </p>
+              <p>
+                Tai puiki galimybė kirpėjams, koloristams ir grožio salonų
+                savininkams iš arti susipažinti su{' '}
+                <strong className="text-brand-gray-900">
+                  Color SHOCK dažais
+                </strong>
+                , pamatyti jų veikimą realioje situacijoje ir užduoti rūpimus
+                klausimus apie produktų naudojimą kasdienėje salono praktikoje.
+              </p>
+            </div>
+
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold text-brand-gray-900">
                 Ko tikėtis
               </h2>
               <ul className="mt-6 space-y-4">
                 <FeatureItem
-                  title="Live demo ant modelio"
-                  desc="Pamatysite realų dažymo procesą su Color SHOCK produktais — spalvų maišymą, aplikavimą, rezultato vertinimą."
+                  title="Gyva demonstracija su gyvu modeliu"
+                  desc="Pamatysite realų dažymo procesą su Color SHOCK profesionaliais plaukų dažais — nuo konsultacijos ir spalvos parinkimo iki mišinio paruošimo, aplikavimo bei galutinio rezultato įvertinimo."
                 />
                 <FeatureItem
                   title="Dažymo technikos profesionalams"
-                  desc="Džiuljeta Vėbrė parodys technikas, kurios kasdien naudojamos salone — nuo žilų dengimo iki šviesinimo 2–3 tonais."
+                  desc="Džiuljeta Vėbrė praktiškai parodys dažymo technikas, kurios aktualios kasdieniam darbui salone: žilų plaukų dengimą, spalvos atnaujinimą, tonų korekciją ir profesionalų dažų pritaikymą pagal kliento poreikį."
                 />
                 <FeatureItem
-                  title="Produktų demonstracija"
-                  desc="Kiekvienas oksidantų variantas (1.5%, 3%, 6%, 9%) ir jo paskirtis — praktiškai, o ne iš lentelės."
+                  title="Color SHOCK produktų pristatymas"
+                  desc="Bus pristatyti Color SHOCK profesionalūs plaukų dažai ir jų naudojimo principai. Sužinosite, kaip pasirinkti tinkamą atspalvį, kaip teisingai maišyti produktus ir kaip pasiekti stabilų, prognozuojamą rezultatą."
                 />
                 <FeatureItem
-                  title="Q&A sesija"
-                  desc="Klauskite visko, kas aktualu kasdieniam darbui salone — spalvų parinkimas, sąnaudos, 180 ml talpos nauda."
+                  title="Oksidantų variantai ir jų paskirtis"
+                  desc="Aptarsime skirtingus oksiduojančių emulsijų stiprumus — 1,5 %, 3 %, 6 % ir 9 % — bei jų praktinį naudojimą salono darbe. Paaiškinsime, kada rinktis švelnesnį, o kada stipresnį oksidantą."
                 />
                 <FeatureItem
-                  title="Vaišės ir dovanos"
-                  desc="Lengvas užkandis ir kava dalyviams. Kiekvienas dalyvis išsineš ir dovaną."
+                  title="180 ml pakuotės nauda salonui"
+                  desc="Ypatingas dėmesys 180 ml Color SHOCK dažų pakuotei: kodėl didesnė tūbelė yra ekonomiškas sprendimas — mažesnė vieno dažymo savikaina, patogesnis atsargų planavimas, mažiau užsakymų ir daugiau produkto profesionaliam darbui."
+                />
+                <FeatureItem
+                  title="Klausimų ir atsakymų sesija"
+                  desc="Turėsite galimybę užduoti klausimus apie spalvų parinkimą, dažų maišymą, oksidantų pasirinkimą, sąnaudas, žilų plaukų dengimą ir Color SHOCK produktų taikymą kasdienėje praktikoje."
+                />
+                <FeatureItem
+                  title="Kava ir lengvos vaišės"
+                  desc="Dalyvių lauks kava ir lengvos vaišės — proga ne tik pamatyti demonstraciją, bet ir pabendrauti, aptarti rūpimus klausimus bei susipažinti su Color SHOCK dažų naudojimo galimybėmis."
                 />
               </ul>
             </div>
@@ -153,15 +200,30 @@ export default async function EventPage({
               <h2 className="text-2xl sm:text-3xl font-bold text-brand-gray-900">
                 Apie vietą
               </h2>
-              <p className="mt-4 text-brand-gray-500 leading-relaxed">
-                Renginys vyks{' '}
-                <strong className="text-brand-gray-900">
-                  {EVENT.venueName}
-                </strong>{' '}
-                — {EVENT.venueStreet}, {EVENT.venueCity}. Salone bus sėdimos ir
-                stovimos vietos, gera matomumo zona prie modelio vietos. Ateiti
-                patartina 10–15 min. anksčiau.
-              </p>
+              <div className="mt-4 space-y-4 text-brand-gray-500 leading-relaxed">
+                <p>
+                  Renginys vyks{' '}
+                  <strong className="text-brand-gray-900">
+                    {EVENT.venueName}
+                  </strong>
+                  , adresu{' '}
+                  <strong className="text-brand-gray-900">
+                    {EVENT.venueStreet}, {EVENT.venueCity}
+                  </strong>
+                  . Salone bus sėdimos ir stovimos vietos, gera matomumo zona
+                  prie gyvo modelio vietos — dalyviai galės patogiai stebėti
+                  dažymo procesą, matyti naudojamus produktus ir užduoti
+                  klausimus demonstracijos metu.
+                </p>
+                <p>
+                  Atvykti rekomenduojame{' '}
+                  <strong className="text-brand-gray-900">
+                    10–15 min. anksčiau
+                  </strong>
+                  , kad galėtumėte ramiai užsiregistruoti, susipažinti su
+                  renginio eiga ir pasiruošti prezentacijai.
+                </p>
+              </div>
               <a
                 href="https://www.google.com/maps/search/?api=1&query=Kipro+Petrausko+g.+44+Kaunas"
                 target="_blank"
@@ -176,12 +238,55 @@ export default async function EventPage({
               <h2 className="text-2xl sm:text-3xl font-bold text-brand-gray-900">
                 Kam skirta
               </h2>
-              <p className="mt-4 text-brand-gray-500 leading-relaxed">
-                Kirpėjams, koloristams ir grožio salonų savininkams, kurie nori
-                pamatyti Color SHOCK produktus veikme ir aptarti jų taikymą
-                savo kasdieniam darbui. Vietų skaičius ribotas — registracijos
-                priimamos iki užpildymo.
-              </p>
+              <div className="mt-4 space-y-4 text-brand-gray-500 leading-relaxed">
+                <p>
+                  Šis renginys skirtas{' '}
+                  <strong className="text-brand-gray-900">
+                    kirpėjams, koloristams ir grožio salonų savininkams
+                  </strong>
+                  , kurie nori susipažinti su Color SHOCK profesionaliais
+                  plaukų dažais, pamatyti jų veikimą realioje situacijoje ir
+                  įvertinti, kaip šie produktai gali būti pritaikomi kasdieniam
+                  darbui salone.
+                </p>
+                <p>
+                  Prezentacija ypač aktuali tiems, kurie ieško profesionalių,
+                  ekonomiškų ir patikimų dažymo sprendimų, nori geriau suprasti
+                  oksidantų naudojimą, spalvų parinkimą ir{' '}
+                  <strong className="text-brand-gray-900">
+                    180 ml pakuotės naudą
+                  </strong>{' '}
+                  salono darbui. Vietų skaičius ribotas — registracija priimama
+                  iki vietų užpildymo.
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-brand-gray-900">
+                Kodėl verta dalyvauti
+              </h2>
+              <div className="mt-4 space-y-4 text-brand-gray-500 leading-relaxed">
+                <p>
+                  Dalyvaudami prezentacijoje gausite ne teorinį produkto
+                  aprašymą, o gyvą ir praktišką patirtį. Matysite, kaip{' '}
+                  <strong className="text-brand-gray-900">
+                    Color SHOCK dažai
+                  </strong>{' '}
+                  veikia realiame dažymo procese su gyvu modeliu — galėsite
+                  įvertinti produkto tekstūrą, maišymą, aplikavimą ir
+                  rezultatą.
+                </p>
+                <p>
+                  Tai galimybė iš arti susipažinti su profesionalia dažų
+                  linija, sukurta kasdieniam salono darbui, ir praktiškai
+                  įvertinti, kaip{' '}
+                  <strong className="text-brand-gray-900">
+                    180 ml dažų tūbelė
+                  </strong>{' '}
+                  gali padėti dirbti ekonomiškiau bei efektyviau.
+                </p>
+              </div>
             </div>
           </div>
 

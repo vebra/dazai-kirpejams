@@ -1,7 +1,7 @@
 'use server'
 
 import { randomUUID } from 'node:crypto'
-import { createServerSupabase } from '@/lib/supabase/ssr'
+import { createServerClient } from '@/lib/supabase/server'
 import { sendEmail, getAdminNotificationEmail } from '@/lib/email/resend'
 import {
   buildEventRegistrationAdminEmail,
@@ -80,7 +80,10 @@ export async function registerForEventAction(
     return { error: 'Per daug bandymų. Pabandykite vėliau.' }
   }
 
-  const supabase = await createServerSupabase()
+  // Service role klientas — RLS politika blokuoja anon insert'us
+  // (event_registrations yra service-only). Veiksmas vis tiek patikrintas
+  // rate-limit'u + honeypot'u + validacija aukščiau.
+  const supabase = createServerClient()
 
   const { data: inserted, error } = await supabase
     .from('event_registrations')

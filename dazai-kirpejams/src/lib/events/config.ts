@@ -39,7 +39,7 @@ export const DAZU_PREZENTACIJA_2026: EventInfo = {
   title: 'Color SHOCK dažų prezentacija Kaune',
   shortTitle: 'Dažų prezentacija Kaune',
   description:
-    'Gyvas Color SHOCK dažų pristatymas: naujausios dažymo technikos, produktų demonstracija ant modelio ir Q&A sesija. Vaišės, dovanos dalyviams. Įėjimas nemokamas, bet būtina registracija.',
+    'Gyva profesionalių Color SHOCK plaukų dažų prezentacija Kaune su dažymo technikų demonstracija ant gyvo modelio. Aptarsime oksidantų variantus ir 180 ml pakuotės naudą salonui. Įėjimas nemokamas, būtina registracija.',
   // 2026-05-17 10:00–15:00 Europe/Vilnius (EEST = UTC+03:00)
   startsAt: new Date('2026-05-17T10:00:00+03:00'),
   endsAt: new Date('2026-05-17T15:00:00+03:00'),
@@ -50,7 +50,7 @@ export const DAZU_PREZENTACIJA_2026: EventInfo = {
   venueCity: 'Kaunas',
   venueCountry: 'LT',
   presenterName: 'Džiuljeta Vėbrė',
-  presenterTitle: 'Color SHOCK atstovė',
+  presenterTitle: 'Color SHOCK technologė-atstovė',
   isFree: true,
   capacityMin: 30,
   capacityMax: 50,
