@@ -20,6 +20,7 @@ export type EventRegistrationState = {
 }
 
 const FALLBACK_ADMIN_EMAIL = 'info@dziuljetavebre.lt'
+const OWNER_NOTIFICATION_EMAIL = 'vebramarius@gmail.com'
 
 const ALLOWED_ROLES = ['kirpejas', 'koloristas', 'savininkas', 'kita'] as const
 
@@ -117,7 +118,13 @@ export async function registerForEventAction(
     process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
     'https://www.dazaikirpejams.lt'
   const eventUrl = `${siteUrl}${event.path}`
-  const adminEmailAddress = getAdminNotificationEmail() ?? FALLBACK_ADMIN_EMAIL
+  const primaryAdminEmail =
+    getAdminNotificationEmail() ?? FALLBACK_ADMIN_EMAIL
+  const adminRecipients = Array.from(
+    new Set(
+      [primaryAdminEmail, OWNER_NOTIFICATION_EMAIL].map((e) => e.toLowerCase())
+    )
+  )
 
   // Email'ai + ICS. Jei siuntimas sugrius, registracija JAU DB'e —
   // vartotojas mato success ekraną. Admin gali rankiniu būdu persiųsti
@@ -171,7 +178,7 @@ export async function registerForEventAction(
         ],
       }),
       sendEmail({
-        to: adminEmailAddress,
+        to: adminRecipients,
         subject: adminPayload.subject,
         html: adminPayload.html,
         text: adminPayload.text,
