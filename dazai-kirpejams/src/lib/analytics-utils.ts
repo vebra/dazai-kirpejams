@@ -9,12 +9,23 @@
 const CONSENT_STORAGE_KEY = 'cookie-consent-v1'
 const SESSION_PREFIX = 'dk-analytics-'
 
+const PRODUCTION_HOSTS = new Set([
+  'dazaikirpejams.lt',
+  'www.dazaikirpejams.lt',
+])
+
+export function isProductionHost(): boolean {
+  if (typeof window === 'undefined') return false
+  return PRODUCTION_HOSTS.has(window.location.hostname.toLowerCase())
+}
+
 export function analyticsEnabled(): boolean {
   if (typeof window === 'undefined') return false
-  // Jei env kintamasis eksplicitiškai `false`, tracking išjungiam
-  // (pvz. dev'e arba staging'e). Jei `undefined` — laikom įjungta.
   const envFlag = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS
   if (envFlag === 'false' || envFlag === '0') return false
+  // Preview/localhost — netriggerintume GA/Meta įvykių, kad nedirbtume
+  // Lietuvos rinkos statistikos su JAV cloud'o botų srautu.
+  if (!isProductionHost()) return false
   return true
 }
 

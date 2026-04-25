@@ -135,6 +135,16 @@ export default async function RootLayout({
           prefill={dict.common.whatsappPrefill}
         />
         <CookieConsent lang={lang} dict={dict.cookies} />
+        <Script id="analytics-host-guard" strategy="beforeInteractive">
+          {`
+            (function(){
+              var allowed = ['dazaikirpejams.lt','www.dazaikirpejams.lt'];
+              window.__DK_ANALYTICS_ENABLED = allowed.indexOf(
+                (location.hostname || '').toLowerCase()
+              ) !== -1;
+            })();
+          `}
+        </Script>
         <Script id="gtag-consent-default" strategy="beforeInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
@@ -160,25 +170,29 @@ export default async function RootLayout({
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-DS608JQ7CV');
+            if (window.__DK_ANALYTICS_ENABLED) {
+              gtag('config', 'G-DS608JQ7CV');
+            }
           `}
         </Script>
         {process.env.NEXT_PUBLIC_META_PIXEL_ID ? (
           <>
             <Script id="fb-pixel" strategy="afterInteractive">
               {`
-                !function(f,b,e,v,n,t,s)
-                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-                n.queue=[];t=b.createElement(e);t.async=!0;
-                t.src=v;s=b.getElementsByTagName(e)[0];
-                s.parentNode.insertBefore(t,s)}(window, document,'script',
-                'https://connect.facebook.net/en_US/fbevents.js');
-                var stored = null;
-                try { stored = localStorage.getItem('cookie-consent-v1'); } catch(e) {}
-                if (stored !== 'accepted') fbq('consent', 'revoke');
-                fbq('init', '${process.env.NEXT_PUBLIC_META_PIXEL_ID}');
+                if (window.__DK_ANALYTICS_ENABLED) {
+                  !function(f,b,e,v,n,t,s)
+                  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                  n.queue=[];t=b.createElement(e);t.async=!0;
+                  t.src=v;s=b.getElementsByTagName(e)[0];
+                  s.parentNode.insertBefore(t,s)}(window, document,'script',
+                  'https://connect.facebook.net/en_US/fbevents.js');
+                  var stored = null;
+                  try { stored = localStorage.getItem('cookie-consent-v1'); } catch(e) {}
+                  if (stored !== 'accepted') fbq('consent', 'revoke');
+                  fbq('init', '${process.env.NEXT_PUBLIC_META_PIXEL_ID}');
+                }
               `}
             </Script>
             <noscript>
