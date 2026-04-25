@@ -6,7 +6,7 @@
 
 export type CurrencyCode = 'EUR' | 'USD' | 'GBP'
 export type LocaleCode = 'lt' | 'en' | 'ru'
-export type LeadType = 'b2b' | 'contact'
+export type LeadType = 'b2b' | 'contact' | 'event'
 export type UserType = 'guest' | 'professional'
 export type PackSize = '180ml' | 'other'
 export type SubscribeSource = 'newsletter' | 'footer' | 'popup'

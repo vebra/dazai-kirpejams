@@ -16,6 +16,7 @@ import { Testimonials } from '@/components/home/Testimonials'
 import { B2BCta } from '@/components/home/B2BCta'
 import { Newsletter } from '@/components/home/Newsletter'
 import { FinalCta } from '@/components/home/FinalCta'
+import { EventBanner } from '@/components/events/EventBanner'
 
 export default async function HomePage({ params }: PageProps<'/[lang]'>) {
   const { lang } = await params
@@ -29,6 +30,7 @@ export default async function HomePage({ params }: PageProps<'/[lang]'>) {
       <JsonLd data={breadcrumbSchema([
         { name: dict.common.home, url: buildCanonicalUrl(lang, '/') },
       ])} />
+      <EventBanner lang={lang} />
       <Hero lang={lang} dict={dict} />
       <TrustBar dict={dict} />
       <Advantages dict={dict} />

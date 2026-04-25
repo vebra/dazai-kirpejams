@@ -1514,6 +1514,77 @@ export async function getUserProfiles(
 }
 
 // ============================================
+// RENGINIŲ REGISTRACIJOS (Event registrations)
+// ============================================
+
+export type EventRegistrationStatus =
+  | 'confirmed'
+  | 'cancelled'
+  | 'attended'
+  | 'no_show'
+
+export type EventRegistrationRow = {
+  id: string
+  eventSlug: string
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  salonName: string | null
+  role: string | null
+  guestsCount: number
+  locale: string
+  status: EventRegistrationStatus
+  reminderSentAt: string | null
+  notes: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export async function getEventRegistrations(
+  eventSlug?: string
+): Promise<EventRegistrationRow[]> {
+  // Service role — viešam submit'ui naudojam service klientą, o admin
+  // puslapyje irgi — nes RLS uždaro anon/auth kontekstus.
+  const { createServerClient } = await import('@/lib/supabase/server')
+  const supabase = createServerClient()
+
+  let query = supabase
+    .from('event_registrations')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (eventSlug) {
+    query = query.eq('event_slug', eventSlug)
+  }
+
+  const { data, error } = await query
+
+  if (error) {
+    console.error('[admin/queries] getEventRegistrations:', error.message)
+    return []
+  }
+
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    eventSlug: r.event_slug,
+    firstName: r.first_name,
+    lastName: r.last_name,
+    email: r.email,
+    phone: r.phone,
+    salonName: r.salon_name ?? null,
+    role: r.role ?? null,
+    guestsCount: r.guests_count ?? 0,
+    locale: r.locale ?? 'lt',
+    status: r.status as EventRegistrationStatus,
+    reminderSentAt: r.reminder_sent_at ?? null,
+    notes: r.notes ?? null,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  }))
+}
+
+// ============================================
 // NAUJIENLAIŠKIAI (Newsletter subscribers)
 // ============================================
 

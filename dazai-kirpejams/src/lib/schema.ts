@@ -415,3 +415,63 @@ export function webPageSchema(lang = 'lt'): Record<string, unknown> {
 }
 
 export { getCategoryName }
+
+/**
+ * Event schema — Google rodo datą, vietą ir registracijos info tiesiogiai
+ * paieškos rezultatuose. Naudoja EventAttendanceModeEnumeration `Offline`
+ * (fizinis renginys) ir EventStatusType `Scheduled`.
+ */
+export function eventSchema(input: {
+  name: string
+  description: string
+  startsAtIso: string
+  endsAtIso: string
+  venueName: string
+  venueStreet: string
+  venueCity: string
+  venueCountry: string
+  venuePostalCode?: string
+  url: string
+  isFree: boolean
+  capacityMax: number
+  organizerName: string
+  organizerEmail: string
+}): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: input.name,
+    description: input.description,
+    startDate: input.startsAtIso,
+    endDate: input.endsAtIso,
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    eventStatus: 'https://schema.org/EventScheduled',
+    location: {
+      '@type': 'Place',
+      name: input.venueName,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: input.venueStreet,
+        addressLocality: input.venueCity,
+        postalCode: input.venuePostalCode,
+        addressCountry: input.venueCountry,
+      },
+    },
+    organizer: {
+      '@type': 'Person',
+      name: input.organizerName,
+      email: input.organizerEmail,
+    },
+    offers: {
+      '@type': 'Offer',
+      url: input.url,
+      price: input.isFree ? '0' : undefined,
+      priceCurrency: 'EUR',
+      availability: 'https://schema.org/InStock',
+      validFrom: new Date().toISOString(),
+    },
+    maximumAttendeeCapacity: input.capacityMax,
+    inLanguage: 'lt',
+    isAccessibleForFree: input.isFree,
+  }
+}

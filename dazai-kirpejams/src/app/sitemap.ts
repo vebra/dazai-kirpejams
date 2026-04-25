@@ -3,6 +3,7 @@ import { locales, defaultLocale } from '@/i18n/config'
 import { SITE_URL } from '@/lib/seo'
 import { getCategories, getProducts, getBlogPosts } from '@/lib/data/queries'
 import { AUTHORS } from '@/lib/data/authors'
+import { DAZU_PREZENTACIJA_2026, isEventPast } from '@/lib/events/config'
 
 /**
  * Statinių puslapių sąrašas — pathai BE lokalės prefikso.
@@ -111,11 +112,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     expandLocales(`/autorius/${a.slug}`, undefined, 'monthly', 0.5)
   )
 
+  // 6. Renginys — tik LT, rodom kol renginys neįvyko.
+  // Kiti lokaliai redirect'ina į /lt/renginys, tad į sitemap neįtraukiam.
+  const eventEntries: MetadataRoute.Sitemap = isEventPast(
+    DAZU_PREZENTACIJA_2026
+  )
+    ? []
+    : [
+        {
+          url: `${SITE_URL}/lt${DAZU_PREZENTACIJA_2026.path}`,
+          changeFrequency: 'daily',
+          priority: 0.9,
+        },
+      ]
+
   return [
     ...staticEntries,
     ...categoryEntries,
     ...productEntries,
     ...blogEntries,
     ...authorEntries,
+    ...eventEntries,
   ]
 }
