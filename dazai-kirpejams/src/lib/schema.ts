@@ -399,6 +399,46 @@ export function returnPolicySchema(): Record<string, unknown> {
 }
 
 /**
+ * AggregateRating prie Organization — naudojama homepage'e, kur klientų
+ * atsiliepimai yra matomi. Google reikalauja, kad reitingas būtų pagrįstas
+ * realiais atsiliepimais, pateiktais tame pačiame puslapyje (Review array).
+ *
+ * Įvedimas: kai pridedi naują atsiliepimą į testimonials.items dict'e,
+ * atnaujink šį skaičių rankiniu būdu (arba pakeisk į dinamišką iš dict'o).
+ */
+export function organizationAggregateRatingSchema(input: {
+  ratingValue: number
+  reviewCount: number
+  reviews: { author: string; reviewBody: string; rating?: number }[]
+}): Record<string, unknown> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': `${SITE_URL}/#organization`,
+    name: SITE_NAME,
+    url: SITE_URL,
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: String(input.ratingValue),
+      bestRating: '5',
+      worstRating: '1',
+      reviewCount: String(input.reviewCount),
+    },
+    review: input.reviews.map((r) => ({
+      '@type': 'Review',
+      author: { '@type': 'Person', name: r.author },
+      reviewBody: r.reviewBody,
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: String(r.rating ?? 5),
+        bestRating: '5',
+        worstRating: '1',
+      },
+    })),
+  }
+}
+
+/**
  * FAQPage schema — Question/Answer poros, kad Google galėtų rodyti
  * tiesioginius DUK atsakymus paieškos rezultatuose.
  * Atsakymo tekstas turi būti TEKSTAS (be HTML tag'ų), bet ilgis OK.

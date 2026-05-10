@@ -3,7 +3,11 @@ export const revalidate = 60
 import { notFound } from 'next/navigation'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { JsonLd } from '@/components/seo/JsonLd'
-import { breadcrumbSchema, webPageSchema } from '@/lib/schema'
+import {
+  breadcrumbSchema,
+  organizationAggregateRatingSchema,
+  webPageSchema,
+} from '@/lib/schema'
 import { buildCanonicalUrl } from '@/lib/seo'
 import { Hero } from '@/components/home/Hero'
 import { TrustBar } from '@/components/home/TrustBar'
@@ -25,12 +29,32 @@ export default async function HomePage({ params }: PageProps<'/[lang]'>) {
 
   const dict = await getDictionary(lang)
 
+  // AggregateRating sudaroma iš realių atsiliepimų, kurie matomi puslapyje.
+  // Google reikalauja, kad reitingas atitiktų kontekstą — todėl ima review
+  // array iš to paties dict'o, kuris renderinasi <Testimonials> komponente.
+  type DictTestimonial = { quote: string; name: string }
+  const testimonials = (dict.testimonials.items as DictTestimonial[]) ?? []
+  const avg = testimonials.length > 0 ? 5 : 0
+  const aggregateRating =
+    testimonials.length > 0
+      ? organizationAggregateRatingSchema({
+          ratingValue: avg,
+          reviewCount: testimonials.length,
+          reviews: testimonials.map((t) => ({
+            author: t.name,
+            reviewBody: t.quote,
+            rating: 5,
+          })),
+        })
+      : null
+
   return (
     <>
       <JsonLd data={webPageSchema(lang)} />
       <JsonLd data={breadcrumbSchema([
         { name: dict.common.home, url: buildCanonicalUrl(lang, '/') },
       ])} />
+      {aggregateRating && <JsonLd data={aggregateRating} />}
       <Hero lang={lang} dict={dict} />
       <EventCountdownSection lang={lang} />
       <TrustBar dict={dict} />

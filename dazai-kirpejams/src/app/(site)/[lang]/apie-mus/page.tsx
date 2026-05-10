@@ -6,7 +6,8 @@ import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { buildPageMetadata, buildCanonicalUrl, SITE_URL } from '@/lib/seo'
 import { JsonLd } from '@/components/seo/JsonLd'
-import { breadcrumbSchema } from '@/lib/schema'
+import { breadcrumbSchema, personSchema } from '@/lib/schema'
+import { getAuthorBySlug } from '@/lib/data/authors'
 import { langPrefix } from '@/lib/utils'
 
 export const revalidate = 300
@@ -57,12 +58,34 @@ export default async function AboutPage({
   const heroImage =
     lang === 'en' ? '/about-us.webp' : lang === 'ru' ? '/o-nas.webp' : '/apie-mus-hero.webp'
 
+  // Person schema'ą Džiuljetai — E-E-A-T autoritetas Google'ui. URL nukreiptas
+  // į /autorius/dziuljeta-vebre (kanoninis Person profilis), bet renderinasi
+  // čia, kad /apie-mus puslapis turėtų aiškų asmens-organizacijos ryšį.
+  const dziuljeta = getAuthorBySlug('dziuljeta-vebre')
+  const personJsonLd = dziuljeta
+    ? personSchema({
+        url: buildCanonicalUrl(lang, '/autorius/dziuljeta-vebre'),
+        name: dziuljeta.name,
+        jobTitle: dziuljeta.jobTitle[lang],
+        description: dziuljeta.bio[lang].tagline,
+        imageUrl: dziuljeta.imagePath ?? undefined,
+        sameAs: dziuljeta.sameAs.length > 0 ? dziuljeta.sameAs : undefined,
+        knowsAbout: [
+          'Hair colouring',
+          'Color SHOCK',
+          'Professional hairdressing',
+          'Image design',
+        ],
+      })
+    : null
+
   return (
     <>
       <JsonLd data={breadcrumbSchema([
         { name: c.home, url: buildCanonicalUrl(lang, '/') },
         { name: t.badge, url: buildCanonicalUrl(lang, '/apie-mus') },
       ])} />
+      {personJsonLd && <JsonLd data={personJsonLd} />}
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>
