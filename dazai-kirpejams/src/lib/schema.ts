@@ -266,6 +266,7 @@ export function blogPostingSchema({
   url,
   imageUrl,
   datePublished,
+  dateModified,
   author,
   authorUrl,
 }: {
@@ -274,6 +275,8 @@ export function blogPostingSchema({
   url: string
   imageUrl?: string | null
   datePublished: string
+  /** Optional: jei undefined — fallback į datePublished. */
+  dateModified?: string | null
   author?: string | null
   authorUrl?: string | null
 }): Record<string, unknown> {
@@ -299,7 +302,7 @@ export function blogPostingSchema({
     url,
     image: imageUrl ? toAbsoluteUrl(imageUrl) : `${SITE_URL}/og-image.jpg`,
     datePublished,
-    dateModified: datePublished,
+    dateModified: dateModified ?? datePublished,
     author: authorNode,
     publisher: { '@id': `${SITE_URL}/#organization` },
     mainEntityOfPage: {

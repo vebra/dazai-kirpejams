@@ -404,6 +404,8 @@ export type BlogPost = {
   category: string | null
   publishedAt: string | null
   createdAt: string
+  /** Naudojama sitemap'e (lastmod) ir BlogPosting schema (dateModified). */
+  updatedAt: string | null
 }
 
 type Locale = 'lt' | 'en' | 'ru'
@@ -438,6 +440,7 @@ async function _getBlogPosts(lang: Locale = 'lt'): Promise<BlogPost[]> {
     category: r.category,
     publishedAt: r.published_at,
     createdAt: r.created_at,
+    updatedAt: r.updated_at ?? null,
   }))
 }
 
@@ -475,6 +478,7 @@ async function _getBlogPostBySlug(
     category: data.category,
     publishedAt: data.published_at,
     createdAt: data.created_at,
+    updatedAt: data.updated_at ?? null,
   }
 }
 

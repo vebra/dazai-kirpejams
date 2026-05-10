@@ -92,6 +92,7 @@ export default async function ArticlePage({
           url: postUrl,
           imageUrl: post.coverImageUrl,
           datePublished: post.publishedAt ?? post.createdAt,
+          dateModified: post.updatedAt ?? post.publishedAt ?? post.createdAt,
           author: post.author,
           authorUrl,
         })}

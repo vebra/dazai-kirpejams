@@ -100,10 +100,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return expandLocales(path, lastMod, 'weekly', 0.7)
   })
 
-  // 4. Blogo straipsnių puslapiai
+  // 4. Blogo straipsnių puslapiai — lastmod paimam iš `updated_at`, ne
+  // `published_at`. Taip Google sužino, kai redaguojam seną straipsnį
+  // (typo fix, naujas section, atnaujintas turinys) ir gauname recrawl.
   const blogPosts = await getBlogPosts()
   const blogEntries: MetadataRoute.Sitemap = blogPosts.flatMap((post) => {
-    const lastMod = post.publishedAt ? new Date(post.publishedAt) : undefined
+    const source = post.updatedAt ?? post.publishedAt
+    const lastMod = source ? new Date(source) : undefined
     return expandLocales(`/blogas/${post.slug}`, lastMod, 'monthly', 0.6)
   })
 
