@@ -96,6 +96,20 @@ const nextConfig: NextConfig = {
         destination: '/:lang/blogas/dazymo-technikos',
         permanent: true,
       },
+      // /produktai/visi nėra realus slug'as DB'e. Su globalNotFound + statiniu
+      // render'iu Next.js grąžina 200 + injektuoja noindex meta — gauname
+      // indexable URL'ą su noindex, kuris blogai signalizuoja Google'ui.
+      // „Visi" = visi produktai → redirect'inam į /produktai (tikras katalogas).
+      {
+        source: '/produktai/visi',
+        destination: '/produktai',
+        permanent: true,
+      },
+      {
+        source: '/:lang(en|ru)/produktai/visi',
+        destination: '/:lang/produktai',
+        permanent: true,
+      },
     ]
   },
   async headers() {
