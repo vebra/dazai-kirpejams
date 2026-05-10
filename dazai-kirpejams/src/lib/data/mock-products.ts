@@ -1,4 +1,5 @@
 import type { Product, Category } from '@/lib/types'
+import { dyeDescriptions } from './dye-descriptions'
 
 /**
  * Mock duomenys naudoti kol bus prijungta Supabase.
@@ -244,6 +245,17 @@ const hairDyes: Product[] = hairDyeColors.map((c, idx) => {
   const namePrefixLt = c.num ? `${c.num} Color SHOCK` : `Color SHOCK ${c.name_en}`
   const namePrefixEn = c.num ? `${c.num} Color SHOCK` : `Color SHOCK ${c.name_en}`
   const namePrefixRu = c.num ? `${c.num} Color SHOCK` : `Color SHOCK ${c.name_en}`
+
+  // Kiekvienas atspalvis turi unikalų aprašymą — jei map'e nėra, naudojam
+  // generinį fallback'ą (negali atsitikti dabar — visi 50 padengti).
+  const customDesc = dyeDescriptions[c.slug]
+  const descLt = customDesc?.lt
+    ?? `Profesionalus kreminės tekstūros plaukų dažas ${c.name_lt.toLowerCase()} atspalvio. Stabili formulė, ilgalaikis rezultatas, didelė 180 ml talpa.`
+  const descEn = customDesc?.en
+    ?? `Professional cream-textured hair dye in ${c.name_en.toLowerCase()} shade. Stable formula, long-lasting result, large 180 ml volume.`
+  const descRu = customDesc?.ru
+    ?? `Профессиональная кремовая краска для волос оттенка «${c.name_ru.toLowerCase()}». Стабильная формула, долговечный результат, большой объём 180 мл.`
+
   return makeProduct({
     id: `prod-dye-${idx + 1}`,
     slug: c.slug,
@@ -253,9 +265,9 @@ const hairDyes: Product[] = hairDyeColors.map((c, idx) => {
     name_lt: `${namePrefixLt} — ${c.name_lt}`,
     name_en: `${namePrefixEn} — ${c.name_en}`,
     name_ru: `${namePrefixRu} — ${c.name_ru}`,
-    description_lt: `Profesionalus kreminės tekstūros plaukų dažas ${c.name_lt.toLowerCase()} atspalvio. Stabili formulė, ilgalaikis rezultatas, didelė 180 ml talpa.`,
-    description_en: `Professional cream-textured hair dye in ${c.name_en.toLowerCase()} shade. Stable formula, long-lasting result, large 180 ml volume.`,
-    description_ru: `Профессиональная кремовая краска для волос оттенка «${c.name_ru.toLowerCase()}». Стабильная формула, долговечный результат, большой объём 180 мл.`,
+    description_lt: descLt,
+    description_en: descEn,
+    description_ru: descRu,
     ingredients_lt:
       'Aqua, Cetearyl Alcohol, Propylene Glycol, Ammonium Hydroxide, Fragrance, Ascorbic Acid.',
     ingredients_en:
