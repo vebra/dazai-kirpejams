@@ -4,7 +4,11 @@ import { createServerSupabase } from '@/lib/supabase/ssr'
 import { createServerClient as createServiceClient } from '@/lib/supabase/server'
 import { locales, type Locale, defaultLocale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
-import { sendEmail, getAdminNotificationEmail } from '@/lib/email/resend'
+import {
+  sendEmail,
+  getAdminNotificationEmail,
+  isResendConfigured,
+} from '@/lib/email/resend'
 import {
   buildWelcomeEmail,
   buildAdminRegistrationEmail,
@@ -118,45 +122,58 @@ export async function registerAction(
     process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
     'https://www.dazaikirpejams.lt'
 
-  const welcome = buildWelcomeEmail({
-    firstName,
-    lang,
-    siteUrl,
-  })
-  await sendEmail({
-    to: email,
-    subject: welcome.subject,
-    html: welcome.html,
-    text: welcome.text,
-  }).catch((err) => {
-    console.error('[register] welcome email failed:', err)
-  })
+  // Diagnostiniai logai — Vercel runtime'e matysim kur lūžis.
+  console.log('[register][diag] isResendConfigured =', isResendConfigured)
+  console.log('[register][diag] adminEmailEnv =', process.env.ADMIN_NOTIFICATION_EMAIL)
+  console.log('[register][diag] resendFromEnv =', process.env.RESEND_FROM)
+  console.log(
+    '[register][diag] resendApiKey prefix =',
+    process.env.RESEND_API_KEY?.slice(0, 5) ?? '(unset)'
+  )
 
-  const adminEmail = getAdminNotificationEmail() ?? FALLBACK_ADMIN_EMAIL
-  const adminMail = buildAdminRegistrationEmail({
-    firstName,
-    lastName,
-    email,
-    phone,
-    city: city || null,
-    businessType: businessType || null,
-    salonName: salonName || null,
-    companyCode: companyCode || null,
-    dailyDyesCount: dailyDyesCount || null,
-    verificationNotes: verificationNotes || null,
-    lang,
-    createdAt: new Date().toISOString(),
-    adminUrl: `${siteUrl}/admin/verifikacija`,
-  })
-  await sendEmail({
-    to: adminEmail,
-    subject: adminMail.subject,
-    html: adminMail.html,
-    text: adminMail.text,
-    replyTo: email,
-  }).catch((err) => {
-    console.error('[register] admin notification email failed:', err)
-  })
+  try {
+    const welcome = buildWelcomeEmail({ firstName, lang, siteUrl })
+    console.log('[register][diag] sending welcome to', email)
+    const welcomeRes = await sendEmail({
+      to: email,
+      subject: welcome.subject,
+      html: welcome.html,
+      text: welcome.text,
+    })
+    console.log('[register][diag] welcome result:', welcomeRes)
+  } catch (err) {
+    console.error('[register][diag] welcome email threw:', err)
+  }
+
+  try {
+    const adminEmail = getAdminNotificationEmail() ?? FALLBACK_ADMIN_EMAIL
+    const adminMail = buildAdminRegistrationEmail({
+      firstName,
+      lastName,
+      email,
+      phone,
+      city: city || null,
+      businessType: businessType || null,
+      salonName: salonName || null,
+      companyCode: companyCode || null,
+      dailyDyesCount: dailyDyesCount || null,
+      verificationNotes: verificationNotes || null,
+      lang,
+      createdAt: new Date().toISOString(),
+      adminUrl: `${siteUrl}/admin/verifikacija`,
+    })
+    console.log('[register][diag] sending admin to', adminEmail)
+    const adminRes = await sendEmail({
+      to: adminEmail,
+      subject: adminMail.subject,
+      html: adminMail.html,
+      text: adminMail.text,
+      replyTo: email,
+    })
+    console.log('[register][diag] admin result:', adminRes)
+  } catch (err) {
+    console.error('[register][diag] admin email threw:', err)
+  }
 
   return { success: true }
 }
