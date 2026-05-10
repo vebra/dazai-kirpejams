@@ -26,15 +26,29 @@ type RegisterFormDict = {
     lastNamePlaceholder: string
     phone: string
     phonePlaceholder: string
+    city: string
+    cityPlaceholder: string
   }
   business: {
     legend: string
     typeLabel: string
-    options: { hairdresser: string; salon: string; other: string }
+    options: {
+      hairdresser: string
+      colorist: string
+      salon_owner: string
+      student: string
+      other: string
+    }
     salonName: string
     salonNamePlaceholder: string
     companyCode: string
     companyCodePlaceholder: string
+    dailyDyes: string
+    dailyDyesPlaceholder: string
+    dailyDyesOpt1: string
+    dailyDyesOpt2: string
+    dailyDyesOpt3: string
+    dailyDyesOpt4: string
     notes: string
     notesPlaceholder: string
     noticeStrong: string
@@ -61,8 +75,16 @@ export function RegisterForm({
 
   useEffect(() => {
     if (state.success) {
+      // trackCompleteRegistration tipas siaurai apibrėžia tik 3 reikšmes —
+      // žemėlapis sumažina iki to set'o, kad analytics neraportuotų neaiškių.
+      const mapped: 'hairdresser' | 'salon' | 'other' =
+        businessType === 'salon_owner'
+          ? 'salon'
+          : businessType === 'hairdresser' || businessType === 'colorist'
+            ? 'hairdresser'
+            : 'other'
       trackCompleteRegistration({
-        businessType: businessType as 'hairdresser' | 'salon' | 'other',
+        businessType: mapped,
         locale: lang,
       })
     }
@@ -146,6 +168,12 @@ export function RegisterForm({
             type="tel"
             placeholder={dict.personal.phonePlaceholder}
           />
+          <Field
+            label={dict.personal.city}
+            name="city"
+            autoComplete="address-level2"
+            placeholder={dict.personal.cityPlaceholder}
+          />
         </div>
       </fieldset>
 
@@ -170,12 +198,14 @@ export function RegisterForm({
             className="w-full px-4 py-3 border border-brand-gray-50 rounded-xl text-sm focus:outline-none focus:border-brand-magenta transition-colors bg-white"
           >
             <option value="hairdresser">{dict.business.options.hairdresser}</option>
-            <option value="salon">{dict.business.options.salon}</option>
+            <option value="colorist">{dict.business.options.colorist}</option>
+            <option value="salon_owner">{dict.business.options.salon_owner}</option>
+            <option value="student">{dict.business.options.student}</option>
             <option value="other">{dict.business.options.other}</option>
           </select>
         </div>
 
-        {(businessType === 'salon' || businessType === 'other') && (
+        {(businessType === 'salon_owner' || businessType === 'other') && (
           <div className="grid sm:grid-cols-2 gap-4">
             <Field
               label={dict.business.salonName}
@@ -190,6 +220,27 @@ export function RegisterForm({
             />
           </div>
         )}
+
+        <div>
+          <label
+            htmlFor="daily_dyes_count"
+            className="block text-xs font-medium text-brand-gray-500 mb-1.5"
+          >
+            {dict.business.dailyDyes}
+          </label>
+          <select
+            id="daily_dyes_count"
+            name="daily_dyes_count"
+            defaultValue=""
+            className="w-full px-4 py-3 border border-brand-gray-50 rounded-xl text-sm focus:outline-none focus:border-brand-magenta transition-colors bg-white"
+          >
+            <option value="">{dict.business.dailyDyesPlaceholder}</option>
+            <option value="1-3">{dict.business.dailyDyesOpt1}</option>
+            <option value="4-7">{dict.business.dailyDyesOpt2}</option>
+            <option value="8-15">{dict.business.dailyDyesOpt3}</option>
+            <option value="16+">{dict.business.dailyDyesOpt4}</option>
+          </select>
+        </div>
 
         <div>
           <label

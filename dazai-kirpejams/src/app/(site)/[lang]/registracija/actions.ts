@@ -4,11 +4,27 @@ import { createServerSupabase } from '@/lib/supabase/ssr'
 import { createServerClient as createServiceClient } from '@/lib/supabase/server'
 import { locales, type Locale, defaultLocale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
+import { sendEmail, getAdminNotificationEmail } from '@/lib/email/resend'
+import {
+  buildWelcomeEmail,
+  buildAdminRegistrationEmail,
+} from '@/lib/email/auth-templates'
 
 export type RegisterState = {
   error?: string
   success?: boolean
 }
+
+const FALLBACK_ADMIN_EMAIL = 'info@dziuljetavebre.lt'
+
+const ALLOWED_BUSINESS_TYPES = [
+  'hairdresser',
+  'colorist',
+  'salon_owner',
+  'salon', // legacy reikšmė — paliekame, kad seni linkai/forma neatmestų
+  'student',
+  'other',
+] as const
 
 function resolveLang(raw: FormDataEntryValue | null): Locale {
   if (typeof raw === 'string' && (locales as readonly string[]).includes(raw)) {
@@ -26,9 +42,11 @@ export async function registerAction(
   const firstName = ((formData.get('first_name') as string) ?? '').trim()
   const lastName = ((formData.get('last_name') as string) ?? '').trim()
   const phone = ((formData.get('phone') as string) ?? '').trim()
+  const city = ((formData.get('city') as string) ?? '').trim()
   const businessType = ((formData.get('business_type') as string) ?? '').trim()
   const salonName = ((formData.get('salon_name') as string) ?? '').trim()
   const companyCode = ((formData.get('company_code') as string) ?? '').trim()
+  const dailyDyesCount = ((formData.get('daily_dyes_count') as string) ?? '').trim()
   const verificationNotes = (
     (formData.get('verification_notes') as string) ?? ''
   ).trim()
@@ -47,7 +65,10 @@ export async function registerAction(
   if (!lastName) {
     return { error: errors.lastNameRequired }
   }
-  if (!businessType || !['hairdresser', 'salon', 'other'].includes(businessType)) {
+  if (
+    !businessType ||
+    !(ALLOWED_BUSINESS_TYPES as readonly string[]).includes(businessType)
+  ) {
     return { error: errors.businessTypeRequired }
   }
 
@@ -78,9 +99,11 @@ export async function registerAction(
       first_name: firstName,
       last_name: lastName,
       phone,
+      city: city || null,
       business_type: businessType,
       salon_name: salonName || null,
       company_code: companyCode || null,
+      daily_dyes_count: dailyDyesCount || null,
       verification_notes: verificationNotes || null,
       verification_status: 'pending',
     })
@@ -88,6 +111,52 @@ export async function registerAction(
   if (profileError) {
     console.error('[register] profile insert error:', profileError.message)
   }
+
+  // Email'ai — defensyvūs. Jei Resend nesukonfigūruotas arba lūžta —
+  // registracijos srautas nesugriūna, tik konsolėj warning'as.
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
+    'https://www.dazaikirpejams.lt'
+
+  const welcome = buildWelcomeEmail({
+    firstName,
+    lang,
+    siteUrl,
+  })
+  await sendEmail({
+    to: email,
+    subject: welcome.subject,
+    html: welcome.html,
+    text: welcome.text,
+  }).catch((err) => {
+    console.error('[register] welcome email failed:', err)
+  })
+
+  const adminEmail = getAdminNotificationEmail() ?? FALLBACK_ADMIN_EMAIL
+  const adminMail = buildAdminRegistrationEmail({
+    firstName,
+    lastName,
+    email,
+    phone,
+    city: city || null,
+    businessType: businessType || null,
+    salonName: salonName || null,
+    companyCode: companyCode || null,
+    dailyDyesCount: dailyDyesCount || null,
+    verificationNotes: verificationNotes || null,
+    lang,
+    createdAt: new Date().toISOString(),
+    adminUrl: `${siteUrl}/admin/verifikacija`,
+  })
+  await sendEmail({
+    to: adminEmail,
+    subject: adminMail.subject,
+    html: adminMail.html,
+    text: adminMail.text,
+    replyTo: email,
+  }).catch((err) => {
+    console.error('[register] admin notification email failed:', err)
+  })
 
   return { success: true }
 }
