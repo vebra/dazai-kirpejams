@@ -31,6 +31,13 @@ export async function Hero({ lang, dict }: HeroProps) {
     ? `${langPrefix(lang)}${banner.ctaSecondaryUrl}`
     : `${langPrefix(lang)}/salonams`
 
+  const heroImageSrc =
+    lang === 'en'
+      ? '/hero-180ml-en.jpg'
+      : lang === 'ru'
+        ? '/hero-180ml-ru.jpg'
+        : '/hero-180ml.jpg'
+
   return (
     <section className="relative overflow-hidden bg-[linear-gradient(135deg,#ffffff_0%,#f5f5f7_100%)] py-10 lg:py-20">
       <Container>
@@ -93,8 +100,8 @@ export async function Hero({ lang, dict }: HeroProps) {
           <div className="relative flex flex-col items-center">
             <div className="relative w-full max-w-[280px] sm:max-w-[420px] lg:max-w-[480px] aspect-[3/4] rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.2)]">
               <Image
-                src="/hero-180ml.jpg"
-                alt="Color SHOCK 180 ml profesionalūs plaukų dažai"
+                src={heroImageSrc}
+                alt="Color SHOCK 180 ml"
                 fill
                 sizes="(max-width: 768px) 280px, (max-width: 1024px) 420px, 480px"
                 className="object-cover"
