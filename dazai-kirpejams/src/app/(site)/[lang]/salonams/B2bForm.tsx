@@ -68,8 +68,21 @@ export function B2bForm({ lang, labels }: { lang: Locale; labels: B2bLabels }) {
   return (
     <form action={formAction} className="space-y-5">
       <input type="hidden" name="locale" value={lang} />
-      {/* Honeypot — paslėptas nuo vartotojų, matomas bot'ams */}
-      <div aria-hidden="true" className="absolute -left-[9999px] w-px h-px overflow-hidden">
+      {/* Honeypot — paslėptas nuo vartotojų, matomas bot'ams.
+          Naudojam inline style, nes Tailwind absolute + arbitrary value
+          kai kuriose browser/extension situacijose nesuveikia ir laukas
+          tampa matomas vartotojui. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          left: '-9999px',
+          width: '1px',
+          height: '1px',
+          overflow: 'hidden',
+          clip: 'rect(0 0 0 0)',
+        }}
+      >
         <label>
           Website
           <input

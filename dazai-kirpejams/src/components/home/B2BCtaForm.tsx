@@ -66,9 +66,17 @@ export function B2BCtaForm({
       </h3>
       <form action={formAction} className="space-y-4">
         <input type="hidden" name="locale" value={lang} />
+        {/* Honeypot — inline style užtikrina hide net kai Tailwind nesuveikia */}
         <div
           aria-hidden="true"
-          className="absolute -left-[9999px] w-px h-px overflow-hidden"
+          style={{
+            position: 'absolute',
+            left: '-9999px',
+            width: '1px',
+            height: '1px',
+            overflow: 'hidden',
+            clip: 'rect(0 0 0 0)',
+          }}
         >
           <label>
             Website

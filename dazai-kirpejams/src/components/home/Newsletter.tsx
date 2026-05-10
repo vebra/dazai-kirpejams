@@ -67,10 +67,17 @@ export function Newsletter({
               className="flex flex-col sm:flex-row gap-3 w-full md:w-auto flex-shrink-0"
             >
               <input type="hidden" name="locale" value={lang} />
-              {/* Honeypot — paslėptas nuo vartotojų, matomas bot'ams */}
+              {/* Honeypot — inline style užtikrina hide net kai Tailwind nesuveikia */}
               <div
                 aria-hidden="true"
-                className="absolute -left-[9999px] w-px h-px overflow-hidden"
+                style={{
+                  position: 'absolute',
+                  left: '-9999px',
+                  width: '1px',
+                  height: '1px',
+                  overflow: 'hidden',
+                  clip: 'rect(0 0 0 0)',
+                }}
               >
                 <label>
                   Website
