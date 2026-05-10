@@ -37,8 +37,11 @@ test.describe('Auth flow — login + verification + logout', () => {
     await page.goto('/lt/produktai')
     await page.waitForLoadState('networkidle')
 
-    // Approved user neturi matyti "Prisijungti, kad matytum" CTA
-    const loginCta = page.getByText(/prisijungti.*kainai|prisijungti.*kainas/i)
+    // Approved user neturi matyti login CTA (CTA žodynas pakeistas į
+    // „Registruotis nemokamai — matysite kainas"; match'inam abu variantus).
+    const loginCta = page.getByText(
+      /(registruotis|prisijungti).*kain/i
+    )
     await expect(loginCta).toHaveCount(0)
 
     // 6. Logout

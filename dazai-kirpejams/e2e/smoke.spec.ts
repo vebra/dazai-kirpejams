@@ -69,14 +69,20 @@ test.describe('Smoke — products page', () => {
 })
 
 test.describe('Smoke — pricing gate (anonymous)', () => {
-  test('anonymous user sees "Prisijungti dėl kainos" on product cards', async ({
+  test('anonymous user sees register/login CTA on product cards (no prices)', async ({
     page,
   }) => {
     await page.goto('/produktai')
 
-    // Visi produktų kortelės turi rodyti login CTA, ne kainą
+    // CTA žodynas keitėsi (anksčiau „Prisijungti dėl kainos", dabar
+    // „Registruotis nemokamai — matysite kainas"). Match'inam abu —
+    // bendras vardiklis: žodis „kainas/kainai/kainos" CTA tekste.
     await expect(
-      page.getByRole('link', { name: /prisijungti dėl kainos/i }).first()
+      page
+        .getByRole('link', {
+          name: /(registruotis|prisijungti).*kain/i,
+        })
+        .first()
     ).toBeVisible({ timeout: 10_000 })
 
     // Sanity: neturi būti realios kainos (€) listing'e neprisijungus
@@ -84,12 +90,14 @@ test.describe('Smoke — pricing gate (anonymous)', () => {
     await expect(euroPrice).toHaveCount(0)
   })
 
-  test('anonymous user on product detail page sees login CTA, not price', async ({
+  test('anonymous user on product detail page sees register/login CTA, not price', async ({
     page,
   }) => {
     await page.goto('/produktai/dazai/color-shock-4-23')
 
-    await expect(page.getByText(/prisijungti/i).first()).toBeVisible({
+    await expect(
+      page.getByText(/registruotis|prisijungti/i).first()
+    ).toBeVisible({
       timeout: 10_000,
     })
   })
