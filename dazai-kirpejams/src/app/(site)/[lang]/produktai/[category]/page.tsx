@@ -36,7 +36,8 @@ export async function generateMetadata({
   const dict = await getDictionary(lang)
   const c = dict.common
 
-  const title = `${name} ${c.seoCategoryAudienceSuffix} | ${c.seoBrandSuffix}`
+  // Brand suffix prideda parent layout'o `title.template`.
+  const title = `${name} ${c.seoCategoryAudienceSuffix}`
 
   return {
     title,

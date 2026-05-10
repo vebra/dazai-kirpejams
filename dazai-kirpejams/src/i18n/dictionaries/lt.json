@@ -445,7 +445,7 @@
     "seoProductDescFallback": "{name} — profesionalūs kirpėjų produktai. Dažai Kirpėjams: plaukų dažai, oksidantai ir priežiūros priemonės salonams."
   },
   "aboutPage": {
-    "metaTitle": "Apie mus — Dažai Kirpėjams",
+    "metaTitle": "Apie mus",
     "metaDesc": "Aprūpiname Lietuvos kirpėjus ir salonus profesionaliais darbo įrankiais. Mūsų misija — kokybiški, ekonomiški dažai 180 ml talpoje.",
     "badge": "Apie mus",
     "title": "Mes aprūpiname kirpėjus darbo įrankiais, kuriais galima",
@@ -521,7 +521,7 @@
     }
   },
   "contactPage": {
-    "metaTitle": "Kontaktai — Dažai Kirpėjams",
+    "metaTitle": "Kontaktai",
     "metaDesc": "Susisiekite su mumis dėl produktų, B2B pasiūlymų ar bet kokių klausimų. El. paštas, telefonas, kontaktų forma.",
     "badge": "Kontaktai",
     "title": "Susisiekite su mumis",
@@ -1253,7 +1253,7 @@
     }
   },
   "colorPalettePage": {
-    "metaTitle": "Color SHOCK spalvų paletė — 50 atspalvių, 180 ml | Dažai Kirpėjams",
+    "metaTitle": "Color SHOCK spalvų paletė — 50 atspalvių, 180 ml",
     "metaDesc": "Color SHOCK profesionalių plaukų dažų spalvų paletė. 50+ atspalvių 180 ml pakuotėse. Filtruokite pagal šeimą ar ieškokite pagal numerį.",
     "searchPlaceholder": "Ieškoti pagal spalvos numerį arba pavadinimą...",
     "filterAll": "Visi",

@@ -38,7 +38,8 @@ export async function generateMetadata({
   return buildPageMetadata({
     lang,
     path: `/autorius/${slug}`,
-    title: `${author.name} — ${jobTitle} | Dažai Kirpėjams`,
+    // Brand suffix prideda parent layout'o `title.template`.
+    title: `${author.name} — ${jobTitle}`,
     description: bio.tagline,
   })
 }

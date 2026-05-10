@@ -48,7 +48,9 @@ export async function generateMetadata({
   const volumePart = product.volume_ml
     ? `, ${product.volume_ml} ${c.seoVolumeMl}`
     : ''
-  const title = `${name}${volumePart} — ${categoryName} | ${c.seoBrandSuffix}`
+  // Brand suffix prideda parent layout'o `title.template` — jei pridėtume jį
+  // čia, gausim „X | Dažai Kirpėjams | Dažai Kirpėjams".
+  const title = `${name}${volumePart} — ${categoryName}`
   const fallbackDesc = c.seoProductDescFallback.replace('{name}', name)
   const metaDescription = description || fallbackDesc
 

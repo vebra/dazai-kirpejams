@@ -445,7 +445,7 @@
     "seoProductDescFallback": "{name} — professional products for hairdressers. Dažai Kirpėjams: hair dyes, oxidants and care products for salons."
   },
   "aboutPage": {
-    "metaTitle": "About Us — Dažai Kirpėjams",
+    "metaTitle": "About Us",
     "metaDesc": "We supply Lithuanian hairdressers and salons with professional work tools. Our mission — high-quality, economical dyes in 180 ml packaging.",
     "badge": "About Us",
     "title": "We supply hairdressers with work tools they can",
@@ -521,7 +521,7 @@
     }
   },
   "contactPage": {
-    "metaTitle": "Contact — Dažai Kirpėjams",
+    "metaTitle": "Contact",
     "metaDesc": "Contact us regarding products, B2B offers or any questions. Email, phone, contact form.",
     "badge": "Contact",
     "title": "Get in Touch",
@@ -1253,7 +1253,7 @@
     }
   },
   "colorPalettePage": {
-    "metaTitle": "Color SHOCK palette — 50 shades, 180 ml | Dažai Kirpėjams",
+    "metaTitle": "Color SHOCK palette — 50 shades, 180 ml",
     "metaDesc": "Color SHOCK professional hair dye palette. 50+ shades in 180 ml packaging. Filter by family or search by number.",
     "searchPlaceholder": "Search by colour number or name...",
     "filterAll": "All",

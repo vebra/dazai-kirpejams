@@ -40,7 +40,8 @@ export async function generateMetadata({
   return buildPageMetadata({
     lang,
     path: `/blogas/${slug}`,
-    title: `${post.title} | Dažai Kirpėjams`,
+    // Brand suffix prideda parent layout'o `title.template`.
+    title: post.title,
     description: post.excerpt ?? '',
   })
 }
