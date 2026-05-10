@@ -486,6 +486,40 @@ export const getBlogPostBySlug = (slug: string, lang: Locale = 'lt') =>
   )()
 
 // ============================================
+// RENGINIO VIETOS (public count)
+// ============================================
+
+/**
+ * Viešas registracijų skaičius renginiui. Naudoja service role
+ * (event_registrations RLS uždaro anon), bet grąžina TIK skaičių — ne
+ * eilučies, ne PII. Cache'uojam 60s, kad spam'as dashboard'ą nenuždautų.
+ */
+async function _getEventSpotsTaken(eventSlug: string): Promise<number> {
+  try {
+    const { createServerClient } = await import('@/lib/supabase/server')
+    const supabase = createServerClient()
+    const { count, error } = await supabase
+      .from('event_registrations')
+      .select('*', { count: 'exact', head: true })
+      .eq('event_slug', eventSlug)
+    if (error) {
+      console.error('[queries.getEventSpotsTaken]', error.message)
+      return 0
+    }
+    return count ?? 0
+  } catch {
+    return 0
+  }
+}
+
+export const getEventSpotsTaken = (eventSlug: string) =>
+  unstable_cache(
+    () => _getEventSpotsTaken(eventSlug),
+    ['event-spots', eventSlug],
+    { revalidate: 60, tags: ['event-spots', `event-spots:${eventSlug}`] }
+  )()
+
+// ============================================
 // Info helper'is — ar DB prijungta
 // ============================================
 

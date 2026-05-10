@@ -27,14 +27,24 @@
     "closeMenu": "Close menu"
   },
   "hero": {
-    "title": "Professional hair dyes for hairdressers",
+    "title": "Professional dyes — for licensed hairdressers and salons in Lithuania only",
     "subtitle": "Larger 180 ml capacity. More value for salon work.",
-    "cta": "Browse products",
-    "ctaSecondary": "Get a salon offer",
-    "badgeFallback": "Color SHOCK — 50 shades to choose from",
-    "titleMain": "Professional hair dyes",
-    "titleAccent": "for hairdressers",
-    "subtitleSuffix": "A professional formula, a wide colour palette and an economical price — everything your salon needs."
+    "cta": "Register for free",
+    "ctaSecondary": "For salons",
+    "badgeFallback": "Color SHOCK · Choice of professionals",
+    "titleStart": "Professional dyes —",
+    "titleAccent": "for licensed",
+    "titleEnd": "hairdressers and salons in Lithuania",
+    "subheader": "Color SHOCK — a palette validated by Džiuljeta Vėbrė, a colourist with 30 years of experience.",
+    "priceNote": "From €7.90 for 180 ml — for verified professional accounts only",
+    "trust1": "30+ salons in Lithuania",
+    "trust2": "50+ Color SHOCK shades",
+    "trust3": "Delivery in 1–3 business days",
+    "trust4": "Recommended by Džiuljeta Vėbrė",
+    "compareLabelOurs": "180 ml — our pack",
+    "compareLabelStd": "60 ml — standard",
+    "compareBadge": "3× more product",
+    "subtitleSuffix": ""
   },
   "trust": {
     "volume": "180 ml Volume",
