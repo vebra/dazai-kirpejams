@@ -13,6 +13,7 @@ import {
 import { getCategoryName, getCategoryDescription } from '@/lib/types'
 import { Container } from '@/components/ui/Container'
 import { CategoryProductsView } from '@/components/products/CategoryProductsView'
+import { CategorySeoContent } from '@/components/products/CategorySeoContent'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { itemListSchema, breadcrumbSchema } from '@/lib/schema'
 import { buildCanonicalUrl, buildLanguageAlternates } from '@/lib/seo'
@@ -229,6 +230,9 @@ export default async function CategoryPage({
           </Container>
         </section>
       )}
+
+      {/* SEO content — 400+ žodžių per kategoriją (LT/EN/RU) */}
+      <CategorySeoContent categorySlug={categorySlug} lang={lang} />
 
       {/* Final CTA */}
       <section className="py-20 bg-white text-center">
