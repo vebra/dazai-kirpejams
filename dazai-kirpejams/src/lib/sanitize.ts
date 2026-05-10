@@ -35,5 +35,12 @@ export function sanitizeHtml(dirty: string): string {
     allowedSchemesByTag: {
       img: ['http', 'https', 'data'],
     },
+    transformTags: {
+      // Body content niekad neturi turėti H1 — page template'as renderinasi
+      // savo H1 viršuje (post.title). Demote'inam autorių parašytą H1 → H2,
+      // kad puslapis turėtų vienintelį H1. Veikia ant esamų ir būsimų postų
+      // be DB migracijos.
+      h1: 'h2',
+    },
   })
 }
