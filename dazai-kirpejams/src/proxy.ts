@@ -90,6 +90,18 @@ export async function proxy(request: NextRequest) {
   // Praleisti statinius failus iš /public
   if (/\.[a-zA-Z0-9]+$/.test(pathname)) return
 
+  // Lowercase redirect — uppercase URL'ai (pvz. /Produktai, /PRODUKTAI)
+  // grąžindavo HTTP 200 ir kūrė duplicate content kanonui /produktai. Visi
+  // realūs route'ai ir slug'ai šitam projekte yra lowercase, todėl saugu
+  // redirect'inti BET KOKIĄ uppercase raidę URL'e. _next/data ir kitos
+  // sisteminės route'os jau filtruotos per matcher'į, bet pridedam papildomą
+  // saugiklį, kad nieko nesugadintume.
+  if (/[A-Z]/.test(pathname) && !pathname.startsWith('/_next/')) {
+    const url = request.nextUrl.clone()
+    url.pathname = pathname.toLowerCase()
+    return NextResponse.redirect(url, 301)
+  }
+
   // Pradinis response — į jį @supabase/ssr rašo atnaujintus cookie'ius.
   // Kiekvienas žemiau grąžinamas redirect/rewrite turi šiuos cookie'ius
   // perkelti per `copyCookies`.
