@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Container } from '@/components/ui/Container'
 import { getActiveBanners, type Banner } from '@/lib/data/queries'
 import type { Locale } from '@/i18n/config'
@@ -88,48 +89,20 @@ export async function Hero({ lang, dict }: HeroProps) {
             </div>
           </div>
 
-          {/* DEŠINĖ — 180 ml vs 60 ml palyginimas */}
-          <div className="relative flex flex-col items-center justify-center">
-            <div className="relative flex items-end gap-6 sm:gap-10">
-              {/* 180 ml — mūsų */}
-              <div className="flex flex-col items-center">
-                <div className="w-[10px] h-[22px] bg-brand-gray-900 rounded-t-sm" />
-                <div className="w-[12px] h-[8px] bg-brand-gray-900" />
-                <div className="relative w-[120px] sm:w-[140px] h-[280px] sm:h-[320px] bg-brand-gray-900 rounded-b-2xl rounded-t-md flex flex-col items-center justify-center text-white shadow-[0_8px_32px_rgba(0,0,0,0.18)] overflow-hidden">
-                  <div className="absolute top-0 left-0 right-0 h-[14%] bg-white/[0.05] border-b border-white/10" />
-                  <div className="absolute inset-x-0 top-1/4 bottom-1/4 bg-brand-magenta flex flex-col items-center justify-center px-3 text-center">
-                    <div className="text-[0.6rem] sm:text-[0.65rem] font-bold uppercase tracking-[2px] mb-0.5">
-                      Color
-                    </div>
-                    <div className="text-[0.85rem] sm:text-[0.95rem] font-extrabold tracking-wider">
-                      SHOCK
-                    </div>
-                    <div className="mt-2 px-2 py-0.5 bg-white text-brand-magenta text-[0.7rem] sm:text-[0.78rem] font-extrabold rounded-full">
-                      180 ml
-                    </div>
-                  </div>
-                </div>
-                <div className="text-center mt-4 text-[0.85rem] sm:text-[0.92rem] font-bold text-brand-gray-900">
-                  {hero.compareLabelOurs}
-                </div>
-              </div>
-
-              {/* 60 ml — standartinė */}
-              <div className="flex flex-col items-center">
-                <div className="w-[7px] h-[14px] bg-brand-gray-500 rounded-t-sm" />
-                <div className="w-[8px] h-[5px] bg-brand-gray-500" />
-                <div className="relative w-[60px] sm:w-[70px] h-[100px] sm:h-[115px] bg-brand-gray-500 rounded-b-xl rounded-t-md flex items-center justify-center text-white shadow-[0_4px_18px_rgba(0,0,0,0.12)]">
-                  <div className="px-2 py-0.5 bg-white text-brand-gray-700 text-[0.6rem] sm:text-[0.65rem] font-bold rounded-full">
-                    60 ml
-                  </div>
-                </div>
-                <div className="text-center mt-4 text-[0.78rem] sm:text-[0.85rem] text-brand-gray-500">
-                  {hero.compareLabelStd}
-                </div>
-              </div>
+          {/* DEŠINĖ — 180 ml produkto nuotrauka */}
+          <div className="relative flex flex-col items-center">
+            <div className="relative w-full max-w-[280px] sm:max-w-[420px] lg:max-w-[480px] aspect-[3/4] rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.2)]">
+              <Image
+                src="/hero-180ml.jpg"
+                alt="Color SHOCK 180 ml profesionalūs plaukų dažai"
+                fill
+                sizes="(max-width: 768px) 280px, (max-width: 1024px) 420px, 480px"
+                className="object-cover"
+                priority
+              />
             </div>
 
-            <div className="mt-7 inline-flex items-center gap-2 px-5 py-2.5 bg-brand-magenta/10 border border-brand-magenta/25 text-brand-magenta rounded-full text-[0.88rem] font-bold">
+            <div className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-brand-magenta/10 border border-brand-magenta/25 text-brand-magenta rounded-full text-[0.88rem] font-bold">
               <span aria-hidden>↑</span> {hero.compareBadge}
             </div>
           </div>
