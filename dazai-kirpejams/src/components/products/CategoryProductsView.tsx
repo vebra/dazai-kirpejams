@@ -64,10 +64,16 @@ export function CategoryProductsView({
   const defaultSort = isDazai ? 'number' : 'popular'
   const sortBy = searchParams.get('sort') || defaultSort
   const groupParam = searchParams.get('group') || undefined
+  const toneParam = searchParams.get('tone') || undefined
+
+  const filteredByTone = useMemo(() => {
+    if (!toneParam || toneParam === 'all') return products
+    return products.filter((p) => p.color_tone === toneParam)
+  }, [products, toneParam])
 
   const sortedProducts = useMemo(
-    () => sortProducts(products, sortBy, lang),
-    [products, sortBy, lang]
+    () => sortProducts(filteredByTone, sortBy, lang),
+    [filteredByTone, sortBy, lang]
   )
 
   const groupedByDyeCategory = useMemo(() => {
@@ -105,6 +111,7 @@ export function CategoryProductsView({
         <Container>
           <CategoryFiltersBar
             showGroupFilter={showColorFilters}
+            showToneFilter={showColorFilters}
             totalCount={visibleCount}
             allGroupsCount={DYE_PALETTE_TARGET_COUNT}
             groupOptions={groupOptions}
@@ -117,6 +124,11 @@ export function CategoryProductsView({
               sortByNumber: dict.categoryPage.sortByNumber,
               sortByName: dict.categoryPage.sortByName,
               sortByPopular: dict.categoryPage.sortByPopular,
+              toneLabel: dict.categoryPage.filterToneLabel,
+              toneAll: dict.categoryPage.filterToneAll,
+              toneWarm: dict.categoryPage.filterToneWarm,
+              toneCool: dict.categoryPage.filterToneCool,
+              toneNeutral: dict.categoryPage.filterToneNeutral,
             }}
           />
         </Container>

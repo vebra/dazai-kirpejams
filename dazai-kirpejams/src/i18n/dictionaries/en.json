@@ -195,7 +195,7 @@
     "addToCart": "Add to Cart",
     "added": "Added",
     "viewAll": "View All",
-    "loginForPrice": "Log in to see price",
+    "loginForPrice": "Register for free — to see prices",
     "accountPending": "Account under review",
     "accountRejected": "Upload document"
   },
@@ -1098,9 +1098,17 @@
     "filterSortLabel": "Sort:",
     "filterAllColors": "All colours",
     "filterShowingCount": "Showing: {count} products",
+    "filterToneLabel": "Tone:",
+    "filterToneAll": "All tones",
+    "filterToneWarm": "Warm",
+    "filterToneCool": "Cool",
+    "filterToneNeutral": "Natural",
     "sortByNumber": "By number",
     "sortByName": "By name",
-    "sortByPopular": "Most popular"
+    "sortByPopular": "Most popular",
+    "toneBadgeWarm": "Warm",
+    "toneBadgeCool": "Cool",
+    "toneBadgeNeutral": "Natural"
   },
   "loginPage": {
     "metaTitle": "Sign in",

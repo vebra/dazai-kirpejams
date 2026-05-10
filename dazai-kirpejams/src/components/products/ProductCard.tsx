@@ -35,6 +35,16 @@ export function ProductCard({
   const accountPending = p.accountPending
   const accountRejected = p.accountRejected
 
+  const cp = dict.categoryPage
+  const toneBadge =
+    product.color_tone === 'šilta'
+      ? { label: cp?.toneBadgeWarm ?? 'Šiltas', cls: 'bg-amber-50 text-amber-700 border border-amber-200' }
+      : product.color_tone === 'šalta'
+        ? { label: cp?.toneBadgeCool ?? 'Šaltas', cls: 'bg-sky-50 text-sky-700 border border-sky-200' }
+        : product.color_tone === 'neutrali'
+          ? { label: cp?.toneBadgeNeutral ?? 'Natūralus', cls: 'bg-brand-gray-50 text-brand-gray-700 border border-[#E0E0E0]' }
+          : null
+
   let ctaHref = `${langPrefix(lang)}/prisijungimas`
   let ctaLabel = loginForPrice
   let ctaClassName =
@@ -95,13 +105,22 @@ export function ProductCard({
           </h3>
         </Link>
         {product.color_name && (
-          <div className="text-[0.82rem] text-brand-gray-500 mb-3 line-clamp-1">
+          <div className="text-[0.82rem] text-brand-gray-500 mb-2 line-clamp-1">
             {product.color_name}
           </div>
         )}
         {!product.color_name && product.volume_ml && (
-          <div className="text-[0.82rem] text-brand-gray-500 mb-3">
+          <div className="text-[0.82rem] text-brand-gray-500 mb-2">
             {product.volume_ml} ml
+          </div>
+        )}
+        {toneBadge && (
+          <div className="mb-3">
+            <span
+              className={`inline-block px-2 py-0.5 rounded-full text-[0.7rem] font-semibold ${toneBadge.cls}`}
+            >
+              {toneBadge.label}
+            </span>
           </div>
         )}
 

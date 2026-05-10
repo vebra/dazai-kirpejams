@@ -195,7 +195,7 @@
     "addToCart": "В корзину",
     "added": "Добавлено",
     "viewAll": "Смотреть все",
-    "loginForPrice": "Войдите, чтобы увидеть цену",
+    "loginForPrice": "Бесплатная регистрация — чтобы увидеть цены",
     "accountPending": "Аккаунт на проверке",
     "accountRejected": "Загрузить документ"
   },
@@ -1098,9 +1098,17 @@
     "filterSortLabel": "Сортировать:",
     "filterAllColors": "Все цвета",
     "filterShowingCount": "Показано: {count} товаров",
+    "filterToneLabel": "Тон:",
+    "filterToneAll": "Все тона",
+    "filterToneWarm": "Тёплые",
+    "filterToneCool": "Холодные",
+    "filterToneNeutral": "Натуральные",
     "sortByNumber": "По номеру",
     "sortByName": "По названию",
-    "sortByPopular": "Популярные"
+    "sortByPopular": "Популярные",
+    "toneBadgeWarm": "Тёплый",
+    "toneBadgeCool": "Холодный",
+    "toneBadgeNeutral": "Натуральный"
   },
   "loginPage": {
     "metaTitle": "Вход",

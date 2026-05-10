@@ -195,7 +195,7 @@
     "addToCart": "Į krepšelį",
     "added": "Pridėta",
     "viewAll": "Peržiūrėti visus",
-    "loginForPrice": "Prisijungti dėl kainos",
+    "loginForPrice": "Registruotis nemokamai — matysite kainas",
     "accountPending": "Paskyra peržiūrima",
     "accountRejected": "Įkelti dokumentą"
   },
@@ -1098,9 +1098,17 @@
     "filterSortLabel": "Rūšiuoti:",
     "filterAllColors": "Visos spalvos",
     "filterShowingCount": "Rodomi: {count} produktai",
+    "filterToneLabel": "Tonas:",
+    "filterToneAll": "Visi tonai",
+    "filterToneWarm": "Šilti",
+    "filterToneCool": "Šalti",
+    "filterToneNeutral": "Natūralūs",
     "sortByNumber": "Pagal numerį",
     "sortByName": "Pagal pavadinimą",
-    "sortByPopular": "Populiariausi"
+    "sortByPopular": "Populiariausi",
+    "toneBadgeWarm": "Šiltas",
+    "toneBadgeCool": "Šaltas",
+    "toneBadgeNeutral": "Natūralus"
   },
   "loginPage": {
     "metaTitle": "Prisijungimas",
