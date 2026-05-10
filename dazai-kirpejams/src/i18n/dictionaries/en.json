@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Dažai Kirpėjams — Professional Hair Dyes for Hairdressers",
-    "description": "Professional hair dyes and products for hairdressers, colourists and beauty salons. 180 ml volume — more value for salon work."
+    "title": "Dažai Kirpėjams — Color SHOCK 180 ml hair dyes for professionals",
+    "description": "Color SHOCK 180 ml hair dyes for hairdressers in Lithuania. 50+ shades, professional formula, B2B pricing for salons. Licensed professionals only."
   },
   "nav": {
     "home": "Home",
@@ -242,6 +242,18 @@
         "desc": "For those working every day who value a reliable result, quality and a smart price-to-value ratio."
       }
     ]
+  },
+  "miniCalculator": {
+    "badge": "Quick calculator",
+    "title": "How much can you save with the 180 ml pack?",
+    "subtitle": "Enter how many colourings you do per month — see the real savings versus a standard 60 ml pack.",
+    "inputLabel": "Colourings per month",
+    "inputSuffix": "colourings",
+    "resultLabel": "Your savings",
+    "perMonth": "per month",
+    "perYear": "per year",
+    "cta": "Buy now",
+    "fullCta": "Full calculator"
   },
   "testimonials": {
     "badge": "Testimonials",
@@ -939,7 +951,12 @@
     "ctaDesc": "The numbers speak for themselves. Try Color SHOCK 180 ml dyes and feel the difference in Your work — from the very first application.",
     "ctaCta": "View products →",
     "aboutAuthor": "About the author",
-    "readBio": "Read full bio"
+    "readBio": "Read full bio",
+    "shareTitle": "Share",
+    "shareFacebook": "Share on Facebook",
+    "shareWhatsapp": "Send via WhatsApp",
+    "shareCopy": "Copy link",
+    "shareCopied": "Copied!"
   },
   "authorPage": {
     "badge": "Author",

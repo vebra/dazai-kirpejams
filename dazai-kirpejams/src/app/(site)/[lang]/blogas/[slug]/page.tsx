@@ -9,6 +9,7 @@ import { buildPageMetadata, buildCanonicalUrl, SITE_URL } from '@/lib/seo'
 import { getBlogPostBySlug, getBlogPosts } from '@/lib/data/queries'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { blogPostingSchema, breadcrumbSchema } from '@/lib/schema'
+import { ShareButtons } from '@/components/blog/ShareButtons'
 import { CATEGORY_STYLES, type ArticleCategory } from '@/lib/data/articles'
 import { getAuthorByName } from '@/lib/data/authors'
 import { langPrefix } from '@/lib/utils'
@@ -211,6 +212,20 @@ export default async function ArticlePage({
                 {t.contentPending}
               </p>
             )}
+
+            <div className="mt-12 pt-8 border-t border-[#E0E0E0]">
+              <ShareButtons
+                url={postUrl}
+                title={post.title}
+                labels={{
+                  title: t.shareTitle,
+                  facebook: t.shareFacebook,
+                  whatsapp: t.shareWhatsapp,
+                  copy: t.shareCopy,
+                  copied: t.shareCopied,
+                }}
+              />
+            </div>
           </div>
         </Container>
       </section>

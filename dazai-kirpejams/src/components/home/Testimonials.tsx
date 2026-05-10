@@ -1,8 +1,20 @@
+import Image from 'next/image'
 import { Container } from '@/components/ui/Container'
+
+type TestimonialItem = {
+  quote: string
+  initials: string
+  name: string
+  role: string
+  /** Optional: kelias į /public foto failą (pvz. „/testimonials/rasa-s.jpg"). */
+  imageUrl?: string
+}
 
 /**
  * Atsiliepimai — baltas fonas, centruota antraštė, 3 šviesiai pilkos
  * kortelės su auksinėmis žvaigždutėmis, citatomis ir autoriaus avataru.
+ * Jei `imageUrl` nustatytas — rodom realią nuotrauką; kitu atveju —
+ * inicialų placeholder'is, kad senas turinys be foto neugriūtų.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function Testimonials({ dict }: { dict: any }) {
@@ -24,7 +36,7 @@ export function Testimonials({ dict }: { dict: any }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-          {t.items.map((item: { quote: string; initials: string; name: string; role: string }) => (
+          {(t.items as TestimonialItem[]).map((item) => (
             <div
               key={item.name}
               className="bg-brand-gray-50 rounded-xl p-8 relative"
@@ -39,9 +51,21 @@ export function Testimonials({ dict }: { dict: any }) {
                 &bdquo;{item.quote}&ldquo;
               </p>
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full bg-[#E0E0E0] flex items-center justify-center font-bold text-[0.85rem] text-brand-gray-500">
-                  {item.initials}
-                </div>
+                {item.imageUrl ? (
+                  <div className="relative w-11 h-11 rounded-full overflow-hidden flex-shrink-0">
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.name}
+                      fill
+                      sizes="44px"
+                      className="object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-11 h-11 rounded-full bg-[#E0E0E0] flex items-center justify-center font-bold text-[0.85rem] text-brand-gray-500 flex-shrink-0">
+                    {item.initials}
+                  </div>
+                )}
                 <div>
                   <div className="font-semibold text-[0.9rem] text-brand-gray-900">
                     {item.name}

@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Dažai Kirpėjams — Profesionalūs plaukų dažai kirpėjams",
-    "description": "Profesionalūs plaukų dažai ir priemonės kirpėjams, koloristams ir grožio salonams. 180 ml talpa — daugiau vertės darbui salone."
+    "title": "Dažai Kirpėjams — Color SHOCK 180 ml profesionaliems kirpėjams",
+    "description": "Color SHOCK 180 ml plaukų dažai kirpėjams Lietuvoje. 50+ atspalvių, profesionali formulė, B2B kainos salonams. Tik licencijuotiems profesionalams."
   },
   "nav": {
     "home": "Pradžia",
@@ -242,6 +242,18 @@
         "desc": "Dirbantiems kasdien, kurie vertina patikimą rezultatą, kokybę ir protingą kainos ir vertės santykį."
       }
     ]
+  },
+  "miniCalculator": {
+    "badge": "Greita skaičiuoklė",
+    "title": "Kiek galite sutaupyti su 180 ml pakuote?",
+    "subtitle": "Įveskite, kiek dažymų atliekate per mėnesį — pamatysite realų sutaupymą lyginant su standartine 60 ml pakuote.",
+    "inputLabel": "Dažymai per mėnesį",
+    "inputSuffix": "dažymų",
+    "resultLabel": "Jūsų sutaupymas",
+    "perMonth": "per mėnesį",
+    "perYear": "per metus",
+    "cta": "Pirkti dabar",
+    "fullCta": "Pilna skaičiuoklė"
   },
   "testimonials": {
     "badge": "Atsiliepimai",
@@ -939,7 +951,12 @@
     "ctaDesc": "Skaičiai kalba patys už save. Išbandykite Color SHOCK 180 ml dažus ir įvertinkite skirtumą savo darbe — nuo pirmo dažymo.",
     "ctaCta": "Peržiūrėti produktus →",
     "aboutAuthor": "Apie autorių",
-    "readBio": "Skaityti pilną biografiją"
+    "readBio": "Skaityti pilną biografiją",
+    "shareTitle": "Pasidalinti",
+    "shareFacebook": "Dalintis Facebook",
+    "shareWhatsapp": "Siųsti per WhatsApp",
+    "shareCopy": "Kopijuoti nuorodą",
+    "shareCopied": "Nukopijuota!"
   },
   "authorPage": {
     "badge": "Autorius",

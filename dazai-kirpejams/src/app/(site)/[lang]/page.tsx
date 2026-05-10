@@ -16,6 +16,7 @@ import { Testimonials } from '@/components/home/Testimonials'
 import { B2BCta } from '@/components/home/B2BCta'
 import { Newsletter } from '@/components/home/Newsletter'
 import { FinalCta } from '@/components/home/FinalCta'
+import { MiniCalculator } from '@/components/home/MiniCalculator'
 import { EventCountdownSection } from '@/components/events/EventCountdownSection'
 
 export default async function HomePage({ params }: PageProps<'/[lang]'>) {
@@ -38,6 +39,7 @@ export default async function HomePage({ params }: PageProps<'/[lang]'>) {
       <Comparison lang={lang} dict={dict} />
       <FeaturedProducts lang={lang} dict={dict} />
       <Audience dict={dict} />
+      <MiniCalculator lang={lang} dict={dict.miniCalculator} />
       <Testimonials dict={dict} />
       <B2BCta lang={lang} dict={dict} />
       <Newsletter lang={lang} dict={dict.newsletter} />

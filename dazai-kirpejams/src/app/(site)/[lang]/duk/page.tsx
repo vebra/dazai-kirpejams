@@ -5,7 +5,7 @@ import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { buildPageMetadata, buildCanonicalUrl, SITE_URL } from '@/lib/seo'
 import { JsonLd } from '@/components/seo/JsonLd'
-import { breadcrumbSchema } from '@/lib/schema'
+import { breadcrumbSchema, faqPageSchema } from '@/lib/schema'
 import { langPrefix } from '@/lib/utils'
 
 export const revalidate = 300
@@ -70,12 +70,29 @@ export default async function FaqPage({ params }: PageProps<'/[lang]/duk'>) {
 
   const categories: FaqCategory[] = t.categories
 
+  // FAQ schema'os atsakymas turi būti plain text — sujungiam intro/list/outro
+  // į vieną eilutę. Google rich result'ai HTML neima.
+  const faqItems = categories.flatMap((cat) =>
+    cat.items.map((item) => {
+      let answer = item.text ?? ''
+      if (!answer) {
+        const parts: string[] = []
+        if (item.intro) parts.push(item.intro)
+        if (item.list) parts.push(item.list.join('. '))
+        if (item.outro) parts.push(item.outro)
+        answer = parts.join(' ')
+      }
+      return { question: item.q, answer }
+    })
+  )
+
   return (
     <>
       <JsonLd data={breadcrumbSchema([
         { name: c.home, url: buildCanonicalUrl(lang, '/') },
         { name: t.breadcrumb, url: buildCanonicalUrl(lang, '/duk') },
       ])} />
+      <JsonLd data={faqPageSchema(faqItems)} />
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">
         <Container>
