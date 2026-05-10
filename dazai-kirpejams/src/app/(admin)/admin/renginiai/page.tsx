@@ -101,7 +101,7 @@ export default async function AdminEventsPage({
             </div>
           </div>
           <a
-            href="/lt/renginys"
+            href="/renginys"
             target="_blank"
             rel="noopener noreferrer"
             className="px-3 py-1.5 bg-[#F5F5F7] hover:bg-[#eee] text-brand-gray-900 rounded-lg text-[12px] font-semibold transition-colors"

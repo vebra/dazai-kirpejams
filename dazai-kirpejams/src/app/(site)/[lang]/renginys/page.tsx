@@ -51,9 +51,11 @@ export default async function EventPage({
   if (!hasLocale(lang)) notFound()
 
   // Renginys vyksta Kaune LT kalba — EN/RU lankytojus nukreipiam į LT
-  // versiją, kad neturėtume prastai išverstų placeholder'ių.
+  // canonical URL'ą. LT yra default locale, todėl be prefikso (ne /lt/...),
+  // antraip gauname dvigubą redirect grandinę: /en/renginys → 307 →
+  // /lt/renginys → 301 → /renginys.
   if (lang !== 'lt') {
-    redirect('/lt/renginys')
+    redirect('/renginys')
   }
 
   const past = isEventPast(EVENT)

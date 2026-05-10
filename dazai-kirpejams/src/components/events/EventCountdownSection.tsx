@@ -48,7 +48,7 @@ export async function EventCountdownSection({
               Praktiška Color SHOCK dažų prezentacija su demonstracija ant gyvo modelio. Veda Džiuljeta Vėbrė, koloristė su 30 metų patirtimi.
             </p>
             <Link
-              href="/lt/renginys"
+              href="/renginys"
               className="inline-flex items-center justify-center gap-2 px-9 py-[16px] bg-brand-magenta text-white rounded-lg text-[1.05rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.4)] transition-all"
             >
               {isFull ? 'Susisiekti dėl laukimo sąrašo' : 'Registruotis nemokamai'} →

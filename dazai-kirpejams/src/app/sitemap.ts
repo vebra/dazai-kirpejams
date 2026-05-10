@@ -113,14 +113,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   )
 
   // 6. Renginys — tik LT, rodom kol renginys neįvyko.
-  // Kiti lokaliai redirect'ina į /lt/renginys, tad į sitemap neįtraukiam.
+  // LT yra default locale, todėl URL serveriamas be prefikso (/renginys).
+  // Kiti lokaliai redirect'ina į /renginys, tad į sitemap neįtraukiam.
   const eventEntries: MetadataRoute.Sitemap = isEventPast(
     DAZU_PREZENTACIJA_2026
   )
     ? []
     : [
         {
-          url: `${SITE_URL}/lt${DAZU_PREZENTACIJA_2026.path}`,
+          url: `${SITE_URL}${DAZU_PREZENTACIJA_2026.path}`,
           changeFrequency: 'daily',
           priority: 0.9,
         },
