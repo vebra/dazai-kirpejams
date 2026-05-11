@@ -188,12 +188,12 @@ export default async function CalculatorPage({
                 key={card.title}
                 className="bg-brand-gray-50 rounded-xl p-10 px-8 text-center border border-transparent hover:border-brand-magenta hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
               >
-                <div className="relative w-16 h-16 mx-auto rounded-xl bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)] overflow-hidden mb-5">
+                <div className="relative w-28 h-28 mx-auto rounded-2xl bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)] overflow-hidden mb-6">
                   <Image
                     src={card.icon}
                     alt=""
                     fill
-                    sizes="64px"
+                    sizes="112px"
                     className="object-contain"
                   />
                 </div>
