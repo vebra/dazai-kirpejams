@@ -358,9 +358,10 @@ export function shippingDetailsSchema(): Record<string, unknown> {
     '@context': 'https://schema.org',
     '@type': 'OfferShippingDetails',
     '@id': `${SITE_URL}/#shipping`,
+    // Pigiausia mokama parinktis (LP EXPRESS paštomatas). Nemokama nuo €50.
     shippingRate: {
       '@type': 'MonetaryAmount',
-      value: '0',
+      value: '3.00',
       currency: 'EUR',
     },
     shippingDestination: {

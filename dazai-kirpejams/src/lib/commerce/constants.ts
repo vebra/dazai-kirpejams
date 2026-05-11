@@ -10,8 +10,13 @@ export const MIN_ORDER_CENTS = 3000
 export const FREE_SHIPPING_THRESHOLD_CENTS = 5000
 
 // Pristatymo kainos
-export const SHIPPING_COURIER_CENTS = 499 // 4.99 EUR
-export const SHIPPING_PARCEL_LOCKER_CENTS = 299 // 2.99 EUR
+// Paštomatui naudojam vieną tarifą checkout'e (€3.00 = LP EXPRESS), nors
+// /pristatymas puslapio informacinėje lentelėje rodom abu vežėjus su
+// skirtingais ekrane (LP EXPRESS €3.00, Omniva €3.49). Tai sąmoningas
+// sprendimas — sąskaitoje viena rinkimo eilutė, klientas pasirenka
+// paštomatą per pickup_point picker'į.
+export const SHIPPING_COURIER_CENTS = 599 // 5.99 EUR
+export const SHIPPING_PARCEL_LOCKER_CENTS = 300 // 3.00 EUR (LP EXPRESS bazinis)
 export const SHIPPING_PICKUP_CENTS = 0
 
 // PVM tarifas Lietuvoje (21%)

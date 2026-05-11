@@ -148,9 +148,9 @@ export default async function DeliveryPage({
                 </thead>
                 <tbody>
                   {[
-                    { method: `🚚 ${t.courierTitle}`, term: t.courierTime, price: '€3,99', free: true },
-                    { method: '📦 LP EXPRESS', term: t.parcelTime, price: '€2,49', free: true },
-                    { method: '📦 Omniva', term: t.parcelTime, price: '€2,49', free: true },
+                    { method: `🚚 ${t.courierTitle}`, term: t.courierTime, price: '€5,99', free: true },
+                    { method: '📦 LP EXPRESS', term: t.parcelTime, price: '€3,00', free: true },
+                    { method: '📦 Omniva', term: t.parcelTime, price: '€3,49', free: true },
                     { method: `🏢 ${t.pickupTitle}`, term: t.pickupTime, price: t.free, free: true, priceIsFree: true },
                   ].map((row) => (
                     <tr
