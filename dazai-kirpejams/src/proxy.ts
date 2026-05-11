@@ -112,6 +112,13 @@ export async function proxy(request: NextRequest) {
     return await checkAdminAuth(request, response)
   }
 
+  // /auth/* (pvz. /auth/callback) — Supabase OAuth callback route'os
+  // gyvena ne po [lang] segmento. Be šito guard'o middleware'as rewrite'intų
+  // /auth/callback į /lt/auth/callback ir gautume 404 po Google/Facebook login.
+  if (pathname.startsWith('/auth/')) {
+    return response
+  }
+
   // Visiems kitiems route'ams refresh'inam Supabase sesiją, kad access_token
   // nepasensta naršymo metu.
   await refreshSupabaseSession(request, response)
