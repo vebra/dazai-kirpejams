@@ -94,7 +94,7 @@ export function MiniCalculator({
             <div className="text-[0.78rem] font-bold uppercase tracking-[2px] text-white/55 mb-3">
               {dict.resultLabel}
             </div>
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <div className="bg-brand-magenta/10 border border-brand-magenta/25 rounded-xl p-5 text-center">
                 <div className="text-[0.72rem] uppercase tracking-wider text-white/60 mb-1.5 font-semibold">
                   {dict.perMonth}
