@@ -129,25 +129,25 @@
     "items": [
       {
         "slug": "dazai",
-        "icon": "🎨",
+        "icon": "/icons/categories/hair-dye.jpg",
         "title": "Plaukų dažai",
         "count": "Color SHOCK • 180 ml"
       },
       {
         "slug": "oksidantai",
-        "icon": "⚗",
+        "icon": "/icons/categories/oxidant.jpg",
         "title": "Oksidantai",
         "count": "Profesionali linija"
       },
       {
         "slug": "sampunai",
-        "icon": "🧴",
+        "icon": "/icons/categories/shampoo.jpg",
         "title": "Šampūnai ir priežiūra",
         "count": "RosaNera Cosmetic"
       },
       {
         "slug": "priemones",
-        "icon": "✂",
+        "icon": "/icons/categories/accessories.jpg",
         "title": "Pagalbinės priemonės",
         "count": "Kirpėjams"
       }

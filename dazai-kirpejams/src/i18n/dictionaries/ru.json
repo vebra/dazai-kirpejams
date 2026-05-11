@@ -129,25 +129,25 @@
     "items": [
       {
         "slug": "dazai",
-        "icon": "🎨",
+        "icon": "/icons/categories/hair-dye.jpg",
         "title": "Краски для волос",
         "count": "Color SHOCK • 180 мл"
       },
       {
         "slug": "oksidantai",
-        "icon": "⚗",
+        "icon": "/icons/categories/oxidant.jpg",
         "title": "Оксиданты",
         "count": "Профессиональная линия"
       },
       {
         "slug": "sampunai",
-        "icon": "🧴",
+        "icon": "/icons/categories/shampoo.jpg",
         "title": "Шампуни и уход",
         "count": "RosaNera Cosmetic"
       },
       {
         "slug": "priemones",
-        "icon": "✂",
+        "icon": "/icons/categories/accessories.jpg",
         "title": "Вспомогательные средства",
         "count": "Для парикмахеров"
       }

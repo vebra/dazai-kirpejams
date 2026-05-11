@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import type { Locale } from '@/i18n/config'
@@ -10,6 +11,10 @@ type CategoriesProps = {
 }
 
 type Item = { slug: string; icon: string; title: string; count: string }
+
+function isImagePath(icon: string): boolean {
+  return icon.startsWith('/')
+}
 
 export function Categories({ lang, dict }: CategoriesProps) {
   const t = dict.categories
@@ -37,9 +42,21 @@ export function Categories({ lang, dict }: CategoriesProps) {
               href={`${langPrefix(lang)}/produktai/${cat.slug}`}
               className="group bg-white rounded-xl overflow-hidden border border-[#E0E0E0] hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
             >
-              <div className="aspect-square bg-[linear-gradient(135deg,#f5f5f7_0%,#e8e8ec_100%)] flex items-center justify-center text-5xl">
-                <span aria-hidden>{cat.icon}</span>
-              </div>
+              {isImagePath(cat.icon) ? (
+                <div className="relative aspect-square bg-[linear-gradient(135deg,#f5f5f7_0%,#e8e8ec_100%)] overflow-hidden">
+                  <Image
+                    src={cat.icon}
+                    alt=""
+                    fill
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                    className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                  />
+                </div>
+              ) : (
+                <div className="aspect-square bg-[linear-gradient(135deg,#f5f5f7_0%,#e8e8ec_100%)] flex items-center justify-center text-5xl">
+                  <span aria-hidden>{cat.icon}</span>
+                </div>
+              )}
               <div className="p-5">
                 <div className="text-[1.05rem] font-bold text-brand-gray-900 mb-1.5 group-hover:text-brand-magenta transition-colors">
                   {cat.title}

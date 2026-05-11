@@ -129,25 +129,25 @@
     "items": [
       {
         "slug": "dazai",
-        "icon": "🎨",
+        "icon": "/icons/categories/hair-dye.jpg",
         "title": "Hair dyes",
         "count": "Color SHOCK • 180 ml"
       },
       {
         "slug": "oksidantai",
-        "icon": "⚗",
+        "icon": "/icons/categories/oxidant.jpg",
         "title": "Oxidants",
         "count": "Professional line"
       },
       {
         "slug": "sampunai",
-        "icon": "🧴",
+        "icon": "/icons/categories/shampoo.jpg",
         "title": "Shampoos & care",
         "count": "RosaNera Cosmetic"
       },
       {
         "slug": "priemones",
-        "icon": "✂",
+        "icon": "/icons/categories/accessories.jpg",
         "title": "Tools & accessories",
         "count": "For hairdressers"
       }
