@@ -222,22 +222,22 @@
     "subtitle": "Our products are built for those who care about the working result",
     "cards": [
       {
-        "icon": "✂",
+        "icon": "/icons/audience/hairdresser.jpg",
         "title": "Hairdressers",
         "desc": "Reliable tools for daily work. An economical 180 ml pack — less hassle, more work done."
       },
       {
-        "icon": "🎨",
+        "icon": "/icons/audience/colorist.jpg",
         "title": "Colourists",
         "desc": "A wide palette and a professional formula let you deliver precise colour for every client."
       },
       {
-        "icon": "🏪",
+        "icon": "/icons/audience/salon.jpg",
         "title": "Beauty salons",
         "desc": "B2B terms, regular supply and an economical pricing model — the ideal fit for a salon budget."
       },
       {
-        "icon": "💪",
+        "icon": "/icons/audience/professional.jpg",
         "title": "Professionals",
         "desc": "For those working every day who value a reliable result, quality and a smart price-to-value ratio."
       }

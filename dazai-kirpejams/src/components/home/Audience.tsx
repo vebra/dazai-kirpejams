@@ -1,6 +1,11 @@
+import Image from 'next/image'
 import { Container } from '@/components/ui/Container'
 
 type Card = { icon: string; title: string; desc: string }
+
+function isImagePath(icon: string): boolean {
+  return icon.startsWith('/')
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function Audience({ dict }: { dict: any }) {
@@ -28,9 +33,21 @@ export function Audience({ dict }: { dict: any }) {
               key={card.title}
               className="bg-white rounded-xl p-9 px-7 text-center border border-[#E0E0E0] hover:border-brand-magenta hover:shadow-[0_2px_16px_rgba(0,0,0,0.07)] transition-all"
             >
-              <div className="text-[2.5rem] mb-4" aria-hidden>
-                {card.icon}
-              </div>
+              {isImagePath(card.icon) ? (
+                <div className="relative w-20 h-20 mx-auto mb-4 rounded-xl overflow-hidden bg-white">
+                  <Image
+                    src={card.icon}
+                    alt=""
+                    fill
+                    sizes="80px"
+                    className="object-contain"
+                  />
+                </div>
+              ) : (
+                <div className="text-[2.5rem] mb-4" aria-hidden>
+                  {card.icon}
+                </div>
+              )}
               <h4 className="text-[1.1rem] font-bold text-brand-gray-900 mb-2.5">
                 {card.title}
               </h4>

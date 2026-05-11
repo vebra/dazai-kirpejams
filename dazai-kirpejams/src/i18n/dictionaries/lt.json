@@ -222,22 +222,22 @@
     "subtitle": "Mūsų produktai sukurti tiems, kuriems svarbus darbo rezultatas",
     "cards": [
       {
-        "icon": "✂",
+        "icon": "/icons/audience/hairdresser.jpg",
         "title": "Kirpėjams",
         "desc": "Patikimi darbo įrankiai kasdieniam naudojimui. Ekonomiška 180 ml pakuotė — mažiau rūpesčių, daugiau darbo."
       },
       {
-        "icon": "🎨",
+        "icon": "/icons/audience/colorist.jpg",
         "title": "Koloristams",
         "desc": "Plati spalvų paletė ir profesionali formulė leidžia kurti tikslias spalvas pagal kiekvieno kliento poreikius."
       },
       {
-        "icon": "🏪",
+        "icon": "/icons/audience/salon.jpg",
         "title": "Grožio salonams",
         "desc": "B2B sąlygos, reguliarus tiekimas ir ekonomiškas kainos modelis — idealus sprendimas salono biudžetui."
       },
       {
-        "icon": "💪",
+        "icon": "/icons/audience/professional.jpg",
         "title": "Profesionalams",
         "desc": "Dirbantiems kasdien, kurie vertina patikimą rezultatą, kokybę ir protingą kainos ir vertės santykį."
       }
