@@ -1140,7 +1140,10 @@
     "submit": "Sign in",
     "submitting": "Signing in…",
     "noAccount": "Don't have an account?",
-    "registerCta": "Register"
+    "registerCta": "Register",
+    "oauthGoogle": "Continue with Google",
+    "oauthFacebook": "Continue with Facebook",
+    "oauthOr": "or"
   },
   "registerPage": {
     "metaTitle": "Registration for professionals",
@@ -1199,7 +1202,11 @@
     "submit": "Register",
     "submitting": "Registering…",
     "haveAccount": "Already have an account?",
-    "loginCta": "Sign in"
+    "loginCta": "Sign in",
+    "oauthGoogle": "Sign up with Google",
+    "oauthFacebook": "Sign up with Facebook",
+    "oauthOr": "or with email",
+    "oauthHint": "After signing up via Google/Facebook, complete your professional info (salon, phone, role) on the account page so we can verify you."
   },
   "accountPage": {
     "metaTitle": "My account",

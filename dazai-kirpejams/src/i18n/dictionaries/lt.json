@@ -1140,7 +1140,10 @@
     "submit": "Prisijungti",
     "submitting": "Jungiamasi…",
     "noAccount": "Neturite paskyros?",
-    "registerCta": "Registruotis"
+    "registerCta": "Registruotis",
+    "oauthGoogle": "Tęsti su Google",
+    "oauthFacebook": "Tęsti su Facebook",
+    "oauthOr": "arba"
   },
   "registerPage": {
     "metaTitle": "Registracija profesionalams",
@@ -1199,7 +1202,11 @@
     "submit": "Registruotis",
     "submitting": "Registruojama…",
     "haveAccount": "Jau turite paskyrą?",
-    "loginCta": "Prisijungti"
+    "loginCta": "Prisijungti",
+    "oauthGoogle": "Registruotis su Google",
+    "oauthFacebook": "Registruotis su Facebook",
+    "oauthOr": "arba el. paštu",
+    "oauthHint": "Po Google/Facebook registracijos prisijungus pirmą kartą — papildysite profesinę informaciją (salonas, telefonas, vaidmuo) paskyros puslapyje, kad mes galėtume jus verifikuoti."
   },
   "accountPage": {
     "metaTitle": "Mano paskyra",

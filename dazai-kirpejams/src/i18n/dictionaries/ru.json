@@ -1140,7 +1140,10 @@
     "submit": "Войти",
     "submitting": "Вход…",
     "noAccount": "Нет аккаунта?",
-    "registerCta": "Зарегистрироваться"
+    "registerCta": "Зарегистрироваться",
+    "oauthGoogle": "Продолжить с Google",
+    "oauthFacebook": "Продолжить с Facebook",
+    "oauthOr": "или"
   },
   "registerPage": {
     "metaTitle": "Регистрация для профессионалов",
@@ -1199,7 +1202,11 @@
     "submit": "Зарегистрироваться",
     "submitting": "Регистрация…",
     "haveAccount": "Уже есть аккаунт?",
-    "loginCta": "Войти"
+    "loginCta": "Войти",
+    "oauthGoogle": "Регистрация через Google",
+    "oauthFacebook": "Регистрация через Facebook",
+    "oauthOr": "или по email",
+    "oauthHint": "После регистрации через Google/Facebook вам нужно будет дополнить профессиональную информацию (салон, телефон, роль) на странице аккаунта, чтобы мы могли вас верифицировать."
   },
   "accountPage": {
     "metaTitle": "Мой аккаунт",

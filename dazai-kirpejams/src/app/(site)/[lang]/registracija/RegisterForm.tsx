@@ -6,6 +6,7 @@ import { registerAction, type RegisterState } from './actions'
 import { trackCompleteRegistration } from '@/lib/analytics'
 import type { Locale } from '@/i18n/config'
 import { langPrefix } from '@/lib/utils'
+import { OAuthButtons } from '@/components/auth/OAuthButtons'
 
 const initialState: RegisterState = {}
 
@@ -58,6 +59,10 @@ type RegisterFormDict = {
   submitting: string
   haveAccount: string
   loginCta: string
+  oauthGoogle: string
+  oauthFacebook: string
+  oauthOr: string
+  oauthHint: string
 }
 
 export function RegisterForm({
@@ -115,6 +120,19 @@ export function RegisterForm({
   return (
     <form action={formAction} className="space-y-6">
       <input type="hidden" name="lang" value={lang} />
+
+      <OAuthButtons
+        lang={lang}
+        dict={{
+          google: dict.oauthGoogle,
+          facebook: dict.oauthFacebook,
+          or: dict.oauthOr,
+        }}
+      />
+      <p className="text-[0.78rem] text-brand-gray-500 leading-[1.6] -mt-2">
+        {dict.oauthHint}
+      </p>
+
       {state.error && (
         <div className="px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
           {state.error}

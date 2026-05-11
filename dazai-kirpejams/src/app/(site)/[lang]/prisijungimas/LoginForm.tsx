@@ -7,6 +7,7 @@ import type { Locale } from '@/i18n/config'
 import { langPrefix } from '@/lib/utils'
 import { createBrowserSupabase } from '@/lib/supabase/browser'
 import { trackLogin } from '@/lib/analytics'
+import { OAuthButtons } from '@/components/auth/OAuthButtons'
 
 type LoginFormDict = {
   emailLabel: string
@@ -17,6 +18,9 @@ type LoginFormDict = {
   submitting: string
   noAccount: string
   registerCta: string
+  oauthGoogle: string
+  oauthFacebook: string
+  oauthOr: string
 }
 
 type ErrorDict = {
@@ -85,6 +89,15 @@ export function LoginForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      <OAuthButtons
+        lang={lang}
+        dict={{
+          google: dict.oauthGoogle,
+          facebook: dict.oauthFacebook,
+          or: dict.oauthOr,
+        }}
+      />
+
       {error && (
         <div className="px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
           {error}
