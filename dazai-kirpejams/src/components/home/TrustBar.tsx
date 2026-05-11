@@ -11,22 +11,22 @@ export function TrustBar({ dict }: { dict: any }) {
   const t = dict.trustBar
   const items = [
     {
-      icon: '/icons/advantages/tube-180ml.jpg',
+      icon: '/icons/trust/volume.jpg',
       title: t.volumeTitle,
       desc: t.volumeDesc,
     },
     {
-      icon: '/icons/advantages/beaker.jpg',
+      icon: '/icons/trust/formula.jpg',
       title: t.formulaTitle,
       desc: t.formulaDesc,
     },
     {
-      icon: '/icons/advantages/truck.jpg',
+      icon: '/icons/trust/delivery.jpg',
       title: t.deliveryTitle,
       desc: t.deliveryDesc,
     },
     {
-      icon: '/icons/advantages/handshake.jpg',
+      icon: '/icons/trust/b2b.jpg',
       title: t.b2bTitle,
       desc: t.b2bDesc,
     },
