@@ -224,19 +224,25 @@ export default async function DeliveryPage({
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: '📅', title: t.ret1Title, desc: t.ret1Desc },
-              { icon: '📦', title: t.ret2Title, desc: t.ret2Desc },
-              { icon: '🚫', title: t.ret3Title, desc: t.ret3Desc },
-              { icon: '🔄', title: t.ret4Title, desc: t.ret4Desc },
-              { icon: '💰', title: t.ret5Title, desc: t.ret5Desc },
-              { icon: '📤', title: t.ret6Title, desc: t.ret6Desc },
+              { icon: '/icons/returns/calendar.jpg', title: t.ret1Title, desc: t.ret1Desc },
+              { icon: '/icons/returns/original-package.jpg', title: t.ret2Title, desc: t.ret2Desc },
+              { icon: '/icons/returns/no-return.jpg', title: t.ret3Title, desc: t.ret3Desc },
+              { icon: '/icons/returns/defective.jpg', title: t.ret4Title, desc: t.ret4Desc },
+              { icon: '/icons/returns/refund.jpg', title: t.ret5Title, desc: t.ret5Desc },
+              { icon: '/icons/returns/shipping-cost.jpg', title: t.ret6Title, desc: t.ret6Desc },
             ].map((card) => (
               <div
                 key={card.title}
                 className="bg-white rounded-xl p-7 border border-[#E0E0E0] hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 hover:border-brand-magenta transition-all"
               >
-                <div className="w-12 h-12 rounded-xl bg-brand-magenta/10 text-[1.4rem] flex items-center justify-center mb-4">
-                  <span aria-hidden>{card.icon}</span>
+                <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-brand-magenta/5 mb-4">
+                  <Image
+                    src={card.icon}
+                    alt=""
+                    fill
+                    sizes="64px"
+                    className="object-contain"
+                  />
                 </div>
                 <h4 className="text-[1.05rem] font-bold text-brand-gray-900 mb-2 leading-snug">
                   {card.title}
@@ -267,10 +273,10 @@ export default async function DeliveryPage({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { n: '1', icon: '✉', title: t.howRet1Title, desc: t.howRet1Desc },
-              { n: '2', icon: '✅', title: t.howRet2Title, desc: t.howRet2Desc },
-              { n: '3', icon: '🚚', title: t.howRet3Title, desc: t.howRet3Desc },
-              { n: '4', icon: '💰', title: t.howRet4Title, desc: t.howRet4Desc },
+              { n: '1', icon: '/icons/return-steps/contact.jpg', title: t.howRet1Title, desc: t.howRet1Desc },
+              { n: '2', icon: '/icons/return-steps/confirmation.jpg', title: t.howRet2Title, desc: t.howRet2Desc },
+              { n: '3', icon: '/icons/return-steps/ship.jpg', title: t.howRet3Title, desc: t.howRet3Desc },
+              { n: '4', icon: '/icons/return-steps/refund.jpg', title: t.howRet4Title, desc: t.howRet4Desc },
             ].map((step) => (
               <div
                 key={step.n}
@@ -279,8 +285,14 @@ export default async function DeliveryPage({
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-brand-magenta text-white text-[1rem] font-extrabold flex items-center justify-center shadow-[0_4px_16px_rgba(233,30,140,0.3)]">
                   {step.n}
                 </div>
-                <div className="text-[2rem] mb-4 mt-2" aria-hidden>
-                  {step.icon}
+                <div className="relative w-20 h-20 mx-auto mb-4 mt-2 rounded-xl overflow-hidden bg-white">
+                  <Image
+                    src={step.icon}
+                    alt=""
+                    fill
+                    sizes="80px"
+                    className="object-contain"
+                  />
                 </div>
                 <h4 className="text-[1rem] font-bold text-brand-gray-900 mb-2.5">
                   {step.title}
