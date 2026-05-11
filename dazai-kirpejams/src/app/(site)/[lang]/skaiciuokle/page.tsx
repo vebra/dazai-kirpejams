@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
@@ -168,17 +169,17 @@ export default async function CalculatorPage({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
-                icon: '💰',
+                icon: '/icons/advantages/cost-savings.jpg',
                 title: t.benefit1Title,
                 desc: t.benefit1Desc,
               },
               {
-                icon: '📦',
+                icon: '/icons/advantages/fewer-packages.jpg',
                 title: t.benefit2Title,
                 desc: t.benefit2Desc,
               },
               {
-                icon: '📈',
+                icon: '/icons/advantages/profit.jpg',
                 title: t.benefit3Title,
                 desc: t.benefit3Desc,
               },
@@ -187,8 +188,14 @@ export default async function CalculatorPage({
                 key={card.title}
                 className="bg-brand-gray-50 rounded-xl p-10 px-8 text-center border border-transparent hover:border-brand-magenta hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
               >
-                <div className="w-16 h-16 mx-auto rounded-xl bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)] flex items-center justify-center text-[2rem] mb-5">
-                  <span aria-hidden>{card.icon}</span>
+                <div className="relative w-16 h-16 mx-auto rounded-xl bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)] overflow-hidden mb-5">
+                  <Image
+                    src={card.icon}
+                    alt=""
+                    fill
+                    sizes="64px"
+                    className="object-contain"
+                  />
                 </div>
                 <h3 className="text-[1.15rem] font-bold text-brand-gray-900 mb-3">
                   {card.title}
