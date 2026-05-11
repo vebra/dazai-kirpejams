@@ -748,7 +748,7 @@
     "ctaContact": "Contact",
     "categories": [
       {
-        "icon": "🎨",
+        "icon": "/icons/faq/products.jpg",
         "title": "About Products",
         "items": [
           {
@@ -807,7 +807,7 @@
         ]
       },
       {
-        "icon": "🛒",
+        "icon": "/icons/faq/orders.jpg",
         "title": "About Ordering",
         "items": [
           {
@@ -841,7 +841,7 @@
         ]
       },
       {
-        "icon": "🚚",
+        "icon": "/icons/faq/delivery.jpg",
         "title": "About Delivery",
         "items": [
           {
@@ -863,7 +863,7 @@
         ]
       },
       {
-        "icon": "🔄",
+        "icon": "/icons/faq/returns.jpg",
         "title": "About Returns",
         "items": [
           {
@@ -881,7 +881,7 @@
         ]
       },
       {
-        "icon": "🤝",
+        "icon": "/icons/faq/partnerships.jpg",
         "title": "About Collaboration",
         "items": [
           {

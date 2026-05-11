@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
@@ -96,19 +97,25 @@ export default async function B2BPage({
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: '💰', title: t.adv1Title, desc: t.adv1Desc },
-              { icon: '📦', title: t.adv2Title, desc: t.adv2Desc },
-              { icon: '🤝', title: t.adv3Title, desc: t.adv3Desc },
-              { icon: '🚚', title: t.adv4Title, desc: t.adv4Desc },
-              { icon: '📈', title: t.adv5Title, desc: t.adv5Desc },
-              { icon: '🎨', title: t.adv6Title, desc: t.adv6Desc },
+              { icon: '/icons/advantages/cost-savings.jpg', title: t.adv1Title, desc: t.adv1Desc },
+              { icon: '/icons/advantages/tube-180ml.jpg', title: t.adv2Title, desc: t.adv2Desc },
+              { icon: '/icons/advantages/handshake.jpg', title: t.adv3Title, desc: t.adv3Desc },
+              { icon: '/icons/advantages/truck.jpg', title: t.adv4Title, desc: t.adv4Desc },
+              { icon: '/icons/advantages/profit.jpg', title: t.adv5Title, desc: t.adv5Desc },
+              { icon: '/icons/advantages/beaker.jpg', title: t.adv6Title, desc: t.adv6Desc },
             ].map((card) => (
               <div
                 key={card.title}
                 className="bg-brand-gray-50 rounded-xl p-8 border border-transparent hover:border-brand-magenta hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
               >
-                <div className="w-14 h-14 rounded-xl bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)] flex items-center justify-center text-[1.6rem] mb-5">
-                  <span aria-hidden>{card.icon}</span>
+                <div className="relative w-20 h-20 rounded-xl bg-white shadow-[0_2px_16px_rgba(0,0,0,0.07)] overflow-hidden mb-5">
+                  <Image
+                    src={card.icon}
+                    alt=""
+                    fill
+                    sizes="80px"
+                    className="object-contain"
+                  />
                 </div>
                 <h4 className="text-[1.05rem] font-bold text-brand-gray-900 mb-2.5 leading-snug">
                   {card.title}

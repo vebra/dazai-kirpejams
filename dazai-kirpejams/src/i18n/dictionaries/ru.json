@@ -748,7 +748,7 @@
     "ctaContact": "Контакты",
     "categories": [
       {
-        "icon": "🎨",
+        "icon": "/icons/faq/products.jpg",
         "title": "О продукции",
         "items": [
           {
@@ -807,7 +807,7 @@
         ]
       },
       {
-        "icon": "🛒",
+        "icon": "/icons/faq/orders.jpg",
         "title": "О заказе",
         "items": [
           {
@@ -841,7 +841,7 @@
         ]
       },
       {
-        "icon": "🚚",
+        "icon": "/icons/faq/delivery.jpg",
         "title": "О доставке",
         "items": [
           {
@@ -863,7 +863,7 @@
         ]
       },
       {
-        "icon": "🔄",
+        "icon": "/icons/faq/returns.jpg",
         "title": "О возврате",
         "items": [
           {
@@ -881,7 +881,7 @@
         ]
       },
       {
-        "icon": "🤝",
+        "icon": "/icons/faq/partnerships.jpg",
         "title": "О сотрудничестве",
         "items": [
           {

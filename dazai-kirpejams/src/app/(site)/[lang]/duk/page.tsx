@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
@@ -127,9 +128,21 @@ export default async function FaqPage({ params }: PageProps<'/[lang]/duk'>) {
             {categories.map((cat) => (
               <div key={cat.title}>
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-12 h-12 rounded-xl bg-brand-magenta/10 text-[1.5rem] flex items-center justify-center flex-shrink-0">
-                    <span aria-hidden>{cat.icon}</span>
-                  </div>
+                  {cat.icon.startsWith('/') ? (
+                    <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-white flex-shrink-0">
+                      <Image
+                        src={cat.icon}
+                        alt=""
+                        fill
+                        sizes="56px"
+                        className="object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-brand-magenta/10 text-[1.5rem] flex items-center justify-center flex-shrink-0">
+                      <span aria-hidden>{cat.icon}</span>
+                    </div>
+                  )}
                   <h2 className="text-[clamp(1.25rem,2.5vw,1.75rem)] font-bold text-brand-gray-900 leading-tight">
                     {cat.title}
                   </h2>

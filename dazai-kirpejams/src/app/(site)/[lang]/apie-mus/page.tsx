@@ -222,16 +222,22 @@ export default async function AboutPage({
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
               {[
-                { icon: '💪', title: t.missionCard1Title, desc: t.missionCard1Desc },
-                { icon: '⚙', title: t.missionCard2Title, desc: t.missionCard2Desc },
-                { icon: '🤝', title: t.missionCard3Title, desc: t.missionCard3Desc },
+                { icon: '/icons/about/mission-experience.jpg', title: t.missionCard1Title, desc: t.missionCard1Desc },
+                { icon: '/icons/about/mission-quality.jpg', title: t.missionCard2Title, desc: t.missionCard2Desc },
+                { icon: '/icons/about/mission-partnership.jpg', title: t.missionCard3Title, desc: t.missionCard3Desc },
               ].map((card) => (
                 <div
                   key={card.title}
                   className="bg-white/[0.06] border border-white/10 rounded-xl p-9 px-7 text-center hover:bg-white/10 hover:border-white/20 hover:-translate-y-1 transition-all"
                 >
-                  <div className="text-[2rem] mb-4" aria-hidden>
-                    {card.icon}
+                  <div className="relative w-20 h-20 mx-auto mb-5 rounded-xl overflow-hidden bg-white">
+                    <Image
+                      src={card.icon}
+                      alt=""
+                      fill
+                      sizes="80px"
+                      className="object-contain"
+                    />
                   </div>
                   <h4 className="text-[1.05rem] font-bold text-white mb-2.5">
                     {card.title}
@@ -264,14 +270,14 @@ export default async function AboutPage({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
               {
-                icon: '🎨',
+                icon: '/icons/about/brand-color-shock.jpg',
                 name: 'Color SHOCK',
                 tagline: t.colorShockTagline,
                 features: t.colorShockFeatures,
                 cta: { label: `${t.viewDyes} →`, href: `${p}/produktai/dazai`, variant: 'primary' as const },
               },
               {
-                icon: '🧴',
+                icon: '/icons/about/brand-rosanera.jpg',
                 name: 'RosaNera Cosmetic',
                 tagline: t.rosaneraTagline,
                 features: t.rosaneraFeatures,
@@ -282,8 +288,14 @@ export default async function AboutPage({
                 key={brand.name}
                 className="bg-white rounded-xl p-12 px-9 text-center border border-[#E0E0E0] hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 hover:border-brand-magenta transition-all"
               >
-                <div className="text-[3rem] mb-5" aria-hidden>
-                  {brand.icon}
+                <div className="relative w-28 h-28 mx-auto mb-5 rounded-2xl overflow-hidden bg-brand-gray-50">
+                  <Image
+                    src={brand.icon}
+                    alt=""
+                    fill
+                    sizes="112px"
+                    className="object-contain"
+                  />
                 </div>
                 <h3 className="text-[clamp(1.15rem,2.5vw,1.5rem)] font-bold text-brand-gray-900 mb-2">
                   {brand.name}
