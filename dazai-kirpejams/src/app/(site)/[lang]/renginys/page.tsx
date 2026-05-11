@@ -89,47 +89,47 @@ export default async function EventPage({
         ])}
       />
 
+      {/* Hero foto — per visą puslapio plotį (full-bleed) */}
+      <section className="relative w-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-[24/9] overflow-hidden">
+        <Image
+          src="/event-hero.jpg"
+          alt="Color SHOCK dažų prezentacija Kaune — Džiuljeta Vėbrė"
+          fill
+          sizes="100vw"
+          className="object-cover"
+          priority
+        />
+      </section>
+
+      {/* Tekstinis turinys po nuotrauka */}
       <section className="bg-gradient-to-b from-[#FFF5FB] to-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 lg:pt-24 lg:pb-16">
-          <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-10 lg:gap-14 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-brand-magenta/10 text-brand-magenta rounded-full text-xs font-semibold uppercase tracking-wider">
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-magenta" />
-                Nemokamas renginys · Būtina registracija
-              </div>
-              <h1 className="mt-5 text-4xl sm:text-5xl lg:text-6xl font-bold text-brand-gray-900 leading-[1.1]">
-                Color SHOCK dažų{' '}
-                <span className="text-brand-magenta">prezentacija</span> Kaune
-              </h1>
-              <p className="mt-6 text-lg sm:text-xl text-brand-gray-500 leading-relaxed">
-                Gyvas Color SHOCK dažų pristatymas su dažymo technikų demonstracija
-                ant modelio. Prezentuoja{' '}
-                <strong className="text-brand-gray-900">
-                  {EVENT.presenterName}
-                </strong>
-                , {EVENT.presenterTitle}.
-              </p>
-
-              <dl className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-                <InfoCard label="Kada" value={dateStr} />
-                <InfoCard
-                  label="Kur"
-                  value={`${EVENT.venueName}, ${EVENT.venueStreet}, ${EVENT.venueCity}`}
-                />
-                <InfoCard label="Įėjimas" value="Nemokamas" accent />
-              </dl>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-12 lg:pt-16 lg:pb-16">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-brand-magenta/10 text-brand-magenta rounded-full text-xs font-semibold uppercase tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-magenta" />
+              Nemokamas renginys · Būtina registracija
             </div>
+            <h1 className="mt-5 text-4xl sm:text-5xl lg:text-6xl font-bold text-brand-gray-900 leading-[1.1]">
+              Color SHOCK dažų{' '}
+              <span className="text-brand-magenta">prezentacija</span> Kaune
+            </h1>
+            <p className="mt-6 text-lg sm:text-xl text-brand-gray-500 leading-relaxed">
+              Gyvas Color SHOCK dažų pristatymas su dažymo technikų demonstracija
+              ant modelio. Prezentuoja{' '}
+              <strong className="text-brand-gray-900">
+                {EVENT.presenterName}
+              </strong>
+              , {EVENT.presenterTitle}.
+            </p>
 
-            <div className="relative w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.15)]">
-              <Image
-                src="/event-hero.jpg"
-                alt="Color SHOCK dažų prezentacija Kaune — Džiuljeta Vėbrė"
-                fill
-                sizes="(max-width: 1024px) 100vw, 560px"
-                className="object-cover"
-                priority
+            <dl className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+              <InfoCard label="Kada" value={dateStr} />
+              <InfoCard
+                label="Kur"
+                value={`${EVENT.venueName}, ${EVENT.venueStreet}, ${EVENT.venueCity}`}
               />
-            </div>
+              <InfoCard label="Įėjimas" value="Nemokamas" accent />
+            </dl>
           </div>
         </div>
       </section>
