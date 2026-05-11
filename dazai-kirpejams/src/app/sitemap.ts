@@ -26,6 +26,7 @@ const STATIC_PATHS: Array<{
   { path: '/pristatymas', priority: 0.5, changeFrequency: 'yearly' },
   { path: '/privatumo-politika', priority: 0.3, changeFrequency: 'yearly' },
   { path: '/pirkimo-salygos', priority: 0.3, changeFrequency: 'yearly' },
+  { path: '/duomenu-trynimas', priority: 0.2, changeFrequency: 'yearly' },
 ]
 
 /**
