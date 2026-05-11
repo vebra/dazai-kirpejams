@@ -1,6 +1,14 @@
+import Image from 'next/image'
 import { Container } from '@/components/ui/Container'
 
 type Card = { icon: string; title: string; desc: string }
+
+// Detect'inam, ar `icon` lauke yra failo kelias (/icons/...) ar emoji. Jei
+// kelias — renderinam Image; jei emoji — paliekam senąją <span> versiją,
+// kad kitos vietos (jei naudoja emoji) nesulūžtų.
+function isImagePath(icon: string): boolean {
+  return icon.startsWith('/')
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function Advantages({ dict }: { dict: any }) {
@@ -28,9 +36,21 @@ export function Advantages({ dict }: { dict: any }) {
               key={card.title}
               className="bg-brand-gray-50 rounded-xl p-5 sm:p-9 sm:px-7 border border-transparent hover:border-[#E0E0E0] hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
             >
-              <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center text-2xl mb-5">
-                <span aria-hidden>{card.icon}</span>
-              </div>
+              {isImagePath(card.icon) ? (
+                <div className="relative w-20 h-20 rounded-xl overflow-hidden mb-5 bg-white">
+                  <Image
+                    src={card.icon}
+                    alt=""
+                    fill
+                    sizes="80px"
+                    className="object-contain"
+                  />
+                </div>
+              ) : (
+                <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center text-2xl mb-5">
+                  <span aria-hidden>{card.icon}</span>
+                </div>
+              )}
               <h4 className="text-[1.05rem] font-bold text-brand-gray-900 mb-2.5 leading-tight">
                 {card.title}
               </h4>

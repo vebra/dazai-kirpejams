@@ -83,32 +83,32 @@
     "subtitle": "Professional products built for everyday salon work",
     "cards": [
       {
-        "icon": "📦",
+        "icon": "/icons/advantages/tube-180ml.jpg",
         "title": "180 ml — twice as much",
         "desc": "The market standard is 60–100 ml. Ours is 180 ml. That means a lower cost per colouring."
       },
       {
-        "icon": "🎨",
+        "icon": "/icons/advantages/beaker.jpg",
         "title": "Professional formula",
         "desc": "Quality ingredients deliver even coverage, long-lasting colour and hair protection during colouring."
       },
       {
-        "icon": "💰",
+        "icon": "/icons/advantages/money-bag.jpg",
         "title": "More economical for your salon",
         "desc": "A larger pack — less waste, lower cost per colouring. A rational daily choice."
       },
       {
-        "icon": "🌈",
+        "icon": "/icons/advantages/color-palette.jpg",
         "title": "Wide colour palette",
         "desc": "Dozens of professional shades — from natural to bold. Every colourist will find what they need."
       },
       {
-        "icon": "🚚",
+        "icon": "/icons/advantages/truck.jpg",
         "title": "Fast and easy ordering",
         "desc": "Order online and receive within 1–3 working days. Courier, parcel locker or in-store pickup."
       },
       {
-        "icon": "🤝",
+        "icon": "/icons/advantages/handshake.jpg",
         "title": "B2B terms for salons",
         "desc": "Special pricing, regular supply and a dedicated account manager for salons and chains."
       }
