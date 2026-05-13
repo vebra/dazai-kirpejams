@@ -99,6 +99,34 @@ export default async function ColorPalettePage({
                 </span>
               </div>
             </div>
+
+            <div className="mt-8 flex flex-col items-center">
+              <a
+                href="/color-shock-paleta.pdf"
+                download
+                className="inline-flex items-center gap-3 px-7 py-[14px] bg-brand-magenta text-white rounded-full text-[0.95rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(233,30,140,0.35)] transition-all"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                {dict.colorPaletteHero.downloadPdf}
+              </a>
+              <p className="mt-3 text-[0.78rem] text-brand-gray-500">
+                {dict.colorPaletteHero.downloadPdfHint}
+              </p>
+            </div>
           </div>
         </Container>
       </section>

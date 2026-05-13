@@ -1320,7 +1320,9 @@
     "ctaTitle": "Radote savo spalvą?",
     "ctaDesc": "Užsisakykite profesionalius Color SHOCK dažus su 180 ml talpa ir gaukite daugiau vertės kiekvienam dažymui.",
     "ctaBuy": "Registruotis ir pirkti",
-    "ctaSalons": "Pasiūlymas salonams"
+    "ctaSalons": "Pasiūlymas salonams",
+    "downloadPdf": "Atsisiųsti paletę (PDF)",
+    "downloadPdfHint": "Visa paletė vienam faile — 180 ml, kontaktai, kainos"
   },
   "errors": {
     "loginMissing": "Įveskite el. paštą ir slaptažodį.",

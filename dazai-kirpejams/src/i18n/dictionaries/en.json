@@ -1320,7 +1320,9 @@
     "ctaTitle": "Found your shade?",
     "ctaDesc": "Order professional Color SHOCK dyes in 180 ml packs and get more value from every colouring.",
     "ctaBuy": "Register and buy",
-    "ctaSalons": "Salon offer"
+    "ctaSalons": "Salon offer",
+    "downloadPdf": "Download palette (PDF)",
+    "downloadPdfHint": "Entire palette in one file — 180 ml, contacts, prices"
   },
   "errors": {
     "loginMissing": "Enter your email and password.",
