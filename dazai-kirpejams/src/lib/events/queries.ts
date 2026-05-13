@@ -137,6 +137,7 @@ type DbEventRow = {
   capacity_max: number
   contact_email: string
   path: string
+  hero_image_url: string | null
 }
 
 /**
@@ -152,7 +153,7 @@ async function _getActiveEventDto(): Promise<CachedEventDto | null> {
     const { data, error } = await supabase
       .from('events')
       .select(
-        'slug, title, short_title, description, starts_at, ends_at, venue_name, venue_street, venue_city, venue_country, venue_postal_code, presenter_name, presenter_title, is_free, capacity_min, capacity_max, contact_email, path'
+        'slug, title, short_title, description, starts_at, ends_at, venue_name, venue_street, venue_city, venue_country, venue_postal_code, presenter_name, presenter_title, is_free, capacity_min, capacity_max, contact_email, path, hero_image_url'
       )
       .eq('is_active', true)
       .limit(1)
@@ -199,6 +200,7 @@ function dtoToEventInfo(row: CachedEventDto): EventInfo {
     capacityMax: row.capacity_max,
     contactEmail: row.contact_email,
     path: row.path,
+    heroImageUrl: row.hero_image_url ?? null,
   }
 }
 

@@ -206,6 +206,34 @@ export async function saveWidgetPrefsAction(
   revalidatePath('/admin/renginiai')
 }
 
+const EVENTS_BUCKET = 'events'
+const MAX_HERO_IMAGE_BYTES = 10 * 1024 * 1024 // 10 MB
+const ALLOWED_HERO_MIME = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/avif',
+])
+
+function buildHeroImagePath(slug: string, file: File): string {
+  const fromName = file.name.split('.').pop()?.toLowerCase()
+  const ext =
+    fromName && /^[a-z0-9]{2,5}$/.test(fromName)
+      ? fromName
+      : file.type === 'image/jpeg'
+        ? 'jpg'
+        : file.type === 'image/png'
+          ? 'png'
+          : file.type === 'image/webp'
+            ? 'webp'
+            : file.type === 'image/avif'
+              ? 'avif'
+              : 'bin'
+  const ts = Date.now()
+  const rand = Math.random().toString(36).slice(2, 8)
+  return `${slug}/${ts}-${rand}.${ext}`
+}
+
 function trimOrEmpty(v: FormDataEntryValue | null): string {
   return typeof v === 'string' ? v.trim() : ''
 }
@@ -309,6 +337,130 @@ export async function updateEventAction(
   revalidatePath('/sitemap.xml')
 
   redirect('/admin/renginiai?saved=event')
+}
+
+export async function uploadEventHeroImageAction(
+  formData: FormData
+): Promise<void> {
+  await requireAdmin()
+
+  const slug = trimOrEmpty(formData.get('slug'))
+  if (!slug) redirect('/admin/renginiai/redaguoti?error=invalid-slug')
+
+  const file = formData.get('hero_image')
+  if (!(file instanceof File) || file.size === 0) {
+    redirect('/admin/renginiai/redaguoti?error=image-missing')
+  }
+  if (file.size > MAX_HERO_IMAGE_BYTES) {
+    redirect('/admin/renginiai/redaguoti?error=image-too-large')
+  }
+  if (!ALLOWED_HERO_MIME.has(file.type)) {
+    redirect('/admin/renginiai/redaguoti?error=image-format')
+  }
+
+  const supabase = createServerClient()
+  const path = buildHeroImagePath(slug, file)
+  const buffer = Buffer.from(await file.arrayBuffer())
+
+  const { error: uploadError } = await supabase.storage
+    .from(EVENTS_BUCKET)
+    .upload(path, buffer, {
+      contentType: file.type,
+      upsert: false,
+    })
+  if (uploadError) {
+    console.error('[admin/renginiai/actions] hero upload:', uploadError.message)
+    redirect('/admin/renginiai/redaguoti?error=image-upload-failed')
+  }
+
+  const { data: publicData } = supabase.storage
+    .from(EVENTS_BUCKET)
+    .getPublicUrl(path)
+  const publicUrl = publicData.publicUrl
+
+  // Pasiimame senąjį URL prieš keisdami, kad galėtume nuvalyti orphan failą
+  const { data: existing } = await supabase
+    .from('events')
+    .select('hero_image_url')
+    .eq('slug', slug)
+    .maybeSingle<{ hero_image_url: string | null }>()
+
+  const { error: updateError } = await supabase
+    .from('events')
+    .update({ hero_image_url: publicUrl })
+    .eq('slug', slug)
+
+  if (updateError) {
+    console.error('[admin/renginiai/actions] hero update:', updateError.message)
+    // Naują failą išvalom, kad neliktų orphan'o
+    await supabase.storage.from(EVENTS_BUCKET).remove([path])
+    redirect('/admin/renginiai/redaguoti?error=update-failed')
+  }
+
+  // Senąją nuotrauką (jei iš mūsų bucket'o) trinam — orphan cleanup
+  const prevUrl = existing?.hero_image_url
+  if (prevUrl) {
+    const marker = `/storage/v1/object/public/${EVENTS_BUCKET}/`
+    const idx = prevUrl.indexOf(marker)
+    if (idx !== -1) {
+      const prevPath = prevUrl.slice(idx + marker.length)
+      if (prevPath && prevPath !== path) {
+        await supabase.storage.from(EVENTS_BUCKET).remove([prevPath])
+      }
+    }
+  }
+
+  updateTag(ACTIVE_EVENT_TAG)
+  revalidatePath('/admin/renginiai')
+  revalidatePath('/admin/renginiai/redaguoti')
+  revalidatePath('/', 'layout')
+  revalidatePath('/renginys')
+
+  redirect('/admin/renginiai/redaguoti?saved=image')
+}
+
+export async function removeEventHeroImageAction(
+  formData: FormData
+): Promise<void> {
+  await requireAdmin()
+  const slug = trimOrEmpty(formData.get('slug'))
+  if (!slug) redirect('/admin/renginiai/redaguoti?error=invalid-slug')
+
+  const supabase = createServerClient()
+  const { data: existing } = await supabase
+    .from('events')
+    .select('hero_image_url')
+    .eq('slug', slug)
+    .maybeSingle<{ hero_image_url: string | null }>()
+
+  const { error } = await supabase
+    .from('events')
+    .update({ hero_image_url: null })
+    .eq('slug', slug)
+  if (error) {
+    console.error('[admin/renginiai/actions] hero remove:', error.message)
+    redirect('/admin/renginiai/redaguoti?error=update-failed')
+  }
+
+  const prevUrl = existing?.hero_image_url
+  if (prevUrl) {
+    const marker = `/storage/v1/object/public/${EVENTS_BUCKET}/`
+    const idx = prevUrl.indexOf(marker)
+    if (idx !== -1) {
+      const prevPath = prevUrl.slice(idx + marker.length)
+      if (prevPath) {
+        await supabase.storage.from(EVENTS_BUCKET).remove([prevPath])
+      }
+    }
+  }
+
+  updateTag(ACTIVE_EVENT_TAG)
+  revalidatePath('/admin/renginiai')
+  revalidatePath('/admin/renginiai/redaguoti')
+  revalidatePath('/', 'layout')
+  revalidatePath('/renginys')
+
+  redirect('/admin/renginiai/redaguoti?saved=image-removed')
 }
 
 export async function setEventVisibilityAction(

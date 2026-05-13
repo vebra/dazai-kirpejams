@@ -32,6 +32,9 @@ export type EventInfo = {
   contactEmail: string
   /** Santykinis kelias puslapiui (pvz. `/renginys`) */
   path: string
+  /** Admin'o įkelta hero nuotrauka. Jei `null` — public puslapis naudoja
+   *  hardcoded'intą `/event-hero.jpg` iš `public/`. */
+  heroImageUrl: string | null
 }
 
 export const DAZU_PREZENTACIJA_2026: EventInfo = {
@@ -56,6 +59,7 @@ export const DAZU_PREZENTACIJA_2026: EventInfo = {
   capacityMax: 50,
   contactEmail: 'info@dziuljetavebre.lt',
   path: '/renginys',
+  heroImageUrl: null,
 }
 
 /** Ar renginys jau įvyko (registracijos uždaromos +1 d po endsAt). */

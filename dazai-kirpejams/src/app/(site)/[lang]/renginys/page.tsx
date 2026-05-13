@@ -91,11 +91,13 @@ export default async function EventPage({
         ])}
       />
 
-      {/* Hero foto — per visą puslapio plotį (full-bleed) */}
+      {/* Hero foto — per visą puslapio plotį (full-bleed).
+          Admin'o įkelta nuotrauka turi prioritetą; jei nėra — fallback į
+          hardcoded'intą /event-hero.jpg iš public/. */}
       <section className="relative w-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-[24/9] overflow-hidden">
         <Image
-          src="/event-hero.jpg"
-          alt="Color SHOCK dažų prezentacija Kaune — Džiuljeta Vėbrė"
+          src={EVENT.heroImageUrl ?? '/event-hero.jpg'}
+          alt={`${EVENT.title} — ${EVENT.presenterName}`}
           fill
           sizes="100vw"
           className="object-cover"

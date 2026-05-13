@@ -1,10 +1,15 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { requireAdmin } from '@/lib/admin/auth'
 import {
   getActiveEvent,
   utcToVilniusInputValue,
 } from '@/lib/events/queries'
-import { updateEventAction } from '../actions'
+import {
+  removeEventHeroImageAction,
+  updateEventAction,
+  uploadEventHeroImageAction,
+} from '../actions'
 
 export const metadata = {
   title: 'Redaguoti renginį',
@@ -19,6 +24,15 @@ const ERRORS: Record<string, string> = {
   'capacity-order': 'Maksimali talpa negali būti mažesnė už minimalią.',
   'date-order': 'Pabaigos laikas turi būti vėlesnis už pradžios.',
   'update-failed': 'Nepavyko išsaugoti. Bandykite dar kartą.',
+  'image-missing': 'Pasirinkite paveikslėlio failą.',
+  'image-too-large': 'Failas per didelis — maksimalus dydis 10 MB.',
+  'image-format': 'Netinkamas formatas. Leidžiama: JPG, PNG, WebP, AVIF.',
+  'image-upload-failed': 'Nepavyko įkelti paveikslėlio į saugyklą.',
+}
+
+const SAVED: Record<string, string> = {
+  image: 'Hero nuotrauka įkelta.',
+  'image-removed': 'Hero nuotrauka pašalinta — viešas puslapis grįžo prie numatytojo /event-hero.jpg.',
 }
 
 export default async function EditEventPage({
@@ -29,10 +43,13 @@ export default async function EditEventPage({
 
   const sp = await searchParams
   const errorParam = typeof sp.error === 'string' ? sp.error : null
+  const savedParam = typeof sp.saved === 'string' ? sp.saved : null
   const errorMessage = errorParam ? ERRORS[errorParam] ?? 'Nežinoma klaida.' : null
+  const savedMessage = savedParam ? SAVED[savedParam] ?? null : null
 
   const startsAtInput = utcToVilniusInputValue(event.startsAt)
   const endsAtInput = utcToVilniusInputValue(event.endsAt)
+  const heroDisplayUrl = event.heroImageUrl ?? '/event-hero.jpg'
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -59,6 +76,82 @@ export default async function EditEventPage({
           {errorMessage}
         </div>
       )}
+
+      {savedMessage && (
+        <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">
+          {savedMessage}
+        </div>
+      )}
+
+      {/* Hero nuotrauka — atskira forma, kad būtų galima įkelti nepakeitus
+          kitų laukų ir atvirkščiai. */}
+      <section className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6 space-y-4">
+        <header>
+          <h3 className="text-base font-bold text-brand-gray-900">
+            Hero nuotrauka
+          </h3>
+          <p className="mt-1 text-[12px] text-brand-gray-500">
+            Rodoma per visą plotį /renginys puslapio viršuje. Rekomendacija:
+            plataus formato (16:9 ar 21:9), bent 1600×900 px. JPG/PNG/WebP/AVIF,
+            iki 10 MB.
+          </p>
+        </header>
+
+        <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] rounded-lg overflow-hidden bg-brand-gray-50 border border-[#E0E0E0]">
+          <Image
+            src={heroDisplayUrl}
+            alt="Renginio hero nuotrauka"
+            fill
+            sizes="(max-width: 1024px) 100vw, 800px"
+            className="object-cover"
+          />
+          {!event.heroImageUrl && (
+            <div className="absolute inset-x-0 bottom-0 bg-black/55 text-white text-[11px] py-1.5 px-3 text-center">
+              Numatytasis (/event-hero.jpg) — admin'as dar neįkėlė savojo
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-end gap-3 flex-wrap">
+          <form
+            action={uploadEventHeroImageAction}
+            encType="multipart/form-data"
+            className="flex-1 min-w-[260px] flex flex-col gap-2"
+          >
+            <input type="hidden" name="slug" value={event.slug} />
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[12px] font-semibold text-brand-gray-900">
+                Pasirinkti naują nuotrauką
+              </span>
+              <input
+                type="file"
+                name="hero_image"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                required
+                className="text-sm text-brand-gray-900 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-brand-magenta file:text-white file:text-[12px] file:font-semibold file:cursor-pointer hover:file:bg-brand-magenta-dark"
+              />
+            </label>
+            <button
+              type="submit"
+              className="self-start inline-flex items-center gap-2 px-4 py-2 bg-brand-magenta hover:bg-brand-magenta-dark text-white rounded-lg text-[12px] font-semibold transition-colors"
+            >
+              Įkelti nuotrauką
+            </button>
+          </form>
+
+          {event.heroImageUrl && (
+            <form action={removeEventHeroImageAction}>
+              <input type="hidden" name="slug" value={event.slug} />
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-red-200 text-red-700 hover:bg-red-50 rounded-lg text-[12px] font-semibold transition-colors"
+              >
+                Pašalinti nuotrauką
+              </button>
+            </form>
+          )}
+        </div>
+      </section>
 
       <form action={updateEventAction} className="space-y-6">
         <input type="hidden" name="slug" value={event.slug} />
