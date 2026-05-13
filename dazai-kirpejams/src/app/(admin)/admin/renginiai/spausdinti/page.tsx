@@ -1,9 +1,7 @@
 import { requireAdmin } from '@/lib/admin/auth'
 import { getEventRegistrations } from '@/lib/admin/queries'
-import {
-  DAZU_PREZENTACIJA_2026,
-  formatEventDateLt,
-} from '@/lib/events/config'
+import { formatEventDateLt } from '@/lib/events/config'
+import { getActiveEvent } from '@/lib/events/queries'
 import { PrintButton } from './PrintButton'
 
 export const metadata = {
@@ -28,7 +26,7 @@ const ROLE_LABELS: Record<string, string> = {
 
 export default async function PrintAttendeesPage() {
   await requireAdmin()
-  const event = DAZU_PREZENTACIJA_2026
+  const event = await getActiveEvent()
   const all = await getEventRegistrations(event.slug)
   const list = all
     .filter((r) => r.status === 'confirmed' || r.status === 'attended')

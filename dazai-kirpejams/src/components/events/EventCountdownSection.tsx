@@ -1,11 +1,9 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
-import {
-  DAZU_PREZENTACIJA_2026,
-  formatEventDateLt,
-  isEventPast,
-} from '@/lib/events/config'
+import { formatEventDateLt, isEventPast } from '@/lib/events/config'
 import { getEventSpotsTaken } from '@/lib/data/queries'
+import { getActiveEvent } from '@/lib/events/queries'
+import { getEventVisibility } from '@/lib/events/visibility'
 
 /**
  * Hero apačioje einanti renginio sekcija — gegužės 17 d. prezentacija.
@@ -18,9 +16,10 @@ export async function EventCountdownSection({
   lang: 'lt' | 'en' | 'ru'
 }) {
   if (lang !== 'lt') return null
-  if (isEventPast(DAZU_PREZENTACIJA_2026)) return null
+  if (!(await getEventVisibility())) return null
 
-  const event = DAZU_PREZENTACIJA_2026
+  const event = await getActiveEvent()
+  if (isEventPast(event)) return null
   const taken = await getEventSpotsTaken(event.slug)
   const remaining = Math.max(0, event.capacityMax - taken)
   const isFull = remaining === 0

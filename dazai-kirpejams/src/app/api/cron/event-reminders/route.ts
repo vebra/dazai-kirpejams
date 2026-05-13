@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase/server'
 import { sendEmail } from '@/lib/email/resend'
 import { buildEventReminderEmail } from '@/lib/events/emails'
-import { DAZU_PREZENTACIJA_2026 } from '@/lib/events/config'
+import { getActiveEvent } from '@/lib/events/queries'
 import { SITE_URL } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
@@ -26,8 +26,6 @@ export const runtime = 'nodejs'
  * bet kuriuo atveju priminimas išeina likus ~22–24h iki 10:00 LT renginio.
  */
 
-const EVENT = DAZU_PREZENTACIJA_2026
-
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization')
   const cronSecret = process.env.CRON_SECRET
@@ -36,6 +34,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
   }
 
+  const EVENT = await getActiveEvent()
   const now = new Date()
   const startsAt = EVENT.startsAt.getTime()
   const hoursUntil = (startsAt - now.getTime()) / (60 * 60 * 1000)

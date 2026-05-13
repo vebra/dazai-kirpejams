@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin/auth'
 import { getEventRegistrations } from '@/lib/admin/queries'
-import { DAZU_PREZENTACIJA_2026 } from '@/lib/events/config'
+import { getActiveEvent } from '@/lib/events/queries'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -64,7 +64,8 @@ export async function GET(request: Request) {
   const url = new URL(request.url)
   const statusFilter = url.searchParams.get('status') ?? 'all'
 
-  let rows = await getEventRegistrations(DAZU_PREZENTACIJA_2026.slug)
+  const event = await getActiveEvent()
+  let rows = await getEventRegistrations(event.slug)
   if (statusFilter !== 'all') {
     rows = rows.filter((r) => r.status === statusFilter)
   }

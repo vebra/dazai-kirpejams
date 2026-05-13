@@ -5,11 +5,9 @@ import { hasLocale } from '@/i18n/dictionaries'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumbSchema, eventSchema } from '@/lib/schema'
 import { buildCanonicalUrl, SITE_URL } from '@/lib/seo'
-import {
-  DAZU_PREZENTACIJA_2026,
-  formatEventDateLt,
-  isEventPast,
-} from '@/lib/events/config'
+import { formatEventDateLt, isEventPast } from '@/lib/events/config'
+import { getActiveEvent } from '@/lib/events/queries'
+import { getEventVisibility } from '@/lib/events/visibility'
 import { EventRegistrationForm } from '@/components/events/EventRegistrationForm'
 
 // 60 s revalidate — data yra (beveik) statinis turinys, bet „renginys įvyko"
@@ -17,16 +15,15 @@ import { EventRegistrationForm } from '@/components/events/EventRegistrationForm
 // per valandą po renginio formos jau nebebus.
 export const revalidate = 60
 
-const EVENT = DAZU_PREZENTACIJA_2026
-
 export async function generateMetadata({
   params,
 }: PageProps<'/[lang]/renginys'>): Promise<Metadata> {
   const { lang } = await params
   if (!hasLocale(lang)) return {}
 
-  const title = `${EVENT.title} — 2026 05 17 Kaune | Registracija`
-  const description = `${EVENT.description} Nemokamas įėjimas, būtina registracija. ${EVENT.venueName}, Kaunas.`
+  const EVENT = await getActiveEvent()
+  const title = `${EVENT.title} ${EVENT.venueCity} | Registracija`
+  const description = `${EVENT.description} Nemokamas įėjimas, būtina registracija. ${EVENT.venueName}, ${EVENT.venueCity}.`
   const canonical = buildCanonicalUrl(lang, '/renginys')
 
   return {
@@ -50,6 +47,10 @@ export default async function EventPage({
   const { lang } = await params
   if (!hasLocale(lang)) notFound()
 
+  // Admin'as gali išjungti renginio info per /admin/renginiai jungiklį.
+  // Tada viešas puslapis grąžina 404 — Google tvarkingai išindeksuoja.
+  if (!(await getEventVisibility())) notFound()
+
   // Renginys vyksta Kaune LT kalba — EN/RU lankytojus nukreipiam į LT
   // canonical URL'ą. LT yra default locale, todėl be prefikso (ne /lt/...),
   // antraip gauname dvigubą redirect grandinę: /en/renginys → 307 →
@@ -58,6 +59,7 @@ export default async function EventPage({
     redirect('/renginys')
   }
 
+  const EVENT = await getActiveEvent()
   const past = isEventPast(EVENT)
   const dateStr = formatEventDateLt(EVENT)
   const eventUrl = `${SITE_URL}${EVENT.path}`

@@ -8,7 +8,8 @@ import {
   buildEventRegistrationCustomerEmail,
 } from '@/lib/events/emails'
 import { buildIcsFile } from '@/lib/events/ics'
-import { DAZU_PREZENTACIJA_2026, isEventPast } from '@/lib/events/config'
+import { isEventPast } from '@/lib/events/config'
+import { getActiveEvent } from '@/lib/events/queries'
 import { checkRateLimit, isHoneypotTriggered } from '@/lib/rate-limit'
 import { sendMetaCapiEvent } from '@/lib/analytics-capi'
 
@@ -28,7 +29,7 @@ export async function registerForEventAction(
   _prev: EventRegistrationState,
   formData: FormData
 ): Promise<EventRegistrationState> {
-  const event = DAZU_PREZENTACIJA_2026
+  const event = await getActiveEvent()
 
   // Renginys įvyko — uždarom formą serveryje (kliento pusėje puslapis
   // irgi neberenderina formos, bet direct POST'ai dar galėtų ateiti).
