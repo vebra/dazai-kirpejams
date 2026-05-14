@@ -9,7 +9,7 @@ import {
 } from '@/lib/events/emails'
 import { buildIcsFile } from '@/lib/events/ics'
 import { isEventPast } from '@/lib/events/config'
-import { getActiveEvent } from '@/lib/events/queries'
+import { getActiveEventBySlug } from '@/lib/events/queries'
 import { checkRateLimit, isHoneypotTriggered } from '@/lib/rate-limit'
 import { sendMetaCapiEvent } from '@/lib/analytics-capi'
 
@@ -29,7 +29,14 @@ export async function registerForEventAction(
   _prev: EventRegistrationState,
   formData: FormData
 ): Promise<EventRegistrationState> {
-  const event = await getActiveEvent()
+  const slug = ((formData.get('event_slug') as string) ?? '').trim()
+  if (!slug) {
+    return { error: 'Nežinomas renginys. Atnaujinkite puslapį ir bandykite dar kartą.' }
+  }
+  const event = await getActiveEventBySlug(slug)
+  if (!event) {
+    return { error: 'Renginys nerastas arba paslėptas. Bandykite vėliau.' }
+  }
 
   // Renginys įvyko — uždarom formą serveryje (kliento pusėje puslapis
   // irgi neberenderina formos, bet direct POST'ai dar galėtų ateiti).
@@ -118,7 +125,7 @@ export async function registerForEventAction(
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
     'https://www.dazaikirpejams.lt'
-  const eventUrl = `${siteUrl}${event.path}`
+  const eventUrl = `${siteUrl}/renginys/${event.slug}`
   const primaryAdminEmail =
     getAdminNotificationEmail() ?? FALLBACK_ADMIN_EMAIL
   const adminRecipients = Array.from(

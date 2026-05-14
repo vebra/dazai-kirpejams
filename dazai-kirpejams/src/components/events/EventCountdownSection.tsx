@@ -1,14 +1,13 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
-import { formatEventDateLt, isEventPast } from '@/lib/events/config'
+import { formatEventDateLt } from '@/lib/events/config'
 import { getEventSpotsTaken } from '@/lib/data/queries'
-import { getActiveEvent } from '@/lib/events/queries'
-import { getEventVisibility } from '@/lib/events/visibility'
+import { getVisibleUpcomingEvents } from '@/lib/events/queries'
 
 /**
- * Hero apačioje einanti renginio sekcija — gegužės 17 d. prezentacija.
- * Live registracijų skaičius (cache 60s), dideli skaičiai, aiškus CTA.
- * LT lokalei tik — renginys vyksta lietuviškai.
+ * Hero apačioje einanti renginio sekcija. Rodo arčiausią matomą upcoming
+ * renginį iš `events` lentelės (per-event is_active filter'is). LT lokalei
+ * tik — renginiai vyksta lietuviškai.
  */
 export async function EventCountdownSection({
   lang,
@@ -16,14 +15,16 @@ export async function EventCountdownSection({
   lang: 'lt' | 'en' | 'ru'
 }) {
   if (lang !== 'lt') return null
-  if (!(await getEventVisibility())) return null
 
-  const event = await getActiveEvent()
-  if (isEventPast(event)) return null
+  const upcoming = await getVisibleUpcomingEvents()
+  const event = upcoming[0]
+  if (!event) return null
+
   const taken = await getEventSpotsTaken(event.slug)
   const remaining = Math.max(0, event.capacityMax - taken)
   const isFull = remaining === 0
   const isLastFew = remaining > 0 && remaining <= 10
+  const detailHref = `/renginys/${event.slug}`
 
   return (
     <section className="bg-brand-gray-900 text-white py-12 lg:py-16">
@@ -44,10 +45,10 @@ export async function EventCountdownSection({
               {event.venueName} · {event.venueStreet}, {event.venueCity}
             </p>
             <p className="text-[0.95rem] text-white/65 leading-[1.7] mb-7 max-w-[520px]">
-              Praktiška Color SHOCK dažų prezentacija su demonstracija ant gyvo modelio. Veda Džiuljeta Vėbrė, koloristė su 30 metų patirtimi.
+              {event.description}
             </p>
             <Link
-              href="/renginys"
+              href={detailHref}
               className="inline-flex items-center justify-center gap-2 px-9 py-[16px] bg-brand-magenta text-white rounded-lg text-[1.05rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.4)] transition-all"
             >
               {isFull ? 'Susisiekti dėl laukimo sąrašo' : 'Registruotis nemokamai'} →

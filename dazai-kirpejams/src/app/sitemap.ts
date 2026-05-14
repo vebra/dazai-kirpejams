@@ -3,9 +3,7 @@ import { locales, defaultLocale } from '@/i18n/config'
 import { SITE_URL } from '@/lib/seo'
 import { getCategories, getProducts, getBlogPosts } from '@/lib/data/queries'
 import { AUTHORS } from '@/lib/data/authors'
-import { isEventPast } from '@/lib/events/config'
-import { getActiveEvent } from '@/lib/events/queries'
-import { getEventVisibility } from '@/lib/events/visibility'
+import { getVisibleUpcomingEvents } from '@/lib/events/queries'
 
 /**
  * Statinių puslapių sąrašas — pathai BE lokalės prefikso.
@@ -118,23 +116,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     expandLocales(`/autorius/${a.slug}`, undefined, 'monthly', 0.5)
   )
 
-  // 6. Renginys — tik LT, rodom kol renginys neįvyko ir admin neišjungė.
-  // LT yra default locale, todėl URL serveriamas be prefikso (/renginys).
-  // Kiti lokaliai redirect'ina į /renginys, tad į sitemap neįtraukiam.
-  const [eventVisible, activeEvent] = await Promise.all([
-    getEventVisibility(),
-    getActiveEvent(),
-  ])
-  const eventEntries: MetadataRoute.Sitemap =
-    !eventVisible || isEventPast(activeEvent)
-      ? []
-      : [
-          {
-            url: `${SITE_URL}${activeEvent.path}`,
-            changeFrequency: 'daily',
-            priority: 0.9,
-          },
-        ]
+  // 6. Renginiai — tik LT, kiekvienas matomas (is_active=true, upcoming)
+  // gauna atskirą sitemap įrašą /renginys/<slug>. Senas /renginys URL'as
+  // į sitemap'ą neįtraukiamas (jis 307 redirect'ina į artimiausią slug'ą,
+  // tad jo crawl'as duplikatas).
+  const visibleEvents = await getVisibleUpcomingEvents()
+  const eventEntries: MetadataRoute.Sitemap = visibleEvents.map((e) => ({
+    url: `${SITE_URL}/renginys/${e.slug}`,
+    changeFrequency: 'daily' as const,
+    priority: 0.9,
+  }))
 
   return [
     ...staticEntries,

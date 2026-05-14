@@ -2,16 +2,14 @@ import { unstable_cache } from 'next/cache'
 import { DAZU_PREZENTACIJA_2026, type EventInfo } from './config'
 
 /**
- * Aktyvaus renginio DB query'is su fallback į hardcoded reikšmes.
+ * Renginių DB query'iai su fallback į hardcoded reikšmes.
  *
- * Renginio duomenis saugo `events` lentelė (migracija 028). Admin redaguoja
- * per /admin/renginiai puslapį. Šis helper grąžina `EventInfo` shape'ą,
- * kuris savaime sutampa su buvusiu `DAZU_PREZENTACIJA_2026` konstantu —
- * todėl visi callsites veikia be papildomo type mapping'o.
+ * Lentelė `events` (migracija 028 + 031) palaiko kelis renginius vienu metu.
+ * Kiekvienas turi `is_active` (per-event viešo matomumo perjungiklis).
+ * Admin redaguoja per /admin/renginiai puslapį.
  *
- * Fallback: jei DB neprieinamas arba lentelės dar nėra (migracija
- * nepritaikyta), grąžinam hardcoded'intą DAZU_PREZENTACIJA_2026. Tai
- * apsaugo nuo viešo puslapio 500 klaidų lokaliam dev'e be Supabase.
+ * Fallback: jei DB neprieinamas arba lentelės dar nėra, viešas puslapis
+ * grįžta prie hardcoded'into DAZU_PREZENTACIJA_2026 — apsauga nuo 500 klaidų.
  */
 
 export const ACTIVE_EVENT_TAG = 'active-event'
@@ -47,10 +45,6 @@ export function vilniusOffsetMs(d: Date): number {
  * į UTC `Date`. DST-aware — naudoja Intl Vilnius'o offset'ą tai datai.
  */
 export function vilniusWallToUtc(wallStr: string): Date {
-  // Pirma — apdorojam wall'ą tarsi jis būtų UTC. Toks „blogasis" Date
-  // mums duoda referencinį tašką, prie kurio prisirišus paimam realų
-  // Vilniaus offset'ą (kuris gali skirtis pasienyje su DST, bet abi
-  // pusės įstos į to paties offset'o ribas).
   const asIfUtc = new Date(wallStr + 'Z')
   return new Date(asIfUtc.getTime() - vilniusOffsetMs(asIfUtc))
 }
@@ -77,8 +71,6 @@ export function utcToVilniusInputValue(d: Date): string {
 
 /** Apskaičiuoja ISO string'ą su Europe/Vilnius offset'u (EEST/EET). */
 function toVilniusIso(d: Date): string {
-  // Sprendžiam offset'ą per realią Vilniaus + UTC laiko skirtumą.
-  // (Intl.DateTimeFormat'as DST'o atžvilgiu yra teisingas.)
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone: 'Europe/Vilnius',
     year: 'numeric',
@@ -93,13 +85,11 @@ function toVilniusIso(d: Date): string {
   const yyyy = get('year')
   const mm = get('month')
   const dd = get('day')
-  // Intl gali grąžinti "24" vidurnaktiui — normalizuojam į "00"
   let hh = get('hour')
   if (hh === '24') hh = '00'
   const min = get('minute')
   const ss = get('second')
 
-  // Offset = (Vilniaus laikas) − (UTC laikas) milisekundėmis
   const asLocal = Date.UTC(
     Number(yyyy),
     Number(mm) - 1,
@@ -117,7 +107,7 @@ function toVilniusIso(d: Date): string {
   return `${yyyy}-${mm}-${dd}T${hh}:${min}:${ss}${sign}${offHh}:${offMm}`
 }
 
-type DbEventRow = {
+type CachedEventDto = {
   slug: string
   is_active: boolean
   title: string
@@ -138,43 +128,11 @@ type DbEventRow = {
   contact_email: string
   path: string
   hero_image_url: string | null
+  display_order: number
 }
 
-/**
- * Cache'inama versija — JSON-friendly (ISO string'ai, ne Date'ai), nes
- * `unstable_cache` serializuoja per JSON ir Date instance neišlieka.
- */
-type CachedEventDto = Omit<DbEventRow, 'is_active'>
-
-async function _getActiveEventDto(): Promise<CachedEventDto | null> {
-  try {
-    const { createServerClient } = await import('@/lib/supabase/server')
-    const supabase = createServerClient()
-    const { data, error } = await supabase
-      .from('events')
-      .select(
-        'slug, title, short_title, description, starts_at, ends_at, venue_name, venue_street, venue_city, venue_country, venue_postal_code, presenter_name, presenter_title, is_free, capacity_min, capacity_max, contact_email, path, hero_image_url'
-      )
-      .eq('is_active', true)
-      .limit(1)
-      .maybeSingle<CachedEventDto>()
-
-    if (error) {
-      console.error('[events/queries] getActiveEvent:', error.message)
-      return null
-    }
-    return data ?? null
-  } catch (e) {
-    console.error('[events/queries] getActiveEvent exception:', e)
-    return null
-  }
-}
-
-const getActiveEventDtoCached = unstable_cache(
-  _getActiveEventDto,
-  ['active-event'],
-  { revalidate: 60, tags: [ACTIVE_EVENT_TAG] },
-)
+const EVENT_COLUMNS =
+  'slug, is_active, title, short_title, description, starts_at, ends_at, venue_name, venue_street, venue_city, venue_country, venue_postal_code, presenter_name, presenter_title, is_free, capacity_min, capacity_max, contact_email, path, hero_image_url, display_order'
 
 function dtoToEventInfo(row: CachedEventDto): EventInfo {
   const startsAt = new Date(row.starts_at)
@@ -204,13 +162,154 @@ function dtoToEventInfo(row: CachedEventDto): EventInfo {
   }
 }
 
+/** Lapinis tipas — `EventInfo` + admin'ui aktualus `isActive` (visibility). */
+export type EventAdminInfo = EventInfo & {
+  isActive: boolean
+  displayOrder: number
+}
+
+function dtoToAdminInfo(row: CachedEventDto): EventAdminInfo {
+  return {
+    ...dtoToEventInfo(row),
+    isActive: row.is_active,
+    displayOrder: row.display_order,
+  }
+}
+
+// ============================================
+// Public queries (cache'inamos)
+// ============================================
+
+async function _getEventBySlugDto(slug: string): Promise<CachedEventDto | null> {
+  try {
+    const { createServerClient } = await import('@/lib/supabase/server')
+    const supabase = createServerClient()
+    const { data, error } = await supabase
+      .from('events')
+      .select(EVENT_COLUMNS)
+      .eq('slug', slug)
+      .maybeSingle<CachedEventDto>()
+
+    if (error) {
+      console.error('[events/queries] getEventBySlug:', error.message)
+      return null
+    }
+    return data ?? null
+  } catch (e) {
+    console.error('[events/queries] getEventBySlug exception:', e)
+    return null
+  }
+}
+
+/** Renginys pagal slug'ą — nepriklausomai nuo `is_active` (admin'ui). */
+export async function getEventBySlug(slug: string): Promise<EventInfo | null> {
+  const dto = await unstable_cache(
+    () => _getEventBySlugDto(slug),
+    ['event-by-slug', slug],
+    { revalidate: 60, tags: [ACTIVE_EVENT_TAG, `event:${slug}`] },
+  )()
+  return dto ? dtoToEventInfo(dto) : null
+}
+
 /**
- * Grąžina aktyvų renginį. Cache'as gyvuoja 60s — admin redagavimas iškart
- * iškviečia `updateTag(ACTIVE_EVENT_TAG)`, tad cache atnaujinamas iškart.
- * Jei DB nepasiekiamas arba lentelės dar nėra — fallback į hardcoded'intą
- * DAZU_PREZENTACIJA_2026 (apsauga nuo viešo puslapio 500 klaidų).
+ * Renginys pagal slug'ą TIK jei `is_active=true`. Naudoja viešas /renginys/[slug]
+ * route'as — paslėptam renginiui grąžina null → 404.
+ */
+export async function getActiveEventBySlug(
+  slug: string,
+): Promise<EventInfo | null> {
+  const dto = await unstable_cache(
+    () => _getEventBySlugDto(slug),
+    ['event-by-slug', slug],
+    { revalidate: 60, tags: [ACTIVE_EVENT_TAG, `event:${slug}`] },
+  )()
+  if (!dto || !dto.is_active) return null
+  return dtoToEventInfo(dto)
+}
+
+async function _getVisibleUpcomingEventsDto(): Promise<CachedEventDto[]> {
+  try {
+    const { createServerClient } = await import('@/lib/supabase/server')
+    const supabase = createServerClient()
+    // „Upcoming" = ends_at + 24h dar ateityje (atitinka isEventPast()).
+    const cutoffIso = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+    const { data, error } = await supabase
+      .from('events')
+      .select(EVENT_COLUMNS)
+      .eq('is_active', true)
+      .gt('ends_at', cutoffIso)
+      .order('display_order', { ascending: true })
+      .order('starts_at', { ascending: true })
+
+    if (error) {
+      console.error('[events/queries] getVisibleUpcomingEvents:', error.message)
+      return []
+    }
+    return (data ?? []) as CachedEventDto[]
+  } catch (e) {
+    console.error('[events/queries] getVisibleUpcomingEvents exception:', e)
+    return []
+  }
+}
+
+const getVisibleUpcomingEventsDtoCached = unstable_cache(
+  _getVisibleUpcomingEventsDto,
+  ['visible-upcoming-events'],
+  { revalidate: 60, tags: [ACTIVE_EVENT_TAG] },
+)
+
+/** Visi viešai matomi renginiai, kurių pabaiga + 24h dar ateityje. */
+export async function getVisibleUpcomingEvents(): Promise<EventInfo[]> {
+  const rows = await getVisibleUpcomingEventsDtoCached()
+  return rows.map(dtoToEventInfo)
+}
+
+/**
+ * Arčiausias upcoming visibly renginys — backward-compat su senuoju
+ * `getActiveEvent()`. Naudoja /renginys (be slug'o) redirect'ui ir homepage
+ * sekcijai, kuri rodo tik vieną renginį.
+ */
+export async function getNearestUpcomingVisibleEvent(): Promise<EventInfo | null> {
+  const list = await getVisibleUpcomingEvents()
+  return list[0] ?? null
+}
+
+// ============================================
+// Admin queries (be cache — admin'ui reikia šviežių duomenų)
+// ============================================
+
+/** Visi renginiai (admin sąrašui) — rūšiuoti pagal display_order, starts_at. */
+export async function getAllEvents(): Promise<EventAdminInfo[]> {
+  try {
+    const { createServerClient } = await import('@/lib/supabase/server')
+    const supabase = createServerClient()
+    const { data, error } = await supabase
+      .from('events')
+      .select(EVENT_COLUMNS)
+      .order('display_order', { ascending: true })
+      .order('starts_at', { ascending: true })
+
+    if (error) {
+      console.error('[events/queries] getAllEvents:', error.message)
+      return []
+    }
+    return ((data ?? []) as CachedEventDto[]).map(dtoToAdminInfo)
+  } catch (e) {
+    console.error('[events/queries] getAllEvents exception:', e)
+    return []
+  }
+}
+
+// ============================================
+// Backward-compat — kol kiti file'ai dar naudoja
+// ============================================
+
+/**
+ * @deprecated Naudoti `getNearestUpcomingVisibleEvent()` arba
+ * `getEventBySlug(slug)`. Liko, kad nesulaužytume callsites'ų refactor'o metu.
+ * Jei nėra matomo renginio — grąžina hardcoded'intą fallback'ą.
  */
 export async function getActiveEvent(): Promise<EventInfo> {
-  const dto = await getActiveEventDtoCached()
-  return dto ? dtoToEventInfo(dto) : DAZU_PREZENTACIJA_2026
+  const nearest = await getNearestUpcomingVisibleEvent()
+  return nearest ?? DAZU_PREZENTACIJA_2026
 }

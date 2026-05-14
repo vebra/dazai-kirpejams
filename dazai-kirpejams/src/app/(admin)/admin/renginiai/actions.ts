@@ -6,16 +6,15 @@ import { requireAdmin } from '@/lib/admin/auth'
 import { createServerClient } from '@/lib/supabase/server'
 import {
   ACTIVE_EVENT_TAG,
+  getEventBySlug,
   vilniusWallToUtc,
 } from '@/lib/events/queries'
-import { EVENT_VISIBILITY_TAG } from '@/lib/events/visibility'
 import { sendEmail } from '@/lib/email/resend'
 import {
   buildEventRegistrationCustomerEmail,
   buildEventReminderEmail,
 } from '@/lib/events/emails'
 import { buildIcsFile } from '@/lib/events/ics'
-import { getActiveEvent } from '@/lib/events/queries'
 import {
   EVENT_WIDGET_DEFAULTS,
   saveEventWidgetPrefs,
@@ -129,8 +128,11 @@ export async function resendConfirmationEmailAction(
 
   if (fetchErr || !reg) return { ok: false, error: 'not-found' }
 
-  const event = await getActiveEvent()
-  const eventUrl = `${SITE_URL}/lt${event.path}`
+  // Renginį parenkam pagal registracijos `event_slug`, kad veiktų kelių
+  // renginių scenarijui.
+  const event = await getEventBySlug(reg.event_slug)
+  if (!event) return { ok: false, error: 'event-not-found' }
+  const eventUrl = `${SITE_URL}/renginys/${event.slug}`
 
   try {
     if (kind === 'reminder') {
@@ -243,14 +245,35 @@ function intOr(v: FormDataEntryValue | null, fallback: number): number {
   return Number.isFinite(n) && n >= 0 ? Math.floor(n) : fallback
 }
 
-export async function updateEventAction(
-  formData: FormData
-): Promise<void> {
-  await requireAdmin()
+type EventFieldsResult =
+  | { ok: true; fields: EventFieldsPayload }
+  | { ok: false; errorParam: string }
 
-  const slug = trimOrEmpty(formData.get('slug'))
-  if (!slug) redirect('/admin/renginiai/redaguoti?error=invalid-slug')
+type EventFieldsPayload = {
+  title: string
+  short_title: string
+  description: string
+  starts_at: string
+  ends_at: string
+  venue_name: string
+  venue_street: string
+  venue_city: string
+  venue_country: string
+  venue_postal_code: string | null
+  presenter_name: string
+  presenter_title: string
+  is_free: boolean
+  capacity_min: number
+  capacity_max: number
+  contact_email: string
+}
 
+/**
+ * Iš FormData ištraukia ir validuoja visus renginio laukus (be slug, be
+ * is_active — tie tvarkomi atskirai). Naudoja `createEventAction` ir
+ * `updateEventAction`.
+ */
+function parseEventFields(formData: FormData): EventFieldsResult {
   const title = trimOrEmpty(formData.get('title'))
   const shortTitle = trimOrEmpty(formData.get('short_title'))
   const description = trimOrEmpty(formData.get('description'))
@@ -267,7 +290,6 @@ export async function updateEventAction(
   const capacityMin = intOr(formData.get('capacity_min'), 0)
   const capacityMax = intOr(formData.get('capacity_max'), 0)
   const contactEmail = trimOrEmpty(formData.get('contact_email'))
-  const path = trimOrEmpty(formData.get('path')) || '/renginys'
 
   if (
     !title ||
@@ -282,61 +304,196 @@ export async function updateEventAction(
     !presenterTitle ||
     !contactEmail
   ) {
-    redirect('/admin/renginiai/redaguoti?error=required-missing')
+    return { ok: false, errorParam: 'required-missing' }
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) {
-    redirect('/admin/renginiai/redaguoti?error=invalid-email')
+    return { ok: false, errorParam: 'invalid-email' }
   }
   if (capacityMax < capacityMin) {
-    redirect('/admin/renginiai/redaguoti?error=capacity-order')
+    return { ok: false, errorParam: 'capacity-order' }
   }
 
   const startsAtUtc = vilniusWallToUtc(startsAtWall)
   const endsAtUtc = vilniusWallToUtc(endsAtWall)
   if (endsAtUtc.getTime() <= startsAtUtc.getTime()) {
-    redirect('/admin/renginiai/redaguoti?error=date-order')
+    return { ok: false, errorParam: 'date-order' }
+  }
+
+  return {
+    ok: true,
+    fields: {
+      title,
+      short_title: shortTitle,
+      description,
+      starts_at: startsAtUtc.toISOString(),
+      ends_at: endsAtUtc.toISOString(),
+      venue_name: venueName,
+      venue_street: venueStreet,
+      venue_city: venueCity,
+      venue_country: venueCountry,
+      venue_postal_code: venuePostalCode || null,
+      presenter_name: presenterName,
+      presenter_title: presenterTitle,
+      is_free: isFree,
+      capacity_min: capacityMin,
+      capacity_max: capacityMax,
+      contact_email: contactEmail,
+    },
+  }
+}
+
+function slugify(input: string): string {
+  return input
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80)
+}
+
+function revalidateEventRoutes(slug: string): void {
+  updateTag(ACTIVE_EVENT_TAG)
+  revalidatePath('/admin/renginiai')
+  revalidatePath('/admin/renginiai/[slug]', 'page')
+  revalidatePath('/admin/renginiai/[slug]/redaguoti', 'page')
+  revalidatePath('/', 'layout')
+  revalidatePath('/renginys')
+  revalidatePath(`/renginys/${slug}`)
+  revalidatePath('/sitemap.xml')
+}
+
+export async function updateEventAction(
+  formData: FormData
+): Promise<void> {
+  await requireAdmin()
+
+  const slug = trimOrEmpty(formData.get('slug'))
+  if (!slug) redirect('/admin/renginiai?error=invalid-slug')
+
+  const parsed = parseEventFields(formData)
+  if (!parsed.ok) {
+    redirect(
+      `/admin/renginiai/${encodeURIComponent(slug)}/redaguoti?error=${parsed.errorParam}`
+    )
   }
 
   const supabase = createServerClient()
   const { error } = await supabase
     .from('events')
-    .upsert(
-      {
-        slug,
-        is_active: true,
-        title,
-        short_title: shortTitle,
-        description,
-        starts_at: startsAtUtc.toISOString(),
-        ends_at: endsAtUtc.toISOString(),
-        venue_name: venueName,
-        venue_street: venueStreet,
-        venue_city: venueCity,
-        venue_country: venueCountry,
-        venue_postal_code: venuePostalCode || null,
-        presenter_name: presenterName,
-        presenter_title: presenterTitle,
-        is_free: isFree,
-        capacity_min: capacityMin,
-        capacity_max: capacityMax,
-        contact_email: contactEmail,
-        path,
-      },
-      { onConflict: 'slug' }
-    )
+    .update(parsed.fields)
+    .eq('slug', slug)
 
   if (error) {
     console.error('[admin/renginiai/actions] updateEvent:', error.message)
-    redirect('/admin/renginiai/redaguoti?error=update-failed')
+    redirect(
+      `/admin/renginiai/${encodeURIComponent(slug)}/redaguoti?error=update-failed`
+    )
   }
 
-  updateTag(ACTIVE_EVENT_TAG)
-  revalidatePath('/admin/renginiai')
-  revalidatePath('/', 'layout')
-  revalidatePath('/renginys')
-  revalidatePath('/sitemap.xml')
+  revalidateEventRoutes(slug)
+  redirect(`/admin/renginiai/${encodeURIComponent(slug)}/redaguoti?saved=event`)
+}
 
-  redirect('/admin/renginiai?saved=event')
+export async function createEventAction(
+  formData: FormData
+): Promise<void> {
+  await requireAdmin()
+
+  // Slug'ą galima įvesti rankiniu būdu arba palikti tuščią — tada
+  // automatiškai generuojamas iš pavadinimo.
+  let slug = trimOrEmpty(formData.get('slug'))
+  const title = trimOrEmpty(formData.get('title'))
+  if (!slug && title) slug = slugify(title)
+  if (!slug) redirect('/admin/renginiai/naujas?error=invalid-slug')
+
+  const parsed = parseEventFields(formData)
+  if (!parsed.ok) {
+    redirect(`/admin/renginiai/naujas?error=${parsed.errorParam}`)
+  }
+
+  const supabase = createServerClient()
+  const { error } = await supabase.from('events').insert({
+    slug,
+    is_active: false, // Naujas renginys pradeda paslėptas — admin įjungia.
+    display_order: 0,
+    path: `/renginys/${slug}`,
+    ...parsed.fields,
+  })
+
+  if (error) {
+    if (error.code === '23505') {
+      redirect('/admin/renginiai/naujas?error=slug-taken')
+    }
+    console.error('[admin/renginiai/actions] createEvent:', error.message)
+    redirect('/admin/renginiai/naujas?error=update-failed')
+  }
+
+  revalidateEventRoutes(slug)
+  redirect(`/admin/renginiai/${encodeURIComponent(slug)}/redaguoti?saved=created`)
+}
+
+export async function deleteEventAction(
+  formData: FormData
+): Promise<void> {
+  await requireAdmin()
+
+  const slug = trimOrEmpty(formData.get('slug'))
+  if (!slug) redirect('/admin/renginiai?error=invalid-slug')
+
+  const supabase = createServerClient()
+
+  // Hero nuotraukos cleanup — jei buvo įkelta į mūsų bucket'ą.
+  const { data: existing } = await supabase
+    .from('events')
+    .select('hero_image_url')
+    .eq('slug', slug)
+    .maybeSingle<{ hero_image_url: string | null }>()
+
+  const { error } = await supabase.from('events').delete().eq('slug', slug)
+
+  if (error) {
+    console.error('[admin/renginiai/actions] deleteEvent:', error.message)
+    redirect('/admin/renginiai?error=delete-failed')
+  }
+
+  if (existing?.hero_image_url) {
+    const marker = `/storage/v1/object/public/${EVENTS_BUCKET}/`
+    const idx = existing.hero_image_url.indexOf(marker)
+    if (idx !== -1) {
+      const path = existing.hero_image_url.slice(idx + marker.length)
+      if (path) {
+        await supabase.storage.from(EVENTS_BUCKET).remove([path])
+      }
+    }
+  }
+
+  revalidateEventRoutes(slug)
+  redirect('/admin/renginiai?saved=deleted')
+}
+
+export async function setEventActiveAction(
+  formData: FormData
+): Promise<void> {
+  await requireAdmin()
+
+  const slug = trimOrEmpty(formData.get('slug'))
+  if (!slug) redirect('/admin/renginiai?error=invalid-slug')
+  const active = formData.get('active') === 'true'
+
+  const supabase = createServerClient()
+  const { error } = await supabase
+    .from('events')
+    .update({ is_active: active })
+    .eq('slug', slug)
+
+  if (error) {
+    console.error('[admin/renginiai/actions] setActive:', error.message)
+    redirect('/admin/renginiai?error=update-failed')
+  }
+
+  revalidateEventRoutes(slug)
+  redirect(`/admin/renginiai?saved=${active ? 'activated' : 'deactivated'}`)
 }
 
 export async function uploadEventHeroImageAction(
@@ -345,17 +502,18 @@ export async function uploadEventHeroImageAction(
   await requireAdmin()
 
   const slug = trimOrEmpty(formData.get('slug'))
-  if (!slug) redirect('/admin/renginiai/redaguoti?error=invalid-slug')
+  if (!slug) redirect('/admin/renginiai?error=invalid-slug')
+  const editPath = `/admin/renginiai/${encodeURIComponent(slug)}/redaguoti`
 
   const file = formData.get('hero_image')
   if (!(file instanceof File) || file.size === 0) {
-    redirect('/admin/renginiai/redaguoti?error=image-missing')
+    redirect(`${editPath}?error=image-missing`)
   }
   if (file.size > MAX_HERO_IMAGE_BYTES) {
-    redirect('/admin/renginiai/redaguoti?error=image-too-large')
+    redirect(`${editPath}?error=image-too-large`)
   }
   if (!ALLOWED_HERO_MIME.has(file.type)) {
-    redirect('/admin/renginiai/redaguoti?error=image-format')
+    redirect(`${editPath}?error=image-format`)
   }
 
   const supabase = createServerClient()
@@ -370,7 +528,7 @@ export async function uploadEventHeroImageAction(
     })
   if (uploadError) {
     console.error('[admin/renginiai/actions] hero upload:', uploadError.message)
-    redirect('/admin/renginiai/redaguoti?error=image-upload-failed')
+    redirect(`${editPath}?error=image-upload-failed`)
   }
 
   const { data: publicData } = supabase.storage
@@ -394,7 +552,7 @@ export async function uploadEventHeroImageAction(
     console.error('[admin/renginiai/actions] hero update:', updateError.message)
     // Naują failą išvalom, kad neliktų orphan'o
     await supabase.storage.from(EVENTS_BUCKET).remove([path])
-    redirect('/admin/renginiai/redaguoti?error=update-failed')
+    redirect(`${editPath}?error=update-failed`)
   }
 
   // Senąją nuotrauką (jei iš mūsų bucket'o) trinam — orphan cleanup
@@ -410,13 +568,8 @@ export async function uploadEventHeroImageAction(
     }
   }
 
-  updateTag(ACTIVE_EVENT_TAG)
-  revalidatePath('/admin/renginiai')
-  revalidatePath('/admin/renginiai/redaguoti')
-  revalidatePath('/', 'layout')
-  revalidatePath('/renginys')
-
-  redirect('/admin/renginiai/redaguoti?saved=image')
+  revalidateEventRoutes(slug)
+  redirect(`${editPath}?saved=image`)
 }
 
 export async function removeEventHeroImageAction(
@@ -424,7 +577,8 @@ export async function removeEventHeroImageAction(
 ): Promise<void> {
   await requireAdmin()
   const slug = trimOrEmpty(formData.get('slug'))
-  if (!slug) redirect('/admin/renginiai/redaguoti?error=invalid-slug')
+  if (!slug) redirect('/admin/renginiai?error=invalid-slug')
+  const editPath = `/admin/renginiai/${encodeURIComponent(slug)}/redaguoti`
 
   const supabase = createServerClient()
   const { data: existing } = await supabase
@@ -439,7 +593,7 @@ export async function removeEventHeroImageAction(
     .eq('slug', slug)
   if (error) {
     console.error('[admin/renginiai/actions] hero remove:', error.message)
-    redirect('/admin/renginiai/redaguoti?error=update-failed')
+    redirect(`${editPath}?error=update-failed`)
   }
 
   const prevUrl = existing?.hero_image_url
@@ -454,39 +608,8 @@ export async function removeEventHeroImageAction(
     }
   }
 
-  updateTag(ACTIVE_EVENT_TAG)
-  revalidatePath('/admin/renginiai')
-  revalidatePath('/admin/renginiai/redaguoti')
-  revalidatePath('/', 'layout')
-  revalidatePath('/renginys')
-
-  redirect('/admin/renginiai/redaguoti?saved=image-removed')
-}
-
-export async function setEventVisibilityAction(
-  formData: FormData
-): Promise<void> {
-  await requireAdmin()
-  const visible = formData.get('visible') === 'true'
-
-  const supabase = createServerClient()
-  const { error } = await supabase
-    .from('shop_settings')
-    .upsert(
-      { key: 'event_visible', value: visible, updated_at: new Date().toISOString() },
-      { onConflict: 'key' }
-    )
-
-  if (error) {
-    console.error('[admin/renginiai/actions] setVisibility:', error.message)
-    redirect('/admin/renginiai?error=update-failed')
-  }
-
-  updateTag(EVENT_VISIBILITY_TAG)
-  revalidatePath('/admin/renginiai')
-  revalidatePath('/', 'layout')
-  revalidatePath('/renginys')
-  revalidatePath('/sitemap.xml')
+  revalidateEventRoutes(slug)
+  redirect(`${editPath}?saved=image-removed`)
 }
 
 export async function deleteEventRegistrationAction(

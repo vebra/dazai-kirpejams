@@ -9,7 +9,7 @@ import { trackLead } from '@/lib/analytics'
 
 const initialState: EventRegistrationState = {}
 
-export function EventRegistrationForm() {
+export function EventRegistrationForm({ eventSlug }: { eventSlug: string }) {
   const [state, formAction, isPending] = useActionState(
     registerForEventAction,
     initialState
@@ -47,6 +47,7 @@ export function EventRegistrationForm() {
 
   return (
     <form action={formAction} className="space-y-5">
+      <input type="hidden" name="event_slug" value={eventSlug} />
       {/* Honeypot — inline style užtikrina hide net kai Tailwind nesuveikia */}
       <div
         aria-hidden="true"
