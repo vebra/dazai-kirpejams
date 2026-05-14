@@ -291,6 +291,10 @@ export const FORM_ERRORS: Record<string, string> = {
 export const FORM_SAVED: Record<string, string> = {
   event: 'Renginio duomenys išsaugoti.',
   created: 'Naujas renginys sukurtas. Jis yra paslėptas — įjunkite jį renginių sąraše, kad atsirastų viešai.',
+  'created-with-image':
+    'Naujas renginys sukurtas su hero nuotrauka. Jis yra paslėptas — įjunkite jį renginių sąraše, kad atsirastų viešai.',
+  'created-image-failed':
+    'Renginys sukurtas, bet hero nuotraukos įkelti nepavyko. Bandykite įkelti dar kartą čia, redagavimo formoje.',
   image: 'Hero nuotrauka įkelta.',
   'image-removed':
     'Hero nuotrauka pašalinta — viešas puslapis grįžo prie numatytojo /event-hero.jpg.',

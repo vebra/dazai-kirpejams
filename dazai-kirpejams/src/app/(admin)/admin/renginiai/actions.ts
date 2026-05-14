@@ -217,6 +217,52 @@ const ALLOWED_HERO_MIME = new Set([
   'image/avif',
 ])
 
+/**
+ * Validuoja FormData'oj esantį `hero_image` File'ą. Grąžina:
+ *  • { ok: true, file: null } — failas neperduotas (skip upload'ą)
+ *  • { ok: true, file: File } — failas validus, galima įkelti
+ *  • { ok: false, errorParam } — validacijos klaida
+ */
+function readHeroImageFile(formData: FormData):
+  | { ok: true; file: File | null }
+  | { ok: false; errorParam: string } {
+  const raw = formData.get('hero_image')
+  if (!(raw instanceof File) || raw.size === 0) {
+    return { ok: true, file: null }
+  }
+  if (raw.size > MAX_HERO_IMAGE_BYTES) {
+    return { ok: false, errorParam: 'image-too-large' }
+  }
+  if (!ALLOWED_HERO_MIME.has(raw.type)) {
+    return { ok: false, errorParam: 'image-format' }
+  }
+  return { ok: true, file: raw }
+}
+
+/**
+ * Įkelia hero nuotrauką į `events` bucket'ą. Grąžina viešą URL'ą arba null
+ * (jei upload'o klaida). Caller'is atsako už row'o UPDATE'ą su URL'u.
+ */
+async function uploadHeroImageBuffer(
+  supabase: ReturnType<typeof createServerClient>,
+  slug: string,
+  file: File,
+): Promise<{ ok: true; url: string; path: string } | { ok: false }> {
+  const path = buildHeroImagePath(slug, file)
+  const buffer = Buffer.from(await file.arrayBuffer())
+  const { error: uploadError } = await supabase.storage
+    .from(EVENTS_BUCKET)
+    .upload(path, buffer, { contentType: file.type, upsert: false })
+  if (uploadError) {
+    console.error('[admin/renginiai/actions] upload:', uploadError.message)
+    return { ok: false }
+  }
+  const { data: publicData } = supabase.storage
+    .from(EVENTS_BUCKET)
+    .getPublicUrl(path)
+  return { ok: true, url: publicData.publicUrl, path }
+}
+
 function buildHeroImagePath(slug: string, file: File): string {
   const fromName = file.name.split('.').pop()?.toLowerCase()
   const ext =
@@ -412,6 +458,13 @@ export async function createEventAction(
     redirect(`/admin/renginiai/naujas?error=${parsed.errorParam}`)
   }
 
+  // Hero nuotrauka — nebūtina. Validuojam dabar, kad neinsertintume
+  // event'o ir tada nepamiršti, jog failas blogo formato.
+  const heroFile = readHeroImageFile(formData)
+  if (!heroFile.ok) {
+    redirect(`/admin/renginiai/naujas?error=${heroFile.errorParam}`)
+  }
+
   const supabase = createServerClient()
   const { error } = await supabase.from('events').insert({
     slug,
@@ -429,8 +482,31 @@ export async function createEventAction(
     redirect('/admin/renginiai/naujas?error=update-failed')
   }
 
+  // Jei admin'as pridėjo hero nuotrauką — įkeliam į Storage ir UPDATE'inam
+  // ką tik sukurtą eilutę. Klaidos upload'e nesusprogdina viso veiksmo —
+  // renginys jau sukurtas, admin gali įkelti vėliau per edit puslapį.
+  let savedParam = 'created'
+  if (heroFile.file) {
+    const upload = await uploadHeroImageBuffer(supabase, slug, heroFile.file)
+    if (upload.ok) {
+      const { error: updateError } = await supabase
+        .from('events')
+        .update({ hero_image_url: upload.url })
+        .eq('slug', slug)
+      if (updateError) {
+        console.error('[admin/renginiai/actions] hero url save:', updateError.message)
+        await supabase.storage.from(EVENTS_BUCKET).remove([upload.path])
+        savedParam = 'created-image-failed'
+      } else {
+        savedParam = 'created-with-image'
+      }
+    } else {
+      savedParam = 'created-image-failed'
+    }
+  }
+
   revalidateEventRoutes(slug)
-  redirect(`/admin/renginiai/${encodeURIComponent(slug)}/redaguoti?saved=created`)
+  redirect(`/admin/renginiai/${encodeURIComponent(slug)}/redaguoti?saved=${savedParam}`)
 }
 
 export async function deleteEventAction(

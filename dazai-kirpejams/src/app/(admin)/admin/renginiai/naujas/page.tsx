@@ -48,7 +48,11 @@ export default async function NewEventPage({
         </div>
       )}
 
-      <form action={createEventAction} className="space-y-6">
+      <form
+        action={createEventAction}
+        encType="multipart/form-data"
+        className="space-y-6"
+      >
         <Section
           title="Renginio ID (slug)"
           desc="URL kelio dalis: /renginys/<slug>. Leidžiama palikti tuščią — tada
@@ -61,6 +65,26 @@ export default async function NewEventPage({
             placeholder="pvz. vasaros-prezentacija-2026"
             hint="Jei nesate tikri — palikite tuščią, sugeneruos iš pavadinimo."
           />
+        </Section>
+
+        <Section
+          title="Hero nuotrauka (nebūtina)"
+          desc="Rodoma per visą plotį /renginys/<slug> puslapio viršuje. Rekomendacija: 16:9 ar 21:9, bent 1600×900 px. JPG/PNG/WebP/AVIF iki 10 MB. Jei nepasirinksite — bus naudojama numatytoji /event-hero.jpg."
+        >
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[12px] font-semibold text-brand-gray-900">
+              Pasirinkti nuotrauką
+            </span>
+            <input
+              type="file"
+              name="hero_image"
+              accept="image/jpeg,image/png,image/webp,image/avif"
+              className="text-sm text-brand-gray-900 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-brand-magenta file:text-white file:text-[12px] file:font-semibold file:cursor-pointer hover:file:bg-brand-magenta-dark"
+            />
+            <span className="text-[11px] text-brand-gray-500">
+              Vėliau visada galėsite pakeisti per redagavimo puslapį.
+            </span>
+          </label>
         </Section>
 
         <EventFormFields />
