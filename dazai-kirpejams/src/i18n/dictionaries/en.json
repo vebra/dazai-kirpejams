@@ -1197,7 +1197,9 @@
       "notes": "Additional information",
       "notesPlaceholder": "E.g. I work at \"Stilius\" salon in Kaunas, 5+ years of experience...",
       "noticeStrong": "Important:",
-      "noticeText": "After registration you will need to upload a professional qualification document (hairdresser certificate or business license). You can do this once signed in. Without a document, prices will not be visible."
+      "noticeText": "This store is for professionals only. Once you confirm you are a hairdresser, colorist or work in a beauty salon, prices are shown immediately — no documents required.",
+      "confirmLabel": "I confirm that I am a professional hairdresser, colorist or work in a beauty salon",
+      "confirmHint": "This is subject to verification. A false confirmation may result in losing access to pricing."
     },
     "submit": "Register",
     "submitting": "Registering…",
@@ -1334,6 +1336,7 @@
     "firstNameRequired": "Enter your first name.",
     "lastNameRequired": "Enter your last name.",
     "businessTypeRequired": "Select an activity type.",
+    "confirmProfessionalRequired": "Please confirm you are a professional — this store is for specialists only.",
     "emailAlreadyRegistered": "This email is already registered. Try signing in.",
     "registerGeneric": "Registration failed. Please try again.",
     "createAccountFailed": "Could not create the account.",

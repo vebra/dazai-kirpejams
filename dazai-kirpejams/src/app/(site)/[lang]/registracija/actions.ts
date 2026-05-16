@@ -71,6 +71,11 @@ export async function registerAction(
   ) {
     return { error: errors.businessTypeRequired }
   }
+  // Profesionalo savideklaracija pakeitė dokumento įkėlimą — be jos
+  // registracija neleidžiama (parduotuvė tik specialistams).
+  if (formData.get('confirm_professional') !== 'on') {
+    return { error: errors.confirmProfessionalRequired }
+  }
 
   const supabase = await createServerSupabase()
   const { data: signUpData, error: signUpError } =
@@ -105,7 +110,10 @@ export async function registerAction(
       company_code: companyCode || null,
       daily_dyes_count: dailyDyesCount || null,
       verification_notes: verificationNotes || null,
-      verification_status: 'pending',
+      // Savideklaracija → iškart patvirtinta (kainos atvertos be laukimo).
+      // Admin'as gali atšaukti įtartinus per /admin/verifikacija.
+      verification_status: 'approved',
+      verified_at: new Date().toISOString(),
     })
 
   if (profileError) {

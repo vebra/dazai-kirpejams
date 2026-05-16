@@ -1197,7 +1197,9 @@
       "notes": "Papildoma informacija",
       "notesPlaceholder": "Pvz. dirbu salone „Stilius\", Kaune, 5+ metų patirtis...",
       "noticeStrong": "Svarbu:",
-      "noticeText": "Po registracijos Jums reikės įkelti profesinės kvalifikacijos dokumentą (kirpėjo sertifikatą arba verslo liudijimą). Tai galėsite padaryti prisijungę prie paskyros. Be dokumento kainos nebus matomos."
+      "noticeText": "Ši parduotuvė skirta tik profesionalams. Patvirtinę, kad esate kirpėja(-s), koloristė(-as) ar dirbate grožio salone, iškart matysite kainas — dokumentų įkelti nereikia.",
+      "confirmLabel": "Patvirtinu, kad esu profesionali(-us) kirpėja(-s), koloristė(-as) arba dirbu grožio salone",
+      "confirmHint": "Ši informacija tikrinama. Klaidingas patvirtinimas gali užkirsti prieigą prie kainų."
     },
     "submit": "Registruotis",
     "submitting": "Registruojama…",
@@ -1334,6 +1336,7 @@
     "firstNameRequired": "Įveskite vardą.",
     "lastNameRequired": "Įveskite pavardę.",
     "businessTypeRequired": "Pasirinkite veiklos tipą.",
+    "confirmProfessionalRequired": "Pažymėkite, kad esate profesionalė(-as) — ši parduotuvė skirta tik specialistams.",
     "emailAlreadyRegistered": "Šis el. paštas jau užregistruotas. Bandykite prisijungti.",
     "registerGeneric": "Nepavyko užregistruoti. Bandykite dar kartą.",
     "createAccountFailed": "Nepavyko sukurti paskyros.",

@@ -45,16 +45,17 @@ export type WelcomeEmailInput = {
 
 const WELCOME_COPY = {
   lt: {
-    subject: 'Sveiki atvykę į Dažai Kirpėjams',
-    preheader: 'Jūsų registracija gauta — laukiame patvirtinimo, kad atidengtume kainas.',
-    badge: 'Registracija sėkminga',
-    title: (name: string) => `Sveiki, ${name}!`,
+    subject: 'Jūsų paskyra patvirtinta — kainos atvertos',
+    preheader: 'Profesionalo statusas patvirtintas. Kainos jau matomos — galite pirkti.',
+    badge: 'Patvirtinta',
+    title: (name: string) => `Sveiki, ${name}! Jūsų prieiga atidaryta`,
     intro:
-      'Ačiū, kad pasirinkote Dažai Kirpėjams. Jūsų paskyra sukurta, ir mes peržiūrėsime registracijos duomenis per artimiausias 24 valandas.',
-    pendingTitle: 'Kas vyksta toliau?',
+      'Ačiū, kad pasirinkote Dažai Kirpėjams. Jūsų profesionalo statusas patvirtintas — nuo šiol matote visas kainas ir galite užsisakyti pilną Color SHOCK asortimentą.',
+    pendingTitle: 'Galite pradėti',
     pendingDesc:
-      'Kol patvirtinsime jūsų profesionalo statusą, kainos liks paslėptos. Kai tik patvirtinsime — gausite atskirą laišką ir galėsite naršyti pilną Color SHOCK katalogą su jūsų kainomis.',
-    perksTitle: 'Tuo tarpu kviečiame:',
+      'Prisijunkite prie paskyros ir naršykite katalogą su jums matomomis profesionalų kainomis. Užsakymai pristatomi įprasta tvarka.',
+    ctaCatalog: 'Peržiūrėti katalogą',
+    perksTitle: 'Taip pat kviečiame:',
     perk1Title: 'Apsilankyti Color SHOCK prezentacijoje Kaune',
     perk1Desc:
       'Gegužės 17 d., 10:00–15:00. Gyva dažymo demonstracija su gyvu modeliu, profesionalūs patarimai. Įėjimas nemokamas.',
@@ -69,17 +70,18 @@ const WELCOME_COPY = {
     footerSite: 'www.dazaikirpejams.lt',
   },
   en: {
-    subject: 'Welcome to Dažai Kirpėjams',
+    subject: 'Your account is approved — prices unlocked',
     preheader:
-      'Your registration is in — we are reviewing it so prices can be unlocked.',
-    badge: 'Registration received',
-    title: (name: string) => `Welcome, ${name}!`,
+      'Professional status confirmed. Prices are now visible — you can order.',
+    badge: 'Approved',
+    title: (name: string) => `Welcome, ${name}! Your access is open`,
     intro:
-      'Thank you for choosing Dažai Kirpėjams. Your account has been created, and we will review your registration within the next 24 hours.',
-    pendingTitle: 'What happens next?',
+      'Thank you for choosing Dažai Kirpėjams. Your professional status is confirmed — you now see all prices and can order the full Color SHOCK range.',
+    pendingTitle: 'You are ready to go',
     pendingDesc:
-      'Until we verify your professional status, prices remain hidden. As soon as we approve — you will receive a separate email and gain full access to the Color SHOCK catalogue with your pricing.',
-    perksTitle: 'In the meantime:',
+      'Sign in to your account and browse the catalogue with your professional pricing. Orders are shipped as usual.',
+    ctaCatalog: 'Browse the catalogue',
+    perksTitle: 'We also invite you to:',
     perk1Title: 'Join the Color SHOCK live demo in Kaunas',
     perk1Desc:
       'May 17, 10:00–15:00. Live colouring demonstration on a real model with professional commentary. Free entry.',
@@ -94,17 +96,18 @@ const WELCOME_COPY = {
     footerSite: 'www.dazaikirpejams.lt',
   },
   ru: {
-    subject: 'Добро пожаловать в Dažai Kirpėjams',
+    subject: 'Ваш аккаунт подтверждён — цены открыты',
     preheader:
-      'Ваша регистрация получена — мы проверяем её, чтобы открыть цены.',
-    badge: 'Регистрация получена',
-    title: (name: string) => `Здравствуйте, ${name}!`,
+      'Профессиональный статус подтверждён. Цены видны — можно заказывать.',
+    badge: 'Подтверждено',
+    title: (name: string) => `Здравствуйте, ${name}! Доступ открыт`,
     intro:
-      'Спасибо, что выбрали Dažai Kirpėjams. Ваш аккаунт создан, мы рассмотрим данные регистрации в ближайшие 24 часа.',
-    pendingTitle: 'Что дальше?',
+      'Спасибо, что выбрали Dažai Kirpėjams. Ваш профессиональный статус подтверждён — теперь вы видите все цены и можете заказать весь ассортимент Color SHOCK.',
+    pendingTitle: 'Можно начинать',
     pendingDesc:
-      'Пока мы подтверждаем ваш профессиональный статус, цены скрыты. Как только мы одобрим аккаунт — вы получите отдельное письмо и получите полный доступ к каталогу Color SHOCK с вашими ценами.',
-    perksTitle: 'А пока приглашаем:',
+      'Войдите в аккаунт и просматривайте каталог с профессиональными ценами. Заказы доставляются в обычном порядке.',
+    ctaCatalog: 'Открыть каталог',
+    perksTitle: 'Также приглашаем:',
     perk1Title: 'Прийти на презентацию Color SHOCK в Каунасе',
     perk1Desc:
       '17 мая, 10:00–15:00. Живая демонстрация окрашивания на модели с комментариями профессионала. Вход бесплатный.',
@@ -128,6 +131,7 @@ export function buildWelcomeEmail(input: WelcomeEmailInput): {
   const c = WELCOME_COPY[input.lang]
   const eventUrl = `${input.siteUrl}/lt/renginys`
   const salonUrl = `${input.siteUrl}/${input.lang}/salonams`
+  const catalogUrl = `${input.siteUrl}/${input.lang}/produktai`
   const safeName = escapeHtml(input.firstName || '')
 
   const html = `<!doctype html>
@@ -171,9 +175,12 @@ export function buildWelcomeEmail(input: WelcomeEmailInput): {
               <div style="font-size:13px;font-weight:700;color:${GRAY_900};margin-bottom:6px;">
                 ${escapeHtml(c.pendingTitle)}
               </div>
-              <p style="margin:0;font-size:14px;line-height:1.65;color:${GRAY_500};">
+              <p style="margin:0 0 14px;font-size:14px;line-height:1.65;color:${GRAY_500};">
                 ${escapeHtml(c.pendingDesc)}
               </p>
+              <a href="${catalogUrl}" style="display:inline-block;padding:11px 20px;background:${BRAND_MAGENTA};color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;border-radius:8px;">
+                ${escapeHtml(c.ctaCatalog)} →
+              </a>
             </div>
           </td>
         </tr>
@@ -242,6 +249,7 @@ ${c.intro}
 
 ${c.pendingTitle}
 ${c.pendingDesc}
+${c.ctaCatalog}: ${catalogUrl}
 
 ${c.perksTitle}
 - ${c.perk1Title}
@@ -285,7 +293,7 @@ export function buildAdminRegistrationEmail(
   input: AdminRegistrationEmailInput
 ): { subject: string; html: string; text: string } {
   const fullName = `${input.firstName} ${input.lastName}`.trim()
-  const subject = `Nauja registracija · ${fullName || input.email}`
+  const subject = `Naujas profesionalas (auto-patvirtintas) · ${fullName || input.email}`
   const businessLabel = input.businessType
     ? BUSINESS_TYPE_LT[input.businessType] ?? input.businessType
     : '—'
@@ -305,7 +313,7 @@ export function buildAdminRegistrationEmail(
 </head>
 <body style="margin:0;padding:0;background:${GRAY_50};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:${GRAY_900};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
-  Nauja registracija laukia patvirtinimo · ${escapeHtml(input.email)}
+  Naujas profesionalas auto-patvirtintas — patikrinkite, jei įtartina · ${escapeHtml(input.email)}
 </div>
 <table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};padding:32px 16px;">
   <tr>
@@ -315,7 +323,7 @@ export function buildAdminRegistrationEmail(
         <tr>
           <td style="padding:24px 32px;background:${BRAND_MAGENTA};">
             <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.85);">
-              Admin · Nauja registracija
+              Admin · Naujas profesionalas (auto-patvirtintas)
             </div>
             <div style="font-size:22px;font-weight:700;color:#ffffff;margin-top:4px;">
               ${escapeHtml(fullName || input.email)}
@@ -361,7 +369,7 @@ export function buildAdminRegistrationEmail(
         <tr>
           <td style="padding:24px 32px 32px;">
             <a href="${input.adminUrl}" style="display:inline-block;padding:12px 24px;background:${GRAY_900};color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;border-radius:8px;">
-              Patvirtinti registraciją admin'e →
+              Peržiūrėti profesionalų sąrašą →
             </a>
           </td>
         </tr>
@@ -373,7 +381,7 @@ export function buildAdminRegistrationEmail(
 </body>
 </html>`
 
-  const text = `Nauja registracija
+  const text = `Naujas profesionalas (auto-patvirtintas)
 ${fullName || input.email}
 Pateikta: ${new Date(input.createdAt).toLocaleString('lt-LT')}
 

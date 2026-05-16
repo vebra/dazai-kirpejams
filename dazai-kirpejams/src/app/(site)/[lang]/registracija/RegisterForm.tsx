@@ -54,6 +54,8 @@ type RegisterFormDict = {
     notesPlaceholder: string
     noticeStrong: string
     noticeText: string
+    confirmLabel: string
+    confirmHint: string
   }
   submit: string
   submitting: string
@@ -279,6 +281,22 @@ export function RegisterForm({
         <div className="px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-[12px] text-amber-800 leading-relaxed">
           <strong>{dict.business.noticeStrong}</strong> {dict.business.noticeText}
         </div>
+
+        <label className="flex items-start gap-3 px-4 py-3 border border-brand-gray-50 rounded-xl cursor-pointer hover:border-brand-magenta/40 transition-colors">
+          <input
+            type="checkbox"
+            name="confirm_professional"
+            required
+            className="mt-0.5 w-4 h-4 accent-brand-magenta shrink-0"
+          />
+          <span className="text-sm text-brand-gray-900 leading-snug">
+            {dict.business.confirmLabel}{' '}
+            <span className="text-brand-magenta">*</span>
+            <span className="block mt-1 text-[12px] text-brand-gray-500">
+              {dict.business.confirmHint}
+            </span>
+          </span>
+        </label>
       </fieldset>
 
       <button
