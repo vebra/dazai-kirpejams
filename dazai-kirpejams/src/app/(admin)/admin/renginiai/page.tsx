@@ -269,6 +269,13 @@ function EventCard({
           <div className="mt-1 text-[11px] text-brand-gray-500 font-mono">
             {slug}
           </div>
+          {!past && (
+            <p className="mt-2 text-[11px] text-brand-gray-500 max-w-xl leading-relaxed">
+              {event.isActive
+                ? 'Renginys matomas viešai ir registruotiems dalyviams bus išsiųstas priminimas likus ~24 h. Jei renginys neįvyks (techninės kliūtys) — paspauskite „Išjungti", tada priminimo el. laiškas NEBUS siunčiamas.'
+                : 'Išjungta: viešas puslapis 404, homepage sekcija paslėpta ir priminimo el. laiškai NESIUNČIAMI. Įjunkite, kai renginys patvirtintas.'}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center gap-2 justify-end">
