@@ -270,6 +270,144 @@ ${c.footerSite}`
 }
 
 // ============================================
+// REGISTRACIJA GAUTA — laukia admin patvirtinimo
+// ============================================
+
+const PENDING_COPY = {
+  lt: {
+    subject: 'Registracija gauta — laukia patvirtinimo',
+    preheader:
+      'Gavome Jūsų registraciją. Patikrinsime profesionalo statusą ir pranešime el. paštu.',
+    badge: 'Laukia patvirtinimo',
+    title: (name: string) =>
+      name ? `Ačiū, ${name}! Registraciją gavome` : 'Registraciją gavome',
+    body1:
+      'Jūsų paskyra sukurta. Kadangi parduotuvė skirta tik profesionalams, registraciją peržiūri mūsų komanda.',
+    body2:
+      'Patvirtinus, gausite atskirą laišką ir kainos taps matomos — galėsite užsisakyti pilną Color SHOCK asortimentą. Peržiūra paprastai trunka iki 1 darbo dienos.',
+    closing:
+      'Klausimai — atsakykite į šį laišką arba rašykite info@dziuljetavebre.lt.',
+    signoff: 'Pagarbiai,\nDažai Kirpėjams komanda',
+  },
+  en: {
+    subject: 'Registration received — pending approval',
+    preheader:
+      'We received your registration. We will verify your professional status and notify you by email.',
+    badge: 'Pending approval',
+    title: (name: string) =>
+      name
+        ? `Thank you, ${name}! Registration received`
+        : 'Registration received',
+    body1:
+      'Your account has been created. As this store is for professionals only, our team reviews each registration.',
+    body2:
+      'Once approved, you will receive a separate email and prices will become visible — you will be able to order the full Color SHOCK range. Review usually takes up to 1 business day.',
+    closing:
+      'Questions — reply to this email or write to info@dziuljetavebre.lt.',
+    signoff: 'Best regards,\nDažai Kirpėjams team',
+  },
+  ru: {
+    subject: 'Регистрация получена — ожидает подтверждения',
+    preheader:
+      'Мы получили вашу регистрацию. Проверим профессиональный статус и сообщим по электронной почте.',
+    badge: 'Ожидает подтверждения',
+    title: (name: string) =>
+      name
+        ? `Спасибо, ${name}! Регистрация получена`
+        : 'Регистрация получена',
+    body1:
+      'Ваша учётная запись создана. Так как магазин предназначен только для профессионалов, каждую регистрацию проверяет наша команда.',
+    body2:
+      'После подтверждения вы получите отдельное письмо, и цены станут видимыми — вы сможете заказать весь ассортимент Color SHOCK. Проверка обычно занимает до 1 рабочего дня.',
+    closing:
+      'Вопросы — ответьте на это письмо или напишите на info@dziuljetavebre.lt.',
+    signoff: 'С уважением,\nкоманда Dažai Kirpėjams',
+  },
+} as const
+
+export type RegistrationPendingEmailInput = {
+  firstName: string
+  lang: 'lt' | 'en' | 'ru'
+  siteUrl: string
+}
+
+export function buildRegistrationPendingEmail(
+  input: RegistrationPendingEmailInput
+): { subject: string; html: string; text: string } {
+  const c = PENDING_COPY[input.lang] ?? PENDING_COPY.lt
+  const safeName = escapeHtml(input.firstName || '')
+
+  const html = `<!doctype html>
+<html lang="${input.lang}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${escapeHtml(c.subject)}</title>
+</head>
+<body style="margin:0;padding:0;background:${GRAY_50};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:${GRAY_900};">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">
+  ${escapeHtml(c.preheader)}
+</div>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};padding:32px 16px;">
+  <tr>
+    <td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
+        <tr>
+          <td style="padding:32px 32px 0;">
+            <div style="display:inline-block;padding:6px 12px;background:${GRAY_900};color:#ffffff;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;border-radius:999px;">
+              ${escapeHtml(c.badge)}
+            </div>
+            <h1 style="margin:20px 0 0;font-size:26px;font-weight:700;color:${GRAY_900};line-height:1.25;">
+              ${escapeHtml(c.title(safeName))}
+            </h1>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:20px 32px 0;">
+            <p style="margin:0 0 14px;font-size:15px;line-height:1.7;color:${GRAY_500};">
+              ${escapeHtml(c.body1)}
+            </p>
+            <p style="margin:0;font-size:15px;line-height:1.7;color:${GRAY_500};">
+              ${escapeHtml(c.body2)}
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px 32px 32px;border-top:1px solid ${BORDER};margin-top:24px;">
+            <p style="margin:16px 0 0;font-size:13px;line-height:1.6;color:${GRAY_500};">
+              ${escapeHtml(c.closing)}
+            </p>
+            <p style="margin:14px 0 0;font-size:12px;color:${GRAY_500};white-space:pre-line;">
+              ${escapeHtml(c.signoff)}
+            </p>
+            <p style="margin:12px 0 0;font-size:12px;">
+              <a href="${input.siteUrl}" style="color:${BRAND_MAGENTA};text-decoration:none;">${escapeHtml(input.siteUrl.replace(/^https?:\/\//, ''))}</a>
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>`
+
+  const text = `${c.title(input.firstName || '')}
+
+${c.body1}
+
+${c.body2}
+
+${c.closing}
+
+${c.signoff}
+
+${input.siteUrl.replace(/^https?:\/\//, '')}`
+
+  return { subject: c.subject, html, text }
+}
+
+// ============================================
 // ADMIN NOTIFICATION — apie naują registraciją
 // ============================================
 
@@ -293,7 +431,7 @@ export function buildAdminRegistrationEmail(
   input: AdminRegistrationEmailInput
 ): { subject: string; html: string; text: string } {
   const fullName = `${input.firstName} ${input.lastName}`.trim()
-  const subject = `Naujas profesionalas (auto-patvirtintas) · ${fullName || input.email}`
+  const subject = `Naujas profesionalas — laukia patvirtinimo · ${fullName || input.email}`
   const businessLabel = input.businessType
     ? BUSINESS_TYPE_LT[input.businessType] ?? input.businessType
     : '—'

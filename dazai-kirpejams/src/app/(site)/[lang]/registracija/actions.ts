@@ -6,9 +6,10 @@ import { locales, type Locale, defaultLocale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 import { sendEmail, getAdminNotificationEmail } from '@/lib/email/resend'
 import {
-  buildWelcomeEmail,
+  buildRegistrationPendingEmail,
   buildAdminRegistrationEmail,
 } from '@/lib/email/auth-templates'
+import { checkRateLimit, isHoneypotTriggered } from '@/lib/rate-limit'
 
 export type RegisterState = {
   error?: string
@@ -53,6 +54,11 @@ export async function registerAction(
   const lang = resolveLang(formData.get('lang'))
   const { errors } = await getDictionary(lang)
 
+  // Honeypot: bot'ams apsimetam sėkme, kad nesidomėtų
+  if (isHoneypotTriggered(formData)) {
+    return { success: true }
+  }
+
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { error: errors.emailInvalid }
   }
@@ -75,6 +81,17 @@ export async function registerAction(
   // registracija neleidžiama (parduotuvė tik specialistams).
   if (formData.get('confirm_professional') !== 'on') {
     return { error: errors.confirmProfessionalRequired }
+  }
+
+  // Rate-limit prieš signUp — registracija rašo per service-role klientą,
+  // todėl be limito galimas masinis fake-account spam'as.
+  const rl = await checkRateLimit({
+    action: 'register',
+    windowSeconds: 3600,
+    max: 5,
+  })
+  if (!rl.allowed) {
+    return { error: errors.registerGeneric }
   }
 
   const supabase = await createServerSupabase()
@@ -110,10 +127,10 @@ export async function registerAction(
       company_code: companyCode || null,
       daily_dyes_count: dailyDyesCount || null,
       verification_notes: verificationNotes || null,
-      // Savideklaracija → iškart patvirtinta (kainos atvertos be laukimo).
-      // Admin'as gali atšaukti įtartinus per /admin/verifikacija.
-      verification_status: 'approved',
-      verified_at: new Date().toISOString(),
+      // Registracija laukia admin'o patvirtinimo per /admin/verifikacija.
+      // Kainos NEatveriamos, kol statusas netaps `approved` — kliento
+      // payload'e jų taip pat nebus (žr. queries.ts kainų vartus).
+      verification_status: 'pending',
     })
 
   if (profileError) {
@@ -126,14 +143,14 @@ export async function registerAction(
     process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
     'https://www.dazaikirpejams.lt'
 
-  const welcome = buildWelcomeEmail({ firstName, lang, siteUrl })
+  const pending = buildRegistrationPendingEmail({ firstName, lang, siteUrl })
   await sendEmail({
     to: email,
-    subject: welcome.subject,
-    html: welcome.html,
-    text: welcome.text,
+    subject: pending.subject,
+    html: pending.html,
+    text: pending.text,
   }).catch((err) => {
-    console.error('[register] welcome email failed:', err)
+    console.error('[register] pending email failed:', err)
   })
 
   const adminEmail = getAdminNotificationEmail() ?? FALLBACK_ADMIN_EMAIL

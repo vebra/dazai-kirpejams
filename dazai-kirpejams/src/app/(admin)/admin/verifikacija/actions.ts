@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/admin/auth'
 import { createServerClient } from '@/lib/supabase/server'
+import { sendEmail } from '@/lib/email/resend'
+import { buildWelcomeEmail } from '@/lib/email/auth-templates'
 
 const VERIFICATION_BUCKET = 'verification-docs'
 
@@ -44,6 +46,40 @@ export async function approveUserAction(formData: FormData): Promise<void> {
   if (error) {
     console.error('[admin/verifikacija/actions] approve:', error.message)
     redirect('/admin/verifikacija?error=update-failed')
+  }
+
+  // „Patvirtinta — kainos atvertos" laiškas siunčiamas ČIA (po admin
+  // patvirtinimo), o ne registracijos metu. Defensyvu: el. laiško klaida
+  // nesugriauna patvirtinimo srauto.
+  try {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('first_name')
+      .eq('id', userId)
+      .maybeSingle<{ first_name: string | null }>()
+    const { data: authUser } = await supabase.auth.admin.getUserById(userId)
+    const email = authUser?.user?.email
+    if (email) {
+      const siteUrl =
+        process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
+        'https://www.dazaikirpejams.lt'
+      const welcome = buildWelcomeEmail({
+        firstName: profile?.first_name ?? '',
+        lang: 'lt',
+        siteUrl,
+      })
+      await sendEmail({
+        to: email,
+        subject: welcome.subject,
+        html: welcome.html,
+        text: welcome.text,
+      })
+    }
+  } catch (err) {
+    console.error(
+      '[admin/verifikacija/actions] approve welcome email failed (non-blocking):',
+      err
+    )
   }
 
   revalidatePath('/admin/verifikacija')

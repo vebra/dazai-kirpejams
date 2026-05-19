@@ -184,6 +184,10 @@ export function productSchema(
         value: `${product.volume_ml} ml`,
       },
     }),
+    // Kaina rodoma TIK patvirtintiems profesionalams. Anonimui/crawler'iui
+    // `price_cents` jau nukirptas (0) duomenų sluoksnyje — tuomet Offer'io
+    // visai nededam, kad JSON-LD nerodytų €0,00.
+    ...(product.price_cents > 0 && {
     offers: {
       '@type': 'Offer',
       url: productUrl,
@@ -232,6 +236,7 @@ export function productSchema(
         returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
       },
     },
+    }),
   }
 }
 

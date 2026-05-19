@@ -1,6 +1,9 @@
 import { getSupabase, isSupabaseConfigured } from '@/lib/supabase/client'
 import { unstable_cache } from 'next/cache'
+import { cache } from 'react'
+import { isUserVerified } from '@/lib/auth/verification'
 import { mockCategories, mockProducts } from './mock-products'
+import { stripProductPricing } from './pricing-gate'
 import type { Category, Product } from '@/lib/types'
 
 /**
@@ -29,6 +32,42 @@ type GetProductsOptions = {
   minPrice?: number
   maxPrice?: number
   sortBy?: SortBy
+}
+
+// ============================================
+// KAINŲ VARTAI (tik patvirtintiems profesionalams)
+// ============================================
+//
+// Verslo modelis: kainos matomos TIK admin'o patvirtintiems
+// profesionalams. Anksčiau `price_cents` patekdavo į kiekvieno anonimo
+// payload'ą ir buvo tik vizualiai paslepiamas kliente — bet kas matydavo
+// kainas per DevTools. Dabar kainos nukerpamos SERVERYJE prieš išsiunčiant.
+//
+// Patikra cache'inama per request'ą (React `cache`), kad kelios užklausos
+// viename puslapyje nedarytų pakartotinių auth round-trip'ų. Dev aplinkoje
+// (Supabase nesukonfigūruotas — mock duomenys) vartai atviri, kad
+// programuotojai matytų kainas lokaliai.
+
+const arePricesVisible = cache(async (): Promise<boolean> => {
+  if (!isSupabaseConfigured) return true
+  try {
+    return await isUserVerified()
+  } catch {
+    return false
+  }
+})
+
+async function gateProducts(products: Product[]): Promise<Product[]> {
+  if (await arePricesVisible()) return products
+  return products.map(stripProductPricing)
+}
+
+async function gateProduct(
+  product: Product | null
+): Promise<Product | null> {
+  if (!product) return null
+  if (await arePricesVisible()) return product
+  return stripProductPricing(product)
 }
 
 // ============================================
@@ -173,13 +212,16 @@ async function _getProducts(
   return (data || []) as Product[]
 }
 
-export const getProducts = (options?: GetProductsOptions) => {
+export const getProducts = async (
+  options?: GetProductsOptions
+): Promise<Product[]> => {
   const key = JSON.stringify(options ?? {})
-  return unstable_cache(
+  const products = await unstable_cache(
     () => _getProducts(options),
     ['products', key],
     { revalidate: 60, tags: ['products'] }
   )()
+  return gateProducts(products)
 }
 
 async function _getProductBySlug(slug: string): Promise<Product | null> {
@@ -203,12 +245,16 @@ async function _getProductBySlug(slug: string): Promise<Product | null> {
   return (data as Product) || null
 }
 
-export const getProductBySlug = (slug: string) =>
-  unstable_cache(
+export const getProductBySlug = async (
+  slug: string
+): Promise<Product | null> => {
+  const product = await unstable_cache(
     () => _getProductBySlug(slug),
     ['product', slug],
     { revalidate: 60, tags: ['products'] }
   )()
+  return gateProduct(product)
+}
 
 async function _getRelatedProducts(
   productId: string,
@@ -243,12 +289,17 @@ async function _getRelatedProducts(
   return (data || []) as Product[]
 }
 
-export const getRelatedProducts = (product: Product, limit = 4) =>
-  unstable_cache(
+export const getRelatedProducts = async (
+  product: Product,
+  limit = 4
+): Promise<Product[]> => {
+  const related = await unstable_cache(
     () => _getRelatedProducts(product.id, product.category_id, limit),
     ['related', product.id, String(limit)],
     { revalidate: 60, tags: ['products'] }
   )()
+  return gateProducts(related)
+}
 
 // ============================================
 // Mock fallback filtravimo helper'is
