@@ -5,6 +5,8 @@ import {
   calculateOrderTotals,
   meetsMinimumOrder,
   vatRateFromVatCode,
+  DELIVERY_METHODS,
+  FREE_SHIPPING_THRESHOLD_CENTS,
   type DeliveryMethod,
   type PaymentMethod,
 } from './constants'
@@ -139,237 +141,121 @@ export async function createOrder(
   }
   const vatRate = vatRateFromVatCode(companyInfo?.vatCode)
 
-  // Įrašas į Supabase — jei sukonfigūruota.
-  //
-  // Srautas:
-  //   1) RPC `decrement_stock_for_order` — atomiškai validuoja aktyvumą,
-  //      likutį ir sumažina stock_quantity (FOR UPDATE lock'ina eilutes).
-  //   2) Insert į `orders` ir `order_items`.
-  //   3) Jei insert'ai nepavyko — kviečiam `restore_stock_for_order` kaip
-  //      kompensacinį veiksmą, kad nepaliktume "pardavę, bet neišsaugoję"
-  //      užsakymo.
+  // Komercinės konstantos perduodamos į RPC — vienas tiesos šaltinis (JS).
+  const shippingBaseCents = DELIVERY_METHODS[input.deliveryMethod].priceCents
+
+  // ============================================
+  // Atominis užsakymo kūrimas — VIENAS RPC, VIENA transakcija.
+  // discount + stock + orders + order_items vyksta `create_order_atomic`
+  // plpgsql funkcijoje; bet kokia klaida → pilnas DB rollback'as. Jokios
+  // JS kompensacijos (anksčiau „best-effort" rollback'as galėjo pats
+  // nepavykti ir palikti nenuoseklią būseną). order_number kolizijos
+  // atveju (23505) pergeneruojam numerį ir bandom dar kartą — kiekvienas
+  // bandymas atomiškai rollback'inasi, todėl dublikatų nelieka.
+  // ============================================
   if (isSupabaseServerConfigured) {
     const supabase = createServerClient()
+    const ATTEMPTS = 3
+    let created: {
+      orderId: string
+      discountCents: number
+      discountCode: string | null
+    } | null = null
 
-    // 1) Nuolaidos kodas — pirmas, nes pigiausias rollback'as
-    //
-    // Kviečiam `apply_discount_code` RPC'ą, kuris:
-    //   - atomiškai (FOR UPDATE) iš naujo validuoja kodą
-    //   - inkrementuoja `used_count`
-    //   - grąžina tikrą `discount_cents` (perskaičiuotą server-side)
-    //
-    // Jei klientas manė, kad nuolaida vienokia, o serveryje paaiškėjo kitokia
-    // (pvz. tarp request'ų buvo išjungtas kuponas), pasirenkam server'io
-    // tiesą. Jei kuponas atmestas — grąžinam klaidą ir user'is gauna kita
-    // dar nekeistų duomenų būseną.
-    if (normalizedInputCode) {
-      const { data: discountResult, error: discountError } = await supabase.rpc(
-        'apply_discount_code',
-        {
-          p_code: normalizedInputCode,
-          p_cart_subtotal_cents: subtotalCents,
+    for (let attempt = 0; attempt < ATTEMPTS; attempt++) {
+      const { data, error } = await supabase.rpc('create_order_atomic', {
+        p_order_number: orderNumber,
+        p_items: input.items.map((i) => ({
+          product_id: i.productId,
+          name: i.name,
+          sku: i.sku,
+          unit_price_cents: i.priceCents,
+          quantity: i.quantity,
+        })),
+        p_email: input.email,
+        p_phone: input.phone,
+        p_first_name: input.firstName,
+        p_last_name: input.lastName,
+        p_company_name: input.isCompany ? input.companyName ?? null : null,
+        p_company_code: input.isCompany ? input.companyCode ?? null : null,
+        p_vat_code: input.isCompany ? input.vatCode ?? null : null,
+        p_delivery_method: input.deliveryMethod,
+        p_delivery_address: input.deliveryAddress ?? null,
+        p_delivery_city: input.deliveryCity ?? null,
+        p_delivery_postal_code: input.deliveryPostalCode ?? null,
+        p_payment_method: effectivePayment,
+        p_locale: input.locale,
+        p_notes: input.notes ?? null,
+        p_discount_code: normalizedInputCode || null,
+        p_shipping_base_cents: shippingBaseCents,
+        p_free_shipping_threshold_cents: FREE_SHIPPING_THRESHOLD_CENTS,
+        p_vat_rate: vatRate,
+      })
+
+      if (error) {
+        // 23505 = order_number unique violation → naujas numeris, retry.
+        if (error.code === '23505' && attempt < ATTEMPTS - 1) {
+          orderNumber = generateOrderNumber()
+          continue
         }
-      )
-
-      if (discountError) {
-        console.error('[order] apply_discount_code error:', discountError)
+        // Likučio trūkumas / produktas neaktyvus ir kt. plpgsql RAISE —
+        // message jau LT (pvz. "Nepakanka likučio: Juoda (yra 2, prašoma 5)").
+        // Visa transakcija jau rollback'inta DB pusėje.
+        console.error('[order] create_order_atomic error:', error)
         return {
           ok: false,
-          error: errs.couponApplyFailed,
+          error: error.message || errs.stockShortageGeneric,
         }
       }
 
-      const dr = discountResult as {
+      const res = data as {
         ok?: boolean
         reason?: string
-        code?: string
+        min_order_cents?: number | null
+        order_id?: string
         discount_cents?: number
-        min_order_cents?: number
+        discount_code?: string | null
       } | null
 
-      if (!dr || !dr.ok) {
+      if (!res || !res.ok) {
+        const reason = res?.reason ?? ''
+        if (reason === 'empty_cart') {
+          return { ok: false, error: errs.cartEmpty }
+        }
         const reasonMap: Record<string, string> = {
           not_found: errs.couponNotFound,
           inactive: errs.couponInactive,
           too_early: errs.couponTooEarly,
           expired: errs.couponExpired,
           max_uses_reached: errs.couponMaxUses,
-          min_order_not_met: dr?.min_order_cents
+          min_order_not_met: res?.min_order_cents
             ? errs.couponMinOrder.replace(
                 '{amount}',
-                (dr.min_order_cents / 100).toFixed(2).replace('.', ',')
+                (res.min_order_cents / 100).toFixed(2).replace('.', ',')
               )
             : errs.couponMinOrderGeneric,
         }
         return {
           ok: false,
-          error: reasonMap[dr?.reason ?? ''] ?? errs.couponGeneric,
+          error: reasonMap[reason] ?? errs.couponGeneric,
         }
       }
 
-      discountCents = dr.discount_cents ?? 0
-      appliedDiscountCode = dr.code ?? normalizedInputCode
-    }
-
-    // 2) Atominiškai mažinam likučius
-    const stockItems = input.items.map((i) => ({
-      product_id: i.productId,
-      quantity: i.quantity,
-    }))
-
-    // Idempotentiniai kompensaciniai veiksmai. Be šių guard'ų tas pats
-    // rollback'as galėjo įvykti du kartus (pvz. vidinė šaka jį iškvietė, o
-    // po to mestas exception'as paleido išorinį `catch`), sugadindamas
-    // bendrą kupono `used_count` arba dukart padidindamas likutį.
-    let discountReverted = false
-    const revertDiscountOnce = async () => {
-      if (!appliedDiscountCode || discountReverted) return
-      discountReverted = true
-      await supabase
-        .rpc('revert_discount_code', { p_code: appliedDiscountCode })
-        .then(() => {}, () => {})
-    }
-    let stockRestored = false
-    const restoreStockOnce = async () => {
-      if (stockRestored) return
-      stockRestored = true
-      await supabase
-        .rpc('restore_stock_for_order', { items: stockItems })
-        .then(() => {}, () => {})
-    }
-
-    const { error: stockError } = await supabase.rpc(
-      'decrement_stock_for_order',
-      { items: stockItems }
-    )
-
-    if (stockError) {
-      // Postgres exception'as iš plpgsql funkcijos — message'as jau LT
-      // (pvz. "Nepakanka likučio: Juoda (yra 2, prašoma 5)")
-      console.error('Stock decrement error:', stockError)
-      // Likutis NEMAŽINTAS (funkcija raise'ino ir pati rollback'ino) —
-      // tereikia atstatyti kuponą.
-      await revertDiscountOnce()
-      return {
-        ok: false,
-        error: stockError.message || errs.stockShortageGeneric,
+      created = {
+        orderId: res.order_id ?? '',
+        discountCents: res.discount_cents ?? 0,
+        discountCode: res.discount_code ?? null,
       }
+      break
     }
 
-    // 3) Skaičiuojam galutinius totals SU nuolaida — serveris yra tiesos
-    //    šaltinis.
-    const computedTotals = calculateOrderTotals(
-      subtotalCents,
-      input.deliveryMethod,
-      discountCents,
-      vatRate
-    )
-
-    // 4) Insert'as į orders — su retry dėl order_number kolizijų
-    //    (unique constraint). Pergeneruojam numerį ir bandome dar kartą.
-    const ORDER_INSERT_RETRIES = 3
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let order: { id: string } | null = null
-
-    try {
-      for (let attempt = 0; attempt < ORDER_INSERT_RETRIES; attempt++) {
-        const { data, error: orderError } = await supabase
-          .from('orders')
-          .insert({
-            order_number: orderNumber,
-            email: input.email,
-            phone: input.phone,
-            first_name: input.firstName,
-            last_name: input.lastName,
-            company_name: input.isCompany ? input.companyName ?? null : null,
-            company_code: input.isCompany ? input.companyCode ?? null : null,
-            vat_code: input.isCompany ? input.vatCode ?? null : null,
-            delivery_method: input.deliveryMethod,
-            delivery_address: input.deliveryAddress ?? null,
-            delivery_city: input.deliveryCity ?? null,
-            delivery_postal_code: input.deliveryPostalCode ?? null,
-            delivery_country: 'LT',
-            delivery_cost_cents: computedTotals.shippingCents,
-            payment_method: effectivePayment,
-            payment_status: 'pending',
-            subtotal_cents: computedTotals.subtotalCents,
-            discount_code: appliedDiscountCode,
-            discount_cents: computedTotals.discountCents,
-            vat_cents: computedTotals.vatCents,
-            total_cents: computedTotals.totalCents,
-            status: 'pending',
-            locale: input.locale,
-            notes: input.notes ?? null,
-          })
-          .select('id')
-          .single()
-
-        if (!orderError && data) {
-          order = data
-          break
-        }
-
-        // Unique violation (23505) — retry su nauju numeriu
-        if (orderError?.code === '23505' && attempt < ORDER_INSERT_RETRIES - 1) {
-          orderNumber = generateOrderNumber()
-          continue
-        }
-
-        console.error('Order insert error:', orderError)
-        // Rollback'inam likučius + kuponą (idempotentiškai)
-        await restoreStockOnce()
-        await revertDiscountOnce()
-        return {
-          ok: false,
-          error: errs.orderCreateFailed,
-        }
-      }
-
-      // Jei po visų bandymų order vis dar null — neturėtų nutikti,
-      // nes paskutinis attempt'as grąžina klaidą, bet dėl saugumo:
-      if (!order) {
-        await restoreStockOnce()
-        await revertDiscountOnce()
-        return {
-          ok: false,
-          error: errs.orderCreateFailed,
-        }
-      }
-
-      // 5) Insert'as į order_items
-      const { error: itemsError } = await supabase.from('order_items').insert(
-        input.items.map((i) => ({
-          order_id: order!.id,
-          product_id: i.productId,
-          product_name: i.name,
-          product_sku: i.sku,
-          quantity: i.quantity,
-          unit_price_cents: i.priceCents,
-          total_cents: i.priceCents * i.quantity,
-        }))
-      )
-
-      if (itemsError) {
-        console.error('Order items insert error:', itemsError)
-        // Rollback'inam: užsakymą, likučius, kuponą (idempotentiškai)
-        await supabase.from('orders').delete().eq('id', order!.id)
-        await restoreStockOnce()
-        await revertDiscountOnce()
-        return {
-          ok: false,
-          error: errs.itemsSaveFailed,
-        }
-      }
-
-      orderDbId = order!.id
-    } catch (err) {
-      console.error('Order creation failed:', err)
-      // Bandom rollback'inti viską — idempotentiškai, kad nesusidubliuotų
-      // su jau vidinėje šakoje įvykdytu kompensavimu.
-      await restoreStockOnce()
-      await revertDiscountOnce()
-      return { ok: false, error: errs.serverError }
+    if (!created) {
+      return { ok: false, error: errs.orderCreateFailed }
     }
+
+    orderDbId = created.orderId
+    discountCents = created.discountCents
+    appliedDiscountCode = created.discountCode
   }
 
   // Server-side tiesa — totals perskaičiuojam, net jei Supabase'o nėra
