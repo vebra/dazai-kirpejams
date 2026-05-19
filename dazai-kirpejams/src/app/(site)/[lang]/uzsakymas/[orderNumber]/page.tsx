@@ -13,6 +13,7 @@ import {
   createServerClient,
   isSupabaseServerConfigured,
 } from '@/lib/supabase/server'
+import { createServerSupabase } from '@/lib/supabase/ssr'
 import { getCompanyInfo } from '@/lib/admin/queries'
 import type { DeliveryMethod, PaymentMethod } from '@/lib/commerce/constants'
 import { PurchaseTracker } from '@/components/analytics/PurchaseTracker'
@@ -62,11 +63,12 @@ type OrderSnapshot = {
 }
 
 /**
- * Užsakymo snapshot'as paimamas iš sausainuko, kurį nustatė `createOrder`
- * action'as. Jei Supabase sukonfigūruota, papildomai patikriname užsakymo
- * egzistavimą DB (kad nebūtų įmanoma suforge'inti cookie su svetimu numeriu).
+ * Užsakymo snapshot'as iš sausainuko, kurį nustatė `createOrder` (greitas
+ * kelias; veikia ir be DB — dev aplinka). Jei Supabase sukonfigūruota,
+ * papildomai patikriname užsakymo egzistavimą DB (kad nebūtų įmanoma
+ * suforge'inti cookie su svetimu numeriu).
  */
-async function loadOrderSnapshot(
+async function loadOrderSnapshotFromCookie(
   orderNumber: string
 ): Promise<OrderSnapshot | null> {
   const cookieStore = await cookies()
@@ -77,7 +79,6 @@ async function loadOrderSnapshot(
     const snapshot = JSON.parse(cookie.value) as OrderSnapshot
     if (snapshot.orderNumber !== orderNumber) return null
 
-    // Jei Supabase sukonfigūruota, patikriname ar įrašas DB sutampa
     if (isSupabaseServerConfigured) {
       const supabase = createServerClient()
       const { data } = await supabase
@@ -92,6 +93,83 @@ async function loadOrderSnapshot(
   } catch {
     return null
   }
+}
+
+/**
+ * Atsarginis kelias, kai sausainukas pasibaigė (30 min), klientas grįžo
+ * kitame įrenginyje ar po laiko. Užsakymą atstatome iš DB, BET tik jei
+ * prisijungęs vartotojas yra to užsakymo savininkas (el. paštas sutampa).
+ * Be šios nuosavybės patikros bet kas, atspėjęs užsakymo numerį, matytų
+ * pirkėjo PII — todėl numerio vien nepakanka.
+ */
+async function loadOrderSnapshotFromDb(
+  orderNumber: string
+): Promise<OrderSnapshot | null> {
+  if (!isSupabaseServerConfigured) return null
+
+  try {
+    const ssr = await createServerSupabase()
+    const {
+      data: { user },
+    } = await ssr.auth.getUser()
+    const userEmail = user?.email?.trim().toLowerCase()
+    if (!userEmail) return null
+
+    const supabase = createServerClient()
+    const { data: order } = await supabase
+      .from('orders')
+      .select(
+        'id, order_number, email, phone, first_name, last_name, delivery_method, delivery_address, delivery_city, delivery_postal_code, payment_method, subtotal_cents, discount_code, discount_cents, delivery_cost_cents, vat_cents, total_cents, created_at'
+      )
+      .eq('order_number', orderNumber)
+      .maybeSingle()
+
+    if (!order) return null
+    if ((order.email ?? '').trim().toLowerCase() !== userEmail) return null
+
+    const { data: itemRows } = await supabase
+      .from('order_items')
+      .select('product_id, product_name, product_sku, unit_price_cents, quantity')
+      .eq('order_id', order.id)
+
+    return {
+      orderNumber: order.order_number,
+      email: order.email,
+      firstName: order.first_name,
+      lastName: order.last_name,
+      phone: order.phone,
+      deliveryMethod: order.delivery_method as DeliveryMethod,
+      deliveryAddress: order.delivery_address ?? null,
+      deliveryCity: order.delivery_city ?? null,
+      deliveryPostalCode: order.delivery_postal_code ?? null,
+      paymentMethod: order.payment_method as PaymentMethod,
+      items: (itemRows ?? []).map((r) => ({
+        productId: r.product_id,
+        name: r.product_name,
+        sku: r.product_sku ?? null,
+        priceCents: r.unit_price_cents,
+        quantity: r.quantity,
+      })),
+      subtotalCents: order.subtotal_cents,
+      discountCode: order.discount_code ?? null,
+      discountCents: order.discount_cents ?? 0,
+      shippingCents: order.delivery_cost_cents ?? 0,
+      vatCents: order.vat_cents ?? 0,
+      totalCents: order.total_cents,
+      createdAt: order.created_at ?? new Date().toISOString(),
+    }
+  } catch {
+    return null
+  }
+}
+
+async function loadOrderSnapshot(
+  orderNumber: string
+): Promise<OrderSnapshot | null> {
+  return (
+    (await loadOrderSnapshotFromCookie(orderNumber)) ??
+    (await loadOrderSnapshotFromDb(orderNumber))
+  )
 }
 
 export default async function OrderConfirmationPage({

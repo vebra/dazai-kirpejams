@@ -217,6 +217,27 @@ export async function createOrder(
       quantity: i.quantity,
     }))
 
+    // Idempotentiniai kompensaciniai veiksmai. Be šių guard'ų tas pats
+    // rollback'as galėjo įvykti du kartus (pvz. vidinė šaka jį iškvietė, o
+    // po to mestas exception'as paleido išorinį `catch`), sugadindamas
+    // bendrą kupono `used_count` arba dukart padidindamas likutį.
+    let discountReverted = false
+    const revertDiscountOnce = async () => {
+      if (!appliedDiscountCode || discountReverted) return
+      discountReverted = true
+      await supabase
+        .rpc('revert_discount_code', { p_code: appliedDiscountCode })
+        .then(() => {}, () => {})
+    }
+    let stockRestored = false
+    const restoreStockOnce = async () => {
+      if (stockRestored) return
+      stockRestored = true
+      await supabase
+        .rpc('restore_stock_for_order', { items: stockItems })
+        .then(() => {}, () => {})
+    }
+
     const { error: stockError } = await supabase.rpc(
       'decrement_stock_for_order',
       { items: stockItems }
@@ -226,12 +247,9 @@ export async function createOrder(
       // Postgres exception'as iš plpgsql funkcijos — message'as jau LT
       // (pvz. "Nepakanka likučio: Juoda (yra 2, prašoma 5)")
       console.error('Stock decrement error:', stockError)
-      // Rollback'inam kuponą, jei jį jau pritaikėm
-      if (appliedDiscountCode) {
-        await supabase
-          .rpc('revert_discount_code', { p_code: appliedDiscountCode })
-          .then(() => {}, () => {})
-      }
+      // Likutis NEMAŽINTAS (funkcija raise'ino ir pati rollback'ino) —
+      // tereikia atstatyti kuponą.
+      await revertDiscountOnce()
       return {
         ok: false,
         error: stockError.message || errs.stockShortageGeneric,
@@ -298,13 +316,9 @@ export async function createOrder(
         }
 
         console.error('Order insert error:', orderError)
-        // Rollback'inam likučius + kuponą
-        await supabase.rpc('restore_stock_for_order', { items: stockItems })
-        if (appliedDiscountCode) {
-          await supabase
-            .rpc('revert_discount_code', { p_code: appliedDiscountCode })
-            .then(() => {}, () => {})
-        }
+        // Rollback'inam likučius + kuponą (idempotentiškai)
+        await restoreStockOnce()
+        await revertDiscountOnce()
         return {
           ok: false,
           error: errs.orderCreateFailed,
@@ -314,12 +328,8 @@ export async function createOrder(
       // Jei po visų bandymų order vis dar null — neturėtų nutikti,
       // nes paskutinis attempt'as grąžina klaidą, bet dėl saugumo:
       if (!order) {
-        await supabase.rpc('restore_stock_for_order', { items: stockItems })
-        if (appliedDiscountCode) {
-          await supabase
-            .rpc('revert_discount_code', { p_code: appliedDiscountCode })
-            .then(() => {}, () => {})
-        }
+        await restoreStockOnce()
+        await revertDiscountOnce()
         return {
           ok: false,
           error: errs.orderCreateFailed,
@@ -341,14 +351,10 @@ export async function createOrder(
 
       if (itemsError) {
         console.error('Order items insert error:', itemsError)
-        // Rollback'inam: užsakymą, likučius, kuponą
+        // Rollback'inam: užsakymą, likučius, kuponą (idempotentiškai)
         await supabase.from('orders').delete().eq('id', order!.id)
-        await supabase.rpc('restore_stock_for_order', { items: stockItems })
-        if (appliedDiscountCode) {
-          await supabase
-            .rpc('revert_discount_code', { p_code: appliedDiscountCode })
-            .then(() => {}, () => {})
-        }
+        await restoreStockOnce()
+        await revertDiscountOnce()
         return {
           ok: false,
           error: errs.itemsSaveFailed,
@@ -358,15 +364,10 @@ export async function createOrder(
       orderDbId = order!.id
     } catch (err) {
       console.error('Order creation failed:', err)
-      // Bandom rollback'inti viską
-      await supabase
-        .rpc('restore_stock_for_order', { items: stockItems })
-        .then(() => {}, () => {})
-      if (appliedDiscountCode) {
-        await supabase
-          .rpc('revert_discount_code', { p_code: appliedDiscountCode })
-          .then(() => {}, () => {})
-      }
+      // Bandom rollback'inti viską — idempotentiškai, kad nesusidubliuotų
+      // su jau vidinėje šakoje įvykdytu kompensavimu.
+      await restoreStockOnce()
+      await revertDiscountOnce()
       return { ok: false, error: errs.serverError }
     }
   }
@@ -487,32 +488,41 @@ export async function createOrder(
   // event_id = orderNumber — tas pats ID naudojamas ir client Pixel'yje
   // (trackPurchase), todėl Meta dedupe'ina abu signalus per 48h.
   // CAPI padengia iOS 14.5+, Safari ITP ir ad-blocker'ių prarastus event'us.
-  await sendMetaCapiEvent({
-    eventName: 'Purchase',
-    eventId: orderNumber,
-    userData: {
-      email: input.email,
-      phone: input.phone,
-      firstName: input.firstName,
-      lastName: input.lastName,
-      city: input.deliveryCity,
-      postalCode: input.deliveryPostalCode,
-      country: 'lt',
-    },
-    customData: {
-      currency: 'EUR',
-      value: totals.totalCents / 100,
-      content_ids: input.items.map((i) => i.productId),
-      content_type: 'product',
-      contents: input.items.map((i) => ({
-        id: i.productId,
-        quantity: i.quantity,
-        item_price: i.priceCents / 100,
-      })),
-      num_items: input.items.reduce((sum, i) => sum + i.quantity, 0),
-      order_id: orderNumber,
-    },
-  })
+  //
+  // SVARBU: užsakymas jau įrašytas ir likutis sumažintas. Jei CAPI mes
+  // klaidą NEAPGAUBTAS — visa funkcija krenta PO commit'o, klientas mato
+  // klaidą, krepšelis neišvalomas, ir pakartotinis bandymas sukuria
+  // dublikatą. Todėl, kaip ir el. laiškai, tai non-blocking.
+  try {
+    await sendMetaCapiEvent({
+      eventName: 'Purchase',
+      eventId: orderNumber,
+      userData: {
+        email: input.email,
+        phone: input.phone,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        city: input.deliveryCity,
+        postalCode: input.deliveryPostalCode,
+        country: 'lt',
+      },
+      customData: {
+        currency: 'EUR',
+        value: totals.totalCents / 100,
+        content_ids: input.items.map((i) => i.productId),
+        content_type: 'product',
+        contents: input.items.map((i) => ({
+          id: i.productId,
+          quantity: i.quantity,
+          item_price: i.priceCents / 100,
+        })),
+        num_items: input.items.reduce((sum, i) => sum + i.quantity, 0),
+        order_id: orderNumber,
+      },
+    })
+  } catch (capiErr) {
+    console.error('[order] Meta CAPI failed (non-blocking):', capiErr)
+  }
 
   // Nustatome sausainuką su užsakymo snapshot'u — leidžia confirmation
   // puslapiui veikti net kai Supabase nėra sukonfigūruotas (dev aplinka).
