@@ -1,5 +1,5 @@
 import 'server-only'
-import { createHash } from 'node:crypto'
+import { createHash, randomBytes } from 'node:crypto'
 import { headers } from 'next/headers'
 import {
   createServerClient,
@@ -17,7 +17,21 @@ import {
  * neturim kur skaičiuoti. Prodas visada turi service-role env'ą.
  */
 
-const IP_SALT = process.env.RATE_LIMIT_SALT ?? 'dk-rate-limit-fallback-salt'
+/**
+ * IP sūdymo salt. Anksčiau buvo viešai žinomas hardcoded fallback —
+ * jį nustačius prodas hash'uodavo IP'us nuspėjamai (pseudonimizacija
+ * atstatoma, rate-limit raktai prognozuojami).
+ *
+ *  - Yra env → naudojam jį (stabilūs kibirai tarp instancijų; nustatom Vercel'e).
+ *  - Prod be env → atsitiktinis salt per procesą: IP'ai lieka neatsekami,
+ *    kibiriai gali skirtis tarp lambda instancijų (priimtina vs. žinomas salt).
+ *  - Dev be env → stabilus dev salt, kad kibiriai nuoseklūs tarp restartų.
+ */
+const IP_SALT =
+  process.env.RATE_LIMIT_SALT ??
+  (process.env.NODE_ENV === 'production'
+    ? randomBytes(32).toString('hex')
+    : 'dk-rate-limit-dev-salt')
 
 export type RateLimitOptions = {
   /** Logical bucket, pvz. "newsletter" arba "contact". */
