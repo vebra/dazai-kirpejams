@@ -84,6 +84,15 @@ export function createProxySupabase(
       },
       setAll(cookiesToSet) {
         for (const { name, value, options } of cookiesToSet) {
+          // Rašom į ABI vietas:
+          //  - request.cookies — kad tas pats request'as (RSC, requireAdmin)
+          //    matytų jau atnaujintą sesiją, o ne pasibaigusį token'ą.
+          //    Be šito proxy refresh'ina token'ą, bet serverio komponentas
+          //    vis tiek skaito seną → getUser() grąžina null → meta į login.
+          //  - response.cookies — Set-Cookie naršyklei, kad kitas request'as
+          //    jau turėtų naują token'ą.
+          // Kanoninis @supabase/ssr + Next.js middleware modelis.
+          request.cookies.set(name, value)
           response.cookies.set({
             name,
             value,

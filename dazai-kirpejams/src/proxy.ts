@@ -81,7 +81,10 @@ async function checkAdminAuth(
     return copyCookies(response, NextResponse.redirect(loginUrl))
   }
 
-  return response
+  // Auth OK — tęsiam į admin puslapį per `{ request }`, kad atnaujinta sesija
+  // (jeigu token'as ką tik buvo refresh'intas) pasiektų requireAdmin() tame
+  // pačiame request'e. Be šito adminą iškart mestų atgal į /admin/login.
+  return copyCookies(response, NextResponse.next({ request }))
 }
 
 export async function proxy(request: NextRequest) {
@@ -102,9 +105,12 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url, 301)
   }
 
-  // Pradinis response — į jį @supabase/ssr rašo atnaujintus cookie'ius.
-  // Kiekvienas žemiau grąžinamas redirect/rewrite turi šiuos cookie'ius
-  // perkelti per `copyCookies`.
+  // Pradinis response — į jį @supabase/ssr rašo atnaujintus cookie'ius
+  // (Set-Cookie naršyklei), o request.cookies mutuojami vietoje. Tęsiamieji
+  // atsakymai grąžinami per `NextResponse.next({ request })` /
+  // `rewrite(url, { request })`, kad atnaujinta sesija pasiektų serverio
+  // komponentus tame pačiame request'e. Redirect'ai cookie'ius perkelia per
+  // `copyCookies` (naršyklė vis tiek persikrauna su nauju Set-Cookie).
   const response = NextResponse.next()
 
   // /admin/* — atskira šaka su savo auth logika (taip pat refresh'ina sesiją)
@@ -139,11 +145,13 @@ export async function proxy(request: NextRequest) {
       (pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`)
   )
 
-  if (pathnameHasLocale) return response
+  if (pathnameHasLocale) {
+    return copyCookies(response, NextResponse.next({ request }))
+  }
 
   // URL be kalbos prefikso — tai lietuvių kalba, rewrite į /lt/...
   request.nextUrl.pathname = `/${defaultLocale}${pathname}`
-  return copyCookies(response, NextResponse.rewrite(request.nextUrl))
+  return copyCookies(response, NextResponse.rewrite(request.nextUrl, { request }))
 }
 
 export const config = {
