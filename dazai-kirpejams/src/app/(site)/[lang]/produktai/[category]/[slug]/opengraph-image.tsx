@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og'
-import { getProductBySlug } from '@/lib/data/queries'
+import { getProductBySlugForBuild } from '@/lib/data/queries'
 import { getProductName } from '@/lib/types'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import {
@@ -27,7 +27,7 @@ export default async function Image({
   const locale = hasLocale(lang) ? lang : 'lt'
   const dict = await getDictionary(locale)
 
-  const product = await getProductBySlug(slug)
+  const product = await getProductBySlugForBuild(slug)
   if (!product) {
     return new ImageResponse(
       (

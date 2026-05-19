@@ -1,4 +1,7 @@
-export const revalidate = 60
+// Kainos rodomos tik patvirtintiems profesionalams (server-side vartai
+// queries.ts naudoja cookies()), todėl puslapis renderinamas per request.
+// DB užklausos vis tiek cache'inamos unstable_cache (60s).
+export const dynamic = 'force-dynamic'
 
 import { notFound } from 'next/navigation'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'

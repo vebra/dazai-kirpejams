@@ -212,15 +212,26 @@ async function _getProducts(
   return (data || []) as Product[]
 }
 
-export const getProducts = async (
+/**
+ * Cached, BE kainų vartų. Naudoti TIK build-time / SEO kontekstuose,
+ * kuriuose `cookies()` (per kainų vartus) yra draudžiamas arba
+ * neturėtų versti maršruto dinaminiu: `generateStaticParams`,
+ * `sitemap.ts`, `opengraph-image.tsx`. Šie keliai kainų nenaudoja.
+ */
+export const getProductsForBuild = (
   options?: GetProductsOptions
 ): Promise<Product[]> => {
   const key = JSON.stringify(options ?? {})
-  const products = await unstable_cache(
-    () => _getProducts(options),
-    ['products', key],
-    { revalidate: 60, tags: ['products'] }
-  )()
+  return unstable_cache(() => _getProducts(options), ['products', key], {
+    revalidate: 60,
+    tags: ['products'],
+  })()
+}
+
+export const getProducts = async (
+  options?: GetProductsOptions
+): Promise<Product[]> => {
+  const products = await getProductsForBuild(options)
   return gateProducts(products)
 }
 
@@ -245,14 +256,19 @@ async function _getProductBySlug(slug: string): Promise<Product | null> {
   return (data as Product) || null
 }
 
+/** Cached, BE kainų vartų — žr. `getProductsForBuild` paaiškinimą. */
+export const getProductBySlugForBuild = (
+  slug: string
+): Promise<Product | null> =>
+  unstable_cache(() => _getProductBySlug(slug), ['product', slug], {
+    revalidate: 60,
+    tags: ['products'],
+  })()
+
 export const getProductBySlug = async (
   slug: string
 ): Promise<Product | null> => {
-  const product = await unstable_cache(
-    () => _getProductBySlug(slug),
-    ['product', slug],
-    { revalidate: 60, tags: ['products'] }
-  )()
+  const product = await getProductBySlugForBuild(slug)
   return gateProduct(product)
 }
 

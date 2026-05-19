@@ -1,4 +1,6 @@
-export const revalidate = 60
+// Kainos tik patvirtintiems (server-side vartai naudoja cookies()) →
+// per-request render. DB užklausos cache'inamos unstable_cache (60s).
+export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
@@ -9,7 +11,7 @@ import {
   getProductBySlug,
   getRelatedProducts,
   getCategoryBySlug,
-  getProducts,
+  getProductsForBuild,
   getCategories,
 } from '@/lib/data/queries'
 import {
@@ -77,7 +79,7 @@ export async function generateMetadata({
 
 export async function generateStaticParams() {
   const params: { lang: string; category: string; slug: string }[] = []
-  const products = await getProducts()
+  const products = await getProductsForBuild()
   const categories = await getCategories()
 
   for (const lang of locales) {

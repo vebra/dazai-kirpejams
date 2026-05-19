@@ -1,4 +1,6 @@
-export const revalidate = 60
+// Kainos tik patvirtintiems (server-side vartai naudoja cookies()) →
+// per-request render. DB užklausos cache'inamos unstable_cache (60s).
+export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
 import Link from 'next/link'

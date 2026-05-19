@@ -1,7 +1,11 @@
 import type { MetadataRoute } from 'next'
 import { locales, defaultLocale } from '@/i18n/config'
 import { SITE_URL } from '@/lib/seo'
-import { getCategories, getProducts, getBlogPosts } from '@/lib/data/queries'
+import {
+  getCategories,
+  getProductsForBuild,
+  getBlogPosts,
+} from '@/lib/data/queries'
 import { AUTHORS } from '@/lib/data/authors'
 import { getVisibleUpcomingEvents } from '@/lib/events/queries'
 
@@ -80,7 +84,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // 2. Kategorijų puslapiai — naudojam naujausio kategorijos produkto datą
   const categories = await getCategories()
-  const products = await getProducts()
+  const products = await getProductsForBuild()
 
   const categoryEntries: MetadataRoute.Sitemap = categories.flatMap((cat) => {
     const catProducts = products.filter((p) => p.category_id === cat.id)
