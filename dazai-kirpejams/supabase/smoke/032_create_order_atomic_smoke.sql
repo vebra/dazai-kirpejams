@@ -31,6 +31,14 @@ declare
   v_stock  int;
   v_res    jsonb;
 begin
+  -- 0) Patikra: ar migracija 032 pritaikyta (funkcija egzistuoja)?
+  if not exists (
+    select 1 from pg_proc where proname = 'create_order_atomic'
+  ) then
+    raise exception
+      'SMOKE: funkcija create_order_atomic NERASTA — pirma pritaikykite migraciją 032_atomic_create_order.sql';
+  end if;
+
   -- Realus aktyvus produktas su pakankamu likučiu (jo pakeitimai bus
   -- atšaukti ROLLBACK'u pabaigoje).
   select id, coalesce(stock_quantity, 0)
@@ -46,19 +54,32 @@ begin
   raise notice 'SMOKE: testinis produktas % (stock=%)', v_pid, v_stock;
 
   -- ---- A) Sėkmingas užsakymas, qty=1, be kupono ----
+  -- Vardinė notacija (=>) — Postgres kiekvieną literalą coerce'ina į
+  -- deklaruotą parametro tipą, todėl nebėra „unknown"/integer↔numeric
+  -- funkcijos resolution problemos.
   v_res := create_order_atomic(
-    'SMOKE-A-' || floor(random() * 1e9)::text,
-    jsonb_build_array(jsonb_build_object(
+    p_order_number => 'SMOKE-A-' || floor(random() * 1e9)::text,
+    p_items => jsonb_build_array(jsonb_build_object(
       'product_id', v_pid, 'name', 'SMOKE', 'sku', NULL,
       'unit_price_cents', 1000, 'quantity', 1)),
-    'smoke@example.com', '+37060000000', 'Smoke', 'Test',
-    NULL, NULL, NULL,
-    'pickup', NULL, NULL, NULL,
-    'bank_transfer', 'lt', 'smoke-test',
-    NULL,            -- p_discount_code
-    0,               -- p_shipping_base_cents
-    5000,            -- p_free_shipping_threshold_cents
-    0                -- p_vat_rate
+    p_email => 'smoke@example.com',
+    p_phone => '+37060000000',
+    p_first_name => 'Smoke',
+    p_last_name => 'Test',
+    p_company_name => NULL,
+    p_company_code => NULL,
+    p_vat_code => NULL,
+    p_delivery_method => 'pickup',
+    p_delivery_address => NULL,
+    p_delivery_city => NULL,
+    p_delivery_postal_code => NULL,
+    p_payment_method => 'bank_transfer',
+    p_locale => 'lt',
+    p_notes => 'smoke-test',
+    p_discount_code => NULL,
+    p_shipping_base_cents => 0,
+    p_free_shipping_threshold_cents => 5000,
+    p_vat_rate => 0
   );
   if coalesce((v_res->>'ok')::boolean, false) then
     raise notice 'A OK (ok=true): %', v_res;
@@ -69,15 +90,28 @@ begin
   -- ---- B) Nepakankamas likutis (qty = stock+1) → turi RAISE ----
   begin
     perform create_order_atomic(
-      'SMOKE-B-' || floor(random() * 1e9)::text,
-      jsonb_build_array(jsonb_build_object(
+      p_order_number => 'SMOKE-B-' || floor(random() * 1e9)::text,
+      p_items => jsonb_build_array(jsonb_build_object(
         'product_id', v_pid, 'name', 'SMOKE', 'sku', NULL,
         'unit_price_cents', 1000, 'quantity', v_stock + 1)),
-      'smoke@example.com', '+37060000000', 'Smoke', 'Test',
-      NULL, NULL, NULL,
-      'pickup', NULL, NULL, NULL,
-      'bank_transfer', 'lt', NULL,
-      NULL, 0, 5000, 0
+      p_email => 'smoke@example.com',
+      p_phone => '+37060000000',
+      p_first_name => 'Smoke',
+      p_last_name => 'Test',
+      p_company_name => NULL,
+      p_company_code => NULL,
+      p_vat_code => NULL,
+      p_delivery_method => 'pickup',
+      p_delivery_address => NULL,
+      p_delivery_city => NULL,
+      p_delivery_postal_code => NULL,
+      p_payment_method => 'bank_transfer',
+      p_locale => 'lt',
+      p_notes => NULL,
+      p_discount_code => NULL,
+      p_shipping_base_cents => 0,
+      p_free_shipping_threshold_cents => 5000,
+      p_vat_rate => 0
     );
     raise notice 'B KLAIDA — turėjo būti atmesta (RAISE), bet nebuvo';
   exception
@@ -87,16 +121,28 @@ begin
 
   -- ---- C) Blogas kuponas → ok=false, reason=not_found ----
   v_res := create_order_atomic(
-    'SMOKE-C-' || floor(random() * 1e9)::text,
-    jsonb_build_array(jsonb_build_object(
+    p_order_number => 'SMOKE-C-' || floor(random() * 1e9)::text,
+    p_items => jsonb_build_array(jsonb_build_object(
       'product_id', v_pid, 'name', 'SMOKE', 'sku', NULL,
       'unit_price_cents', 1000, 'quantity', 1)),
-    'smoke@example.com', '+37060000000', 'Smoke', 'Test',
-    NULL, NULL, NULL,
-    'pickup', NULL, NULL, NULL,
-    'bank_transfer', 'lt', NULL,
-    'TIKRAI-NEEGZISTUOJA-XYZ',   -- p_discount_code
-    0, 5000, 0
+    p_email => 'smoke@example.com',
+    p_phone => '+37060000000',
+    p_first_name => 'Smoke',
+    p_last_name => 'Test',
+    p_company_name => NULL,
+    p_company_code => NULL,
+    p_vat_code => NULL,
+    p_delivery_method => 'pickup',
+    p_delivery_address => NULL,
+    p_delivery_city => NULL,
+    p_delivery_postal_code => NULL,
+    p_payment_method => 'bank_transfer',
+    p_locale => 'lt',
+    p_notes => NULL,
+    p_discount_code => 'TIKRAI-NEEGZISTUOJA-XYZ',
+    p_shipping_base_cents => 0,
+    p_free_shipping_threshold_cents => 5000,
+    p_vat_rate => 0
   );
   if (v_res->>'ok')::boolean is not true
      and v_res->>'reason' = 'not_found' then
