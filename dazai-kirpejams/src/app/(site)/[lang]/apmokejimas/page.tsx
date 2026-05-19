@@ -7,6 +7,8 @@ import { Section } from '@/components/ui/Section'
 import { CheckoutForm } from '@/components/commerce/CheckoutForm'
 import { buildPageMetadata } from '@/lib/seo'
 import { isUserVerified } from '@/lib/auth/verification'
+import { getCompanyInfo } from '@/lib/admin/queries'
+import { vatRateFromVatCode } from '@/lib/commerce/constants'
 import { langPrefix } from '@/lib/utils'
 
 export async function generateMetadata({
@@ -36,13 +38,15 @@ export default async function CheckoutPage({
   if (!verified) redirect(`${langPrefix(lang)}/prisijungimas`)
 
   const dict = await getDictionary(lang)
+  const company = await getCompanyInfo().catch(() => null)
+  const vatRate = vatRateFromVatCode(company?.vatCode)
 
   return (
     <>
       <PageHeader title={dict.checkout.title} />
       <Section background="white">
         <Container>
-          <CheckoutForm lang={lang} dict={dict} />
+          <CheckoutForm lang={lang} dict={dict} vatRate={vatRate} />
         </Container>
       </Section>
     </>

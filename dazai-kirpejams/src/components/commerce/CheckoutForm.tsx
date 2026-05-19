@@ -31,9 +31,11 @@ type CheckoutFormProps = {
   lang: Locale
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict: any
+  /** Efektyvus PVM tarifas (0 = įmonė ne PVM mokėtoja → PVM nerodom). */
+  vatRate: number
 }
 
-export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
+export function CheckoutForm({ lang, dict, vatRate }: CheckoutFormProps) {
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -92,7 +94,8 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
   const totals = calculateOrderTotals(
     subtotalCents,
     deliveryMethod,
-    discountCents
+    discountCents,
+    vatRate
   )
 
   // Jei subtotal sumažėjo žemiau kupono vertės po prekių pašalinimo — auto-nuimam kuponą.
@@ -525,11 +528,13 @@ export function CheckoutForm({ lang, dict }: CheckoutFormProps) {
                   : formatPrice(totals.shippingCents / 100, lang)
               }
             />
-            <Row
-              label={dict.checkout.vat}
-              value={formatPrice(totals.vatCents / 100, lang)}
-              muted
-            />
+            {totals.vatCents > 0 && (
+              <Row
+                label={dict.checkout.vat}
+                value={formatPrice(totals.vatCents / 100, lang)}
+                muted
+              />
+            )}
           </div>
 
           <div className="flex justify-between items-baseline pt-4 border-t border-brand-gray-50/60">

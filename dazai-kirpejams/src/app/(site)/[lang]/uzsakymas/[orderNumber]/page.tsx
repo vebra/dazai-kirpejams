@@ -291,11 +291,13 @@ export default async function OrderConfirmationPage({
                     : formatPrice(order.shippingCents / 100, lang)
                 }
               />
-              <SummaryRow
-                label={dict.checkout.vat}
-                value={formatPrice(order.vatCents / 100, lang)}
-                muted
-              />
+              {order.vatCents > 0 && (
+                <SummaryRow
+                  label={dict.checkout.vat}
+                  value={formatPrice(order.vatCents / 100, lang)}
+                  muted
+                />
+              )}
               <div className="flex justify-between items-baseline pt-3 mt-3 border-t border-brand-gray-50">
                 <span className="text-base font-bold text-brand-gray-900">
                   {dict.cart.total}

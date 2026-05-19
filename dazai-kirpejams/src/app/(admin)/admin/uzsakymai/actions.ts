@@ -59,6 +59,7 @@ export async function updateOrderStatusAction(
     email: string
     first_name: string
     total_cents: number
+    vat_cents: number
     tracking_number: string | null
     tracking_carrier: string | null
   } | null = null
@@ -67,7 +68,7 @@ export async function updateOrderStatusAction(
     const { data } = await supabase
       .from('orders')
       .select(
-        'order_number, email, first_name, total_cents, tracking_number, tracking_carrier'
+        'order_number, email, first_name, total_cents, vat_cents, tracking_number, tracking_carrier'
       )
       .eq('id', id)
       .maybeSingle()
@@ -119,6 +120,7 @@ export async function updateOrderStatusAction(
             invoiceNumber: result.invoiceNumber,
             firstName: orderData.first_name,
             totalCents: orderData.total_cents,
+            isVatInvoice: orderData.vat_cents > 0,
             siteUrl,
             accountUrl: `${siteUrl}/lt/paskyra`,
           })

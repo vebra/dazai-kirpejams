@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import {
   calculateOrderTotals,
   meetsMinimumOrder,
+  vatRateFromVatCode,
   type DeliveryMethod,
   type PaymentMethod,
 } from './constants'
@@ -124,6 +125,20 @@ export async function createOrder(
   let appliedDiscountCode: string | null = null
   const normalizedInputCode = input.discountCode?.trim().toUpperCase() ?? ''
 
+  // Įmonės rekvizitai — tiesos šaltinis ir PVM statusui, ir el. laiško
+  // banko blokui. Paimam VIENĄ kartą čia (anksčiau buvo fetch'inama vėliau
+  // tik email'ui). Jei DB nesukonfigūruota arba `company_vat_code` tuščias —
+  // įmonė laikoma ne PVM mokėtoja, todėl `vatRate` = 0 ir PVM neišskiriamas.
+  let companyInfo: Awaited<ReturnType<typeof getCompanyInfo>> | null = null
+  if (isSupabaseServerConfigured) {
+    try {
+      companyInfo = await getCompanyInfo()
+    } catch (err) {
+      console.error('[order] getCompanyInfo failed (non-blocking):', err)
+    }
+  }
+  const vatRate = vatRateFromVatCode(companyInfo?.vatCode)
+
   // Įrašas į Supabase — jei sukonfigūruota.
   //
   // Srautas:
@@ -228,7 +243,8 @@ export async function createOrder(
     const computedTotals = calculateOrderTotals(
       subtotalCents,
       input.deliveryMethod,
-      discountCents
+      discountCents,
+      vatRate
     )
 
     // 4) Insert'as į orders — su retry dėl order_number kolizijų
@@ -360,7 +376,8 @@ export async function createOrder(
   const totals = calculateOrderTotals(
     subtotalCents,
     input.deliveryMethod,
-    discountCents
+    discountCents,
+    vatRate
   )
 
   // ============================================
@@ -378,18 +395,9 @@ export async function createOrder(
     'https://www.dazaikirpejams.lt'
   const createdAtIso = new Date().toISOString()
 
-  // Įmonės rekvizitai iš Nustatymų — tiesos šaltinis banko pavedimo blokui.
-  // Jei DB nesukonfigūruota arba laukai tušti, template graceful'iai neparodys
-  // banko duomenų (vartotojui bus pranešta, kad instrukcijos ateis atskiru
-  // laišku).
-  let companyInfo: Awaited<ReturnType<typeof getCompanyInfo>> | null = null
-  if (isSupabaseServerConfigured) {
-    try {
-      companyInfo = await getCompanyInfo()
-    } catch (err) {
-      console.error('[order] getCompanyInfo failed (non-blocking):', err)
-    }
-  }
+  // `companyInfo` jau paimtas viršuje (PVM statusui) — tas pats objektas
+  // naudojamas el. laiško banko pavedimo blokui. Jei DB nesukonfigūruota
+  // arba laukai tušti, template graceful'iai neparodys banko duomenų.
 
   try {
     const customerEmailPayload = buildCustomerOrderEmail({

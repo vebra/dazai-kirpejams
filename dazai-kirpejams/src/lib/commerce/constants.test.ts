@@ -3,6 +3,8 @@ import {
   calculateShippingCents,
   calculateOrderTotals,
   meetsMinimumOrder,
+  vatRateFromVatCode,
+  VAT_RATE,
   FREE_SHIPPING_THRESHOLD_CENTS,
   MIN_ORDER_CENTS,
   SHIPPING_COURIER_CENTS,
@@ -97,6 +99,41 @@ describe('calculateOrderTotals — free shipping uses pre-discount subtotal', ()
     expect(t.shippingCents).toBe(0)
     expect(t.discountCents).toBe(4000)
     expect(t.totalCents).toBe(FREE_SHIPPING_THRESHOLD_CENTS - 4000)
+  })
+})
+
+describe('vatRateFromVatCode', () => {
+  it('returns 0 when there is no VAT code (not a VAT payer)', () => {
+    expect(vatRateFromVatCode(null)).toBe(0)
+    expect(vatRateFromVatCode(undefined)).toBe(0)
+    expect(vatRateFromVatCode('')).toBe(0)
+    expect(vatRateFromVatCode('   ')).toBe(0)
+  })
+
+  it('returns the standard rate once a VAT code is set (VAT payer)', () => {
+    expect(vatRateFromVatCode('LT100012345678')).toBe(VAT_RATE)
+  })
+})
+
+describe('calculateOrderTotals — non-VAT payer (vatRate = 0)', () => {
+  it('produces zero VAT so the UI/invoice hides the VAT line', () => {
+    const t = calculateOrderTotals(4000, 'courier', 0, 0)
+    expect(t.vatCents).toBe(0)
+    // Totals are otherwise unchanged — VAT is inclusive, not additive
+    expect(t.totalCents).toBe(4599)
+    expect(t.subtotalCents).toBe(4000)
+    expect(t.shippingCents).toBe(599)
+  })
+
+  it('still extracts VAT when an explicit 21% rate is passed (VAT payer)', () => {
+    const t = calculateOrderTotals(4000, 'courier', 0, VAT_RATE)
+    expect(t.vatCents).toBe(798)
+  })
+
+  it('defaults to the standard VAT rate when no rate argument is given', () => {
+    const explicit = calculateOrderTotals(4000, 'courier', 0, VAT_RATE)
+    const defaulted = calculateOrderTotals(4000, 'courier', 0)
+    expect(defaulted.vatCents).toBe(explicit.vatCents)
   })
 })
 

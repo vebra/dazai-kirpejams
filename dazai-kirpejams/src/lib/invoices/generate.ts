@@ -392,7 +392,9 @@ export async function generateInvoiceForOrder(
     discountCents: order.discount_cents ?? 0,
     deliveryCostCents: order.delivery_cost_cents ?? 0,
     vatCents: order.vat_cents,
-    vatRate: DEFAULT_VAT_RATE,
+    // Ne PVM mokėtojas (seller be PVM kodo) → tarifas 0; PDF šablonas
+    // tuomet rodo paprastą „Sąskaita faktūra" be PVM bloko.
+    vatRate: seller.vatCode ? DEFAULT_VAT_RATE : 0,
     totalCents: order.total_cents,
     paymentMethod: order.payment_method,
     notes: resolvedNotes,

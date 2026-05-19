@@ -285,10 +285,14 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
                       <td style="padding:2px 0;color:${GRAY_500};">Pristatymas</td>
                       <td style="padding:2px 0;color:${GRAY_900};text-align:right;">${input.shippingCents === 0 ? 'Nemokamas' : formatEur(input.shippingCents)}</td>
                     </tr>
-                    <tr>
+                    ${
+                      input.vatCents > 0
+                        ? `<tr>
                       <td style="padding:2px 0;color:${GRAY_500};">PVM (21%)</td>
                       <td style="padding:2px 0;color:${GRAY_500};text-align:right;">${formatEur(input.vatCents)}</td>
-                    </tr>
+                    </tr>`
+                        : ''
+                    }
                     <tr>
                       <td style="padding:8px 0 0;color:${GRAY_900};font-weight:700;font-size:15px;border-top:1px solid ${BORDER};">Iš viso</td>
                       <td style="padding:8px 0 0;color:${GRAY_900};font-weight:700;font-size:18px;text-align:right;border-top:1px solid ${BORDER};">${formatEur(input.totalCents)}</td>
@@ -381,8 +385,7 @@ Nuolaida${input.discountCode ? ` (${input.discountCode})` : ''}: −${formatEur(
       : ''
   }
 Pristatymas: ${input.shippingCents === 0 ? 'Nemokamas' : formatEur(input.shippingCents)}
-PVM (21%):  ${formatEur(input.vatCents)}
-IŠ VISO:    ${formatEur(input.totalCents)}
+${input.vatCents > 0 ? `PVM (21%):  ${formatEur(input.vatCents)}\n` : ''}IŠ VISO:    ${formatEur(input.totalCents)}
 
 PRISTATYMAS
 ${DELIVERY_LT[input.deliveryMethod]}
@@ -688,6 +691,8 @@ type InvoicePaidEmailInput = {
   invoiceNumber: string
   firstName: string
   totalCents: number
+  /** true → „PVM sąskaita faktūra"; false (ne PVM mokėtojas) → „Sąskaita faktūra". */
+  isVatInvoice: boolean
   siteUrl: string
   accountUrl: string
 }
@@ -697,7 +702,13 @@ export function buildInvoicePaidEmail(input: InvoicePaidEmailInput): {
   html: string
   text: string
 } {
-  const subject = `PVM sąskaita faktūra ${input.invoiceNumber} — Dažai Kirpėjams`
+  const docLabel = input.isVatInvoice
+    ? 'PVM sąskaita faktūra'
+    : 'Sąskaita faktūra'
+  const docLabelLower = input.isVatInvoice
+    ? 'PVM sąskaita faktūra'
+    : 'sąskaita faktūra'
+  const subject = `${docLabel} ${input.invoiceNumber} — Dažai Kirpėjams`
 
   const html = `<!doctype html>
 <html lang="lt">
@@ -712,7 +723,7 @@ export function buildInvoicePaidEmail(input: InvoicePaidEmailInput): {
       <tr>
         <td style="padding:32px;border-bottom:1px solid ${BORDER};">
           <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:${BRAND_MAGENTA};">Dažai Kirpėjams</div>
-          <h1 style="margin:8px 0 0;font-size:24px;font-weight:700;color:${GRAY_900};">Jūsų PVM sąskaita faktūra</h1>
+          <h1 style="margin:8px 0 0;font-size:24px;font-weight:700;color:${GRAY_900};">Jūsų ${docLabelLower}</h1>
           <p style="margin:8px 0 0;font-size:14px;color:${GRAY_500};line-height:1.5;">
             Sveiki, ${escapeHtml(input.firstName)}. Ačiū už apmokėjimą — sąskaitą rasite šio laiško priede (PDF).
           </p>
@@ -766,11 +777,11 @@ export function buildInvoicePaidEmail(input: InvoicePaidEmailInput): {
 </body></html>`
 
   const text = `
-PVM sąskaita faktūra ${input.invoiceNumber} — Dažai Kirpėjams
+${docLabel} ${input.invoiceNumber} — Dažai Kirpėjams
 
 Sveiki, ${input.firstName}.
 
-Ačiū už apmokėjimą. Jūsų PVM sąskaita faktūra ${input.invoiceNumber} (užsakymas ${input.orderNumber}) pridėta prie šio laiško kaip PDF.
+Ačiū už apmokėjimą. Jūsų ${docLabelLower} ${input.invoiceNumber} (užsakymas ${input.orderNumber}) pridėta prie šio laiško kaip PDF.
 
 Suma: ${formatEur(input.totalCents)}
 
