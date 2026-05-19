@@ -1,8 +1,18 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createProxySupabase } from '@/lib/supabase/ssr'
-import { defaultLocale } from '@/i18n/config'
+import { defaultLocale, locales, type Locale } from '@/i18n/config'
 import { langPrefix } from '@/lib/utils'
+
+/**
+ * `lang` ateina iš URL query (atakuotojo valdoma). Be validacijos
+ * `langPrefix('/evil.com')` → `//evil.com`, o `new URL('//evil.com/...', base)`
+ * nukreiptų į išorinį domeną (open-redirect / phishing per el. patvirtinimo
+ * nuorodą). Leidžiam tik žinomus locale'us; bet kas kita → defaultLocale.
+ */
+function safeLocale(value: string | null): Locale {
+  return locales.includes(value as Locale) ? (value as Locale) : defaultLocale
+}
 
 /**
  * Supabase Auth email confirmation callback.
@@ -13,7 +23,7 @@ import { langPrefix } from '@/lib/utils'
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
-  const lang = searchParams.get('lang') ?? defaultLocale
+  const lang = safeLocale(searchParams.get('lang'))
 
   if (code) {
     const response = NextResponse.redirect(
