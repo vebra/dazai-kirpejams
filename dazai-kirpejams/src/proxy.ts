@@ -81,7 +81,10 @@ async function checkAdminAuth(
     return copyCookies(response, NextResponse.redirect(loginUrl))
   }
 
-  return response
+  // Sesija galiojanti. Grąžinam ATNAUJINTĄ request'ą downstream'ui (RSC
+  // `requireAdmin()` skaito cookie per next/headers) ir kartu Set-Cookie
+  // antraštes naršyklei. Be `{ request }` RSC matytų seną token'ą.
+  return copyCookies(response, NextResponse.next({ request }))
 }
 
 export async function proxy(request: NextRequest) {
@@ -120,7 +123,8 @@ export async function proxy(request: NextRequest) {
   }
 
   // Visiems kitiems route'ams refresh'inam Supabase sesiją, kad access_token
-  // nepasensta naršymo metu.
+  // nepasensta naršymo metu. Refresh'as mutuoja request.cookies, todėl
+  // tęsiamuose atsakymuose persiunčiam atnaujintą request'ą per `{ request }`.
   await refreshSupabaseSession(request, response)
 
   // Jei URL prasideda /lt arba /lt/... — nukreipiam į versiją be prefikso
@@ -139,11 +143,13 @@ export async function proxy(request: NextRequest) {
       (pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`)
   )
 
-  if (pathnameHasLocale) return response
+  if (pathnameHasLocale) {
+    return copyCookies(response, NextResponse.next({ request }))
+  }
 
   // URL be kalbos prefikso — tai lietuvių kalba, rewrite į /lt/...
   request.nextUrl.pathname = `/${defaultLocale}${pathname}`
-  return copyCookies(response, NextResponse.rewrite(request.nextUrl))
+  return copyCookies(response, NextResponse.rewrite(request.nextUrl, { request }))
 }
 
 export const config = {

@@ -83,6 +83,17 @@ export function createProxySupabase(
         return request.cookies.getAll()
       },
       setAll(cookiesToSet) {
+        // Atnaujintą sesiją rašom į DU vietas:
+        //  1. request.cookies — kad TAS PATS request'as (RSC / Server Action,
+        //     skaitantis per next/headers cookies()) matytų jau atnaujintą
+        //     token'ą. Be šito po access_token expiracijos proxy refresh'ina
+        //     sesiją, bet downstream RSC vis tiek skaito seną cookie, getUser()
+        //     grąžina null ir admin'ą išmeta į /admin/login.
+        //  2. response.cookies — kad naršyklė gautų Set-Cookie ir kituose
+        //     request'uose siųstų jau atnaujintą token'ą.
+        for (const { name, value } of cookiesToSet) {
+          request.cookies.set(name, value)
+        }
         for (const { name, value, options } of cookiesToSet) {
           response.cookies.set({
             name,
