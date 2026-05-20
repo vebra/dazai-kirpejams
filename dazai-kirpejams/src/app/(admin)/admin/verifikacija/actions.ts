@@ -13,6 +13,17 @@ import {
 const VERIFICATION_BUCKET = 'verification-docs'
 
 /**
+ * Saugiai konvertuoja `user_profiles.lang` reikšmę į palaikomą locale.
+ * NULL / nežinomos reikšmės → 'lt' (numatytasis). Apsauga nuo netinkamo
+ * stulpelio turinio el. laiško builder'iuose.
+ */
+function resolveProfileLang(
+  raw: string | null | undefined
+): 'lt' | 'en' | 'ru' {
+  return raw === 'en' || raw === 'ru' ? raw : 'lt'
+}
+
+/**
  * Ištraukia storage PATH'ą iš DB įrašo. Senieji įrašai (prieš bug fix'ą)
  * saugojo `getPublicUrl()` rezultatą — tokiu atveju ištraukiam path'ą iš
  * URL'o. Nauji įrašai saugo vien path'ą.
@@ -57,18 +68,19 @@ export async function approveUserAction(formData: FormData): Promise<void> {
   try {
     const { data: profile } = await supabase
       .from('user_profiles')
-      .select('first_name')
+      .select('first_name, lang')
       .eq('id', userId)
-      .maybeSingle<{ first_name: string | null }>()
+      .maybeSingle<{ first_name: string | null; lang: string | null }>()
     const { data: authUser } = await supabase.auth.admin.getUserById(userId)
     const email = authUser?.user?.email
     if (email) {
       const siteUrl =
         process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
         'https://www.dazaikirpejams.lt'
+      const lang = resolveProfileLang(profile?.lang)
       const welcome = buildWelcomeEmail({
         firstName: profile?.first_name ?? '',
-        lang: 'lt',
+        lang,
         siteUrl,
       })
       await sendEmail({
@@ -179,19 +191,20 @@ export async function rejectUserAction(
   try {
     const { data: profile } = await supabase
       .from('user_profiles')
-      .select('first_name')
+      .select('first_name, lang')
       .eq('id', userId)
-      .maybeSingle<{ first_name: string | null }>()
+      .maybeSingle<{ first_name: string | null; lang: string | null }>()
     const { data: authUser } = await supabase.auth.admin.getUserById(userId)
     const email = authUser?.user?.email
     if (email) {
       const siteUrl =
         process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
         'https://www.dazaikirpejams.lt'
+      const lang = resolveProfileLang(profile?.lang)
       const rejection = buildRejectionEmail({
         firstName: profile?.first_name ?? '',
         reason,
-        lang: 'lt',
+        lang,
         siteUrl,
       })
       await sendEmail({

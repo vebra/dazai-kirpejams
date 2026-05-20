@@ -88,15 +88,196 @@ type CustomerOrderEmailInput = {
    * klientui grįžti į užsakymą iš bet kurio įrenginio be prisijungimo.
    * 30 d. TTL. Jei neperduota — mygtukas nerodomas. */
   viewOrderUrl?: string | null
+  /** Kliento kalba iš /[lang] route'o. Default 'lt' (atgalinis suderinamumas). */
+  lang?: 'lt' | 'en' | 'ru'
   company?: CompanyInfoForEmail
 }
 
-const DELIVERY_LT: Record<string, string> = {
-  courier: 'Kurjeris',
-  parcel_locker: 'Paštomatas',
-  pickup: 'Atsiėmimas',
+type EmailLang = 'lt' | 'en' | 'ru'
+
+// Pristatymo būdo etiketės (kliento laiškas). Admin laiškas ir toliau naudoja
+// LT tik (admin'as visada lietuviškai).
+const DELIVERY_LABELS: Record<EmailLang, Record<string, string>> = {
+  lt: { courier: 'Kurjeris', parcel_locker: 'Paštomatas', pickup: 'Atsiėmimas' },
+  en: { courier: 'Courier', parcel_locker: 'Parcel locker', pickup: 'Pickup' },
+  ru: { courier: 'Курьер', parcel_locker: 'Постамат', pickup: 'Самовывоз' },
 }
 
+// Užsakymo laiško kopijos kiekvienai kalbai. Visi tekstai, kuriuos mato
+// klientas, perėjo per šią lentelę — kad pridėjus kitą kalbą nereikėtų
+// taisyti HTML/text šablono.
+const ORDER_COPY: Record<
+  EmailLang,
+  {
+    subjectGot: string
+    brand: string
+    h1: string
+    intro: (name: string) => string
+    orderNumberLabel: string
+    bankInstructions: string
+    bankTransfer: string
+    bankRecipient: string
+    bankIbanLabel: string
+    bankNameLabel: string
+    bankSum: string
+    bankPurpose: string
+    bankWarning: string
+    bankFallback: string
+    viewCta: string
+    viewTagline: string
+    itemsHeader: string
+    totalsItems: string
+    totalsDiscount: string
+    totalsShipping: string
+    totalsShippingFree: string
+    totalsVat: string
+    totalsTotal: string
+    contactsLabel: string
+    deliveryLabel: string
+    parcelLockerPrefix: string
+    pickupAtPlace: string
+    footerQuestions: string
+    footerTagline: string
+    textOrderHeader: string
+    textDeliveryHeader: string
+    textBankHeader: string
+    textBankWarning: string
+    textDate: string
+    textViewLine: (url: string) => string
+  }
+> = {
+  lt: {
+    subjectGot: 'gautas — Dažai Kirpėjams',
+    brand: 'Dažai Kirpėjams',
+    h1: 'Ačiū už jūsų užsakymą',
+    intro: (name) =>
+      `Sveiki, ${name}. Jūsų užsakymas sėkmingai gautas ir mes jau jį ruošiame.`,
+    orderNumberLabel: 'Užsakymo numeris',
+    bankInstructions: 'Apmokėjimo instrukcijos',
+    bankTransfer: 'Banko pavedimas',
+    bankRecipient: 'Gavėjas',
+    bankIbanLabel: 'IBAN',
+    bankNameLabel: 'Bankas',
+    bankSum: 'Suma',
+    bankPurpose: 'Mokėjimo paskirtis',
+    bankWarning:
+      'SVARBU: mokėjimo paskirtyje nurodykite tikslų užsakymo numerį — tai leis greitai atpažinti jūsų mokėjimą. Prekes išsiųsime iš karto gavę pinigus.',
+    bankFallback:
+      'Mokėjimo instrukcijas atsiųsime atskiru laišku per artimiausią darbo dieną.',
+    viewCta: 'Peržiūrėti užsakymą →',
+    viewTagline: 'Nuoroda galioja 30 dienų · grįžkite iš bet kurio įrenginio',
+    itemsHeader: 'Jūsų užsakymas',
+    totalsItems: 'Prekės',
+    totalsDiscount: 'Nuolaida',
+    totalsShipping: 'Pristatymas',
+    totalsShippingFree: 'Nemokamas',
+    totalsVat: 'PVM (21%)',
+    totalsTotal: 'Iš viso',
+    contactsLabel: 'Kontaktai',
+    deliveryLabel: 'Pristatymas',
+    parcelLockerPrefix: 'Paštomatas: ',
+    pickupAtPlace: 'Atsiėmimas vietoje',
+    footerQuestions:
+      'Jei turite klausimų apie užsakymą, tiesiog atsakykite į šį laišką arba parašykite mums el. paštu.',
+    footerTagline: 'Profesionalūs plaukų dažai kirpėjams · 180 ml',
+    textOrderHeader: 'UŽSAKYMAS',
+    textDeliveryHeader: 'PRISTATYMAS',
+    textBankHeader: 'APMOKĖJIMO INSTRUKCIJOS (Banko pavedimas)',
+    textBankWarning:
+      'SVARBU: mokėjimo paskirtyje nurodykite tikslų užsakymo numerį.',
+    textDate: 'Data',
+    textViewLine: (url) =>
+      `\nPeržiūrėti užsakymą: ${url}\n(nuoroda galioja 30 dienų)\n`,
+  },
+  en: {
+    subjectGot: 'received — Dažai Kirpėjams',
+    brand: 'Dažai Kirpėjams',
+    h1: 'Thank you for your order',
+    intro: (name) =>
+      `Hello, ${name}. We have received your order and are getting it ready.`,
+    orderNumberLabel: 'Order number',
+    bankInstructions: 'Payment instructions',
+    bankTransfer: 'Bank transfer',
+    bankRecipient: 'Recipient',
+    bankIbanLabel: 'IBAN',
+    bankNameLabel: 'Bank',
+    bankSum: 'Amount',
+    bankPurpose: 'Payment reference',
+    bankWarning:
+      'IMPORTANT: include the exact order number in the payment reference so we can identify your payment quickly. We will ship as soon as the funds arrive.',
+    bankFallback:
+      'We will send payment instructions in a separate email within one business day.',
+    viewCta: 'View order →',
+    viewTagline: 'Link valid for 30 days · open from any device',
+    itemsHeader: 'Your order',
+    totalsItems: 'Items',
+    totalsDiscount: 'Discount',
+    totalsShipping: 'Shipping',
+    totalsShippingFree: 'Free',
+    totalsVat: 'VAT (21%)',
+    totalsTotal: 'Total',
+    contactsLabel: 'Contacts',
+    deliveryLabel: 'Delivery',
+    parcelLockerPrefix: 'Parcel locker: ',
+    pickupAtPlace: 'Pickup in store',
+    footerQuestions:
+      'If you have any questions about your order, just reply to this email or write to us.',
+    footerTagline: 'Professional hair colour for hairdressers · 180 ml',
+    textOrderHeader: 'ORDER',
+    textDeliveryHeader: 'DELIVERY',
+    textBankHeader: 'PAYMENT INSTRUCTIONS (Bank transfer)',
+    textBankWarning:
+      'IMPORTANT: include the exact order number in the payment reference.',
+    textDate: 'Date',
+    textViewLine: (url) => `\nView order: ${url}\n(link valid for 30 days)\n`,
+  },
+  ru: {
+    subjectGot: 'получен — Dažai Kirpėjams',
+    brand: 'Dažai Kirpėjams',
+    h1: 'Спасибо за ваш заказ',
+    intro: (name) =>
+      `Здравствуйте, ${name}. Ваш заказ получен — мы его готовим.`,
+    orderNumberLabel: 'Номер заказа',
+    bankInstructions: 'Инструкции по оплате',
+    bankTransfer: 'Банковский перевод',
+    bankRecipient: 'Получатель',
+    bankIbanLabel: 'IBAN',
+    bankNameLabel: 'Банк',
+    bankSum: 'Сумма',
+    bankPurpose: 'Назначение платежа',
+    bankWarning:
+      'ВАЖНО: укажите точный номер заказа в назначении платежа — это позволит быстро идентифицировать ваш платёж. Отправим товар сразу после получения средств.',
+    bankFallback:
+      'Инструкции по оплате пришлём отдельным письмом в ближайший рабочий день.',
+    viewCta: 'Посмотреть заказ →',
+    viewTagline: 'Ссылка действует 30 дней · с любого устройства',
+    itemsHeader: 'Ваш заказ',
+    totalsItems: 'Товары',
+    totalsDiscount: 'Скидка',
+    totalsShipping: 'Доставка',
+    totalsShippingFree: 'Бесплатно',
+    totalsVat: 'НДС (21%)',
+    totalsTotal: 'Итого',
+    contactsLabel: 'Контакты',
+    deliveryLabel: 'Доставка',
+    parcelLockerPrefix: 'Постамат: ',
+    pickupAtPlace: 'Самовывоз в магазине',
+    footerQuestions:
+      'Если есть вопросы по заказу — просто ответьте на это письмо или напишите нам.',
+    footerTagline: 'Профессиональные краски для парикмахеров · 180 ml',
+    textOrderHeader: 'ЗАКАЗ',
+    textDeliveryHeader: 'ДОСТАВКА',
+    textBankHeader: 'ИНСТРУКЦИИ ПО ОПЛАТЕ (Банковский перевод)',
+    textBankWarning:
+      'ВАЖНО: укажите точный номер заказа в назначении платежа.',
+    textDate: 'Дата',
+    textViewLine: (url) =>
+      `\nПосмотреть заказ: ${url}\n(ссылка действует 30 дней)\n`,
+  },
+}
+
+// Admin laiško etiketės (visada LT — admin'as lietuviškai).
+const DELIVERY_LT = DELIVERY_LABELS.lt
 const PAYMENT_LT: Record<string, string> = {
   bank_transfer: 'Banko pavedimas',
   paysera: 'Paysera',
@@ -112,7 +293,14 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
   html: string
   text: string
 } {
-  const subject = `Jūsų užsakymas ${input.orderNumber} gautas — Dažai Kirpėjams`
+  const lang: EmailLang = input.lang ?? 'lt'
+  const c = ORDER_COPY[lang]
+  const deliveryLabel =
+    DELIVERY_LABELS[lang][input.deliveryMethod] ?? input.deliveryMethod
+
+  const subject = `${
+    lang === 'lt' ? 'Jūsų užsakymas' : lang === 'en' ? 'Your order' : 'Ваш заказ'
+  } ${input.orderNumber} ${c.subjectGot}`
 
   const itemsRows = input.items
     .map(
@@ -133,8 +321,8 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
     input.deliveryMethod === 'courier' && input.deliveryAddress
       ? `${escapeHtml(input.deliveryAddress)}, ${escapeHtml(input.deliveryCity ?? '')} ${escapeHtml(input.deliveryPostalCode ?? '')}`
       : input.deliveryMethod === 'parcel_locker' && input.deliveryAddress
-        ? `Paštomatas: ${escapeHtml(input.deliveryAddress)}`
-        : 'Atsiėmimas vietoje'
+        ? `${c.parcelLockerPrefix}${escapeHtml(input.deliveryAddress)}`
+        : c.pickupAtPlace
 
   // Banko pavedimo blokas rodomas tik jei:
   //   - mokėjimo būdas = bank_transfer
@@ -155,41 +343,39 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
         <td style="padding:0 20px;">
           <div style="background:${GRAY_900};color:#ffffff;border-radius:12px;padding:24px;margin:24px 0;">
             <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:rgba(255,255,255,0.6);">
-              Apmokėjimo instrukcijos
+              ${escapeHtml(c.bankInstructions)}
             </div>
             <div style="font-size:16px;font-weight:700;margin-top:4px;margin-bottom:16px;">
-              Banko pavedimas
+              ${escapeHtml(c.bankTransfer)}
             </div>
             <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;">
               <tr>
-                <td style="padding:8px 0;color:rgba(255,255,255,0.6);">Gavėjas</td>
+                <td style="padding:8px 0;color:rgba(255,255,255,0.6);">${escapeHtml(c.bankRecipient)}</td>
                 <td style="padding:8px 0;color:#ffffff;text-align:right;font-weight:600;">${escapeHtml(bankRecipient)}</td>
               </tr>
               <tr>
-                <td style="padding:8px 0;color:rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.1);">IBAN</td>
+                <td style="padding:8px 0;color:rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.1);">${escapeHtml(c.bankIbanLabel)}</td>
                 <td style="padding:8px 0;color:#ffffff;text-align:right;font-family:monospace;border-top:1px solid rgba(255,255,255,0.1);">${escapeHtml(bankIban)}</td>
               </tr>
               ${
                 bankName
                   ? `<tr>
-                <td style="padding:8px 0;color:rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.1);">Bankas</td>
+                <td style="padding:8px 0;color:rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.1);">${escapeHtml(c.bankNameLabel)}</td>
                 <td style="padding:8px 0;color:#ffffff;text-align:right;border-top:1px solid rgba(255,255,255,0.1);">${escapeHtml(bankName)}</td>
               </tr>`
                   : ''
               }
               <tr>
-                <td style="padding:8px 0;color:rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.1);">Suma</td>
+                <td style="padding:8px 0;color:rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.1);">${escapeHtml(c.bankSum)}</td>
                 <td style="padding:8px 0;color:${BRAND_MAGENTA};text-align:right;font-weight:700;font-size:16px;border-top:1px solid rgba(255,255,255,0.1);">${formatEur(input.totalCents)}</td>
               </tr>
               <tr>
-                <td style="padding:8px 0;color:rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.1);">Mokėjimo paskirtis</td>
+                <td style="padding:8px 0;color:rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.1);">${escapeHtml(c.bankPurpose)}</td>
                 <td style="padding:8px 0;color:#ffffff;text-align:right;font-family:monospace;border-top:1px solid rgba(255,255,255,0.1);">${input.orderNumber}</td>
               </tr>
             </table>
             <p style="margin:16px 0 0;font-size:12px;color:rgba(255,255,255,0.6);line-height:1.5;">
-              SVARBU: mokėjimo paskirtyje nurodykite tikslų užsakymo numerį —
-              tai leis greitai atpažinti jūsų mokėjimą. Prekes išsiųsime iš
-              karto gavę pinigus.
+              ${escapeHtml(c.bankWarning)}
             </p>
           </div>
         </td>
@@ -200,8 +386,7 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
         <td style="padding:0 20px;">
           <div style="background:${GRAY_50};border:1px solid ${BORDER};border-radius:12px;padding:20px;margin:24px 0;">
             <div style="font-size:13px;color:${GRAY_900};line-height:1.6;">
-              Mokėjimo instrukcijas atsiųsime atskiru laišku per artimiausią
-              darbo dieną.
+              ${escapeHtml(c.bankFallback)}
             </div>
           </div>
         </td>
@@ -221,10 +406,10 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
             <tr>
               <td align="center" style="padding:8px 0;">
                 <a href="${input.viewOrderUrl}" style="display:inline-block;padding:12px 24px;background:${BRAND_MAGENTA};color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;border-radius:10px;">
-                  Peržiūrėti užsakymą →
+                  ${escapeHtml(c.viewCta)}
                 </a>
                 <div style="font-size:11px;color:${GRAY_500};margin-top:8px;">
-                  Nuoroda galioja 30 dienų · grįžkite iš bet kurio įrenginio
+                  ${escapeHtml(c.viewTagline)}
                 </div>
               </td>
             </tr>
@@ -234,7 +419,7 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
     : ''
 
   const html = `<!doctype html>
-<html lang="lt">
+<html lang="${lang}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -242,7 +427,7 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
 </head>
 <body style="margin:0;padding:0;background:${GRAY_50};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:${GRAY_900};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
-  Ačiū už jūsų užsakymą ${input.orderNumber}. Suma: ${formatEur(input.totalCents)}.
+  ${escapeHtml(c.h1)} ${input.orderNumber}. ${c.bankSum}: ${formatEur(input.totalCents)}.
 </div>
 <table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};padding:32px 16px;">
   <tr>
@@ -253,13 +438,13 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
         <tr>
           <td style="padding:32px 32px 24px;border-bottom:1px solid ${BORDER};">
             <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:${BRAND_MAGENTA};">
-              Dažai Kirpėjams
+              ${escapeHtml(c.brand)}
             </div>
             <h1 style="margin:8px 0 0;font-size:24px;font-weight:700;color:${GRAY_900};line-height:1.2;">
-              Ačiū už jūsų užsakymą
+              ${escapeHtml(c.h1)}
             </h1>
             <p style="margin:8px 0 0;font-size:14px;color:${GRAY_500};line-height:1.5;">
-              Sveiki, ${escapeHtml(input.firstName)}. Jūsų užsakymas sėkmingai gautas ir mes jau jį ruošiame.
+              ${escapeHtml(c.intro(input.firstName))}
             </p>
           </td>
         </tr>
@@ -271,7 +456,7 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
               <tr>
                 <td style="background:${GRAY_50};border-radius:12px;padding:16px 20px;">
                   <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:${GRAY_500};">
-                    Užsakymo numeris
+                    ${escapeHtml(c.orderNumberLabel)}
                   </div>
                   <div style="font-size:20px;font-weight:700;color:${GRAY_900};font-family:monospace;margin-top:4px;">
                     ${escapeHtml(input.orderNumber)}
@@ -292,7 +477,7 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
         <tr>
           <td style="padding:24px 32px 0;">
             <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:${GRAY_500};margin-bottom:8px;">
-              Jūsų užsakymas
+              ${escapeHtml(c.itemsHeader)}
             </div>
             <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${BORDER};border-radius:12px;overflow:hidden;">
               ${itemsRows}
@@ -300,31 +485,31 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
                 <td colspan="2" style="padding:12px 16px;border-top:1px solid ${BORDER};background:${GRAY_50};">
                   <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;">
                     <tr>
-                      <td style="padding:2px 0;color:${GRAY_500};">Prekės</td>
+                      <td style="padding:2px 0;color:${GRAY_500};">${escapeHtml(c.totalsItems)}</td>
                       <td style="padding:2px 0;color:${GRAY_900};text-align:right;">${formatEur(input.subtotalCents)}</td>
                     </tr>
                     ${
                       input.discountCents && input.discountCents > 0
                         ? `<tr>
-                      <td style="padding:2px 0;color:${BRAND_MAGENTA};">Nuolaida${input.discountCode ? ` (${escapeHtml(input.discountCode)})` : ''}</td>
+                      <td style="padding:2px 0;color:${BRAND_MAGENTA};">${escapeHtml(c.totalsDiscount)}${input.discountCode ? ` (${escapeHtml(input.discountCode)})` : ''}</td>
                       <td style="padding:2px 0;color:${BRAND_MAGENTA};text-align:right;font-weight:600;">−${formatEur(input.discountCents)}</td>
                     </tr>`
                         : ''
                     }
                     <tr>
-                      <td style="padding:2px 0;color:${GRAY_500};">Pristatymas</td>
-                      <td style="padding:2px 0;color:${GRAY_900};text-align:right;">${input.shippingCents === 0 ? 'Nemokamas' : formatEur(input.shippingCents)}</td>
+                      <td style="padding:2px 0;color:${GRAY_500};">${escapeHtml(c.totalsShipping)}</td>
+                      <td style="padding:2px 0;color:${GRAY_900};text-align:right;">${input.shippingCents === 0 ? escapeHtml(c.totalsShippingFree) : formatEur(input.shippingCents)}</td>
                     </tr>
                     ${
                       input.vatCents > 0
                         ? `<tr>
-                      <td style="padding:2px 0;color:${GRAY_500};">PVM (21%)</td>
+                      <td style="padding:2px 0;color:${GRAY_500};">${escapeHtml(c.totalsVat)}</td>
                       <td style="padding:2px 0;color:${GRAY_500};text-align:right;">${formatEur(input.vatCents)}</td>
                     </tr>`
                         : ''
                     }
                     <tr>
-                      <td style="padding:8px 0 0;color:${GRAY_900};font-weight:700;font-size:15px;border-top:1px solid ${BORDER};">Iš viso</td>
+                      <td style="padding:8px 0 0;color:${GRAY_900};font-weight:700;font-size:15px;border-top:1px solid ${BORDER};">${escapeHtml(c.totalsTotal)}</td>
                       <td style="padding:8px 0 0;color:${GRAY_900};font-weight:700;font-size:18px;text-align:right;border-top:1px solid ${BORDER};">${formatEur(input.totalCents)}</td>
                     </tr>
                   </table>
@@ -341,7 +526,7 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
               <tr>
                 <td width="50%" valign="top" style="padding-right:8px;">
                   <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:${GRAY_500};margin-bottom:8px;">
-                    Kontaktai
+                    ${escapeHtml(c.contactsLabel)}
                   </div>
                   <div style="font-size:13px;color:${GRAY_900};line-height:1.6;">
                     ${escapeHtml(input.firstName)} ${escapeHtml(input.lastName)}<br>
@@ -351,10 +536,10 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
                 </td>
                 <td width="50%" valign="top" style="padding-left:8px;">
                   <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:${GRAY_500};margin-bottom:8px;">
-                    Pristatymas
+                    ${escapeHtml(c.deliveryLabel)}
                   </div>
                   <div style="font-size:13px;color:${GRAY_900};line-height:1.6;">
-                    <strong>${DELIVERY_LT[input.deliveryMethod]}</strong><br>
+                    <strong>${escapeHtml(deliveryLabel)}</strong><br>
                     ${addressBlock}
                   </div>
                 </td>
@@ -367,12 +552,11 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
         <tr>
           <td style="padding:32px;border-top:1px solid ${BORDER};margin-top:32px;">
             <p style="margin:0 0 12px;font-size:13px;color:${GRAY_500};line-height:1.6;">
-              Jei turite klausimų apie užsakymą, tiesiog atsakykite į šį laišką
-              arba parašykite mums el. paštu.
+              ${escapeHtml(c.footerQuestions)}
             </p>
             <p style="margin:0;font-size:12px;color:${GRAY_500};line-height:1.6;">
-              <strong style="color:${GRAY_900};">${escapeHtml(input.company?.legalName || 'Dažai Kirpėjams')}</strong><br>
-              Profesionalūs plaukų dažai kirpėjams · 180 ml<br>
+              <strong style="color:${GRAY_900};">${escapeHtml(input.company?.legalName || c.brand)}</strong><br>
+              ${escapeHtml(c.footerTagline)}<br>
               ${
                 input.company?.address
                   ? `${escapeHtml(input.company.address)}<br>`
@@ -398,51 +582,51 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
     .join('\n')
 
   const text = `
-Ačiū už jūsų užsakymą — Dažai Kirpėjams
+${c.h1} — ${c.brand}
 
-Sveiki, ${input.firstName}.
+${c.intro(input.firstName)}
 
-Jūsų užsakymas ${input.orderNumber} sėkmingai gautas.
-Data: ${formatDate(input.createdAt)}
-${input.viewOrderUrl ? `\nPeržiūrėti užsakymą: ${input.viewOrderUrl}\n(nuoroda galioja 30 dienų)\n` : ''}
-UŽSAKYMAS
+${c.orderNumberLabel}: ${input.orderNumber}
+${c.textDate}: ${formatDate(input.createdAt)}
+${input.viewOrderUrl ? c.textViewLine(input.viewOrderUrl) : ''}
+${c.textOrderHeader}
 ${itemsText}
 
-Prekės:     ${formatEur(input.subtotalCents)}${
+${c.totalsItems}:     ${formatEur(input.subtotalCents)}${
     input.discountCents && input.discountCents > 0
       ? `
-Nuolaida${input.discountCode ? ` (${input.discountCode})` : ''}: −${formatEur(input.discountCents)}`
+${c.totalsDiscount}${input.discountCode ? ` (${input.discountCode})` : ''}: −${formatEur(input.discountCents)}`
       : ''
   }
-Pristatymas: ${input.shippingCents === 0 ? 'Nemokamas' : formatEur(input.shippingCents)}
-${input.vatCents > 0 ? `PVM (21%):  ${formatEur(input.vatCents)}\n` : ''}IŠ VISO:    ${formatEur(input.totalCents)}
+${c.totalsShipping}: ${input.shippingCents === 0 ? c.totalsShippingFree : formatEur(input.shippingCents)}
+${input.vatCents > 0 ? `${c.totalsVat}:  ${formatEur(input.vatCents)}\n` : ''}${c.totalsTotal.toUpperCase()}:    ${formatEur(input.totalCents)}
 
-PRISTATYMAS
-${DELIVERY_LT[input.deliveryMethod]}
-${input.deliveryMethod === 'pickup' ? 'Atsiėmimas vietoje' : input.deliveryAddress ?? ''}
+${c.textDeliveryHeader}
+${deliveryLabel}
+${input.deliveryMethod === 'pickup' ? c.pickupAtPlace : input.deliveryAddress ?? ''}
 ${input.deliveryCity ? `${input.deliveryCity} ${input.deliveryPostalCode ?? ''}` : ''}
 
 ${
   input.paymentMethod === 'bank_transfer' && hasBankInfo
     ? `
-APMOKĖJIMO INSTRUKCIJOS (Banko pavedimas)
-Gavėjas: ${bankRecipient}
-IBAN: ${bankIban}${bankName ? `\nBankas: ${bankName}` : ''}
-Suma: ${formatEur(input.totalCents)}
-Mokėjimo paskirtis: ${input.orderNumber}
+${c.textBankHeader}
+${c.bankRecipient}: ${bankRecipient}
+${c.bankIbanLabel}: ${bankIban}${bankName ? `\n${c.bankNameLabel}: ${bankName}` : ''}
+${c.bankSum}: ${formatEur(input.totalCents)}
+${c.bankPurpose}: ${input.orderNumber}
 
-SVARBU: mokėjimo paskirtyje nurodykite tikslų užsakymo numerį.
+${c.textBankWarning}
 `
     : input.paymentMethod === 'bank_transfer'
       ? `
-Mokėjimo instrukcijas atsiųsime atskiru laišku per artimiausią darbo dieną.
+${c.bankFallback}
 `
       : ''
 }
 
-Jei turite klausimų — tiesiog atsakykite į šį laišką.
+${c.footerQuestions}
 
-${input.company?.legalName || 'Dažai Kirpėjams'}
+${input.company?.legalName || c.brand}
 ${input.siteUrl}
 `.trim()
 

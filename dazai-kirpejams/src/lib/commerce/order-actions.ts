@@ -322,6 +322,7 @@ export async function createOrder(
       createdAt: createdAtIso,
       siteUrl,
       viewOrderUrl,
+      lang: input.locale,
       company: companyInfo
         ? {
             legalName: companyInfo.legalName,

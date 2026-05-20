@@ -127,6 +127,10 @@ export async function registerAction(
       company_code: companyCode || null,
       daily_dyes_count: dailyDyesCount || null,
       verification_notes: verificationNotes || null,
+      // Registracijos kalba įrašoma profilyje, kad admin'as patvirtindamas
+      // ar atmesdamas (dienomis vėliau) galėtų išsiųsti laišką ta pačia
+      // kalba, kuria vartotojas užsiregistravo. Žr. migraciją 033.
+      lang,
       // Registracija laukia admin'o patvirtinimo per /admin/verifikacija.
       // Kainos NEatveriamos, kol statusas netaps `approved` — kliento
       // payload'e jų taip pat nebus (žr. queries.ts kainų vartus).

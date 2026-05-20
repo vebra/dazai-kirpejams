@@ -273,6 +273,44 @@ const REJECTION_COPY = {
     signoff: 'Pagarbiai,\nDažai Kirpėjams komanda',
     footerSite: 'www.dazaikirpejams.lt',
   },
+  en: {
+    subject: 'About your registration — additional review needed',
+    preheader:
+      'We can’t confirm your professional status right away. Details below.',
+    badge: 'Needs clarification',
+    title: (name: string) =>
+      name ? `Hello, ${name}. About your registration` : 'About your registration',
+    intro:
+      'We reviewed your registration details but cannot confirm your professional status at this time.',
+    reasonTitle: 'Reason',
+    nextStepsTitle: 'What to do next',
+    nextStepsDesc:
+      'If you would like to provide additional documents or clarify, please contact us — we are happy to help.',
+    contactCta: 'Contact us',
+    closing: 'Thank you for your understanding.',
+    signoff: 'Kind regards,\nThe Dažai Kirpėjams team',
+    footerSite: 'www.dazaikirpejams.lt',
+  },
+  ru: {
+    subject: 'О вашей регистрации — нужна дополнительная проверка',
+    preheader:
+      'Сейчас не можем сразу подтвердить профессиональный статус. Подробности ниже.',
+    badge: 'Требуется уточнение',
+    title: (name: string) =>
+      name
+        ? `Здравствуйте, ${name}. О вашей регистрации`
+        : 'О вашей регистрации',
+    intro:
+      'Мы рассмотрели данные регистрации, но пока не можем подтвердить ваш профессиональный статус.',
+    reasonTitle: 'Причина',
+    nextStepsTitle: 'Что делать дальше',
+    nextStepsDesc:
+      'Если хотите предоставить дополнительные документы или уточнить информацию — напишите нам, с радостью поможем.',
+    contactCta: 'Связаться',
+    closing: 'Спасибо за понимание.',
+    signoff: 'С уважением,\nКоманда Dažai Kirpėjams',
+    footerSite: 'www.dazaikirpejams.lt',
+  },
 } as const
 
 export function buildRejectionEmail(input: RejectionEmailInput): {
@@ -280,10 +318,7 @@ export function buildRejectionEmail(input: RejectionEmailInput): {
   html: string
   text: string
 } {
-  // Šiuo metu palaikom tik LT (atitinka esamą welcome email hardcoded LT).
-  // C lokalizacijos užduotyje LT/EN/RU pasirinkimas bus pridėtas abiem
-  // laiškams kartu.
-  const c = REJECTION_COPY.lt
+  const c = REJECTION_COPY[input.lang] ?? REJECTION_COPY.lt
   const safeName = escapeHtml(input.firstName || '')
   const safeReason = escapeHtml(input.reason || '')
   const contactUrl = `${input.siteUrl}/${input.lang}/kontaktai`
