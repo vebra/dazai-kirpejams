@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createProxySupabase } from '@/lib/supabase/ssr'
+import {
+  createServerClient,
+  isSupabaseServerConfigured,
+} from '@/lib/supabase/server'
 import { defaultLocale, locales, type Locale } from '@/i18n/config'
 import { langPrefix } from '@/lib/utils'
 
@@ -30,7 +34,27 @@ export async function GET(request: NextRequest) {
       new URL(`${langPrefix(lang)}/produktai`, request.url)
     )
     const supabase = createProxySupabase(request, response)
-    await supabase.auth.exchangeCodeForSession(code)
+    const { data: sessionData } = await supabase.auth.exchangeCodeForSession(code)
+
+    // OAuth vartotojai praleidžia registracijos formą, todėl jų `lang`
+    // nepatenka į user_profiles per registerAction. Po sėkmingo session
+    // exchange'o atnaujinam profilio kalbą iš callback'o `?lang=` parametro,
+    // kad welcome/atmetimo laiškai eitų ta kalba, kurią pasirinko vartotojas.
+    // Best-effort: klaida neblokuoja login srauto.
+    if (sessionData.user?.id && isSupabaseServerConfigured) {
+      try {
+        const admin = createServerClient()
+        await admin
+          .from('user_profiles')
+          .update({ lang })
+          .eq('id', sessionData.user.id)
+      } catch (err) {
+        console.error(
+          '[auth/callback] profile lang update failed (non-blocking):',
+          err
+        )
+      }
+    }
     return response
   }
 

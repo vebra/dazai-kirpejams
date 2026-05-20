@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { createServerSupabase } from '@/lib/supabase/ssr'
 import { verifyAdminAfterLogin } from '@/lib/admin/auth'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { loginSchema, formDataToObject } from '@/lib/validation/auth-schemas'
 
 export type LoginState = {
   error?: string
@@ -25,12 +26,12 @@ export async function loginAction(
   _prev: LoginState,
   formData: FormData
 ): Promise<LoginState> {
-  const email = (formData.get('email') as string | null)?.trim() ?? ''
-  const password = (formData.get('password') as string | null) ?? ''
-
-  if (!email || !password) {
+  // Zod schema validacija — žr. src/lib/validation/auth-schemas.ts
+  const parsed = loginSchema.safeParse(formDataToObject(formData))
+  if (!parsed.success) {
     return { error: 'Įveskite el. paštą ir slaptažodį.' }
   }
+  const { email, password } = parsed.data
 
   // Brute-force apsauga: 5 bandymai per 10 min iš to paties IP. Tikram
   // adminui to užtenka, atakuotojui — neleidžia password spray.

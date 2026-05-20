@@ -10,6 +10,7 @@ import {
   buildAdminRegistrationEmail,
 } from '@/lib/email/auth-templates'
 import { checkRateLimit, isHoneypotTriggered } from '@/lib/rate-limit'
+import { registerSchema, formDataToObject } from '@/lib/validation/auth-schemas'
 
 export type RegisterState = {
   error?: string
@@ -17,15 +18,6 @@ export type RegisterState = {
 }
 
 const FALLBACK_ADMIN_EMAIL = 'info@dziuljetavebre.lt'
-
-const ALLOWED_BUSINESS_TYPES = [
-  'hairdresser',
-  'colorist',
-  'salon_owner',
-  'salon', // legacy reikšmė — paliekame, kad seni linkai/forma neatmestų
-  'student',
-  'other',
-] as const
 
 function resolveLang(raw: FormDataEntryValue | null): Locale {
   if (typeof raw === 'string' && (locales as readonly string[]).includes(raw)) {
@@ -38,19 +30,6 @@ export async function registerAction(
   _prev: RegisterState,
   formData: FormData
 ): Promise<RegisterState> {
-  const email = ((formData.get('email') as string) ?? '').trim().toLowerCase()
-  const password = (formData.get('password') as string) ?? ''
-  const firstName = ((formData.get('first_name') as string) ?? '').trim()
-  const lastName = ((formData.get('last_name') as string) ?? '').trim()
-  const phone = ((formData.get('phone') as string) ?? '').trim()
-  const city = ((formData.get('city') as string) ?? '').trim()
-  const businessType = ((formData.get('business_type') as string) ?? '').trim()
-  const salonName = ((formData.get('salon_name') as string) ?? '').trim()
-  const companyCode = ((formData.get('company_code') as string) ?? '').trim()
-  const dailyDyesCount = ((formData.get('daily_dyes_count') as string) ?? '').trim()
-  const verificationNotes = (
-    (formData.get('verification_notes') as string) ?? ''
-  ).trim()
   const lang = resolveLang(formData.get('lang'))
   const { errors } = await getDictionary(lang)
 
@@ -59,29 +38,27 @@ export async function registerAction(
     return { success: true }
   }
 
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { error: errors.emailInvalid }
+  // Zod schema validacija. Klaidos `message` string'as yra dictionary
+  // raktas (errors.xxx), žr. src/lib/validation/auth-schemas.ts.
+  const parsed = registerSchema.safeParse(formDataToObject(formData))
+  if (!parsed.success) {
+    const firstIssue = parsed.error.issues[0]
+    const key = firstIssue?.message as keyof typeof errors
+    return { error: errors[key] ?? errors.registerGeneric }
   }
-  if (!password || password.length < 6) {
-    return { error: errors.passwordTooShort }
-  }
-  if (!firstName) {
-    return { error: errors.firstNameRequired }
-  }
-  if (!lastName) {
-    return { error: errors.lastNameRequired }
-  }
-  if (
-    !businessType ||
-    !(ALLOWED_BUSINESS_TYPES as readonly string[]).includes(businessType)
-  ) {
-    return { error: errors.businessTypeRequired }
-  }
-  // Profesionalo savideklaracija pakeitė dokumento įkėlimą — be jos
-  // registracija neleidžiama (parduotuvė tik specialistams).
-  if (formData.get('confirm_professional') !== 'on') {
-    return { error: errors.confirmProfessionalRequired }
-  }
+  const {
+    email,
+    password,
+    first_name: firstName,
+    last_name: lastName,
+    phone,
+    city,
+    business_type: businessType,
+    salon_name: salonName,
+    company_code: companyCode,
+    daily_dyes_count: dailyDyesCount,
+    verification_notes: verificationNotes,
+  } = parsed.data
 
   // Rate-limit prieš signUp — registracija rašo per service-role klientą,
   // todėl be limito galimas masinis fake-account spam'as.

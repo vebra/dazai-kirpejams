@@ -6,6 +6,7 @@ import { locales, type Locale, defaultLocale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 import { langPrefix } from '@/lib/utils'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { loginSchema, formDataToObject } from '@/lib/validation/auth-schemas'
 
 export type LoginState = {
   error?: string
@@ -22,14 +23,16 @@ export async function loginAction(
   _prev: LoginState,
   formData: FormData
 ): Promise<LoginState> {
-  const email = ((formData.get('email') as string) ?? '').trim().toLowerCase()
-  const password = (formData.get('password') as string) ?? ''
   const lang = resolveLang(formData.get('lang'))
   const { errors } = await getDictionary(lang)
 
-  if (!email || !password) {
-    return { error: errors.loginMissing }
+  // Zod schema — žr. src/lib/validation/auth-schemas.ts
+  const parsed = loginSchema.safeParse(formDataToObject(formData))
+  if (!parsed.success) {
+    const key = parsed.error.issues[0]?.message as keyof typeof errors
+    return { error: errors[key] ?? errors.loginMissing }
   }
+  const { email, password } = parsed.data
 
   // Brute-force apsauga: 5 bandymai per 10 min iš to paties IP. Tas pats
   // pattern kaip /admin/login ir kaip registracija (žr. checkRateLimit).
