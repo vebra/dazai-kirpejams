@@ -94,12 +94,20 @@ export async function proxy(request: NextRequest) {
   if (/\.[a-zA-Z0-9]+$/.test(pathname)) return
 
   // Lowercase redirect — uppercase URL'ai (pvz. /Produktai, /PRODUKTAI)
-  // grąžindavo HTTP 200 ir kūrė duplicate content kanonui /produktai. Visi
-  // realūs route'ai ir slug'ai šitam projekte yra lowercase, todėl saugu
-  // redirect'inti BET KOKIĄ uppercase raidę URL'e. _next/data ir kitos
-  // sisteminės route'os jau filtruotos per matcher'į, bet pridedam papildomą
-  // saugiklį, kad nieko nesugadintume.
-  if (/[A-Z]/.test(pathname) && !pathname.startsWith('/_next/')) {
+  // grąžindavo HTTP 200 ir kūrė duplicate content kanonui /produktai. Šis
+  // saugiklis vis dar reikalingas SEO dublikatams.
+  //
+  // IŠIMTYS: kelią su case-sensitive ID NEGALIMA lowercase'inti. Užsakymo
+  // numeris yra formato `DK-260520-160345` (uppercase `DK-` prefiksas) —
+  // redirect'inus į lowercase patvirtinimo puslapis grąžindavo 404, nes
+  // tiek sausainuko raktas, tiek DB `order_number` palyginimas yra
+  // case-sensitive. Tas pats logiškai galiotų bet kokiam keliui po
+  // /uzsakymas/ (pvz. /uzsakymas/{nr}/saskaita).
+  if (
+    /[A-Z]/.test(pathname) &&
+    !pathname.startsWith('/_next/') &&
+    !/(^|\/)uzsakymas\//.test(pathname)
+  ) {
     const url = request.nextUrl.clone()
     url.pathname = pathname.toLowerCase()
     return NextResponse.redirect(url, 301)
