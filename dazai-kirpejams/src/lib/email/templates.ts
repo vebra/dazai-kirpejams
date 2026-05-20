@@ -84,6 +84,10 @@ type CustomerOrderEmailInput = {
   totalCents: number
   createdAt: string
   siteUrl: string
+  /** Žetonu pasirašyta nuoroda į patvirtinimo puslapį — leidžia
+   * klientui grįžti į užsakymą iš bet kurio įrenginio be prisijungimo.
+   * 30 d. TTL. Jei neperduota — mygtukas nerodomas. */
+  viewOrderUrl?: string | null
   company?: CompanyInfoForEmail
 }
 
@@ -204,6 +208,31 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
       </tr>`
         : ''
 
+  // „Peržiūrėti užsakymą" mygtukas — leidžia klientui grįžti į patvirtinimo
+  // puslapį iš bet kurio įrenginio be prisijungimo. URL turi pasirašytą
+  // 30 d. galiojantį žetoną (žr. src/lib/orders/view-token.ts). Be šio
+  // mygtuko klientas, uždaręs taba, tegali pamatyti užsakymą per `/paskyra`
+  // prisijungęs su tuo pačiu el. paštu.
+  const viewOrderUrlBlock = input.viewOrderUrl
+    ? `
+      <tr>
+        <td style="padding:20px 32px 0;">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td align="center" style="padding:8px 0;">
+                <a href="${input.viewOrderUrl}" style="display:inline-block;padding:12px 24px;background:${BRAND_MAGENTA};color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;border-radius:10px;">
+                  Peržiūrėti užsakymą →
+                </a>
+                <div style="font-size:11px;color:${GRAY_500};margin-top:8px;">
+                  Nuoroda galioja 30 dienų · grįžkite iš bet kurio įrenginio
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>`
+    : ''
+
   const html = `<!doctype html>
 <html lang="lt">
 <head>
@@ -257,6 +286,7 @@ export function buildCustomerOrderEmail(input: CustomerOrderEmailInput): {
         </tr>
 
         ${bankTransferBlock}
+        ${viewOrderUrlBlock}
 
         <!-- Prekės -->
         <tr>
@@ -374,7 +404,7 @@ Sveiki, ${input.firstName}.
 
 Jūsų užsakymas ${input.orderNumber} sėkmingai gautas.
 Data: ${formatDate(input.createdAt)}
-
+${input.viewOrderUrl ? `\nPeržiūrėti užsakymą: ${input.viewOrderUrl}\n(nuoroda galioja 30 dienų)\n` : ''}
 UŽSAKYMAS
 ${itemsText}
 

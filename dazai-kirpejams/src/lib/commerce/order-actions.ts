@@ -19,6 +19,7 @@ import {
 import { getCompanyInfo } from '@/lib/admin/queries'
 import { getDictionary } from '@/i18n/dictionaries'
 import { sendMetaCapiEvent } from '@/lib/analytics-capi'
+import { createOrderViewToken } from '@/lib/orders/view-token'
 
 /**
  * Serializuota užsakymo prekė iš kliento (zustand store snapshot'o).
@@ -282,6 +283,15 @@ export async function createOrder(
     'https://www.dazaikirpejams.lt'
   const createdAtIso = new Date().toISOString()
 
+  // Magic-link žetonas, kad klientas galėtų grįžti į patvirtinimo puslapį
+  // iš bet kurio įrenginio be prisijungimo (30 d. galiojimas). Jei
+  // SERVICE_ROLE_KEY nesukonfigūruotas — `createOrderViewToken` grąžina
+  // null, ir email'as siunčiamas be mygtuko (graceful degradation).
+  const viewToken = createOrderViewToken(orderNumber)
+  const viewOrderUrl = viewToken
+    ? `${siteUrl}/uzsakymas/${orderNumber}?token=${encodeURIComponent(viewToken)}`
+    : null
+
   // `companyInfo` jau paimtas viršuje (PVM statusui) — tas pats objektas
   // naudojamas el. laiško banko pavedimo blokui. Jei DB nesukonfigūruota
   // arba laukai tušti, template graceful'iai neparodys banko duomenų.
@@ -311,6 +321,7 @@ export async function createOrder(
       totalCents: totals.totalCents,
       createdAt: createdAtIso,
       siteUrl,
+      viewOrderUrl,
       company: companyInfo
         ? {
             legalName: companyInfo.legalName,

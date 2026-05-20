@@ -17,6 +17,7 @@ import { createServerSupabase } from '@/lib/supabase/ssr'
 import { getCompanyInfo } from '@/lib/admin/queries'
 import type { DeliveryMethod, PaymentMethod } from '@/lib/commerce/constants'
 import { PurchaseTracker } from '@/components/analytics/PurchaseTracker'
+import { verifyOrderViewToken } from '@/lib/orders/view-token'
 
 export async function generateMetadata({
   params,
@@ -163,23 +164,92 @@ async function loadOrderSnapshotFromDb(
   }
 }
 
+/**
+ * Žetonų kelias: el. laiške esantis `?token=...` HMAC žetonas, pasirašytas
+ * kuriant užsakymą (30 d. TTL). Žetonas suriša konkretų `order_number` —
+ * jis YRA autorizacija, todėl el. pašto/sesijos tikrinti nereikia. Tai
+ * leidžia klientui grįžti į užsakymą iš bet kurio įrenginio be prisijungimo.
+ */
+async function loadOrderSnapshotFromToken(
+  orderNumber: string,
+  token: string | null | undefined
+): Promise<OrderSnapshot | null> {
+  if (!token || !isSupabaseServerConfigured) return null
+  if (!verifyOrderViewToken(token, orderNumber)) return null
+
+  try {
+    const supabase = createServerClient()
+    const { data: order } = await supabase
+      .from('orders')
+      .select(
+        'id, order_number, email, phone, first_name, last_name, delivery_method, delivery_address, delivery_city, delivery_postal_code, payment_method, subtotal_cents, discount_code, discount_cents, delivery_cost_cents, vat_cents, total_cents, created_at'
+      )
+      .eq('order_number', orderNumber)
+      .maybeSingle()
+
+    if (!order) return null
+
+    const { data: itemRows } = await supabase
+      .from('order_items')
+      .select('product_id, product_name, product_sku, unit_price_cents, quantity')
+      .eq('order_id', order.id)
+
+    return {
+      orderNumber: order.order_number,
+      email: order.email,
+      firstName: order.first_name,
+      lastName: order.last_name,
+      phone: order.phone,
+      deliveryMethod: order.delivery_method as DeliveryMethod,
+      deliveryAddress: order.delivery_address ?? null,
+      deliveryCity: order.delivery_city ?? null,
+      deliveryPostalCode: order.delivery_postal_code ?? null,
+      paymentMethod: order.payment_method as PaymentMethod,
+      items: (itemRows ?? []).map((r) => ({
+        productId: r.product_id,
+        name: r.product_name,
+        sku: r.product_sku ?? null,
+        priceCents: r.unit_price_cents,
+        quantity: r.quantity,
+      })),
+      subtotalCents: order.subtotal_cents,
+      discountCode: order.discount_code ?? null,
+      discountCents: order.discount_cents ?? 0,
+      shippingCents: order.delivery_cost_cents ?? 0,
+      vatCents: order.vat_cents ?? 0,
+      totalCents: order.total_cents,
+      createdAt: order.created_at ?? new Date().toISOString(),
+    }
+  } catch {
+    return null
+  }
+}
+
 async function loadOrderSnapshot(
-  orderNumber: string
+  orderNumber: string,
+  token?: string | null
 ): Promise<OrderSnapshot | null> {
   return (
     (await loadOrderSnapshotFromCookie(orderNumber)) ??
+    (await loadOrderSnapshotFromToken(orderNumber, token)) ??
     (await loadOrderSnapshotFromDb(orderNumber))
   )
 }
 
 export default async function OrderConfirmationPage({
   params,
+  searchParams,
 }: PageProps<'/[lang]/uzsakymas/[orderNumber]'>) {
   const { lang, orderNumber } = await params
   if (!hasLocale(lang)) notFound()
   const dict = await getDictionary(lang)
 
-  const order = await loadOrderSnapshot(orderNumber)
+  // `token` ateina iš patvirtinimo el. laiško magic-link nuorodos. Leidžia
+  // klientui pamatyti užsakymą be prisijungimo (žr. loadOrderSnapshotFromToken).
+  const sp = await searchParams
+  const tokenParam = typeof sp.token === 'string' ? sp.token : null
+
+  const order = await loadOrderSnapshot(orderNumber, tokenParam)
   if (!order) notFound()
 
   // Įmonės rekvizitai iš Nustatymų — banko pavedimo instrukcijoms.
