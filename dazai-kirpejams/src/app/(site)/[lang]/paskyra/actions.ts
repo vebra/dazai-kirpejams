@@ -7,6 +7,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { getInvoiceSignedUrl } from '@/lib/invoices/queries'
 import { locales, type Locale, defaultLocale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 export type UploadDocState = {
   error?: string
@@ -33,6 +34,18 @@ export async function uploadDocumentAction(
   } = await supabase.auth.getUser()
 
   if (!user) return { error: errors.mustBeLoggedIn }
+
+  // Rate-limit dokumentų įkėlimui — net su prisijungimu, sukompromituota
+  // sesija galėtų užmaišyti storage'ą. 5 įkėlimai per valandą realiam
+  // vartotojui pakanka (paprastai įkelia 1-2 kartus).
+  const rl = await checkRateLimit({
+    action: 'upload-document',
+    windowSeconds: 3600,
+    max: 5,
+  })
+  if (!rl.allowed) {
+    return { error: errors.uploadFailed }
+  }
 
   const file = formData.get('document') as File | null
   if (!file || file.size === 0) {

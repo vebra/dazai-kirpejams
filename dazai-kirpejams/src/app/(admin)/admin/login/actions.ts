@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabase } from '@/lib/supabase/ssr'
 import { verifyAdminAfterLogin } from '@/lib/admin/auth'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 export type LoginState = {
   error?: string
@@ -10,10 +11,12 @@ export type LoginState = {
 
 /**
  * Server Action prisijungimui:
- *  1. Validuoja email+slaptažodį per Supabase Auth
- *  2. Po sėkmingo signIn tikrina, ar vartotojas yra `admin_users` lentelėje
- *  3. Jei ne admin — atsijungia ir grąžina bendrą klaidą (be info leakage)
- *  4. Jei admin — redirect į /admin
+ *  1. Rate-limit prieš signIn — kad password spray ant admin allow-list
+ *     adresų (mažas tikslo aikštė) neleistų neribotai bandyti
+ *  2. Validuoja email+slaptažodį per Supabase Auth
+ *  3. Po sėkmingo signIn tikrina, ar vartotojas yra `admin_users` lentelėje
+ *  4. Jei ne admin — atsijungia ir grąžina bendrą klaidą (be info leakage)
+ *  5. Jei admin — redirect į /admin
  *
  * Klaida visais atvejais ta pati („Neteisingas email arba slaptažodis"),
  * kad neišduotume allow-list'o informacijos per klaidos skirtumus.
@@ -27,6 +30,19 @@ export async function loginAction(
 
   if (!email || !password) {
     return { error: 'Įveskite el. paštą ir slaptažodį.' }
+  }
+
+  // Brute-force apsauga: 5 bandymai per 10 min iš to paties IP. Tikram
+  // adminui to užtenka, atakuotojui — neleidžia password spray.
+  const rl = await checkRateLimit({
+    action: 'admin-login',
+    windowSeconds: 600,
+    max: 5,
+  })
+  if (!rl.allowed) {
+    return {
+      error: 'Per daug bandymų. Pabandykite po kelių minučių.',
+    }
   }
 
   const supabase = await createServerSupabase()
