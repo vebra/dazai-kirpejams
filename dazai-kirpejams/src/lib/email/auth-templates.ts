@@ -56,10 +56,6 @@ const WELCOME_COPY = {
       'Prisijunkite prie paskyros ir naršykite katalogą su jums matomomis profesionalų kainomis. Užsakymai pristatomi įprasta tvarka.',
     ctaCatalog: 'Peržiūrėti katalogą',
     perksTitle: 'Taip pat kviečiame:',
-    perk1Title: 'Apsilankyti Color SHOCK prezentacijoje Kaune',
-    perk1Desc:
-      'Gegužės 17 d., 10:00–15:00. Gyva dažymo demonstracija su gyvu modeliu, profesionalūs patarimai. Įėjimas nemokamas.',
-    perk1Cta: 'Registruotis į renginį',
     perk2Title: 'Aptarti individualias salono sąlygas',
     perk2Desc:
       'Jei dirbate salone arba turite reguliarų poreikį — galim suderinti specialias B2B kainas ir tiekimo planą.',
@@ -82,10 +78,6 @@ const WELCOME_COPY = {
       'Sign in to your account and browse the catalogue with your professional pricing. Orders are shipped as usual.',
     ctaCatalog: 'Browse the catalogue',
     perksTitle: 'We also invite you to:',
-    perk1Title: 'Join the Color SHOCK live demo in Kaunas',
-    perk1Desc:
-      'May 17, 10:00–15:00. Live colouring demonstration on a real model with professional commentary. Free entry.',
-    perk1Cta: 'Register for the event',
     perk2Title: 'Discuss salon-specific terms',
     perk2Desc:
       'If you run a salon or have regular volume — we can arrange B2B pricing and a recurring supply plan.',
@@ -108,10 +100,6 @@ const WELCOME_COPY = {
       'Войдите в аккаунт и просматривайте каталог с профессиональными ценами. Заказы доставляются в обычном порядке.',
     ctaCatalog: 'Открыть каталог',
     perksTitle: 'Также приглашаем:',
-    perk1Title: 'Прийти на презентацию Color SHOCK в Каунасе',
-    perk1Desc:
-      '17 мая, 10:00–15:00. Живая демонстрация окрашивания на модели с комментариями профессионала. Вход бесплатный.',
-    perk1Cta: 'Зарегистрироваться на мероприятие',
     perk2Title: 'Обсудить условия для салона',
     perk2Desc:
       'Если вы работаете в салоне или у вас регулярный объём — мы можем согласовать B2B-цены и план поставок.',
@@ -129,7 +117,6 @@ export function buildWelcomeEmail(input: WelcomeEmailInput): {
   text: string
 } {
   const c = WELCOME_COPY[input.lang]
-  const eventUrl = `${input.siteUrl}/lt/renginys`
   const salonUrl = `${input.siteUrl}/${input.lang}/salonams`
   const catalogUrl = `${input.siteUrl}/${input.lang}/produktai`
   const safeName = escapeHtml(input.firstName || '')
@@ -191,18 +178,6 @@ export function buildWelcomeEmail(input: WelcomeEmailInput): {
               ${escapeHtml(c.perksTitle)}
             </div>
 
-            <div style="border:1px solid ${BORDER};border-radius:12px;padding:18px 20px;margin-bottom:12px;">
-              <div style="font-size:14px;font-weight:700;color:${GRAY_900};margin-bottom:6px;">
-                ${escapeHtml(c.perk1Title)}
-              </div>
-              <p style="margin:0 0 12px;font-size:13px;line-height:1.6;color:${GRAY_500};">
-                ${escapeHtml(c.perk1Desc)}
-              </p>
-              <a href="${eventUrl}" style="display:inline-block;padding:10px 18px;background:${BRAND_MAGENTA};color:#ffffff;text-decoration:none;font-size:13px;font-weight:600;border-radius:8px;">
-                ${escapeHtml(c.perk1Cta)} →
-              </a>
-            </div>
-
             <div style="border:1px solid ${BORDER};border-radius:12px;padding:18px 20px;">
               <div style="font-size:14px;font-weight:700;color:${GRAY_900};margin-bottom:6px;">
                 ${escapeHtml(c.perk2Title)}
@@ -252,10 +227,6 @@ ${c.pendingDesc}
 ${c.ctaCatalog}: ${catalogUrl}
 
 ${c.perksTitle}
-- ${c.perk1Title}
-  ${c.perk1Desc}
-  ${eventUrl}
-
 - ${c.perk2Title}
   ${c.perk2Desc}
   ${salonUrl}
