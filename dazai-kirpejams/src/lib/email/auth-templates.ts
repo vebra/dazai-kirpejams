@@ -241,6 +241,164 @@ ${c.footerSite}`
 }
 
 // ============================================
+// REGISTRACIJA NEPATVIRTINTA — siunčiama po admin reject veiksmo
+// ============================================
+
+export type RejectionEmailInput = {
+  firstName: string
+  /** Admin'o įvesta priežastis iš `user_profiles.rejection_reason` */
+  reason: string
+  /** Šiuo metu hardcoded 'lt' (welcome šablonas elgiasi taip pat). C
+   *  lokalizacijos užduotyje bus pakeista į vartotojo registracijos lang. */
+  lang: 'lt' | 'en' | 'ru'
+  siteUrl: string
+}
+
+const REJECTION_COPY = {
+  lt: {
+    subject: 'Dėl jūsų registracijos — papildomas patikrinimas',
+    preheader:
+      'Negalime iškart patvirtinti profesionalo statuso. Žemiau — paaiškinimas.',
+    badge: 'Reikia patikslinti',
+    title: (name: string) =>
+      name ? `Sveiki, ${name}. Dėl jūsų registracijos` : 'Dėl jūsų registracijos',
+    intro:
+      'Peržiūrėjome jūsų registracijos duomenis, tačiau šiuo metu negalime patvirtinti profesionalo statuso.',
+    reasonTitle: 'Priežastis',
+    nextStepsTitle: 'Ką daryti toliau',
+    nextStepsDesc:
+      'Jei norite pateikti papildomus dokumentus arba patikslinti informaciją, susisiekite su mumis. Mielai padėsime.',
+    contactCta: 'Susisiekti',
+    closing: 'Ačiū už supratimą.',
+    signoff: 'Pagarbiai,\nDažai Kirpėjams komanda',
+    footerSite: 'www.dazaikirpejams.lt',
+  },
+} as const
+
+export function buildRejectionEmail(input: RejectionEmailInput): {
+  subject: string
+  html: string
+  text: string
+} {
+  // Šiuo metu palaikom tik LT (atitinka esamą welcome email hardcoded LT).
+  // C lokalizacijos užduotyje LT/EN/RU pasirinkimas bus pridėtas abiem
+  // laiškams kartu.
+  const c = REJECTION_COPY.lt
+  const safeName = escapeHtml(input.firstName || '')
+  const safeReason = escapeHtml(input.reason || '')
+  const contactUrl = `${input.siteUrl}/${input.lang}/kontaktai`
+
+  const html = `<!doctype html>
+<html lang="${input.lang}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${escapeHtml(c.subject)}</title>
+</head>
+<body style="margin:0;padding:0;background:${GRAY_50};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:${GRAY_900};">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">
+  ${escapeHtml(c.preheader)}
+</div>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};padding:32px 16px;">
+  <tr>
+    <td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
+
+        <tr>
+          <td style="padding:32px 32px 0;">
+            <div style="display:inline-block;padding:6px 12px;background:${GRAY_900};color:#ffffff;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;border-radius:999px;">
+              ${escapeHtml(c.badge)}
+            </div>
+            <h1 style="margin:20px 0 0;font-size:24px;font-weight:700;color:${GRAY_900};line-height:1.3;">
+              ${escapeHtml(c.title(safeName))}
+            </h1>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:20px 32px 0;">
+            <p style="margin:0;font-size:15px;line-height:1.7;color:${GRAY_500};">
+              ${escapeHtml(c.intro)}
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:24px 32px 0;">
+            <div style="background:${GRAY_50};border-left:3px solid ${BRAND_MAGENTA};border-radius:8px;padding:18px 22px;">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:${GRAY_900};margin-bottom:6px;">
+                ${escapeHtml(c.reasonTitle)}
+              </div>
+              <div style="font-size:14px;line-height:1.65;color:${GRAY_900};white-space:pre-line;">
+                ${safeReason}
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:24px 32px 0;">
+            <div style="border:1px solid ${BORDER};border-radius:12px;padding:18px 22px;">
+              <div style="font-size:14px;font-weight:700;color:${GRAY_900};margin-bottom:6px;">
+                ${escapeHtml(c.nextStepsTitle)}
+              </div>
+              <p style="margin:0 0 14px;font-size:13px;line-height:1.65;color:${GRAY_500};">
+                ${escapeHtml(c.nextStepsDesc)}
+              </p>
+              <a href="${contactUrl}" style="display:inline-block;padding:11px 20px;background:${BRAND_MAGENTA};color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;border-radius:8px;">
+                ${escapeHtml(c.contactCta)} →
+              </a>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:28px 32px;">
+            <p style="margin:0;font-size:13px;line-height:1.65;color:${GRAY_500};">
+              ${escapeHtml(c.closing)}
+            </p>
+            <p style="margin:18px 0 0;font-size:13px;line-height:1.65;color:${GRAY_900};white-space:pre-line;">
+              ${escapeHtml(c.signoff)}
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:0 32px 32px;">
+            <div style="border-top:1px solid ${BORDER};padding-top:16px;font-size:11px;color:${GRAY_500};text-align:center;">
+              ${escapeHtml(c.footerSite)}
+            </div>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>`
+
+  const text = `${c.title(input.firstName || '')}
+
+${c.intro}
+
+${c.reasonTitle.toUpperCase()}
+${input.reason}
+
+${c.nextStepsTitle}
+${c.nextStepsDesc}
+${c.contactCta}: ${contactUrl}
+
+${c.closing}
+
+${c.signoff}
+
+${c.footerSite}`
+
+  return { subject: c.subject, html, text }
+}
+
+// ============================================
 // REGISTRACIJA GAUTA — laukia admin patvirtinimo
 // ============================================
 

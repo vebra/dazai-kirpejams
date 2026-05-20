@@ -5,7 +5,10 @@ import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/admin/auth'
 import { createServerClient } from '@/lib/supabase/server'
 import { sendEmail } from '@/lib/email/resend'
-import { buildWelcomeEmail } from '@/lib/email/auth-templates'
+import {
+  buildWelcomeEmail,
+  buildRejectionEmail,
+} from '@/lib/email/auth-templates'
 
 const VERIFICATION_BUCKET = 'verification-docs'
 
@@ -168,6 +171,41 @@ export async function rejectUserAction(
   if (error) {
     console.error('[admin/verifikacija/actions] reject:', error.message)
     return { error: `Nepavyko atmesti: ${error.message}` }
+  }
+
+  // Atmetimo laiškas klientui — kad žinotų statusą ir priežastį. Veidrodis
+  // approveUserAction'o el. laiško srautui: defensyvu, klaida non-blocking.
+  // Be šio laiško klientas net nesužinotų, kad buvo atmestas.
+  try {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('first_name')
+      .eq('id', userId)
+      .maybeSingle<{ first_name: string | null }>()
+    const { data: authUser } = await supabase.auth.admin.getUserById(userId)
+    const email = authUser?.user?.email
+    if (email) {
+      const siteUrl =
+        process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
+        'https://www.dazaikirpejams.lt'
+      const rejection = buildRejectionEmail({
+        firstName: profile?.first_name ?? '',
+        reason,
+        lang: 'lt',
+        siteUrl,
+      })
+      await sendEmail({
+        to: email,
+        subject: rejection.subject,
+        html: rejection.html,
+        text: rejection.text,
+      })
+    }
+  } catch (err) {
+    console.error(
+      '[admin/verifikacija/actions] reject email failed (non-blocking):',
+      err
+    )
   }
 
   revalidatePath('/admin/verifikacija')
