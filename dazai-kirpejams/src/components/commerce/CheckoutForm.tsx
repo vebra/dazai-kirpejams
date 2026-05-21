@@ -319,7 +319,7 @@ export function CheckoutForm({ lang, dict, vatRate }: CheckoutFormProps) {
               return (
                 <label
                   key={value}
-                  className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
+                  className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-colors ${
                     selected
                       ? 'border-brand-magenta bg-brand-magenta/5'
                       : 'border-brand-gray-50 hover:border-brand-gray-500/30'
@@ -331,17 +331,21 @@ export function CheckoutForm({ lang, dict, vatRate }: CheckoutFormProps) {
                     value={value}
                     checked={selected}
                     onChange={() => setDeliveryMethod(value)}
-                    className="mt-1 accent-brand-magenta"
+                    className="mt-1 accent-brand-magenta shrink-0"
                   />
-                  <div className="w-10 h-10 rounded-xl bg-brand-gray-50 flex items-center justify-center flex-shrink-0">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-brand-gray-50 flex items-center justify-center shrink-0">
                     <Icon className="w-5 h-5 text-brand-gray-900" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="font-semibold text-brand-gray-900">
+                    {/* Title + price: stack on mobile, side-by-side >=sm.
+                        Anksčiau `whitespace-nowrap` ant "Nemokamas" kartu su
+                        ilga antrašte (pvz. "Atsiėmimas Kaune") siaurame
+                        viewport'e pjaudavo dešinįjį tekstą. */}
+                    <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                      <div className="font-semibold text-brand-gray-900 text-sm sm:text-base">
                         {title}
                       </div>
-                      <div className="text-sm font-bold text-brand-magenta whitespace-nowrap">
+                      <div className="text-sm font-bold text-brand-magenta">
                         {priceCents === 0 || free
                           ? dict.cart.freeShipping
                           : formatPrice(priceCents / 100, lang)}
@@ -657,7 +661,7 @@ function PaymentOption({
 }) {
   return (
     <label
-      className={`flex items-start gap-4 p-4 rounded-xl border-2 transition-colors ${
+      className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border-2 transition-colors ${
         disabled
           ? 'border-brand-gray-50 opacity-50 cursor-not-allowed'
           : selected
@@ -671,13 +675,15 @@ function PaymentOption({
         checked={selected}
         onChange={onSelect}
         disabled={disabled}
-        className="mt-1 accent-brand-magenta"
+        className="mt-1 accent-brand-magenta shrink-0"
       />
-      <div className="w-10 h-10 rounded-xl bg-brand-gray-50 flex items-center justify-center flex-shrink-0">
+      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-brand-gray-50 flex items-center justify-center shrink-0">
         <Icon className="w-5 h-5 text-brand-gray-900" />
       </div>
-      <div className="flex-1">
-        <div className="font-semibold text-brand-gray-900">{title}</div>
+      <div className="flex-1 min-w-0">
+        <div className="font-semibold text-brand-gray-900 text-sm sm:text-base">
+          {title}
+        </div>
         <div className="text-xs text-brand-gray-500 mt-1">{desc}</div>
       </div>
     </label>
