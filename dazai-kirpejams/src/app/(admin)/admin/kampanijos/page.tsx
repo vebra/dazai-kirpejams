@@ -4,6 +4,7 @@ import {
   getCampaigns,
   getApprovedUsersCount,
 } from '@/lib/admin/marketing-queries'
+import { duplicateCampaignAction } from './actions'
 
 export const metadata = { title: 'Kampanijos' }
 export const dynamic = 'force-dynamic'
@@ -93,6 +94,7 @@ export default async function CampaignsPage({
                   <th className="px-4 py-3 text-left w-[120px]">Statusas</th>
                   <th className="px-4 py-3 text-center w-[100px]">Gavėjai</th>
                   <th className="px-4 py-3 text-right w-[160px]">Sukurta</th>
+                  <th className="px-4 py-3 text-center w-[100px]">Veiksmai</th>
                 </tr>
               </thead>
               <tbody>
@@ -130,6 +132,18 @@ export default async function CampaignsPage({
                     </td>
                     <td className="px-4 py-3 text-right text-brand-gray-500 text-[12px]">
                       {dateFmt.format(new Date(c.createdAt))}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <form action={duplicateCampaignAction}>
+                        <input type="hidden" name="id" value={c.id} />
+                        <button
+                          type="submit"
+                          className="text-[11px] font-semibold text-brand-magenta hover:text-brand-magenta/80 hover:underline"
+                          title="Sukurti naują juodraštį pagal šią kampaniją"
+                        >
+                          📋 Klonuoti
+                        </button>
+                      </form>
                     </td>
                   </tr>
                 ))}

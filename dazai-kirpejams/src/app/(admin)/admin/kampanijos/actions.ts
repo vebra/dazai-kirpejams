@@ -94,6 +94,50 @@ export async function updateCampaignAction(formData: FormData): Promise<void> {
   redirect(`/admin/kampanijos/${id}?saved=1`)
 }
 
+/**
+ * Klonuoja egzistuojančią kampaniją į naują juodraštį — tas pats subject +
+ * body, name su „(kopija)" priesaga. Gavėjai NEkopijuojami (admin'as
+ * pasirenka iš naujo per RecipientPicker'į). Veikia su bet kokio status
+ * kampanija — galima klonuoti net sent, kad galėtumėt išsiųsti tą patį
+ * tekstą iš naujo kitiems gavėjams ar po pakeitimų.
+ */
+export async function duplicateCampaignAction(
+  formData: FormData
+): Promise<void> {
+  const admin = await requireAdmin()
+  const sourceId = (formData.get('id') as string) ?? ''
+  if (!sourceId) redirect('/admin/kampanijos?error=invalid-id')
+
+  const supabase = createServerClient()
+  const { data: source } = await supabase
+    .from('marketing_campaigns')
+    .select('name, subject, body')
+    .eq('id', sourceId)
+    .maybeSingle()
+
+  if (!source) redirect('/admin/kampanijos?error=not-found')
+
+  const { data: newCampaign, error } = await supabase
+    .from('marketing_campaigns')
+    .insert({
+      name: `${source.name} (kopija)`,
+      subject: source.subject,
+      body: source.body,
+      status: 'draft',
+      created_by: admin.id,
+    })
+    .select('id')
+    .single()
+
+  if (error || !newCampaign) {
+    console.error('[admin/kampanijos] duplicate failed:', error?.message)
+    redirect('/admin/kampanijos?error=duplicate-failed')
+  }
+
+  revalidatePath('/admin/kampanijos')
+  redirect(`/admin/kampanijos/${newCampaign.id}?duplicated=1`)
+}
+
 export async function deleteCampaignAction(formData: FormData): Promise<void> {
   await requireAdmin()
   const id = (formData.get('id') as string) ?? ''

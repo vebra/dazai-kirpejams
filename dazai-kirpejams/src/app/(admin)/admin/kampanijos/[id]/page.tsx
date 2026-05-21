@@ -11,6 +11,7 @@ import {
   updateCampaignAction,
   deleteCampaignAction,
   sendTestCampaignAction,
+  duplicateCampaignAction,
 } from '../actions'
 import { RecipientPicker } from '../RecipientPicker'
 
@@ -61,6 +62,7 @@ export default async function CampaignDetailPage({
   const testSentFlag = sp['test-sent'] === '1'
   const sentFlag = sp.sent === '1'
   const notesSavedFlag = sp['notes-saved'] === '1'
+  const duplicatedFlag = sp.duplicated === '1'
   const totalParam = typeof sp.total === 'string' ? sp.total : null
   const failedParam = typeof sp.failed === 'string' ? sp.failed : null
 
@@ -120,6 +122,11 @@ export default async function CampaignDetailPage({
       {notesSavedFlag && (
         <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">
           Pastaba išsaugota.
+        </div>
+      )}
+      {duplicatedFlag && (
+        <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">
+          Kampanija nuklonuota — galite redaguoti tekstą ir pasirinkti gavėjus.
         </div>
       )}
       {sentFlag && (
@@ -259,6 +266,31 @@ export default async function CampaignDetailPage({
               className="text-[12px] text-red-600 hover:text-red-700 hover:underline"
             >
               Ištrinti juodraštį
+            </button>
+          </form>
+        </section>
+      )}
+
+      {/* Klonavimas — galima ir iš sent/failed/sending. Sukuria naują juodraštį
+          su tuo pačiu tekstu. Gavėjai persipildo iš naujo (pasirenkat per
+          RecipientPicker'į). */}
+      {!isDraft && (
+        <section className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6 space-y-3">
+          <h3 className="text-base font-bold text-brand-gray-900">
+            Naudoti šitą tekstą iš naujo
+          </h3>
+          <p className="text-sm text-brand-gray-500">
+            Sukuria naują juodraštį su tuo pačiu pavadinimu (su „(kopija)"
+            priesaga), tema ir tekstu. Galėsite jį redaguoti, pasirinkti
+            naujus gavėjus ir siųsti.
+          </p>
+          <form action={duplicateCampaignAction}>
+            <input type="hidden" name="id" value={campaign.id} />
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-brand-gray-900/90 transition-colors"
+            >
+              📋 Klonuoti į naują juodraštį
             </button>
           </form>
         </section>
