@@ -170,18 +170,53 @@ export async function sendTestCampaignAction(formData: FormData): Promise<void> 
 }
 
 /**
- * Pagrindinis siuntimas — kampanijos laišką gauna VISI patvirtinti
- * (approved) vartotojai. Per gavėją insert'inama eilutė į
- * `marketing_campaign_recipients` su rezultatu (sent / failed).
+ * Atnaujina admin pastabą prie konkretaus vartotojo profilio. Naudojama
+ * /admin/kampanijos/[id] gavėjų pasirinkimo UI'jui (inline notes editor).
+ */
+export async function updateUserAdminNotesAction(
+  formData: FormData
+): Promise<void> {
+  await requireAdmin()
+  const userId = (formData.get('user_id') as string) ?? ''
+  const notes = ((formData.get('admin_notes') as string) ?? '').trim()
+  const campaignId = (formData.get('campaign_id') as string) ?? ''
+
+  if (!userId) {
+    redirect(`/admin/kampanijos/${campaignId}?error=invalid-user`)
+  }
+
+  const supabase = createServerClient()
+  const { error } = await supabase
+    .from('user_profiles')
+    .update({ admin_notes: notes || null, updated_at: new Date().toISOString() })
+    .eq('id', userId)
+
+  if (error) {
+    console.error('[admin/kampanijos] updateAdminNotes:', error.message)
+    redirect(`/admin/kampanijos/${campaignId}?error=notes-failed`)
+  }
+
+  revalidatePath(`/admin/kampanijos/${campaignId}`)
+  redirect(`/admin/kampanijos/${campaignId}?notes-saved=1`)
+}
+
+/**
+ * Pagrindinis siuntimas — kampanijos laišką gauna pasirinkti gavėjai
+ * (formData.getAll('recipient_id')). Jei sąrašas tuščias, fallback'inam
+ * į visus patvirtintus (atgalinis suderinamumas).
  *
- * Saugumas: kampanijos statusas nustatomas į 'sending' prieš siuntimą
- * (jei tinklas nutrūks vidury — vėliau matosi „sending" state, admin'as
- * žinos, kad reikia patikrinti). Po visų gavėjų — į 'sent' arba 'failed'.
+ * Per gavėją insert'inama eilutė į `marketing_campaign_recipients` su
+ * rezultatu (sent / failed). Open tracking — per `/api/track/open/[id]`
+ * pixel beacon'ą, įterptą į laiško HTML.
  */
 export async function sendCampaignAction(formData: FormData): Promise<void> {
   await requireAdmin()
   const id = (formData.get('id') as string) ?? ''
   if (!id) redirect('/admin/kampanijos?error=invalid-id')
+
+  const selectedRecipientIds = formData.getAll('recipient_id').filter(
+    (v): v is string => typeof v === 'string' && v.length > 0
+  )
 
   const supabase = createServerClient()
   const { data: campaign } = await supabase
@@ -203,11 +238,16 @@ export async function sendCampaignAction(formData: FormData): Promise<void> {
     .update({ status: 'sending', updated_at: new Date().toISOString() })
     .eq('id', id)
 
-  // 2) Surenkam patvirtintus vartotojus + email iš auth.users
-  const { data: profiles } = await supabase
+  // 2) Surenkam patvirtintus vartotojus (arba pasirinktą poaibį) + email
+  let profilesQuery = supabase
     .from('user_profiles')
     .select('id, first_name')
     .eq('verification_status', 'approved')
+
+  if (selectedRecipientIds.length > 0) {
+    profilesQuery = profilesQuery.in('id', selectedRecipientIds)
+  }
+  const { data: profiles } = await profilesQuery
 
   const profileById = new Map<string, { firstName: string | null }>()
   for (const p of profiles ?? []) {
@@ -222,7 +262,7 @@ export async function sendCampaignAction(formData: FormData): Promise<void> {
   for (const u of usersResp?.users ?? []) {
     if (!u.email) continue
     const profile = profileById.get(u.id)
-    if (!profile) continue // tik approved
+    if (!profile) continue // tik approved (+ pasirinkti, jei selectedRecipientIds.length > 0)
     recipients.push({
       userId: u.id,
       email: u.email,
@@ -265,6 +305,11 @@ export async function sendCampaignAction(formData: FormData): Promise<void> {
         body: campaign.body,
         firstName: r.firstName,
         siteUrl: SITE_URL,
+        // Tracking pixel — per recipient eilutės UUID. Atidarius laišką
+        // (arba Gmail/Outlook proxy iškart) endpoint'as fiksuos opened_at.
+        trackingPixelUrl: recRow
+          ? `${SITE_URL}/api/track/open/${recRow.id}`
+          : null,
       })
       await sendEmail({
         to: r.email,

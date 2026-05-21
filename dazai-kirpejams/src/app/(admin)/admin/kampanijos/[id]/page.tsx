@@ -5,13 +5,14 @@ import {
   getCampaignById,
   getCampaignRecipients,
   getApprovedUsersCount,
+  getApprovedUsersWithNotes,
 } from '@/lib/admin/marketing-queries'
 import {
   updateCampaignAction,
   deleteCampaignAction,
   sendTestCampaignAction,
-  sendCampaignAction,
 } from '../actions'
+import { RecipientPicker } from '../RecipientPicker'
 
 export const metadata = { title: 'Kampanija' }
 export const dynamic = 'force-dynamic'
@@ -44,10 +45,11 @@ export default async function CampaignDetailPage({
   const { id } = await params
   const sp = await searchParams
 
-  const [campaign, recipients, approvedCount] = await Promise.all([
+  const [campaign, recipients, approvedCount, approvedUsers] = await Promise.all([
     getCampaignById(id),
     getCampaignRecipients(id),
     getApprovedUsersCount(),
+    getApprovedUsersWithNotes(),
   ])
 
   if (!campaign) notFound()
@@ -58,6 +60,7 @@ export default async function CampaignDetailPage({
   const createdFlag = sp.created === '1'
   const testSentFlag = sp['test-sent'] === '1'
   const sentFlag = sp.sent === '1'
+  const notesSavedFlag = sp['notes-saved'] === '1'
   const totalParam = typeof sp.total === 'string' ? sp.total : null
   const failedParam = typeof sp.failed === 'string' ? sp.failed : null
 
@@ -112,6 +115,11 @@ export default async function CampaignDetailPage({
       {testSentFlag && (
         <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">
           Testinė kopija išsiųsta į admin notification el. paštą. Patikrinkite ir, jei viskas gerai, siųskite visiems.
+        </div>
+      )}
+      {notesSavedFlag && (
+        <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">
+          Pastaba išsaugota.
         </div>
       )}
       {sentFlag && (
@@ -209,37 +217,39 @@ export default async function CampaignDetailPage({
         </section>
       )}
 
-      {/* Veiksmų zona */}
+      {/* Veiksmų zona — testas + gavėjų pasirinkimas */}
       {isDraft && (
-        <section className="bg-white rounded-xl border-2 border-brand-magenta/30 shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6 space-y-4">
-          <h3 className="text-base font-bold text-brand-gray-900">Siuntimas</h3>
+        <section className="bg-white rounded-xl border-2 border-brand-magenta/30 shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6 space-y-5">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <h3 className="text-base font-bold text-brand-gray-900">Siuntimas</h3>
+            <span className="text-[12px] text-brand-gray-500">
+              {approvedCount} patvirtin{approvedCount === 1 ? 'tas' : 'ti'} vartoto
+              {approvedCount === 1 ? 'jas' : 'jai'} DB
+            </span>
+          </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            <form action={sendTestCampaignAction}>
-              <input type="hidden" name="id" value={campaign.id} />
-              <button
-                type="submit"
-                className="w-full px-4 py-3 bg-brand-gray-50 border border-[#eee] text-brand-gray-900 text-sm font-semibold rounded-lg hover:bg-brand-gray-50/60 transition-colors"
-              >
-                📧 Siųsti testą sau
-              </button>
-              <p className="mt-1 text-[11px] text-brand-gray-500">
-                Pirma testuokit — laiškas eis tik į ADMIN_NOTIFICATION_EMAIL.
-              </p>
-            </form>
+          <form action={sendTestCampaignAction}>
+            <input type="hidden" name="id" value={campaign.id} />
+            <button
+              type="submit"
+              className="px-4 py-2.5 bg-brand-gray-50 border border-[#eee] text-brand-gray-900 text-sm font-semibold rounded-lg hover:bg-brand-gray-50/60 transition-colors"
+            >
+              📧 Siųsti testą sau (ADMIN_NOTIFICATION_EMAIL)
+            </button>
+          </form>
 
-            <form action={sendCampaignAction}>
-              <input type="hidden" name="id" value={campaign.id} />
-              <button
-                type="submit"
-                className="w-full px-4 py-3 bg-brand-magenta text-white text-sm font-semibold rounded-lg hover:bg-brand-magenta/90 transition-colors"
-              >
-                ✉️ Siųsti visiems ({approvedCount} pat.)
-              </button>
-              <p className="mt-1 text-[11px] text-brand-gray-500">
-                Negrįžtama. Visi patvirtinti vartotojai gaus laišką.
+          <div className="pt-4 border-t border-[#eee]">
+            <div className="mb-3">
+              <h4 className="text-sm font-bold text-brand-gray-900">
+                Pasirinkite gavėjus
+              </h4>
+              <p className="text-[12px] text-brand-gray-500 mt-0.5">
+                Default'iškai pažymėti visi. Filtruokite arba atžymėkite tuos,
+                kuriems šios kampanijos nesiųsti. Pastaba prie kiekvieno
+                vartotojo lieka profilyje ir matosi vėliau.
               </p>
-            </form>
+            </div>
+            <RecipientPicker campaignId={campaign.id} users={approvedUsers} />
           </div>
 
           <form action={deleteCampaignAction} className="pt-4 border-t border-[#eee]">
@@ -261,6 +271,11 @@ export default async function CampaignDetailPage({
             <h3 className="text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500">
               Gavėjai ({recipients.length})
             </h3>
+            <p className="text-[11px] text-brand-gray-500 mt-1.5 leading-relaxed">
+              „Atidaryta" — pixel beacon load'as. Gmail/Outlook paveikslus
+              proxy'ina iškart gavus laišką, todėl Gmail vartotojams reikšmė
+              dažniausiai reiškia „pristatyta į pašto dėžę", ne tikrą atidarymą.
+            </p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -269,6 +284,7 @@ export default async function CampaignDetailPage({
                   <th className="px-4 py-3 text-left">El. paštas</th>
                   <th className="px-4 py-3 text-left w-[100px]">Statusas</th>
                   <th className="px-4 py-3 text-right w-[160px]">Siųsta</th>
+                  <th className="px-4 py-3 text-left w-[120px]">Atidaryta</th>
                   <th className="px-4 py-3 text-left">Klaida</th>
                 </tr>
               </thead>
@@ -283,6 +299,21 @@ export default async function CampaignDetailPage({
                     </td>
                     <td className="px-4 py-3 text-right text-[12px] text-brand-gray-500">
                       {r.sentAt ? dateFmt.format(new Date(r.sentAt)) : '—'}
+                    </td>
+                    <td className="px-4 py-3 text-[12px]">
+                      {r.openedAt ? (
+                        <span
+                          className="text-emerald-700"
+                          title={`Pixel beacon load'ų: ${r.openedCount}`}
+                        >
+                          👁 {dateFmt.format(new Date(r.openedAt))}
+                          {r.openedCount > 1 && (
+                            <span className="text-brand-gray-500"> ({r.openedCount})</span>
+                          )}
+                        </span>
+                      ) : (
+                        <span className="text-brand-gray-500">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-[12px] text-red-600">
                       {r.errorMessage ?? ''}

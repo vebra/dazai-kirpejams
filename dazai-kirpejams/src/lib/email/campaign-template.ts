@@ -52,6 +52,9 @@ export type CampaignEmailInput = {
   /** Vartotojo vardas (pvz. „Marius"). Jei tuščia — kreipiamasi „Sveiki". */
   firstName: string | null
   siteUrl: string
+  /** Email atidarymo tracking pixel URL — per recipient_id įterpia 1×1 PNG.
+   * Jei null/undefined — pixel'is nepridedamas (pvz. testiniam siuntimui). */
+  trackingPixelUrl?: string | null
 }
 
 export function buildCampaignEmail(input: CampaignEmailInput): {
@@ -106,6 +109,11 @@ export function buildCampaignEmail(input: CampaignEmailInput): {
     </table>
   </td></tr>
 </table>
+${
+  input.trackingPixelUrl
+    ? `<img src="${input.trackingPixelUrl}" alt="" width="1" height="1" style="display:block;width:1px;height:1px;border:0;" />`
+    : ''
+}
 </body>
 </html>`
 

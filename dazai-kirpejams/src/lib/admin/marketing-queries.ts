@@ -89,12 +89,67 @@ export async function getApprovedUsersCount(): Promise<number> {
   return count ?? 0
 }
 
+export type ApprovedUserRow = {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  salonName: string | null
+  adminNotes: string | null
+}
+
+/**
+ * Visi patvirtinti vartotojai su email iš auth.users + admin pastabomis.
+ * Naudojama /admin/kampanijos/[id] gavėjų pasirinkimo UI'jui.
+ */
+export async function getApprovedUsersWithNotes(): Promise<ApprovedUserRow[]> {
+  const supabase = createServerClient()
+
+  const { data: profiles, error } = await supabase
+    .from('user_profiles')
+    .select('id, first_name, last_name, salon_name, admin_notes')
+    .eq('verification_status', 'approved')
+    .order('created_at', { ascending: false })
+
+  if (error || !profiles) {
+    console.error(
+      '[admin/marketing-queries] getApprovedUsersWithNotes:',
+      error?.message
+    )
+    return []
+  }
+
+  // Email gaunam iš auth.users per admin API (kaip ir verifikacijos UI)
+  const { data: usersData } = await supabase.auth.admin.listUsers({
+    page: 1,
+    perPage: 1000,
+  })
+
+  const emailMap = new Map<string, string>()
+  for (const u of usersData?.users ?? []) {
+    if (u.email) emailMap.set(u.id, u.email)
+  }
+
+  return profiles
+    .map((p) => ({
+      id: p.id,
+      email: emailMap.get(p.id) ?? '',
+      firstName: p.first_name ?? '',
+      lastName: p.last_name ?? '',
+      salonName: p.salon_name ?? null,
+      adminNotes: p.admin_notes ?? null,
+    }))
+    .filter((p) => p.email) // praleidžiam profilius be email
+}
+
 export type CampaignRecipientRow = {
   id: string
   email: string
   status: 'pending' | 'sent' | 'failed'
   sentAt: string | null
   errorMessage: string | null
+  openedAt: string | null
+  openedCount: number
 }
 
 export async function getCampaignRecipients(
@@ -103,7 +158,7 @@ export async function getCampaignRecipients(
   const supabase = createServerClient()
   const { data, error } = await supabase
     .from('marketing_campaign_recipients')
-    .select('id, email, status, sent_at, error_message')
+    .select('id, email, status, sent_at, error_message, opened_at, opened_count')
     .eq('campaign_id', campaignId)
     .order('created_at', { ascending: true })
 
@@ -120,5 +175,7 @@ export async function getCampaignRecipients(
     status: r.status as 'pending' | 'sent' | 'failed',
     sentAt: r.sent_at,
     errorMessage: r.error_message,
+    openedAt: r.opened_at,
+    openedCount: r.opened_count ?? 0,
   }))
 }
