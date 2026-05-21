@@ -921,7 +921,13 @@
     "continueShopping": "Back to Shop",
     "bankName": "Bank",
     "bankInfoPending": "We will send payment instructions in a separate email within the next business day.",
-    "discountLabel": "Discount"
+    "discountLabel": "Discount",
+    "markReceivedTitle": "Parcel arrived?",
+    "markReceivedDesc": "When you receive the parcel, click the button and we will mark the order as delivered.",
+    "markReceivedCta": "Parcel received",
+    "receivedAck": "Parcel delivered. Thank you!",
+    "receivedAckDesc": "The order has been marked as delivered. If something is not right with the product — just reply to us.",
+    "receivedError": "Could not mark as delivered. Please try again or contact us."
   },
   "blogPage": {
     "metaTitle": "Blog — Professional Tips for Hairdressers",

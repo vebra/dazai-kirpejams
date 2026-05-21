@@ -50,10 +50,13 @@ export async function updateOrderStatusAction(
     redirect(`/admin/uzsakymai/${id}?error=invalid-status`)
   }
 
-  // Jei statusas keičiamas į shipped/cancelled/paid — reikės kliento duomenų
-  // email pranešimui. Paimam vieną kartą prieš update'ą.
+  // Jei statusas keičiamas į shipped/cancelled/paid/delivered — reikės
+  // kliento duomenų email pranešimui. Paimam vieną kartą prieš update'ą.
   const shouldEmail =
-    status === 'shipped' || status === 'cancelled' || status === 'paid'
+    status === 'shipped' ||
+    status === 'cancelled' ||
+    status === 'paid' ||
+    status === 'delivered'
   let orderData: {
     order_number: string
     email: string
@@ -164,9 +167,12 @@ export async function updateOrderStatusAction(
     }
   }
 
-  // Siunčiam status change email'ą klientui (shipped/cancelled). „Paid" turi
-  // savo atskirą email'ą su PDF priedu (žr. aukščiau).
-  if (orderData && (status === 'shipped' || status === 'cancelled')) {
+  // Siunčiam status change email'ą klientui (shipped/cancelled/delivered).
+  // „Paid" turi savo atskirą email'ą su PDF priedu (žr. aukščiau).
+  if (
+    orderData &&
+    (status === 'shipped' || status === 'cancelled' || status === 'delivered')
+  ) {
     try {
       const emailPayload = buildStatusChangeEmail({
         orderNumber: orderData.order_number,

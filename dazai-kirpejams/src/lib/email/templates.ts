@@ -776,7 +776,7 @@ ${input.adminUrl}
 type StatusChangeEmailInput = {
   orderNumber: string
   firstName: string
-  status: 'shipped' | 'cancelled'
+  status: 'shipped' | 'cancelled' | 'delivered'
   trackingNumber: string | null
   trackingCarrier: string | null
   siteUrl: string
@@ -803,7 +803,96 @@ export function buildStatusChangeEmail(input: StatusChangeEmailInput): {
   if (input.status === 'shipped') {
     return buildShippedEmail(input)
   }
+  if (input.status === 'delivered') {
+    return buildDeliveredEmail(input)
+  }
   return buildCancelledEmail(input)
+}
+
+function buildDeliveredEmail(input: StatusChangeEmailInput): {
+  subject: string
+  html: string
+  text: string
+} {
+  const subject = `Užsakymas ${input.orderNumber} pristatytas — ačiū, kad pirkote!`
+  const accountUrl = `${input.siteUrl}/lt/paskyra`
+  const catalogUrl = `${input.siteUrl}/lt/produktai`
+  const html = `<!doctype html>
+<html lang="lt">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(subject)}</title></head>
+<body style="margin:0;padding:0;background:${GRAY_50};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:${GRAY_900};">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">
+  Užsakymas ${escapeHtml(input.orderNumber)} pristatytas. Ačiū, kad pasirinkote Dažai Kirpėjams.
+</div>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};padding:32px 16px;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
+      <tr>
+        <td style="padding:32px;border-bottom:1px solid ${BORDER};">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:${BRAND_MAGENTA};">Dažai Kirpėjams</div>
+          <h1 style="margin:8px 0 0;font-size:24px;font-weight:700;color:${GRAY_900};line-height:1.25;">
+            Ačiū, ${escapeHtml(input.firstName)}!
+          </h1>
+          <p style="margin:8px 0 0;font-size:14px;color:${GRAY_500};line-height:1.5;">
+            Jūsų užsakymas <strong>${escapeHtml(input.orderNumber)}</strong> pristatytas. Tikimės, kad Color SHOCK pateisins lūkesčius.
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:24px 32px 0;">
+          <p style="margin:0;font-size:14px;color:${GRAY_900};line-height:1.7;">
+            Jei kažkas su preke ne taip — tiesiog atsakykite į šį laišką, padėsime. Pakuotė pažeista, trūksta prekės ar atrodo netinkamos kokybės — viską išspręsime.
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:24px 32px 0;">
+          <div style="background:${GRAY_50};border-radius:12px;padding:20px;">
+            <div style="font-size:13px;font-weight:700;color:${GRAY_900};margin-bottom:6px;">
+              Vėl reikia dažų?
+            </div>
+            <p style="margin:0 0 14px;font-size:13px;color:${GRAY_500};line-height:1.6;">
+              Mes laikomės sandėlyje pilnos Color SHOCK paletės. Užsisakykite anksčiau — pristatysime per 1–2 darbo dienas.
+            </p>
+            <a href="${catalogUrl}" style="display:inline-block;padding:11px 22px;background:${BRAND_MAGENTA};color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;border-radius:8px;">
+              Atidaryti katalogą →
+            </a>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px;border-top:1px solid ${BORDER};margin-top:24px;">
+          <p style="margin:0 0 8px;font-size:13px;color:${GRAY_500};line-height:1.6;">
+            Užsakymo istoriją ir sąskaitas rasite savo <a href="${accountUrl}" style="color:${BRAND_MAGENTA};text-decoration:none;font-weight:600;">paskyroje</a>.
+          </p>
+          <p style="margin:18px 0 0;font-size:12px;color:${GRAY_500};">
+            <strong style="color:${GRAY_900};">Dažai Kirpėjams</strong><br>
+            <a href="${input.siteUrl}" style="color:${BRAND_MAGENTA};text-decoration:none;">${input.siteUrl.replace(/^https?:\/\//, '')}</a>
+          </p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body></html>`
+
+  const text = `
+Ačiū, ${input.firstName}!
+
+Jūsų užsakymas ${input.orderNumber} pristatytas. Tikimės, kad Color SHOCK pateisins lūkesčius.
+
+Jei kažkas su preke ne taip — tiesiog atsakykite į šį laišką, padėsime.
+
+Vėl reikia dažų? Atidaryti katalogą: ${catalogUrl}
+
+Užsakymo istoriją ir sąskaitas rasite savo paskyroje:
+${accountUrl}
+
+Dažai Kirpėjams
+${input.siteUrl}
+`.trim()
+
+  return { subject, html, text }
 }
 
 function buildShippedEmail(input: StatusChangeEmailInput): {

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
-import { CheckCircle2, Package, Truck, Building2, ArrowRight } from 'lucide-react'
+import { CheckCircle2, Package, Truck, Building2, ArrowRight, PackageCheck } from 'lucide-react'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -18,6 +18,7 @@ import { getCompanyInfo } from '@/lib/admin/queries'
 import type { DeliveryMethod, PaymentMethod } from '@/lib/commerce/constants'
 import { PurchaseTracker } from '@/components/analytics/PurchaseTracker'
 import { verifyOrderViewToken } from '@/lib/orders/view-token'
+import { markOrderReceivedAction } from './actions'
 
 export async function generateMetadata({
   params,
@@ -61,6 +62,10 @@ type OrderSnapshot = {
   vatCents: number
   totalCents: number
   createdAt: string
+  /** Užsakymo statusas iš DB. Reikalingas „Siunta gauta" mygtukui rodyti
+   * tik kai status='shipped'. Cookie path'e statusas visada bus 'pending'
+   * (kurį momentą sausainukas buvo nustatytas), todėl mygtukas ten nesirodys. */
+  status: string
 }
 
 /**
@@ -77,7 +82,7 @@ async function loadOrderSnapshotFromCookie(
   if (!cookie) return null
 
   try {
-    const snapshot = JSON.parse(cookie.value) as OrderSnapshot
+    const snapshot = JSON.parse(cookie.value) as Partial<OrderSnapshot>
     if (snapshot.orderNumber !== orderNumber) return null
 
     if (isSupabaseServerConfigured) {
@@ -90,7 +95,10 @@ async function loadOrderSnapshotFromCookie(
       if (!data) return null
     }
 
-    return snapshot
+    // Senesni sausainukai gali neturėti `status` lauko — fallback'inam į
+    // 'pending'. Cookie galioja tik 30 min po pateikimo, todėl statusas
+    // realiai bus pending; „Siunta gauta" mygtukas šiame kelyje nesirodys.
+    return { ...(snapshot as OrderSnapshot), status: snapshot.status ?? 'pending' }
   } catch {
     return null
   }
@@ -120,7 +128,7 @@ async function loadOrderSnapshotFromDb(
     const { data: order } = await supabase
       .from('orders')
       .select(
-        'id, order_number, email, phone, first_name, last_name, delivery_method, delivery_address, delivery_city, delivery_postal_code, payment_method, subtotal_cents, discount_code, discount_cents, delivery_cost_cents, vat_cents, total_cents, created_at'
+        'id, order_number, email, phone, first_name, last_name, delivery_method, delivery_address, delivery_city, delivery_postal_code, payment_method, subtotal_cents, discount_code, discount_cents, delivery_cost_cents, vat_cents, total_cents, created_at, status'
       )
       .eq('order_number', orderNumber)
       .maybeSingle()
@@ -158,6 +166,7 @@ async function loadOrderSnapshotFromDb(
       vatCents: order.vat_cents ?? 0,
       totalCents: order.total_cents,
       createdAt: order.created_at ?? new Date().toISOString(),
+      status: (order as { status?: string }).status ?? 'pending',
     }
   } catch {
     return null
@@ -182,7 +191,7 @@ async function loadOrderSnapshotFromToken(
     const { data: order } = await supabase
       .from('orders')
       .select(
-        'id, order_number, email, phone, first_name, last_name, delivery_method, delivery_address, delivery_city, delivery_postal_code, payment_method, subtotal_cents, discount_code, discount_cents, delivery_cost_cents, vat_cents, total_cents, created_at'
+        'id, order_number, email, phone, first_name, last_name, delivery_method, delivery_address, delivery_city, delivery_postal_code, payment_method, subtotal_cents, discount_code, discount_cents, delivery_cost_cents, vat_cents, total_cents, created_at, status'
       )
       .eq('order_number', orderNumber)
       .maybeSingle()
@@ -219,6 +228,7 @@ async function loadOrderSnapshotFromToken(
       vatCents: order.vat_cents ?? 0,
       totalCents: order.total_cents,
       createdAt: order.created_at ?? new Date().toISOString(),
+      status: (order as { status?: string }).status ?? 'pending',
     }
   } catch {
     return null
@@ -248,6 +258,8 @@ export default async function OrderConfirmationPage({
   // klientui pamatyti užsakymą be prisijungimo (žr. loadOrderSnapshotFromToken).
   const sp = await searchParams
   const tokenParam = typeof sp.token === 'string' ? sp.token : null
+  const receivedSuccess = sp.received === '1'
+  const receivedError = sp['received-error'] === '1'
 
   const order = await loadOrderSnapshot(orderNumber, tokenParam)
   if (!order) notFound()
@@ -391,6 +403,58 @@ export default async function OrderConfirmationPage({
               </div>
             </DetailCard>
           </div>
+
+          {/* „Siunta gauta" savitarnos blokas — rodomas tik kai admin'as
+              pažymėjo siuntą kaip išsiųstą (status='shipped'). Klientas po
+              fizinio gavimo gali pats užbaigti grandinę vienu paspaudimu.
+              Idempotentiška: pakartotinis paspaudimas nieko nesugadina. */}
+          {order.status === 'shipped' && !receivedSuccess && (
+            <div className="mb-8 bg-emerald-50 border border-emerald-200 rounded-2xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                  <PackageCheck className="w-5 h-5 text-emerald-700" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base font-bold text-emerald-900 mb-1">
+                    {dict.order.markReceivedTitle}
+                  </h3>
+                  <p className="text-sm text-emerald-800 leading-relaxed mb-4">
+                    {dict.order.markReceivedDesc}
+                  </p>
+                  <form action={markOrderReceivedAction}>
+                    <input type="hidden" name="order_number" value={order.orderNumber} />
+                    <input type="hidden" name="lang" value={lang} />
+                    {tokenParam && (
+                      <input type="hidden" name="token" value={tokenParam} />
+                    )}
+                    <button
+                      type="submit"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-700 text-white rounded-lg text-sm font-semibold hover:bg-emerald-800 transition-colors"
+                    >
+                      <PackageCheck className="w-4 h-4" />
+                      {dict.order.markReceivedCta}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {(order.status === 'delivered' || receivedSuccess) && (
+            <div className="mb-8 bg-emerald-50 border border-emerald-200 rounded-2xl p-5 flex items-start gap-3">
+              <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-emerald-900">
+                <strong>{dict.order.receivedAck}</strong>{' '}
+                {dict.order.receivedAckDesc}
+              </div>
+            </div>
+          )}
+
+          {receivedError && (
+            <div className="mb-8 bg-red-50 border border-red-200 rounded-2xl p-4 text-sm text-red-700">
+              {dict.order.receivedError}
+            </div>
+          )}
 
           {/* Prekės */}
           <div className="bg-white border border-brand-gray-50 rounded-2xl overflow-hidden mb-8">

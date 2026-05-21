@@ -921,7 +921,13 @@
     "continueShopping": "Grįžti į parduotuvę",
     "bankName": "Bankas",
     "bankInfoPending": "Mokėjimo instrukcijas atsiųsime atskiru laišku per artimiausią darbo dieną.",
-    "discountLabel": "Nuolaida"
+    "discountLabel": "Nuolaida",
+    "markReceivedTitle": "Siunta jau pas Jus?",
+    "markReceivedDesc": "Kai gausite pakuotę, paspauskite mygtuką ir mes pažymėsime užsakymą kaip pristatytą.",
+    "markReceivedCta": "Siunta gauta",
+    "receivedAck": "Siunta pristatyta. Ačiū!",
+    "receivedAckDesc": "Užsakymas pažymėtas kaip pristatytas. Jei kažkas su preke ne taip — tiesiog parašykite mums.",
+    "receivedError": "Nepavyko pažymėti pristatymo. Pamėginkite dar kartą arba parašykite mums."
   },
   "blogPage": {
     "metaTitle": "Blogas — profesionalūs patarimai kirpėjams",
