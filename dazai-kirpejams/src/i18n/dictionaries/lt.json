@@ -1255,6 +1255,21 @@
       "downloadPdf": "Parsisiųsti PDF",
       "pdfPending": "PDF ruošiamas"
     },
+    "orders": {
+      "title": "Mano užsakymai",
+      "desc": "Visi jūsų užsakymai — naujausi viršuje. Spauskite „Peržiūrėti“, kad atidarytumėte užsakymo detales ir banko pavedimo informaciją.",
+      "empty": "Užsakymų dar nėra. Kai pateiksite užsakymą, jis pasirodys čia.",
+      "viewOrder": "Peržiūrėti",
+      "orderStatus": {
+        "pending": "Laukia apmokėjimo",
+        "paid": "Apmokėta",
+        "processing": "Ruošiamas",
+        "shipped": "Išsiųsta",
+        "delivered": "Pristatyta",
+        "cancelled": "Atšauktas",
+        "refunded": "Grąžinta"
+      }
+    },
     "logout": {
       "title": "Atsijungti",
       "desc": "Atsijungsite nuo savo paskyros.",

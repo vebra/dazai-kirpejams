@@ -4,6 +4,11 @@ import { useActionState } from 'react'
 import type { Locale } from '@/i18n/config'
 import type { VerificationStatus } from '@/lib/auth/verification'
 import type { CustomerInvoice } from '@/lib/invoices/queries'
+import type {
+  CustomerOrderSummary,
+  CustomerOrderStatus,
+} from '@/lib/orders/customer-queries'
+import { langPrefix } from '@/lib/utils'
 import {
   uploadDocumentAction,
   downloadCustomerInvoiceAction,
@@ -41,6 +46,21 @@ type AccountDict = {
     downloadPdf: string
     pdfPending: string
   }
+  orders: {
+    title: string
+    desc: string
+    empty: string
+    viewOrder: string
+    orderStatus: {
+      pending: string
+      paid: string
+      processing: string
+      shipped: string
+      delivered: string
+      cancelled: string
+      refunded: string
+    }
+  }
   logout: { title: string; desc: string; cta: string }
 }
 
@@ -52,12 +72,23 @@ const STATUS_COLORS: Record<string, string> = {
 
 const uploadInitial: UploadDocState = {}
 
+const ORDER_STATUS_COLORS: Record<CustomerOrderStatus, string> = {
+  pending: 'bg-amber-50 text-amber-700 border-amber-200',
+  paid: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  processing: 'bg-sky-50 text-sky-700 border-sky-200',
+  shipped: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+  delivered: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  cancelled: 'bg-red-50 text-red-600 border-red-200',
+  refunded: 'bg-gray-50 text-gray-600 border-gray-200',
+}
+
 export function AccountView({
   lang,
   email,
   status,
   profile,
   invoices,
+  orders,
   dict,
 }: {
   lang: Locale
@@ -66,6 +97,7 @@ export function AccountView({
   status: VerificationStatus
   profile: Profile
   invoices: CustomerInvoice[]
+  orders: CustomerOrderSummary[]
   dict: AccountDict
 }) {
   const [uploadState, uploadFormAction, isUploading] = useActionState(
@@ -184,6 +216,61 @@ export function AccountView({
           </form>
         </div>
       )}
+
+      {/* Užsakymai — visi vartotojo užsakymai (incl. dar laukiantys apmokėjimo).
+          Skirtumas nuo Sąskaitų: užsakymas atsiranda iškart, sąskaita —
+          tik kai admin'as pažymi apmokėjimą. */}
+      <div className="bg-white rounded-2xl p-8 shadow-sm">
+        <h3 className="text-lg font-bold text-brand-gray-900 mb-2">
+          {dict.orders.title}
+        </h3>
+        <p className="text-sm text-brand-gray-500 mb-5 leading-relaxed">
+          {dict.orders.desc}
+        </p>
+
+        {orders.length === 0 ? (
+          <div className="px-4 py-6 bg-brand-gray-50 border border-[#eee] rounded-xl text-sm text-brand-gray-500 text-center">
+            {dict.orders.empty}
+          </div>
+        ) : (
+          <ul className="divide-y divide-[#eee] border border-[#eee] rounded-xl overflow-hidden">
+            {orders.map((o) => (
+              <li
+                key={o.id}
+                className="flex items-start justify-between gap-4 p-4 flex-wrap bg-white"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-mono font-semibold text-brand-gray-900 text-sm">
+                      {o.orderNumber}
+                    </span>
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full border text-[11px] font-semibold ${ORDER_STATUS_COLORS[o.status] ?? ORDER_STATUS_COLORS.pending}`}
+                    >
+                      {dict.orders.orderStatus[o.status] ?? o.status}
+                    </span>
+                  </div>
+                  <div className="text-[12px] text-brand-gray-500 mt-1">
+                    {dateFormatter.format(new Date(o.createdAt))}
+                    {o.itemsCount > 0 ? ` · × ${o.itemsCount}` : ''}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-semibold text-brand-gray-900">
+                    {priceFormatter.format(o.totalCents / 100)}
+                  </span>
+                  <a
+                    href={`${langPrefix(lang)}/uzsakymas/${o.orderNumber}`}
+                    className="px-4 py-2 bg-brand-gray-900 text-white rounded-lg text-[13px] font-semibold hover:bg-brand-gray-900/90 transition-colors whitespace-nowrap"
+                  >
+                    {dict.orders.viewOrder}
+                  </a>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       <div className="bg-white rounded-2xl p-8 shadow-sm">
         <h3 className="text-lg font-bold text-brand-gray-900 mb-2">

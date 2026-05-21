@@ -8,6 +8,7 @@ import { buildPageMetadata } from '@/lib/seo'
 import { createServerSupabase } from '@/lib/supabase/ssr'
 import { getVerificationStatus } from '@/lib/auth/verification'
 import { getInvoicesForEmail } from '@/lib/invoices/queries'
+import { getOrdersForCustomer } from '@/lib/orders/customer-queries'
 import { AccountView } from './AccountView'
 import { langPrefix } from '@/lib/utils'
 
@@ -41,11 +42,12 @@ export default async function AccountPage({
 
   if (!user) redirect(`${langPrefix(lang)}/prisijungimas`)
 
-  const [dict, status, profileResult, invoices] = await Promise.all([
+  const [dict, status, profileResult, invoices, orders] = await Promise.all([
     getDictionary(lang),
     getVerificationStatus(),
     supabase.from('user_profiles').select('*').eq('id', user.id).single(),
     user.email ? getInvoicesForEmail(user.email) : Promise.resolve([]),
+    user.email ? getOrdersForCustomer(user.email) : Promise.resolve([]),
   ])
 
   return (
@@ -60,6 +62,7 @@ export default async function AccountPage({
             status={status}
             profile={profileResult.data}
             invoices={invoices}
+            orders={orders}
             dict={dict.accountPage}
           />
         </Container>

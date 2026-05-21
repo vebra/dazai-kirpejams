@@ -1255,6 +1255,21 @@
       "downloadPdf": "Download PDF",
       "pdfPending": "PDF is being prepared"
     },
+    "orders": {
+      "title": "My orders",
+      "desc": "All your orders — newest at the top. Click “View” to open order details and bank transfer information.",
+      "empty": "No orders yet. Once you place an order, it will appear here.",
+      "viewOrder": "View",
+      "orderStatus": {
+        "pending": "Awaiting payment",
+        "paid": "Paid",
+        "processing": "Processing",
+        "shipped": "Shipped",
+        "delivered": "Delivered",
+        "cancelled": "Cancelled",
+        "refunded": "Refunded"
+      }
+    },
     "logout": {
       "title": "Log out",
       "desc": "You will be signed out of your account.",
