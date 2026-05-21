@@ -75,12 +75,31 @@ export async function updateOrderStatusAction(
     orderData = data
   }
 
+  // Automatinis payment_status sinchronizavimas pagal užsakymo statusą.
+  // Logika: bet kuris „toliau nei pending" statusas implikuoja, kad
+  // apmokėjimas gautas (admin'as paprastai pažymi „Apmokėtas" pirma, bet
+  // gali iškart pereiti į „Išsiųsta" po fizinio patikrinimo). 'cancelled'
+  // ir 'pending' nelieskime — admin'as nuspręs atskirai (gali būti atvejis,
+  // kai cancel'inam neapmokėtą užsakymą be refund'o).
+  const paymentStatusForStatus: Record<string, string | undefined> = {
+    paid: 'paid',
+    processing: 'paid',
+    shipped: 'paid',
+    delivered: 'paid',
+    refunded: 'refunded',
+  }
+  const updatePayload: Record<string, unknown> = {
+    status,
+    updated_at: new Date().toISOString(),
+  }
+  const newPaymentStatus = paymentStatusForStatus[status]
+  if (newPaymentStatus) {
+    updatePayload.payment_status = newPaymentStatus
+  }
+
   const { error } = await supabase
     .from('orders')
-    .update({
-      status,
-      updated_at: new Date().toISOString(),
-    })
+    .update(updatePayload)
     .eq('id', id)
 
   if (error) {
