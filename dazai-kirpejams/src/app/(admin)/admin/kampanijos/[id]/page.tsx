@@ -141,8 +141,8 @@ export default async function CampaignDetailPage({
         <div className="px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
           {errorParam === 'cannot-edit-sent'
             ? 'Negalima redaguoti — kampanija jau išsiųsta.'
-            : errorParam === 'cannot-delete-sent'
-              ? 'Negalima ištrinti išsiųstos kampanijos.'
+            : errorParam === 'cannot-delete-sending'
+              ? 'Negalima ištrinti — kampanija šiuo metu siunčiama. Palaukit, kol pasibaigs.'
               : errorParam === 'already-sent'
                 ? 'Šitą kampaniją jau išsiuntėte. Sukurkite naują, jei norite siųsti kitą laišką.'
                 : errorParam === 'no-admin-email'
@@ -293,6 +293,27 @@ export default async function CampaignDetailPage({
               📋 Klonuoti į naują juodraštį
             </button>
           </form>
+
+          {/* Ištrynimas — leidžiama bet kokiam statusui (išskyrus „sending").
+              CASCADE pašalina ir gavėjų audit eilutes. Negrįžtama. */}
+          {campaign.status !== 'sending' && (
+            <div className="pt-4 mt-4 border-t border-[#eee]">
+              <p className="text-[12px] text-brand-gray-500 mb-2 leading-relaxed">
+                Jeigu nebereikia šios kampanijos audit istorijos — galite ją
+                ištrinti. <strong>Negrįžtama:</strong> visi gavėjai ir jų
+                pristatymo/atidarymo statusai dings.
+              </p>
+              <form action={deleteCampaignAction}>
+                <input type="hidden" name="id" value={campaign.id} />
+                <button
+                  type="submit"
+                  className="text-[12px] font-semibold text-red-600 hover:text-red-700 hover:underline"
+                >
+                  Ištrinti kampaniją visam laikui
+                </button>
+              </form>
+            </div>
+          )}
         </section>
       )}
 

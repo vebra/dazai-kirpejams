@@ -73,9 +73,11 @@ export default async function CampaignsPage({
         <div className="px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
           {errorParam === 'not-found'
             ? 'Kampanija nerasta.'
-            : errorParam === 'cannot-delete-sent'
-              ? 'Negalima ištrinti išsiųstos kampanijos.'
-              : `Klaida: ${errorParam}`}
+            : errorParam === 'cannot-delete-sending'
+              ? 'Negalima ištrinti — kampanija šiuo metu siunčiama.'
+              : errorParam === 'duplicate-failed'
+                ? 'Nepavyko klonuoti.'
+                : `Klaida: ${errorParam}`}
         </div>
       )}
 

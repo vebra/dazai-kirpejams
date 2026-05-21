@@ -144,15 +144,22 @@ export async function deleteCampaignAction(formData: FormData): Promise<void> {
   if (!id) redirect('/admin/kampanijos?error=invalid-id')
 
   const supabase = createServerClient()
-  // Trinti galima tik draft kampanijas — išsiųsti laiškai turi audit istoriją.
+  // Vienintelis statusas, kurio negalim trinti — `sending` (vyksta siuntimas).
+  // Trinant tuo metu, marketing_campaign_recipients eilutės būtų ištrintos
+  // per CASCADE, bet jau išsiųsti email'ai pasiektų gavėjus be audit įrašo.
+  // Draft / sent / failed — viskas saugu trinti (CASCADE išvalo audit kartu).
   const { data: current } = await supabase
     .from('marketing_campaigns')
     .select('status')
     .eq('id', id)
     .maybeSingle()
 
-  if (current?.status !== 'draft') {
-    redirect(`/admin/kampanijos/${id}?error=cannot-delete-sent`)
+  if (!current) {
+    redirect('/admin/kampanijos?error=not-found')
+  }
+
+  if (current.status === 'sending') {
+    redirect(`/admin/kampanijos/${id}?error=cannot-delete-sending`)
   }
 
   const { error } = await supabase
