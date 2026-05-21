@@ -152,6 +152,83 @@ export type CampaignRecipientRow = {
   openedCount: number
 }
 
+export type MarketingEmailSendRow = {
+  id: string
+  campaignId: string
+  campaignName: string
+  campaignSubject: string
+  campaignStatus: CampaignStatus
+  email: string
+  status: 'pending' | 'sent' | 'failed'
+  sentAt: string | null
+  errorMessage: string | null
+  openedAt: string | null
+  openedCount: number
+  createdAt: string
+}
+
+/**
+ * Plokščias visų kampanijų siuntimų žurnalas — kiekviena eilutė =
+ * (kampanija × gavėjas) pora. Naudojama /admin/kampanijos/zurnalas
+ * bendro matomumo puslapiui. Naujausi viršuje.
+ */
+export async function getAllMarketingEmailSends(): Promise<
+  MarketingEmailSendRow[]
+> {
+  const supabase = createServerClient()
+  const { data, error } = await supabase
+    .from('marketing_campaign_recipients')
+    .select(
+      `id, email, status, sent_at, error_message, opened_at, opened_count, created_at, campaign_id,
+       marketing_campaigns!inner(id, name, subject, status)`
+    )
+    .order('created_at', { ascending: false })
+    .limit(2000)
+
+  if (error) {
+    console.error(
+      '[admin/marketing-queries] getAllMarketingEmailSends:',
+      error.message
+    )
+    return []
+  }
+
+  type Row = {
+    id: string
+    email: string
+    status: 'pending' | 'sent' | 'failed'
+    sent_at: string | null
+    error_message: string | null
+    opened_at: string | null
+    opened_count: number | null
+    created_at: string
+    campaign_id: string
+    marketing_campaigns:
+      | { id: string; name: string; subject: string; status: CampaignStatus }
+      | { id: string; name: string; subject: string; status: CampaignStatus }[]
+  }
+
+  return ((data as Row[] | null) ?? []).map((r) => {
+    const campaign = Array.isArray(r.marketing_campaigns)
+      ? r.marketing_campaigns[0]
+      : r.marketing_campaigns
+    return {
+      id: r.id,
+      campaignId: r.campaign_id,
+      campaignName: campaign?.name ?? '(ištrinta kampanija)',
+      campaignSubject: campaign?.subject ?? '',
+      campaignStatus: (campaign?.status as CampaignStatus) ?? 'sent',
+      email: r.email,
+      status: r.status,
+      sentAt: r.sent_at,
+      errorMessage: r.error_message,
+      openedAt: r.opened_at,
+      openedCount: r.opened_count ?? 0,
+      createdAt: r.created_at,
+    }
+  })
+}
+
 export async function getCampaignRecipients(
   campaignId: string
 ): Promise<CampaignRecipientRow[]> {

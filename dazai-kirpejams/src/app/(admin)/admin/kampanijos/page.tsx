@@ -56,12 +56,20 @@ export default async function CampaignsPage({
             {approvedCount === 1 ? 'jas' : 'jai'}.
           </p>
         </div>
-        <Link
-          href="/admin/kampanijos/nauja"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-brand-magenta text-white text-sm font-semibold rounded-lg hover:bg-brand-magenta/90 transition-colors"
-        >
-          + Nauja kampanija
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/admin/kampanijos/zurnalas"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#eee] text-brand-gray-900 text-sm font-semibold rounded-lg hover:border-brand-gray-500 transition-colors"
+          >
+            📊 Siuntimų žurnalas
+          </Link>
+          <Link
+            href="/admin/kampanijos/nauja"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-magenta text-white text-sm font-semibold rounded-lg hover:bg-brand-magenta/90 transition-colors"
+          >
+            + Nauja kampanija
+          </Link>
+        </div>
       </div>
 
       {deletedFlag && (
