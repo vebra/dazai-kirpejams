@@ -53,6 +53,14 @@ const PAYMENT_LABELS: Record<string, string> = {
   bank_transfer: 'Banko pavedimas',
 }
 
+const PAYMENT_STATUS_LABELS: Record<string, string> = {
+  pending: 'Laukia apmokėjimo',
+  paid: 'APMOKĖTA',
+  refunded: 'Grąžinta',
+  cancelled: 'Atšaukta',
+  failed: 'Nepavyko',
+}
+
 /**
  * Loginis srautas būsenų keitimui — vizualiai parodo kelią:
  * pending → paid → processing → shipped → delivered
@@ -511,7 +519,9 @@ export default async function AdminOrderDetailPage({
               Mokėjimo būsena
             </dt>
             <dd className="mt-0.5 text-brand-gray-900">
-              {order.paymentStatus ?? '—'}
+              {order.paymentStatus
+                ? PAYMENT_STATUS_LABELS[order.paymentStatus] ?? order.paymentStatus
+                : '—'}
             </dd>
           </div>
           <div>
