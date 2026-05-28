@@ -110,6 +110,22 @@ export async function updateOrderStatusAction(
     redirect(`/admin/uzsakymai/${id}?error=update-failed`)
   }
 
+  // Cancelled / refunded — grąžinam prekes į sandėlį. RPC idempotentiškas:
+  // jei admin'as cancel'ins ir paskui ištrins užsakymą, sandėlis bus
+  // atstatytas tik vieną kartą (orders.stock_restored flag'as).
+  if (status === 'cancelled' || status === 'refunded') {
+    const { error: restoreErr } = await supabase.rpc(
+      'restore_stock_by_order_id',
+      { p_order_id: id }
+    )
+    if (restoreErr) {
+      console.error(
+        '[admin/uzsakymai/actions] stock restore failed (non-blocking):',
+        restoreErr.message
+      )
+    }
+  }
+
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
     'https://www.dazaikirpejams.lt'
@@ -328,6 +344,56 @@ export async function generateInvoiceAction(formData: FormData): Promise<void> {
   redirect(
     `/admin/uzsakymai/${id}?invoice=${result.alreadyExisted ? 'exists' : 'created'}`
   )
+}
+
+// ============================================
+// Užsakymo trynimas
+// ============================================
+
+/**
+ * Ištrina užsakymą iš DB. Prieš ištrynimą atstato prekes į sandėlį
+ * (idempotentiškai per `orders.stock_restored` flag'ą — jei užsakymas
+ * jau buvo cancelled ir sandėlis grąžintas, antras kartas nepadės).
+ *
+ * order_items ištrinami automatiškai per ON DELETE CASCADE.
+ * invoices su pdf_path lieka Storage'e (admin'as gali rankiniu būdu išvalyt,
+ * jei reikės — paprastai sąskaitas reikia saugot dėl apskaitos).
+ */
+export async function deleteOrderAction(formData: FormData): Promise<void> {
+  await requireAdmin()
+  const supabase = createServerClient()
+
+  const id = formData.get('id') as string | null
+  if (!id) redirect('/admin/uzsakymai?error=invalid-id')
+
+  // 1) Atstatyti prekes į sandėlį (idempotentiška)
+  const { error: restoreErr } = await supabase.rpc(
+    'restore_stock_by_order_id',
+    { p_order_id: id }
+  )
+  if (restoreErr) {
+    console.error(
+      '[admin/uzsakymai/actions] delete: stock restore failed:',
+      restoreErr.message
+    )
+    // Vis tiek bandom ištrint — admin'as gali norėt išvalyt net ir tada,
+    // kai sandėlio neįmanoma atstatyt (pvz. produktas jau ištrintas).
+  }
+
+  // 2) Ištrint užsakymą (order_items ištrinami per CASCADE)
+  const { error: deleteErr } = await supabase
+    .from('orders')
+    .delete()
+    .eq('id', id)
+
+  if (deleteErr) {
+    console.error('[admin/uzsakymai/actions] deleteOrder:', deleteErr.message)
+    redirect(`/admin/uzsakymai/${id}?error=delete-failed`)
+  }
+
+  revalidatePath('/admin/uzsakymai', 'layout')
+  revalidatePath('/admin')
+  redirect('/admin/uzsakymai?deleted=1')
 }
 
 /**

@@ -14,7 +14,9 @@ import {
   updateTrackingAction,
   generateInvoiceAction,
   downloadInvoiceAction,
+  deleteOrderAction,
 } from '../actions'
+import { DeleteOrderButton } from './DeleteOrderButton'
 import { getInvoiceByOrderId } from '@/lib/invoices/queries'
 
 export const metadata = {
@@ -620,6 +622,24 @@ export default async function AdminOrderDetailPage({
             </button>
           </div>
         </form>
+      </section>
+
+      {/* Pavojinga zona — užsakymo ištrynimas */}
+      <section className="bg-white rounded-xl border border-red-200 shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6">
+        <h3 className="text-[11px] font-semibold uppercase tracking-[0.5px] text-red-700 mb-2">
+          Pavojinga zona
+        </h3>
+        <p className="text-sm text-brand-gray-500 mb-4 leading-relaxed">
+          Ištrinant užsakymą prekės automatiškai grąžinamos į sandėlį (jei dar
+          nebuvo grąžintos). Užsakymo eilutės ištrinamos visam laikui — šis
+          veiksmas neatšaukiamas. Sąskaita-faktūra (jei buvo išrašyta) lieka
+          Storage'e dėl apskaitos.
+        </p>
+        <DeleteOrderButton
+          action={deleteOrderAction}
+          orderId={order.id}
+          orderNumber={order.orderNumber}
+        />
       </section>
     </div>
   )
