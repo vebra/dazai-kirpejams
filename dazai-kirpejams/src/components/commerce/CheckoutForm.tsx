@@ -11,6 +11,9 @@ import {
   Banknote,
   Tag,
   X,
+  Lock,
+  RotateCcw,
+  HeadphonesIcon,
 } from 'lucide-react'
 import { useCartStore } from '@/lib/commerce/cart-store'
 import {
@@ -289,6 +292,9 @@ export function CheckoutForm({
               onChange={setPhone}
               type="tel"
               required
+              placeholder="+370 ..."
+              pattern="^[+0-9 ()\-]{6,}$"
+              title={dict.checkout.phoneInvalid}
             />
           </div>
           <label className="flex items-center gap-3 mt-4 cursor-pointer select-none">
@@ -594,6 +600,14 @@ export function CheckoutForm({
           >
             {isPending ? dict.checkout.processing : dict.checkout.placeOrder}
           </button>
+
+          {/* Trust signal'ai — paskutinis pasitikėjimo stiprintojas prieš
+              pirkimą. Aiškiai matomi po Pirkti mygtuku. */}
+          <div className="grid grid-cols-3 gap-2 pt-3 border-t border-brand-gray-50/60">
+            <TrustBadge icon={Lock} label={dict.checkout.trustPayment} />
+            <TrustBadge icon={RotateCcw} label={dict.checkout.trustReturn} />
+            <TrustBadge icon={HeadphonesIcon} label={dict.checkout.trustSupport} />
+          </div>
         </div>
       </aside>
 
@@ -643,6 +657,27 @@ function Fieldset({
   )
 }
 
+/** Mažytis trust signal'as — ikona viršuje, etiketė apačioje. Tikslas —
+ *  pasitikėjimo žinutė prieš pat „Pirkti" mygtuko paspaudimą. */
+function TrustBadge({
+  icon: Icon,
+  label,
+}: {
+  icon: typeof Lock
+  label: string
+}) {
+  return (
+    <div className="flex flex-col items-center gap-1 text-center">
+      <div className="w-7 h-7 rounded-full bg-brand-gray-50 flex items-center justify-center">
+        <Icon className="w-3.5 h-3.5 text-brand-gray-900" />
+      </div>
+      <span className="text-[10px] leading-tight text-brand-gray-500">
+        {label}
+      </span>
+    </div>
+  )
+}
+
 function TextField({
   label,
   value,
@@ -653,6 +688,8 @@ function TextField({
   className = '',
   autoComplete,
   inputMode,
+  pattern,
+  title,
 }: {
   label: string
   value: string
@@ -663,6 +700,10 @@ function TextField({
   className?: string
   autoComplete?: string
   inputMode?: 'text' | 'email' | 'tel' | 'numeric' | 'decimal' | 'search' | 'url'
+  /** HTML5 pattern (regex) — naudojama formų validacijai. */
+  pattern?: string
+  /** Pranešimas, kuris parodomas, jei pattern nesutampa. */
+  title?: string
 }) {
   const resolvedAutoComplete =
     autoComplete ??
@@ -684,6 +725,8 @@ function TextField({
         placeholder={placeholder}
         autoComplete={resolvedAutoComplete}
         inputMode={resolvedInputMode}
+        pattern={pattern}
+        title={title}
         className="w-full px-4 py-3 border border-brand-gray-50 rounded-xl focus:outline-none focus:border-brand-magenta transition-colors text-sm bg-white"
       />
     </label>
