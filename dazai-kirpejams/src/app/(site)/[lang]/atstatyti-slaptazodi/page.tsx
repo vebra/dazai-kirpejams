@@ -5,64 +5,57 @@ import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Section } from '@/components/ui/Section'
 import { buildPageMetadata } from '@/lib/seo'
-import { LoginForm } from './LoginForm'
+import { ResetRequestForm } from './ResetRequestForm'
 
 export async function generateMetadata({
   params,
-}: PageProps<'/[lang]/prisijungimas'>): Promise<Metadata> {
+}: PageProps<'/[lang]/atstatyti-slaptazodi'>): Promise<Metadata> {
   const { lang } = await params
   if (!hasLocale(lang)) return {}
   const dict = await getDictionary(lang)
   return {
     ...buildPageMetadata({
       lang,
-      path: '/prisijungimas',
-      title: dict.loginPage.metaTitle,
-      description: dict.loginPage.metaDesc,
+      path: '/atstatyti-slaptazodi',
+      title: dict.resetRequestPage.metaTitle,
+      description: dict.resetRequestPage.metaDesc,
     }),
-    robots: { index: false, follow: true },
+    robots: { index: false, follow: false },
   }
 }
 
-export default async function LoginPage({
+export default async function ResetRequestPage({
   params,
-  searchParams,
-}: PageProps<'/[lang]/prisijungimas'>) {
+}: PageProps<'/[lang]/atstatyti-slaptazodi'>) {
   const { lang } = await params
   if (!hasLocale(lang)) notFound()
   const dict = await getDictionary(lang)
-  const sp = await searchParams
-  const resetExpired = sp?.reset === 'expired'
 
   return (
     <>
-      <PageHeader title={dict.loginPage.headerTitle} />
+      <PageHeader title={dict.resetRequestPage.headerTitle} />
       <Section background="gray">
         <Container size="narrow">
           <div className="bg-white rounded-2xl p-8 lg:p-10 shadow-sm max-w-md mx-auto">
             <div className="text-center mb-8">
               <h2 className="text-xl font-bold text-brand-gray-900 mb-2">
-                {dict.loginPage.cardTitle}
+                {dict.resetRequestPage.cardTitle}
               </h2>
               <p className="text-sm text-brand-gray-500 leading-relaxed">
-                {dict.loginPage.cardDesc}
+                {dict.resetRequestPage.cardDesc}
               </p>
             </div>
 
-            {resetExpired && (
-              <div className="mb-6 px-4 py-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg text-sm">
-                {dict.loginPage.resetExpiredNotice}
-              </div>
-            )}
-
-            <LoginForm
+            <ResetRequestForm
               lang={lang}
-              dict={dict.loginPage}
-              errorDict={{
-                loginMissing: dict.errors.loginMissing,
-                loginInvalid: dict.errors.loginInvalid,
-                loginUnconfirmedEmail: dict.errors.loginUnconfirmedEmail,
-                loginGeneric: dict.errors.loginGeneric,
+              dict={{
+                emailLabel: dict.resetRequestPage.emailLabel,
+                emailPlaceholder: dict.resetRequestPage.emailPlaceholder,
+                submit: dict.resetRequestPage.submit,
+                submitting: dict.resetRequestPage.submitting,
+                successTitle: dict.resetRequestPage.successTitle,
+                successDesc: dict.resetRequestPage.successDesc,
+                backToLogin: dict.resetRequestPage.backToLogin,
               }}
             />
           </div>

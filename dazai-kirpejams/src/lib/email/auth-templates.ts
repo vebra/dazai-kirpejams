@@ -701,3 +701,182 @@ Admin: ${input.adminUrl}`
 
   return { subject, html, text }
 }
+
+// ============================================
+// SLAPTAŽODŽIO ATSTATYMAS — siunčiama po /atstatyti-slaptazodi
+// ============================================
+
+export type PasswordResetEmailInput = {
+  firstName: string
+  /** Pilnas atstatymo URL (Supabase generateLink action_link). */
+  resetUrl: string
+  lang: 'lt' | 'en' | 'ru'
+  siteUrl: string
+}
+
+const PASSWORD_RESET_COPY = {
+  lt: {
+    subject: 'Slaptažodžio atstatymas',
+    preheader: 'Paspauskite mygtuką, kad nustatytumėte naują slaptažodį.',
+    badge: 'Saugumas',
+    title: (name: string) =>
+      name ? `Sveiki, ${name}` : 'Slaptažodžio atstatymas',
+    intro:
+      'Gavome prašymą atstatyti jūsų paskyros slaptažodį. Paspauskite mygtuką žemiau ir nustatykite naują slaptažodį.',
+    ctaLabel: 'Nustatyti naują slaptažodį',
+    validity: 'Nuoroda galioja 1 valandą.',
+    ignoreTitle: 'Neprašėte atstatyti?',
+    ignoreDesc:
+      'Tiesiog ignoruokite šį laišką — jūsų dabartinis slaptažodis lieka nepakeistas. Nuoroda negaliojanti, kol jos nepaspaudžiate.',
+    closing:
+      'Jei kyla klausimų ar matote įtartiną veiklą — atsakykite į šį laišką.',
+    signoff: 'Pagarbiai,\nDažai Kirpėjams komanda',
+    footerSite: 'www.dazaikirpejams.lt',
+  },
+  en: {
+    subject: 'Password reset',
+    preheader: 'Click the button to set a new password.',
+    badge: 'Security',
+    title: (name: string) => (name ? `Hello, ${name}` : 'Password reset'),
+    intro:
+      'We received a request to reset your account password. Click the button below to set a new password.',
+    ctaLabel: 'Set a new password',
+    validity: 'The link is valid for 1 hour.',
+    ignoreTitle: 'Didn’t request this?',
+    ignoreDesc:
+      'Just ignore this email — your current password stays unchanged. The link does nothing until clicked.',
+    closing:
+      'If you have any questions or see suspicious activity — reply to this email.',
+    signoff: 'Kind regards,\nThe Dažai Kirpėjams team',
+    footerSite: 'www.dazaikirpejams.lt',
+  },
+  ru: {
+    subject: 'Сброс пароля',
+    preheader: 'Нажмите кнопку, чтобы задать новый пароль.',
+    badge: 'Безопасность',
+    title: (name: string) => (name ? `Здравствуйте, ${name}` : 'Сброс пароля'),
+    intro:
+      'Мы получили запрос на сброс пароля вашего аккаунта. Нажмите кнопку ниже, чтобы задать новый пароль.',
+    ctaLabel: 'Задать новый пароль',
+    validity: 'Ссылка действительна 1 час.',
+    ignoreTitle: 'Не запрашивали сброс?',
+    ignoreDesc:
+      'Просто проигнорируйте письмо — текущий пароль остаётся без изменений. Ссылка не сработает, пока вы её не нажмёте.',
+    closing:
+      'Если есть вопросы или вы видите подозрительную активность — ответьте на это письмо.',
+    signoff: 'С уважением,\nКоманда Dažai Kirpėjams',
+    footerSite: 'www.dazaikirpejams.lt',
+  },
+} as const
+
+export function buildPasswordResetEmail(input: PasswordResetEmailInput): {
+  subject: string
+  html: string
+  text: string
+} {
+  const c = PASSWORD_RESET_COPY[input.lang] ?? PASSWORD_RESET_COPY.lt
+  const safeName = escapeHtml(input.firstName || '')
+
+  const html = `<!doctype html>
+<html lang="${input.lang}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${escapeHtml(c.subject)}</title>
+</head>
+<body style="margin:0;padding:0;background:${GRAY_50};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:${GRAY_900};">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">
+  ${escapeHtml(c.preheader)}
+</div>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};padding:32px 16px;">
+  <tr>
+    <td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
+
+        <tr>
+          <td style="padding:32px 32px 0;">
+            <div style="display:inline-block;padding:6px 12px;background:${GRAY_900};color:#ffffff;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;border-radius:999px;">
+              ${escapeHtml(c.badge)}
+            </div>
+            <h1 style="margin:20px 0 0;font-size:26px;font-weight:700;color:${GRAY_900};line-height:1.25;">
+              ${escapeHtml(c.title(safeName))}
+            </h1>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:20px 32px 0;">
+            <p style="margin:0;font-size:15px;line-height:1.7;color:${GRAY_500};">
+              ${escapeHtml(c.intro)}
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:24px 32px 0;">
+            <a href="${input.resetUrl}" style="display:inline-block;padding:14px 28px;background:${BRAND_MAGENTA};color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;border-radius:10px;">
+              ${escapeHtml(c.ctaLabel)} →
+            </a>
+            <p style="margin:12px 0 0;font-size:12px;color:${GRAY_500};">
+              ${escapeHtml(c.validity)}
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:28px 32px 0;">
+            <div style="background:${GRAY_50};border-radius:12px;padding:18px 22px;">
+              <div style="font-size:13px;font-weight:700;color:${GRAY_900};margin-bottom:6px;">
+                ${escapeHtml(c.ignoreTitle)}
+              </div>
+              <p style="margin:0;font-size:13px;line-height:1.65;color:${GRAY_500};">
+                ${escapeHtml(c.ignoreDesc)}
+              </p>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:28px 32px;">
+            <p style="margin:0;font-size:13px;line-height:1.65;color:${GRAY_500};">
+              ${escapeHtml(c.closing)}
+            </p>
+            <p style="margin:18px 0 0;font-size:13px;line-height:1.65;color:${GRAY_900};white-space:pre-line;">
+              ${escapeHtml(c.signoff)}
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:0 32px 32px;">
+            <div style="border-top:1px solid ${BORDER};padding-top:16px;font-size:11px;color:${GRAY_500};text-align:center;">
+              ${escapeHtml(c.footerSite)}
+            </div>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>`
+
+  const text = `${c.title(input.firstName || '')}
+
+${c.intro}
+
+${c.ctaLabel}: ${input.resetUrl}
+${c.validity}
+
+${c.ignoreTitle}
+${c.ignoreDesc}
+
+${c.closing}
+
+${c.signoff}
+
+${c.footerSite}`
+
+  return { subject: c.subject, html, text }
+}

@@ -1153,7 +1153,42 @@
     "registerCta": "Register",
     "oauthGoogle": "Continue with Google",
     "oauthFacebook": "Continue with Facebook",
-    "oauthOr": "or"
+    "oauthOr": "or",
+    "forgotPassword": "Forgot your password?",
+    "resetExpiredNotice": "The password reset link is no longer valid or has already been used. Request a new one below."
+  },
+  "resetRequestPage": {
+    "metaTitle": "Password reset",
+    "metaDesc": "Forgot your password? Enter your email and we'll send you a reset link.",
+    "headerTitle": "Password reset",
+    "cardTitle": "Forgot your password?",
+    "cardDesc": "Enter the email you registered with. We will send a link to set a new password.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "your@email.com",
+    "submit": "Send reset link",
+    "submitting": "Sending…",
+    "successTitle": "Check your email",
+    "successDesc": "If an account with this email exists, you will receive a reset link within a few minutes. The link is valid for 1 hour.",
+    "backToLogin": "Back to sign in"
+  },
+  "newPasswordPage": {
+    "metaTitle": "New password",
+    "metaDesc": "Set a new password for your account.",
+    "headerTitle": "New password",
+    "cardTitle": "Set a new password",
+    "cardDesc": "Enter the new password twice. Minimum 8 characters.",
+    "passwordLabel": "New password",
+    "passwordPlaceholder": "Min. 8 characters",
+    "confirmLabel": "Repeat password",
+    "confirmPlaceholder": "Repeat the same password",
+    "submit": "Save password",
+    "submitting": "Saving…",
+    "successRedirect": "Password updated. Redirecting to your account…",
+    "errorMissing": "Please fill in both password fields.",
+    "errorMismatch": "Passwords don't match.",
+    "errorWeak": "Password is too short — minimum 8 characters.",
+    "errorNoSession": "Reset session expired. Please request a new reset link.",
+    "errorGeneric": "Could not save the password. Please try again later."
   },
   "registerPage": {
     "metaTitle": "Registration for professionals",

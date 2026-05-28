@@ -21,6 +21,7 @@ type LoginFormDict = {
   oauthGoogle: string
   oauthFacebook: string
   oauthOr: string
+  forgotPassword: string
 }
 
 type ErrorDict = {
@@ -120,8 +121,16 @@ export function LoginForm({
       </label>
 
       <label className="block">
-        <span className="block text-xs font-medium text-brand-gray-500 mb-1.5">
-          {dict.passwordLabel} <span className="text-brand-magenta">*</span>
+        <span className="flex items-center justify-between mb-1.5">
+          <span className="text-xs font-medium text-brand-gray-500">
+            {dict.passwordLabel} <span className="text-brand-magenta">*</span>
+          </span>
+          <Link
+            href={`${langPrefix(lang)}/atstatyti-slaptazodi`}
+            className="text-xs text-brand-magenta font-medium hover:underline"
+          >
+            {dict.forgotPassword}
+          </Link>
         </span>
         <input
           type="password"

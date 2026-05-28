@@ -1153,7 +1153,42 @@
     "registerCta": "Registruotis",
     "oauthGoogle": "Tęsti su Google",
     "oauthFacebook": "Tęsti su Facebook",
-    "oauthOr": "arba"
+    "oauthOr": "arba",
+    "forgotPassword": "Pamiršot slaptažodį?",
+    "resetExpiredNotice": "Slaptažodžio atstatymo nuoroda nebegalioja arba jau panaudota. Užklauskite naujos žemiau."
+  },
+  "resetRequestPage": {
+    "metaTitle": "Slaptažodžio atstatymas",
+    "metaDesc": "Užmiršot slaptažodį? Įveskite el. paštą ir gaukit atstatymo nuorodą.",
+    "headerTitle": "Slaptažodžio atstatymas",
+    "cardTitle": "Užmiršot slaptažodį?",
+    "cardDesc": "Įveskite el. paštą, kuriuo registravotės. Atsiųsime nuorodą naujam slaptažodžiui nustatyti.",
+    "emailLabel": "El. paštas",
+    "emailPlaceholder": "jusu@paštas.lt",
+    "submit": "Siųsti atstatymo nuorodą",
+    "submitting": "Siunčiama…",
+    "successTitle": "Patikrinkite el. paštą",
+    "successDesc": "Jei paskyra su šiuo el. paštu egzistuoja, per kelias minutes gausite laišką su atstatymo nuoroda. Nuoroda galioja 1 valandą.",
+    "backToLogin": "Grįžti į prisijungimą"
+  },
+  "newPasswordPage": {
+    "metaTitle": "Naujas slaptažodis",
+    "metaDesc": "Nustatykite naują paskyros slaptažodį.",
+    "headerTitle": "Naujas slaptažodis",
+    "cardTitle": "Nustatykite naują slaptažodį",
+    "cardDesc": "Įveskite naują slaptažodį du kartus. Slaptažodis turi būti bent 8 simbolių ilgio.",
+    "passwordLabel": "Naujas slaptažodis",
+    "passwordPlaceholder": "Min. 8 simboliai",
+    "confirmLabel": "Pakartokite slaptažodį",
+    "confirmPlaceholder": "Pakartokite tą patį slaptažodį",
+    "submit": "Išsaugoti slaptažodį",
+    "submitting": "Saugoma…",
+    "successRedirect": "Slaptažodis pakeistas. Nukreipiama į paskyrą…",
+    "errorMissing": "Užpildykite abu slaptažodžio laukus.",
+    "errorMismatch": "Slaptažodžiai nesutampa.",
+    "errorWeak": "Slaptažodis per trumpas — bent 8 simboliai.",
+    "errorNoSession": "Atstatymo sesija pasibaigė. Užklauskite naujos atstatymo nuorodos.",
+    "errorGeneric": "Nepavyko išsaugoti slaptažodžio. Bandykite vėliau."
   },
   "registerPage": {
     "metaTitle": "Registracija profesionalams",
