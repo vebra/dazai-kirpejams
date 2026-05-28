@@ -59,6 +59,10 @@ export default async function CheckoutPage({
         salonName?: string
         companyCode?: string
         isCompany?: boolean
+        deliveryMethod?: 'courier' | 'parcel_locker' | 'pickup'
+        deliveryAddress?: string
+        deliveryCity?: string
+        deliveryPostalCode?: string
       }
     | undefined
   if (isSupabaseServerConfigured) {
@@ -71,9 +75,18 @@ export default async function CheckoutPage({
         const admin = createServerClient()
         const { data: profile } = await admin
           .from('user_profiles')
-          .select('first_name, last_name, phone, salon_name, company_code')
+          .select(
+            'first_name, last_name, phone, salon_name, company_code, last_delivery_data'
+          )
           .eq('id', user.id)
           .maybeSingle()
+        const lastDelivery = (profile?.last_delivery_data ?? null) as {
+          method?: 'courier' | 'parcel_locker' | 'pickup'
+          address?: string | null
+          city?: string | null
+          postalCode?: string | null
+          parcelLocker?: string | null
+        } | null
         prefill = {
           firstName: profile?.first_name ?? '',
           lastName: profile?.last_name ?? '',
@@ -87,6 +100,10 @@ export default async function CheckoutPage({
             (profile?.salon_name && profile.salon_name.trim()) ||
               (profile?.company_code && profile.company_code.trim())
           ),
+          deliveryMethod: lastDelivery?.method,
+          deliveryAddress: lastDelivery?.address ?? '',
+          deliveryCity: lastDelivery?.city ?? '',
+          deliveryPostalCode: lastDelivery?.postalCode ?? '',
         }
       }
     } catch (err) {

@@ -11,6 +11,7 @@ import {
   type PaymentMethod,
 } from './constants'
 import { createServerClient, isSupabaseServerConfigured } from '@/lib/supabase/server'
+import { createServerSupabase } from '@/lib/supabase/ssr'
 import { sendEmail, getAdminNotificationEmail } from '@/lib/email/resend'
 import {
   buildCustomerOrderEmail,
@@ -282,6 +283,44 @@ export async function createOrder(
     process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
     'https://www.dazaikirpejams.lt'
   const createdAtIso = new Date().toISOString()
+
+  // Įrašom pristatymo pasirinkimą į user_profiles.last_delivery_data, kad
+  // kitam užsakymui pre-fill'intų tuos pačius laukus (nuolatinis klientas
+  // nuolat užsako į tą patį paštomatą / adresą — sutaupom rankų darbą).
+  // Best-effort: klaida nesustabdo srauto (DB klaidos, neprisijungusi
+  // sesija dėl edge case'o — viskas tylėdama praeina).
+  if (isSupabaseServerConfigured && orderDbId) {
+    try {
+      const ssr = await createServerSupabase()
+      const {
+        data: { user },
+      } = await ssr.auth.getUser()
+      if (user) {
+        const admin = createServerClient()
+        await admin
+          .from('user_profiles')
+          .update({
+            last_delivery_data: {
+              method: input.deliveryMethod,
+              address: input.deliveryAddress ?? null,
+              city: input.deliveryCity ?? null,
+              postalCode: input.deliveryPostalCode ?? null,
+              parcelLocker:
+                input.deliveryMethod === 'parcel_locker'
+                  ? input.deliveryAddress ?? null
+                  : null,
+            },
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', user.id)
+      }
+    } catch (err) {
+      console.error(
+        '[order-actions] last_delivery_data update failed (non-blocking):',
+        err
+      )
+    }
+  }
 
   // Magic-link žetonas, kad klientas galėtų grįžti į patvirtinimo puslapį
   // iš bet kurio įrenginio be prisijungimo (30 d. galiojimas). Jei

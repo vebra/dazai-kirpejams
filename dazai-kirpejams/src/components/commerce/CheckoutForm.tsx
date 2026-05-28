@@ -39,6 +39,11 @@ type CheckoutFormPrefill = {
   companyCode?: string
   /** Jei salonName arba companyCode užpildyti — pažymim „Perku įmonės vardu". */
   isCompany?: boolean
+  /** Paskutinio užsakymo pristatymo pasirinkimas — iš user_profiles.last_delivery_data. */
+  deliveryMethod?: DeliveryMethod
+  deliveryAddress?: string
+  deliveryCity?: string
+  deliveryPostalCode?: string
 }
 
 type CheckoutFormProps = {
@@ -76,11 +81,23 @@ export function CheckoutForm({
   const [companyName, setCompanyName] = useState(prefill?.salonName ?? '')
   const [companyCode, setCompanyCode] = useState(prefill?.companyCode ?? '')
   const [vatCode, setVatCode] = useState('')
-  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('courier')
-  const [address, setAddress] = useState('')
-  const [city, setCity] = useState('')
-  const [postalCode, setPostalCode] = useState('')
-  const [parcelLocker, setParcelLocker] = useState('')
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>(
+    prefill?.deliveryMethod ?? 'courier'
+  )
+  // Pre-fill iš last_delivery_data:
+  // - courier: address / city / postalCode
+  // - parcel_locker: tas pats `deliveryAddress` laukas (order-actions įrašo
+  //   paštomato pavadinimą į `address`), tad rodom jį `parcelLocker` lauke
+  const [address, setAddress] = useState(
+    prefill?.deliveryMethod === 'courier' ? prefill?.deliveryAddress ?? '' : ''
+  )
+  const [city, setCity] = useState(prefill?.deliveryCity ?? '')
+  const [postalCode, setPostalCode] = useState(prefill?.deliveryPostalCode ?? '')
+  const [parcelLocker, setParcelLocker] = useState(
+    prefill?.deliveryMethod === 'parcel_locker'
+      ? prefill?.deliveryAddress ?? ''
+      : ''
+  )
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('bank_transfer')
   const [notes, setNotes] = useState('')
   const [agreed, setAgreed] = useState(false)
