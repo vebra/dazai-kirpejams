@@ -596,6 +596,34 @@ export function CheckoutForm({
           </button>
         </div>
       </aside>
+
+      {/* Mobile sticky bottom bar — Total + Pirkti visada matomas, nesvarbu
+          kur klientas yra formoje. Slepiama nuo md+ (ten šoninis aside'as
+          su sticky efektu jau veikia desktop'e). Submit type'as veikia,
+          nes mygtukas yra <form> viduje. */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-brand-gray-50 shadow-[0_-4px_12px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom,0)]">
+        <div className="flex items-center gap-3 px-4 py-3">
+          <div className="flex-1 min-w-0">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500">
+              {dict.cart.total}
+            </div>
+            <div className="text-xl font-bold text-brand-gray-900 tabular-nums leading-tight">
+              {formatPrice(totals.totalCents / 100, lang)}
+            </div>
+          </div>
+          <button
+            type="submit"
+            disabled={!canSubmit || isPending}
+            className="px-6 py-3 bg-brand-magenta text-white font-semibold rounded-xl hover:bg-brand-magenta/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+          >
+            {isPending ? dict.checkout.processing : dict.checkout.placeOrder}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile tarpas, kad sticky bar'as nedengtu paskutinio formos
+          turinio (krepšelio sumavimo aside'o). md+ — nereikia. */}
+      <div className="md:hidden h-24" aria-hidden="true" />
     </form>
   )
 }
