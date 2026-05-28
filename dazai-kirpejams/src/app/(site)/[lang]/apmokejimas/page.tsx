@@ -10,6 +10,11 @@ import { isUserVerified } from '@/lib/auth/verification'
 import { getCompanyInfo } from '@/lib/admin/queries'
 import { vatRateFromVatCode } from '@/lib/commerce/constants'
 import { langPrefix } from '@/lib/utils'
+import { createServerSupabase } from '@/lib/supabase/ssr'
+import {
+  createServerClient,
+  isSupabaseServerConfigured,
+} from '@/lib/supabase/server'
 
 export async function generateMetadata({
   params,
@@ -41,12 +46,65 @@ export default async function CheckoutPage({
   const company = await getCompanyInfo().catch(() => null)
   const vatRate = vatRateFromVatCode(company?.vatCode)
 
+  // Pre-fill iš user_profiles + auth.users — kad nuolatinis klientas
+  // neturėtų kasdien įvesti tų pačių laukų. Tylus fallback į tuščia, jei
+  // ko nors trūksta (verified guard'as iškart anksčiau jau garantuoja, kad
+  // user yra).
+  let prefill:
+    | {
+        firstName?: string
+        lastName?: string
+        email?: string
+        phone?: string
+        salonName?: string
+        companyCode?: string
+        isCompany?: boolean
+      }
+    | undefined
+  if (isSupabaseServerConfigured) {
+    try {
+      const ssr = await createServerSupabase()
+      const {
+        data: { user },
+      } = await ssr.auth.getUser()
+      if (user) {
+        const admin = createServerClient()
+        const { data: profile } = await admin
+          .from('user_profiles')
+          .select('first_name, last_name, phone, salon_name, company_code')
+          .eq('id', user.id)
+          .maybeSingle()
+        prefill = {
+          firstName: profile?.first_name ?? '',
+          lastName: profile?.last_name ?? '',
+          email: user.email ?? '',
+          phone: profile?.phone ?? '',
+          salonName: profile?.salon_name ?? '',
+          companyCode: profile?.company_code ?? '',
+          // Jei buvo užpildytas salono pavadinimas ar įmonės kodas
+          // registracijos metu — pažymim „Perku įmonės vardu" iškart.
+          isCompany: Boolean(
+            (profile?.salon_name && profile.salon_name.trim()) ||
+              (profile?.company_code && profile.company_code.trim())
+          ),
+        }
+      }
+    } catch (err) {
+      console.error('[apmokejimas/page] prefill fetch failed:', err)
+    }
+  }
+
   return (
     <>
       <PageHeader title={dict.checkout.title} />
       <Section background="white">
         <Container>
-          <CheckoutForm lang={lang} dict={dict} vatRate={vatRate} />
+          <CheckoutForm
+            lang={lang}
+            dict={dict}
+            vatRate={vatRate}
+            prefill={prefill}
+          />
         </Container>
       </Section>
     </>

@@ -27,15 +27,34 @@ import { createOrder } from '@/lib/commerce/order-actions'
 import { validateDiscountCodeAction } from '@/lib/commerce/discount-actions'
 import type { Locale } from '@/i18n/config'
 
+type CheckoutFormPrefill = {
+  firstName?: string
+  lastName?: string
+  email?: string
+  phone?: string
+  salonName?: string
+  companyCode?: string
+  /** Jei salonName arba companyCode užpildyti — pažymim „Perku įmonės vardu". */
+  isCompany?: boolean
+}
+
 type CheckoutFormProps = {
   lang: Locale
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict: any
   /** Efektyvus PVM tarifas (0 = įmonė ne PVM mokėtoja → PVM nerodom). */
   vatRate: number
+  /** Prisijungusio vartotojo profilio duomenys — pre-fill'ina formą,
+   *  kad nuolatinis klientas neturėtų kasdien įvesti tų pačių laukų. */
+  prefill?: CheckoutFormPrefill
 }
 
-export function CheckoutForm({ lang, dict, vatRate }: CheckoutFormProps) {
+export function CheckoutForm({
+  lang,
+  dict,
+  vatRate,
+  prefill,
+}: CheckoutFormProps) {
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -45,14 +64,14 @@ export function CheckoutForm({ lang, dict, vatRate }: CheckoutFormProps) {
   const clear = useCartStore((s) => s.clear)
   const submittedRef = useRef(false)
 
-  // Forma
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [isCompany, setIsCompany] = useState(false)
-  const [companyName, setCompanyName] = useState('')
-  const [companyCode, setCompanyCode] = useState('')
+  // Forma — pre-fill iš user_profiles, jei prisijungęs (žr. /apmokejimas/page.tsx).
+  const [firstName, setFirstName] = useState(prefill?.firstName ?? '')
+  const [lastName, setLastName] = useState(prefill?.lastName ?? '')
+  const [email, setEmail] = useState(prefill?.email ?? '')
+  const [phone, setPhone] = useState(prefill?.phone ?? '')
+  const [isCompany, setIsCompany] = useState(prefill?.isCompany ?? false)
+  const [companyName, setCompanyName] = useState(prefill?.salonName ?? '')
+  const [companyCode, setCompanyCode] = useState(prefill?.companyCode ?? '')
   const [vatCode, setVatCode] = useState('')
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('courier')
   const [address, setAddress] = useState('')
