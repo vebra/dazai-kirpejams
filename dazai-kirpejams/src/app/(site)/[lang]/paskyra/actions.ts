@@ -8,8 +8,17 @@ import { getInvoiceSignedUrl } from '@/lib/invoices/queries'
 import { locales, type Locale, defaultLocale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 import { checkRateLimit } from '@/lib/rate-limit'
+import {
+  updateProfileSchema,
+  formDataToObject,
+} from '@/lib/validation/auth-schemas'
 
 export type UploadDocState = {
+  error?: string
+  success?: boolean
+}
+
+export type UpdateProfileState = {
   error?: string
   success?: boolean
 }
@@ -98,6 +107,75 @@ export async function uploadDocumentAction(
 
   if (upsertError) {
     console.error('[upload-doc] profile upsert error:', upsertError.message)
+    return { error: errors.profileUpdateFailed }
+  }
+
+  revalidatePath('/paskyra', 'page')
+  return { success: true }
+}
+
+export async function updateProfileAction(
+  _prev: UpdateProfileState,
+  formData: FormData
+): Promise<UpdateProfileState> {
+  // `_form_lang` — puslapio kalba klaidos pranešimui. `lang` lieka
+  // formData'oje schemos validacijai (email pranešimų kalbos pasirinkimas).
+  const lang = resolveLang(formData.get('_form_lang'))
+  const { errors } = await getDictionary(lang)
+
+  const supabase = await createServerSupabase()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return { error: errors.mustBeLoggedIn }
+
+  // Rate-limit: 20 per valandą pakanka realiam vartotojui (kelis kartus
+  // pakeisti telefoną ar adresą), bet sustabdo masinį spam'inimą.
+  const rl = await checkRateLimit({
+    action: 'update-profile',
+    windowSeconds: 3600,
+    max: 20,
+  })
+  if (!rl.allowed) {
+    return { error: errors.uploadFailed }
+  }
+
+  const parsed = updateProfileSchema.safeParse(formDataToObject(formData))
+  if (!parsed.success) {
+    const firstIssue = parsed.error.issues[0]
+    const key = firstIssue?.message as keyof typeof errors
+    return { error: errors[key] ?? errors.profileUpdateFailed }
+  }
+
+  const {
+    first_name,
+    last_name,
+    phone,
+    city,
+    salon_name,
+    company_code,
+    daily_dyes_count,
+    lang: preferredLang,
+  } = parsed.data
+
+  const { error: updateError } = await supabase
+    .from('user_profiles')
+    .update({
+      first_name,
+      last_name,
+      phone,
+      city: city || null,
+      salon_name: salon_name || null,
+      company_code: company_code || null,
+      daily_dyes_count: daily_dyes_count || null,
+      lang: preferredLang,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', user.id)
+
+  if (updateError) {
+    console.error('[paskyra/actions] updateProfile:', updateError.message)
     return { error: errors.profileUpdateFailed }
   }
 

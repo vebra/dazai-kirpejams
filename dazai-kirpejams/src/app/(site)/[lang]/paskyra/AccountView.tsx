@@ -14,6 +14,7 @@ import {
   downloadCustomerInvoiceAction,
   type UploadDocState,
 } from './actions'
+import { ProfileEditForm } from './ProfileEditForm'
 import { LogoutButton } from '@/components/auth/LogoutButton'
 
 const LOCALE_MAP: Record<string, string> = { lt: 'lt-LT', en: 'en-GB', ru: 'ru-RU' }
@@ -27,6 +28,32 @@ type AccountDict = {
   rejectionReason: string
   businessTypes: { hairdresser: string; salon: string; other: string }
   labels: { businessType: string; phone: string; salon: string; companyCode: string }
+  profileEdit: {
+    title: string
+    desc: string
+    firstName: string
+    lastName: string
+    phone: string
+    phonePlaceholder: string
+    city: string
+    cityPlaceholder: string
+    salon: string
+    salonPlaceholder: string
+    companyCode: string
+    companyCodePlaceholder: string
+    dailyDyesCount: string
+    dailyDyesPlaceholder: string
+    emailLang: string
+    emailLangHint: string
+    langLt: string
+    langEn: string
+    langRu: string
+    emailReadOnly: string
+    emailReadOnlyHint: string
+    save: string
+    saving: string
+    successMessage: string
+  }
   document: {
     title: string
     desc: string
@@ -161,6 +188,25 @@ export function AccountView({
           )}
         </div>
       </div>
+
+      <ProfileEditForm
+        lang={lang}
+        email={email}
+        defaults={{
+          firstName: profile?.first_name ?? '',
+          lastName: profile?.last_name ?? '',
+          phone: profile?.phone ?? '',
+          city: profile?.city ?? '',
+          salonName: profile?.salon_name ?? '',
+          companyCode: profile?.company_code ?? '',
+          dailyDyesCount: profile?.daily_dyes_count ?? '',
+          preferredLang:
+            profile?.lang && ['lt', 'en', 'ru'].includes(profile.lang)
+              ? (profile.lang as Locale)
+              : lang,
+        }}
+        dict={dict.profileEdit}
+      />
 
       {statusKey !== 'approved' && (
         <div className="bg-white rounded-2xl p-8 shadow-sm">

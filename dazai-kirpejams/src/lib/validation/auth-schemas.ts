@@ -58,6 +58,24 @@ export const registerSchema = z.object({
 export type RegisterInput = z.infer<typeof registerSchema>
 
 /**
+ * Vartotojo paskyros redagavimas — laukai, kuriuos klientas pats gali
+ * keisti per /paskyra. NEįeina: email (Auth), business_type, verification
+ * statusas/dokumentai (admin'o sritis).
+ */
+export const updateProfileSchema = z.object({
+  first_name: z.string().trim().min(1, { message: 'firstNameRequired' }).max(100),
+  last_name: z.string().trim().min(1, { message: 'lastNameRequired' }).max(100),
+  phone: z.string().trim().max(50).default(''),
+  city: z.string().trim().max(100).default(''),
+  salon_name: z.string().trim().max(200).default(''),
+  company_code: z.string().trim().max(50).default(''),
+  daily_dyes_count: z.string().trim().max(50).default(''),
+  lang: z.enum(ALLOWED_LANGS).default('lt'),
+})
+
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>
+
+/**
  * Suvienodintas FormData → object pavertimas. Naudoja `Object.fromEntries`,
  * tačiau pateikia tipą Zod schemoms aiškiai.
  */
