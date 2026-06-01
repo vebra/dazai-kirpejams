@@ -23,6 +23,9 @@ import {
   SITE_URL,
   buildCanonicalUrl,
   buildLanguageAlternates,
+  OG_IMAGE_URL,
+  OG_IMAGE_WIDTH,
+  OG_IMAGE_HEIGHT,
 } from '@/lib/seo'
 
 const inter = Inter({
@@ -65,11 +68,20 @@ export async function generateMetadata({
       alternateLocale: ['lt_LT', 'en_US', 'ru_RU'].filter(
         (l) => l !== (lang === 'lt' ? 'lt_LT' : lang === 'en' ? 'en_US' : 'ru_RU')
       ),
+      images: [
+        {
+          url: OG_IMAGE_URL,
+          width: OG_IMAGE_WIDTH,
+          height: OG_IMAGE_HEIGHT,
+          type: 'image/jpeg',
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: dict.meta.title,
       description: dict.meta.description,
+      images: [OG_IMAGE_URL],
     },
     robots: {
       index: true,

@@ -12,6 +12,19 @@ export const SITE_URL = (
 export const SITE_NAME = 'Dažai Kirpėjams'
 
 /**
+ * Statinis OG paveiksliukas (1200×630, JPG). Padengia FB/LinkedIn/Twitter
+ * share preview visiems puslapiams, kurie naudoja `buildPageMetadata`.
+ * Pagrindiniam puslapiui taip pat veikia file-convention versija
+ * `src/app/(site)/[lang]/opengraph-image.jpg` — tas pats failas. Bet
+ * pagal Next.js metadata merge logiką, kai page'as nustato `openGraph: {...}`
+ * be `images`, vaikų puslapyje rody­tų FB tuščią kortelę. Todėl
+ * eksplicitiškai paduodam šitą URL kiekvienam puslapiui.
+ */
+export const OG_IMAGE_URL = '/og-image.jpg'
+export const OG_IMAGE_WIDTH = 1200
+export const OG_IMAGE_HEIGHT = 630
+
+/**
  * Sukuria hreflang alternates žemėlapį visiems locale'ams vienam path'ui.
  * Path turi prasidėti „/" ir NETURI turėti locale prefikso (pvz. „/produktai").
  */
@@ -71,11 +84,20 @@ export function buildPageMetadata({
       description,
       url: canonical,
       type: 'website',
+      images: [
+        {
+          url: OG_IMAGE_URL,
+          width: OG_IMAGE_WIDTH,
+          height: OG_IMAGE_HEIGHT,
+          type: 'image/jpeg',
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: [OG_IMAGE_URL],
     },
   }
 }
