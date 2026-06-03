@@ -223,21 +223,19 @@ export default async function ArticlePage({
         </Container>
       </section>
 
-      {/* Cover image */}
+      {/* Cover image — natūrali proporcija, kad pilnai matytųsi tiek nuotraukos,
+          tiek infografikai (be 16:9 apkarpymo). */}
       {post.coverImageUrl && (
         <section className="bg-white">
           <Container>
             <div className="max-w-[820px] mx-auto -mt-4 mb-4">
-              <div className="relative aspect-[16/9] rounded-xl overflow-hidden">
-                <Image
-                  src={post.coverImageUrl}
-                  alt={post.title}
-                  fill
-                  sizes="(max-width: 820px) 100vw, 820px"
-                  className="object-cover"
-                  priority
-                />
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={post.coverImageUrl}
+                alt={post.title}
+                fetchPriority="high"
+                className="w-full h-auto rounded-xl"
+              />
             </div>
           </Container>
         </section>
