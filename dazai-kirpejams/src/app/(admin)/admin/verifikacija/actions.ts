@@ -8,9 +8,126 @@ import { sendEmail } from '@/lib/email/resend'
 import {
   buildWelcomeEmail,
   buildRejectionEmail,
+  buildPasswordResetEmail,
 } from '@/lib/email/auth-templates'
+import { randomUUID } from 'crypto'
 
 const VERIFICATION_BUCKET = 'verification-docs'
+
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
+  'https://www.dazaikirpejams.lt'
+
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+/**
+ * Admin'as rankiniu būdu prideda naują klientą — sukuria auth vartotoją ir
+ * iškart `approved` profilį (kad matytų kainas ir gautų kampanijas). Skirta
+ * salonams/kirpėjams, kuriuos onboardinam patys, be self-registracijos.
+ *
+ * Pasirinktinai išsiunčiama prisijungimo nuoroda (Supabase recovery link),
+ * kad klientas pats nusistatytų slaptažodį — tas pats srautas kaip
+ * „pamiršau slaptažodį".
+ */
+export async function createClientAction(formData: FormData): Promise<void> {
+  const currentAdmin = await requireAdmin()
+  const supabase = createServerClient()
+
+  const email = ((formData.get('email') as string) ?? '').trim().toLowerCase()
+  const firstName = ((formData.get('first_name') as string) ?? '').trim()
+  const lastName = ((formData.get('last_name') as string) ?? '').trim()
+  const salonName = ((formData.get('salon_name') as string) ?? '').trim() || null
+  const phone = ((formData.get('phone') as string) ?? '').trim()
+  const rawType = ((formData.get('business_type') as string) ?? '').trim()
+  const businessType =
+    rawType === 'hairdresser' || rawType === 'salon' || rawType === 'other'
+      ? rawType
+      : null
+  const sendInvite = formData.get('send_invite') === 'on'
+
+  if (!isValidEmail(email)) {
+    redirect('/admin/verifikacija/naujas?error=invalid-email')
+  }
+
+  // 1) Sukuriam auth vartotoją (email patvirtintas, laikinas atsitiktinis slaptažodis)
+  const { data: created, error: createErr } =
+    await supabase.auth.admin.createUser({
+      email,
+      email_confirm: true,
+      password: `${randomUUID()}${randomUUID()}`,
+    })
+
+  if (createErr || !created?.user) {
+    const msg = createErr?.message ?? ''
+    if (/already|registered|exists/i.test(msg)) {
+      redirect('/admin/verifikacija/naujas?error=email-exists')
+    }
+    console.error('[admin/verifikacija] createClient createUser:', msg)
+    redirect('/admin/verifikacija/naujas?error=create-failed')
+  }
+
+  const userId = created.user.id
+
+  // 2) Įrašom profilį iškart kaip patvirtintą
+  const { error: profileErr } = await supabase.from('user_profiles').insert({
+    id: userId,
+    first_name: firstName,
+    last_name: lastName,
+    phone,
+    salon_name: salonName,
+    business_type: businessType,
+    lang: 'lt',
+    verification_status: 'approved',
+    verified_at: new Date().toISOString(),
+    verified_by: currentAdmin.id,
+  })
+
+  if (profileErr) {
+    console.error('[admin/verifikacija] createClient profile:', profileErr.message)
+    // Atšaukiam pusiau sukurtą būseną — ištrinam auth vartotoją
+    await supabase.auth.admin.deleteUser(userId).catch(() => {})
+    redirect('/admin/verifikacija/naujas?error=profile-failed')
+  }
+
+  // 3) (Nebūtina) prisijungimo nuoroda — kad klientas nusistatytų slaptažodį.
+  // Defensyvu: el. laiško klaida nesugriauna kliento sukūrimo.
+  if (sendInvite) {
+    try {
+      const redirectTo = `${SITE_URL}/auth/recovery?lang=lt`
+      const { data: linkData } = await supabase.auth.admin.generateLink({
+        type: 'recovery',
+        email,
+        options: { redirectTo },
+      })
+      const resetUrl = linkData?.properties?.action_link
+      if (resetUrl) {
+        const mail = buildPasswordResetEmail({
+          firstName,
+          resetUrl,
+          lang: 'lt',
+          siteUrl: SITE_URL,
+        })
+        await sendEmail({
+          to: email,
+          subject: mail.subject,
+          html: mail.html,
+          text: mail.text,
+        })
+      }
+    } catch (err) {
+      console.error(
+        '[admin/verifikacija] createClient invite email failed (non-blocking):',
+        err
+      )
+    }
+  }
+
+  revalidatePath('/admin/verifikacija')
+  revalidatePath('/', 'layout')
+  redirect('/admin/verifikacija?created=1')
+}
 
 /**
  * Saugiai konvertuoja `user_profiles.lang` reikšmę į palaikomą locale.

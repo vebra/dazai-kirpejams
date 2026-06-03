@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { requireAdmin } from '@/lib/admin/auth'
 import { getUserProfiles } from '@/lib/admin/queries'
 import { VerificationTable } from './VerificationTable'
@@ -26,6 +27,8 @@ export default async function AdminVerificationPage({
             ? 'Nepavyko sugeneruoti nuorodos į dokumentą.'
             : null
 
+  const createdFlag = sp.created === '1'
+
   const profiles = await getUserProfiles()
 
   const statusCounts = {
@@ -36,15 +39,29 @@ export default async function AdminVerificationPage({
 
   return (
     <div className="space-y-6 max-w-6xl">
-      <div>
-        <h2 className="text-2xl font-bold text-brand-gray-900">
-          Vartotojų verifikacija
-        </h2>
-        <p className="mt-1 text-sm text-brand-gray-500">
-          Peržiūrėkite registracijų dokumentus ir patvirtinkite profesionalus,
-          kad jie galėtų matyti kainas ir pirkti.
-        </p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h2 className="text-2xl font-bold text-brand-gray-900">
+            Vartotojų verifikacija
+          </h2>
+          <p className="mt-1 text-sm text-brand-gray-500">
+            Peržiūrėkite registracijų dokumentus ir patvirtinkite profesionalus,
+            kad jie galėtų matyti kainas ir pirkti.
+          </p>
+        </div>
+        <Link
+          href="/admin/verifikacija/naujas"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand-magenta text-white text-sm font-semibold rounded-lg hover:bg-brand-magenta/90 transition-colors whitespace-nowrap"
+        >
+          + Pridėti klientą
+        </Link>
       </div>
+
+      {createdFlag && (
+        <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">
+          Klientas sukurtas ir patvirtintas. Jis matys kainas ir gaus kampanijas.
+        </div>
+      )}
 
       {errorMessage && (
         <div className="px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
