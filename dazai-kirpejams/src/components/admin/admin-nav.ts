@@ -15,6 +15,7 @@ export type AdminNavItem = {
 export const ADMIN_NAV: AdminNavItem[] = [
   { href: '/admin', label: 'Apžvalga', icon: '📊' },
   { href: '/admin/uzsakymai', label: 'Užsakymai', icon: '📦' },
+  { href: '/admin/patvirtinimai', label: 'Patvirtinimai', icon: '🕓' },
   { href: '/admin/sandelis', label: 'Sandėlis', icon: '📋' },
   { href: '/admin/klientai', label: 'Klientai', icon: '👥' },
   { href: '/admin/kainos', label: 'Kainos ir nuolaidos', icon: '💰' },
