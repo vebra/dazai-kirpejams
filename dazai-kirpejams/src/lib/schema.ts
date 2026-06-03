@@ -30,9 +30,9 @@ export function organizationSchema(): Record<string, unknown> {
     url: SITE_URL,
     logo: {
       '@type': 'ImageObject',
-      url: `${SITE_URL}/logo.png`,
-      width: 512,
-      height: 512,
+      url: `${SITE_URL}/logo-colorshock.png`,
+      width: 600,
+      height: 554,
     },
     description:
       'Profesionalūs plaukų dažai kirpėjams ir koloristams. Didesnė 180 ml talpa — daugiau vertės darbui salone.',
@@ -88,7 +88,7 @@ export function localBusinessSchema(): Record<string, unknown> {
       closes: '18:00',
     },
     priceRange: '€€',
-    image: `${SITE_URL}/logo.png`,
+    image: `${SITE_URL}/logo-colorshock.png`,
     sameAs: [SOCIAL.facebook, SOCIAL.instagram],
   }
 }

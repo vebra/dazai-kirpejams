@@ -9,6 +9,10 @@ import {
 import { AUTHORS } from '@/lib/data/authors'
 import { getVisibleUpcomingEvents } from '@/lib/events/queries'
 
+// Sitemap'as periodiškai pergeneruojamas (ISR), kad nauji publikuoti blogo
+// straipsniai ir produktai automatiškai patektų be atskiro deploy.
+export const revalidate = 3600
+
 /**
  * Statinių puslapių sąrašas — pathai BE lokalės prefikso.
  * priority: santykinė svarba (0–1), changeFrequency: numatomas pakeitimų dažnis.
