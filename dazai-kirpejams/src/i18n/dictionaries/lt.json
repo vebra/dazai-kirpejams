@@ -459,7 +459,7 @@
     "storyBadge": "Mūsų istorija",
     "storyTitle": "Kaip viskas prasidėjo",
     "storyP1": "Viskas prasidėjo nuo paprasto pastebėjimo: Lietuvos kirpėjai moka per daug už profesionalius plaukų dažus. Daugelis tiekėjų siūlo 60–100 ml pakuotes už kainas, kurios ne visada atitinka darbo realybę. Kirpėjai kasdien naudoja dažus — tai jų pagrindinis darbo įrankis, o ne prabangos prekė. Mes nusprendėme, kad galima kitaip.",
-    "storyP2": "Užmezgėme tiesioginius ryšius su Italijos gamintojais ir į Lietuvos rinką atvežėme Color SHOCK — profesionalių plaukų dažų liniją 180 ml pakuotėse. Tai dvigubai ar trigubai daugiau nei standartinė pakuotė rinkoje. Formulė su Argan ir Jojoba aliejais bei rožių ekstraktu užtikrina kokybišką rezultatą, o didesnė talpa reiškia mažesnę savikainą kiekvienam dažymui. Greta Color SHOCK pasiūlėme ir RosaNera Cosmetic — profesionalią plaukų priežiūros liniją, kuri puikiai papildo dažymo procesą.",
+    "storyP2": "Užmezgėme tiesioginius ryšius su Italijos gamintojais ir į Lietuvos rinką atvežėme Color SHOCK — profesionalių plaukų dažų liniją 180 ml pakuotėse. Tai dvigubai ar trigubai daugiau nei standartinė pakuotė rinkoje. Formulė su Argan ir Jojoba aliejais bei erškėtrožių ekstraktu užtikrina kokybišką rezultatą, o didesnė talpa reiškia mažesnę savikainą kiekvienam dažymui. Greta Color SHOCK pasiūlėme ir RosaNera Cosmetic — profesionalią plaukų priežiūros liniją, kuri puikiai papildo dažymo procesą.",
     "storyP3": "Šiandien dirbame su kirpėjais, koloristais ir grožio salonais visoje Lietuvoje. Nesiekiame būti dar viena „grožio“ kompanija su tuščiais pažadais. Mūsų požiūris pragmatiškas: geras darbo įrankis turi būti patikimas, ekonomiškas ir lengvai prieinamas. Būtent tai mes ir siūlome.",
     "missionBadge": "Misija",
     "missionTitle": "Ką mes darome ir kodėl",
@@ -478,7 +478,7 @@
       "50+ profesionalių atspalvių",
       "180 ml ekonominė pakuotė",
       "Argan & Jojoba aliejai",
-      "Rožių ekstraktas",
+      "Erškėtrožių ekstraktas",
       "Itališka kokybė",
       "Maišymo santykis 1+2"
     ],
@@ -760,7 +760,7 @@
             "intro": "Mūsų Color SHOCK dažai išsiskiria keliais esminiais aspektais:",
             "list": [
               "180 ml pakuotė — dvigubai didesnė nei standartinė rinkoje (60–100 ml), todėl kaina už mililitrą yra žymiai mažesnė.",
-              "Premium ingredientai — formulėje naudojamas Argano aliejus, Jojobos aliejus ir Rožių ekstraktas, kurie maitina ir saugo plaukus dažymo metu.",
+              "Premium ingredientai — formulėje naudojamas Argano aliejus, Jojobos aliejus ir Erškėtrožių ekstraktas, kurie maitina ir saugo plaukus dažymo metu.",
               "Itališka kokybė — produktai gaminami Italijoje, laikantis aukščiausių kokybės standartų.",
               "Profesionali kaina — didesnė pakuotė leidžia pasiūlyti konkurencingą kainą, neprarandant kokybės."
             ]
@@ -1085,8 +1085,8 @@
     "feat180mlDesc": "dvigubai daugiau nei standartinė pakuotė",
     "featArgan": "Argan & Jojoba aliejus",
     "featArganDesc": "maitina ir apsaugo plaukus",
-    "featRose": "Rožių ekstraktas",
-    "featRoseDesc": "suteikia blizgesio",
+    "featRose": "Erškėtrožių ekstraktas",
+    "featRoseDesc": "turi antioksidacinių savybių",
     "featGray": "100% pilkų plaukų padengimas",
     "featGrayDesc": "patikimas rezultatas",
     "featColor": "Ilgai išliekanti spalva",
@@ -1100,7 +1100,7 @@
   },
   "categoryPage": {
     "dyeTitle": "Plaukų dažai — Color SHOCK",
-    "dyeDesc": "Profesionalūs kreminiai plaukų dažai su Argan & Jojoba aliejumi ir rožių ekstraktu.",
+    "dyeDesc": "Profesionalūs kreminiai plaukų dažai su Argan & Jojoba aliejumi ir erškėtrožių ekstraktu.",
     "dyeDescBold": "180 ml talpa",
     "dyeDescEnd": "— dvigubai daugiau nei standartinė pakuotė.",
     "colorsLabel": "spalvų",

@@ -459,7 +459,7 @@
     "storyBadge": "Our Story",
     "storyTitle": "How It All Started",
     "storyP1": "It all started with a simple observation: Lithuanian hairdressers pay too much for professional hair dyes. Many suppliers offer 60–100 ml packages at prices that don't always match the reality of daily work. Hairdressers use dyes every day — it's their primary work tool, not a luxury item. We decided there had to be a better way.",
-    "storyP2": "We established direct relationships with Italian manufacturers and brought Color SHOCK to the Lithuanian market — a professional hair dye line in 180 ml packages. That's two to three times more than the standard package on the market. The formula with Argan and Jojoba oils and rose extract ensures quality results, while the larger volume means a lower cost per application. Alongside Color SHOCK, we also introduced RosaNera Cosmetic — a professional hair care line that perfectly complements the colouring process.",
+    "storyP2": "We established direct relationships with Italian manufacturers and brought Color SHOCK to the Lithuanian market — a professional hair dye line in 180 ml packages. That's two to three times more than the standard package on the market. The formula with Argan and Jojoba oils and rosehip extract ensures quality results, while the larger volume means a lower cost per application. Alongside Color SHOCK, we also introduced RosaNera Cosmetic — a professional hair care line that perfectly complements the colouring process.",
     "storyP3": "Today we work with hairdressers, colourists and beauty salons across Lithuania. We don't aspire to be just another \"beauty\" company with empty promises. Our approach is pragmatic: a good work tool must be reliable, economical and easily accessible. That's exactly what we offer.",
     "missionBadge": "Mission",
     "missionTitle": "What We Do and Why",
@@ -478,7 +478,7 @@
       "50+ professional shades",
       "180 ml economical packaging",
       "Argan & Jojoba oils",
-      "Rose extract",
+      "Rosehip extract",
       "Italian quality",
       "Mixing ratio 1+2"
     ],
@@ -760,7 +760,7 @@
             "intro": "Our Color SHOCK dyes stand out in several key ways:",
             "list": [
               "180 ml package — twice the size of the standard market offering (60–100 ml), making the price per millilitre significantly lower.",
-              "Premium ingredients — the formula contains Argan oil, Jojoba oil and Rose extract, which nourish and protect hair during colouring.",
+              "Premium ingredients — the formula contains Argan oil, Jojoba oil and Rosehip extract, which nourish and protect hair during colouring.",
               "Italian quality — products are manufactured in Italy to the highest quality standards.",
               "Professional pricing — the larger package allows us to offer a competitive price without sacrificing quality."
             ]
@@ -1085,8 +1085,8 @@
     "feat180mlDesc": "twice the size of a standard package",
     "featArgan": "Argan & Jojoba oil",
     "featArganDesc": "nourishes and protects hair",
-    "featRose": "Rose extract",
-    "featRoseDesc": "adds shine",
+    "featRose": "Rosehip extract",
+    "featRoseDesc": "has antioxidant properties",
     "featGray": "100% grey hair coverage",
     "featGrayDesc": "reliable results",
     "featColor": "Long-lasting colour",
@@ -1100,7 +1100,7 @@
   },
   "categoryPage": {
     "dyeTitle": "Hair Dyes — Color SHOCK",
-    "dyeDesc": "Professional cream hair dyes with Argan & Jojoba oils and rose extract.",
+    "dyeDesc": "Professional cream hair dyes with Argan & Jojoba oils and rosehip extract.",
     "dyeDescBold": "180 ml volume",
     "dyeDescEnd": "— twice the size of a standard package.",
     "colorsLabel": "colours",
