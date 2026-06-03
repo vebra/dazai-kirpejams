@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { requireAdmin } from '@/lib/admin/auth'
 import { createCampaignAction } from '../actions'
+import { CampaignImagePicker } from '../CampaignImagePicker'
 
 export const metadata = { title: 'Nauja kampanija' }
 export const dynamic = 'force-dynamic'
@@ -95,6 +96,8 @@ Kviečiame susipažinti su mūsų katalogu...`}
             kartus). Nuorodos su https:// automatiškai taps spaudžiamais link'ais.
           </p>
         </div>
+
+        <CampaignImagePicker />
 
         <div className="flex items-center gap-3 pt-2">
           <button

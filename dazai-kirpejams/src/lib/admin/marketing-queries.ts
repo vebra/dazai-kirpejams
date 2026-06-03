@@ -14,6 +14,8 @@ export type CampaignRow = {
   sentAt: string | null
   sentCount: number
   failedCount: number
+  /** Pasirinktinė laiško nuotrauka (viešas URL). */
+  imageUrl?: string | null
   /** Skaičiuojamas: kiek patvirtintų vartotojų DB šiuo metu (nuoroda admin'ui). */
   approvedUsersCount?: number
 }
@@ -53,7 +55,7 @@ export async function getCampaignById(
   const { data, error } = await supabase
     .from('marketing_campaigns')
     .select(
-      'id, name, subject, body, status, created_at, updated_at, sent_at, sent_count, failed_count'
+      'id, name, subject, body, image_url, status, created_at, updated_at, sent_at, sent_count, failed_count'
     )
     .eq('id', id)
     .maybeSingle()
@@ -64,6 +66,7 @@ export async function getCampaignById(
     name: data.name,
     subject: data.subject,
     body: data.body,
+    imageUrl: data.image_url ?? null,
     status: data.status as CampaignStatus,
     createdAt: data.created_at,
     updatedAt: data.updated_at,

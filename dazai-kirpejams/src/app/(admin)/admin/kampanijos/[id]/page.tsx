@@ -14,6 +14,7 @@ import {
   duplicateCampaignAction,
 } from '../actions'
 import { RecipientPicker } from '../RecipientPicker'
+import { CampaignImagePicker } from '../CampaignImagePicker'
 
 export const metadata = { title: 'Kampanija' }
 export const dynamic = 'force-dynamic'
@@ -196,6 +197,7 @@ export default async function CampaignDetailPage({
               className="w-full px-4 py-3 border border-[#eee] rounded-lg text-sm focus:outline-none focus:border-brand-magenta font-mono leading-relaxed"
             />
           </div>
+          <CampaignImagePicker initialUrl={campaign.imageUrl ?? ''} />
           <div className="flex items-center gap-3 pt-2">
             <button
               type="submit"
@@ -213,6 +215,19 @@ export default async function CampaignDetailPage({
             </div>
             <div className="text-sm text-brand-gray-900">{campaign.subject}</div>
           </div>
+          {campaign.imageUrl && (
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500 mb-1">
+                Nuotrauka
+              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={campaign.imageUrl}
+                alt="Laiško nuotrauka"
+                className="max-w-[400px] w-full rounded-lg border border-[#eee]"
+              />
+            </div>
+          )}
           <div>
             <div className="text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500 mb-1">
               Tekstas

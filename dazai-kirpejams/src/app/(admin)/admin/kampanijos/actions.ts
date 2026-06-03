@@ -18,11 +18,60 @@ function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms))
 }
 
+// Kampanijos nuotraukos keliamos į tą patį viešą 'blog' bucket'ą (campaigns/).
+const CAMPAIGN_BUCKET = 'blog'
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024 // 10 MB
+const ALLOWED_IMAGE_MIME = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/avif',
+])
+
+export type CampaignImageUploadState = {
+  error?: string
+  url?: string
+}
+
+export async function uploadCampaignImageAction(
+  _prev: CampaignImageUploadState,
+  formData: FormData
+): Promise<CampaignImageUploadState> {
+  await requireAdmin()
+
+  const file = formData.get('file') as File | null
+  if (!file || file.size === 0) return { error: 'Pasirinkite paveikslėlį.' }
+  if (file.size > MAX_IMAGE_SIZE) return { error: 'Failas per didelis (max 10 MB).' }
+  if (!ALLOWED_IMAGE_MIME.has(file.type)) {
+    return { error: 'Netinkamas formatas. Leidžiama: JPG, PNG, WebP, AVIF.' }
+  }
+
+  const supabase = createServerClient()
+  const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
+  const path = `campaigns/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+  const buffer = Buffer.from(await file.arrayBuffer())
+
+  const { error: uploadError } = await supabase.storage
+    .from(CAMPAIGN_BUCKET)
+    .upload(path, buffer, { contentType: file.type, upsert: true })
+
+  if (uploadError) {
+    console.error('[admin/kampanijos] upload:', uploadError.message)
+    return { error: `Nepavyko įkelti: ${uploadError.message}` }
+  }
+
+  const { data: publicData } = supabase.storage
+    .from(CAMPAIGN_BUCKET)
+    .getPublicUrl(path)
+  return { url: publicData.publicUrl }
+}
+
 export async function createCampaignAction(formData: FormData): Promise<void> {
   const admin = await requireAdmin()
   const name = ((formData.get('name') as string) ?? '').trim()
   const subject = ((formData.get('subject') as string) ?? '').trim()
   const body = ((formData.get('body') as string) ?? '').trim()
+  const imageUrl = ((formData.get('image_url') as string) ?? '').trim() || null
 
   if (!name || !subject || !body) {
     redirect('/admin/kampanijos/nauja?error=missing-fields')
@@ -35,6 +84,7 @@ export async function createCampaignAction(formData: FormData): Promise<void> {
       name,
       subject,
       body,
+      image_url: imageUrl,
       status: 'draft',
       created_by: admin.id,
     })
@@ -56,6 +106,7 @@ export async function updateCampaignAction(formData: FormData): Promise<void> {
   const name = ((formData.get('name') as string) ?? '').trim()
   const subject = ((formData.get('subject') as string) ?? '').trim()
   const body = ((formData.get('body') as string) ?? '').trim()
+  const imageUrl = ((formData.get('image_url') as string) ?? '').trim() || null
 
   if (!id || !name || !subject || !body) {
     redirect(`/admin/kampanijos/${id}?error=missing-fields`)
@@ -80,6 +131,7 @@ export async function updateCampaignAction(formData: FormData): Promise<void> {
       name,
       subject,
       body,
+      image_url: imageUrl,
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)
@@ -188,7 +240,7 @@ export async function sendTestCampaignAction(formData: FormData): Promise<void> 
   const supabase = createServerClient()
   const { data: campaign } = await supabase
     .from('marketing_campaigns')
-    .select('id, subject, body')
+    .select('id, subject, body, image_url')
     .eq('id', id)
     .maybeSingle()
 
@@ -203,6 +255,7 @@ export async function sendTestCampaignAction(formData: FormData): Promise<void> 
     const payload = buildCampaignEmail({
       subject: `[TESTAS] ${campaign.subject}`,
       body: campaign.body,
+      imageUrl: campaign.image_url,
       firstName: 'admin',
       siteUrl: SITE_URL,
     })
@@ -272,7 +325,7 @@ export async function sendCampaignAction(formData: FormData): Promise<void> {
   const supabase = createServerClient()
   const { data: campaign } = await supabase
     .from('marketing_campaigns')
-    .select('id, subject, body, status')
+    .select('id, subject, body, image_url, status')
     .eq('id', id)
     .maybeSingle()
 
@@ -354,6 +407,7 @@ export async function sendCampaignAction(formData: FormData): Promise<void> {
       const payload = buildCampaignEmail({
         subject: campaign.subject,
         body: campaign.body,
+        imageUrl: campaign.image_url,
         firstName: r.firstName,
         siteUrl: SITE_URL,
         // Tracking pixel — per recipient eilutės UUID. Atidarius laišką
