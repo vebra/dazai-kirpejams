@@ -1,7 +1,6 @@
-// Statinis/ISR — metadata ir turinys į <head>, hreflang veikia, edge cache.
-// Kaina NĖRA HTML'e (stripProductPricing); ją klientas pasiima per /api/prices
-// (PricesProvider/usePrice) tik patvirtintiems profesionalams.
-export const revalidate = 3600
+// Kainos tik patvirtintiems (server-side vartai naudoja cookies()) →
+// per-request render. DB užklausos cache'inamos unstable_cache (60s).
+export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
@@ -9,13 +8,12 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import {
-  getProductBySlugForBuild,
-  getRelatedProductsForBuild,
+  getProductBySlug,
+  getRelatedProducts,
   getCategoryBySlug,
   getProductsForBuild,
   getCategories,
 } from '@/lib/data/queries'
-import { stripProductPricing } from '@/lib/data/pricing-gate'
 import {
   getProductName,
   getProductDescription,
@@ -37,7 +35,7 @@ export async function generateMetadata({
   const { lang, category: categorySlug, slug } = await params
   if (!hasLocale(lang)) return {}
 
-  const product = await getProductBySlugForBuild(slug)
+  const product = await getProductBySlug(slug)
   const category = await getCategoryBySlug(categorySlug)
   if (!product || !category) return {}
 
@@ -101,26 +99,30 @@ export default async function ProductPage({
   const { lang, category: categorySlug, slug } = await params
   if (!hasLocale(lang)) notFound()
 
-  const rawProduct = await getProductBySlugForBuild(slug)
-  if (!rawProduct) notFound()
-  // Kaina pašalinama iš payload'o — į HTML nepatenka. Klientas ją pasiima
-  // per /api/prices (usePrice) tik patvirtintiems profesionalams.
-  const product = stripProductPricing(rawProduct)
+  const product = await getProductBySlug(slug)
+  if (!product) notFound()
 
   const category = await getCategoryBySlug(categorySlug)
   if (!category || category.id !== product.category_id) notFound()
 
   const dict = await getDictionary(lang)
   const t = dict.productPage
-  const relatedProducts = (await getRelatedProductsForBuild(product, 4)).map(
-    stripProductPricing
-  )
-  // Verifikacija ir kaina — kliento pusėje (VerificationProvider + usePrice)
+  const relatedProducts = await getRelatedProducts(product, 4)
+  // Verifikacija tikrinama kliento pusėje per VerificationProvider kontekstą
 
   const name = getProductName(product, lang)
   const description = getProductDescription(product, lang)
   const ingredients = localizedField(product, 'ingredients', lang)
   const usage = localizedField(product, 'usage', lang)
+
+  const price = product.price_cents / 100
+  const comparePrice = product.compare_price_cents
+    ? product.compare_price_cents / 100
+    : null
+  const savings = comparePrice ? comparePrice - price : null
+  const pricePerMl = product.volume_ml
+    ? (price / product.volume_ml).toFixed(3)
+    : null
 
   const productUrl = buildCanonicalUrl(lang, `/produktai/${categorySlug}/${slug}`)
   const productJsonLd = productSchema(product, category, lang, productUrl)
@@ -232,7 +234,10 @@ export default async function ProductPage({
               <ProductPriceBlock
                 lang={lang}
                 langPrefixStr={langPrefix(lang)}
-                slug={product.slug}
+                price={price}
+                comparePrice={comparePrice}
+                savings={savings}
+                pricePerMl={pricePerMl}
                 volumeMl={product.volume_ml}
                 cartItem={{
                   productId: product.id,
@@ -240,7 +245,7 @@ export default async function ProductPage({
                   categorySlug,
                   sku: product.sku,
                   name,
-                  priceCents: 0,
+                  priceCents: product.price_cents,
                   volumeMl: product.volume_ml,
                   imageUrl: images[0] ?? null,
                   colorHex: product.color_hex,

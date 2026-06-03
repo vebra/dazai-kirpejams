@@ -6,7 +6,6 @@ import { getProductName, type Product } from '@/lib/types'
 import { formatPrice, langPrefix } from '@/lib/utils'
 import type { Locale } from '@/i18n/config'
 import { useVerification } from '@/components/auth/VerificationProvider'
-import { usePrice } from '@/components/products/PricesProvider'
 import { AddToCartButton } from '@/components/commerce/AddToCartButton'
 
 type ProductCardProps = {
@@ -27,8 +26,6 @@ export function ProductCard({
   priority = false,
 }: ProductCardProps) {
   const { isVerified, isLoggedIn, status } = useVerification()
-  // Kaina kraunama klientiškai (statiniame HTML jos nėra — nenuteka svečiams).
-  const { priceCents } = usePrice(product.slug)
   const name = getProductName(product, lang)
   const href = `${langPrefix(lang)}/produktai/${categorySlug}/${product.slug}`
   const primaryImage = product.image_urls?.[0]
@@ -130,34 +127,25 @@ export function ProductCard({
         {isVerified ? (
           <div className="flex items-center justify-between">
             <div className="text-[1.15rem] font-bold text-brand-gray-900">
-              {priceCents !== null ? (
-                formatPrice(priceCents / 100, lang)
-              ) : (
-                <span
-                  className="inline-block w-16 h-5 rounded bg-brand-gray-50 animate-pulse align-middle"
-                  aria-hidden
-                />
-              )}
+              {formatPrice(product.price_cents / 100, lang)}
             </div>
-            {priceCents !== null && (
-              <AddToCartButton
-                variant="icon"
-                label={p.addToCart}
-                labelAdded={p.added}
-                item={{
-                  productId: product.id,
-                  slug: product.slug,
-                  categorySlug,
-                  sku: product.sku,
-                  name,
-                  priceCents,
-                  volumeMl: product.volume_ml,
-                  imageUrl: primaryImage ?? null,
-                  colorHex: product.color_hex,
-                  colorNumber: product.color_number,
-                }}
-              />
-            )}
+            <AddToCartButton
+              variant="icon"
+              label={p.addToCart}
+              labelAdded={p.added}
+              item={{
+                productId: product.id,
+                slug: product.slug,
+                categorySlug,
+                sku: product.sku,
+                name,
+                priceCents: product.price_cents,
+                volumeMl: product.volume_ml,
+                imageUrl: primaryImage ?? null,
+                colorHex: product.color_hex,
+                colorNumber: product.color_number,
+              }}
+            />
           </div>
         ) : (
           <Link

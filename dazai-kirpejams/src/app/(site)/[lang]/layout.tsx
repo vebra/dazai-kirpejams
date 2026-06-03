@@ -10,7 +10,6 @@ import { Footer } from '@/components/layout/Footer'
 import { WhatsAppButton } from '@/components/layout/WhatsAppButton'
 import { Suspense } from 'react'
 import { VerificationProvider } from '@/components/auth/VerificationProvider'
-import { PricesProvider } from '@/components/products/PricesProvider'
 import { CookieConsent } from '@/components/cookies/CookieConsent'
 import { RouteTracker } from '@/components/analytics/RouteTracker'
 import { JsonLd } from '@/components/seo/JsonLd'
@@ -134,14 +133,12 @@ export default async function RootLayout({
         <JsonLd data={shippingDetailsSchema()} />
         <JsonLd data={returnPolicySchema()} />
         <VerificationProvider>
-          <PricesProvider>
-            <Header lang={lang} dict={dict} />
-            <main className="flex-1 pt-[72px] lg:pt-[100px]">{children}</main>
-            <Footer lang={lang} dict={dict} />
-            <Suspense fallback={null}>
-              <RouteTracker />
-            </Suspense>
-          </PricesProvider>
+          <Header lang={lang} dict={dict} />
+          <main className="flex-1 pt-[72px] lg:pt-[100px]">{children}</main>
+          <Footer lang={lang} dict={dict} />
+          <Suspense fallback={null}>
+            <RouteTracker />
+          </Suspense>
         </VerificationProvider>
         <WhatsAppButton
           lang={lang}

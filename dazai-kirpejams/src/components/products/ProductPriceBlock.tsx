@@ -3,7 +3,6 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { useVerification } from '@/components/auth/VerificationProvider'
-import { usePrice } from '@/components/products/PricesProvider'
 import { AddToCartButton } from '@/components/commerce/AddToCartButton'
 import { formatPrice } from '@/lib/utils'
 import {
@@ -16,8 +15,10 @@ import type { Locale } from '@/i18n/config'
 type Props = {
   lang: Locale
   langPrefixStr: string
-  /** Produkto slug — kaina kraunama klientiškai per usePrice (ne props). */
-  slug: string
+  price: number
+  comparePrice: number | null
+  savings: number | null
+  pricePerMl: string | null
   volumeMl: number | null
   // AddToCartButton item data
   cartItem: {
@@ -58,19 +59,15 @@ type Props = {
 export function ProductPriceBlock({
   lang,
   langPrefixStr,
-  slug,
+  price,
+  comparePrice,
+  savings,
+  pricePerMl,
   volumeMl,
   cartItem,
   labels,
 }: Props) {
   const { isVerified, isLoggedIn, status } = useVerification()
-  // Kaina pasiimama klientiškai (statiniame HTML jos nėra — nenuteka svečiams).
-  const { priceCents, comparePriceCents } = usePrice(slug)
-  const hasPrice = priceCents !== null
-  const price = hasPrice ? priceCents! / 100 : 0
-  const comparePrice = comparePriceCents != null ? comparePriceCents / 100 : null
-  const savings = comparePrice ? comparePrice - price : null
-  const pricePerMl = hasPrice && volumeMl ? (price / volumeMl).toFixed(3) : null
 
   // ViewContent — visada, nepriklausomai nuo user type. Meta optimizuoja
   // reklamą ant peržiūrų, todėl svarbu siųsti ir guest'ams (be price) ir
@@ -80,14 +77,14 @@ export function ProductPriceBlock({
       productId: cartItem.productId,
       name: cartItem.name,
       category: cartItem.categorySlug,
-      price: isVerified && hasPrice ? price : undefined,
+      price: isVerified ? price : undefined,
       currency: 'EUR',
       locale: lang,
       userType: isVerified ? 'professional' : 'guest',
       packSize: volumeMl === 180 ? '180ml' : 'other',
     })
 
-    if (isVerified && hasPrice) {
+    if (isVerified) {
       trackPriceView({
         productId: cartItem.productId,
         name: cartItem.name,
@@ -103,7 +100,6 @@ export function ProductPriceBlock({
     cartItem.name,
     cartItem.categorySlug,
     isVerified,
-    hasPrice,
     lang,
     price,
     volumeMl,
@@ -144,28 +140,21 @@ export function ProductPriceBlock({
 
       {/* Price */}
       {isVerified ? (
-        hasPrice ? (
-          <div className="flex items-baseline flex-wrap gap-3 mb-5">
-            {comparePrice && (
-              <span className="text-[1.1rem] text-brand-gray-500 line-through">
-                {formatPrice(comparePrice, lang)}
-              </span>
-            )}
-            <span className="text-[2.25rem] font-extrabold text-brand-magenta leading-none">
-              {formatPrice(price, lang)}
+        <div className="flex items-baseline flex-wrap gap-3 mb-5">
+          {comparePrice && (
+            <span className="text-[1.1rem] text-brand-gray-500 line-through">
+              {formatPrice(comparePrice, lang)}
             </span>
-            {savings && savings > 0 && (
-              <span className="px-3 py-1 bg-brand-magenta/10 text-brand-magenta text-[0.78rem] font-bold rounded-full">
-                {labels.youSave} {formatPrice(savings, lang)}
-              </span>
-            )}
-          </div>
-        ) : (
-          <div
-            className="mb-5 h-11 w-52 rounded-lg bg-brand-gray-50 animate-pulse"
-            aria-hidden
-          />
-        )
+          )}
+          <span className="text-[2.25rem] font-extrabold text-brand-magenta leading-none">
+            {formatPrice(price, lang)}
+          </span>
+          {savings && savings > 0 && (
+            <span className="px-3 py-1 bg-brand-magenta/10 text-brand-magenta text-[0.78rem] font-bold rounded-full">
+              {labels.youSave} {formatPrice(savings, lang)}
+            </span>
+          )}
+        </div>
       ) : isLoggedIn && status === 'pending' ? (
         <div className="mb-5 px-5 py-5 bg-amber-50 rounded-xl border border-amber-200">
           <p className="text-[0.95rem] text-amber-900 font-semibold mb-1.5">
@@ -240,14 +229,14 @@ export function ProductPriceBlock({
       )}
 
       {/* CTA */}
-      {isVerified && hasPrice ? (
+      {isVerified ? (
         <div className="flex flex-col sm:flex-row gap-3 mb-8">
           <AddToCartButton
             variant="large"
             className="flex-1 !px-10 !py-[18px] !rounded-lg !text-[1.05rem]"
             label={labels.addToCart}
             labelAdded={labels.addedToCart}
-            item={{ ...cartItem, priceCents: priceCents! }}
+            item={cartItem}
           />
           <Link
             href={`${langPrefixStr}/salonams`}
