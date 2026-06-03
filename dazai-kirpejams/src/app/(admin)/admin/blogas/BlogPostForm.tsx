@@ -1,15 +1,10 @@
 'use client'
 
-import { useActionState, useState, useRef } from 'react'
-import Image from 'next/image'
+import { useActionState, useState } from 'react'
 import Link from 'next/link'
-import {
-  saveBlogPostAction,
-  uploadBlogCoverAction,
-  type BlogFormState,
-  type CoverUploadState,
-} from './actions'
+import { saveBlogPostAction, type BlogFormState } from './actions'
 import type { BlogPostRow } from '@/lib/admin/queries'
+import { CoverUploader } from './CoverUploader'
 
 const CATEGORIES = [
   { value: '', label: '— Pasirinkite —' },
@@ -19,38 +14,17 @@ const CATEGORIES = [
 ]
 
 const initialState: BlogFormState = {}
-const initialUpload: CoverUploadState = {}
 
 export function BlogPostForm({ post }: { post?: BlogPostRow }) {
   const [state, formAction, isPending] = useActionState(
     saveBlogPostAction,
     initialState
   )
-  const [uploadState, uploadAction, isUploading] = useActionState(
-    uploadBlogCoverAction,
-    initialUpload
-  )
   const [tab, setTab] = useState<'lt' | 'en' | 'ru'>('lt')
-  const [coverUrl, setCoverUrl] = useState(post?.coverImageUrl ?? '')
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  // When upload succeeds, update coverUrl
-  const handleUpload = async (formData: FormData) => {
-    const result = await uploadAction(formData)
-    // uploadAction updates uploadState via useActionState;
-    // we read the URL from the returned state in the effect below
-  }
-
-  // Sync upload result to coverUrl
-  if (uploadState.url && uploadState.url !== coverUrl) {
-    setCoverUrl(uploadState.url)
-  }
 
   return (
     <form action={formAction} className="space-y-6">
       {post && <input type="hidden" name="id" value={post.id} />}
-      {/* Hidden input carries the cover URL to the save action */}
-      <input type="hidden" name="cover_image_url" value={coverUrl} />
 
       {/* Success / Error */}
       {state.success && (
@@ -109,76 +83,26 @@ export function BlogPostForm({ post }: { post?: BlogPostRow }) {
         </div>
       </div>
 
-      {/* Cover image upload */}
-      <div>
-        <label className="block text-[12px] font-semibold text-brand-gray-500 uppercase tracking-[0.5px] mb-1.5">
-          Viršelio nuotrauka
-        </label>
-
-        {/* Preview */}
-        {coverUrl ? (
-          <div className="relative w-full max-w-[400px] aspect-[16/10] rounded-lg overflow-hidden border border-[#E0E0E0] mb-3 group">
-            <Image
-              src={coverUrl}
-              alt="Viršelio nuotrauka"
-              fill
-              sizes="400px"
-              className="object-cover"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                setCoverUrl('')
-                if (fileInputRef.current) fileInputRef.current.value = ''
-              }}
-              className="absolute top-2 right-2 px-2.5 py-1 bg-white/90 text-red-700 text-[11px] font-semibold rounded hover:bg-red-600 hover:text-white transition-colors opacity-0 group-hover:opacity-100"
-            >
-              Pašalinti
-            </button>
-          </div>
-        ) : (
-          <div className="w-full max-w-[400px] aspect-[16/10] rounded-lg border-2 border-dashed border-[#ddd] bg-[#F5F5F7] flex items-center justify-center mb-3">
-            <span className="text-sm text-brand-gray-500">Nėra nuotraukos</span>
-          </div>
-        )}
-
-        {/* Upload error */}
-        {uploadState.error && (
-          <div className="px-4 py-2 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm mb-3 max-w-[400px]">
-            {uploadState.error}
-          </div>
-        )}
-
-        {/* File input + upload button */}
-        <div className="flex items-center gap-3 max-w-[400px]">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/avif"
-            onChange={async (e) => {
-              const file = e.target.files?.[0]
-              if (!file) return
-              const fd = new FormData()
-              fd.append('file', file)
-              uploadAction(fd)
-            }}
-            className="block w-full text-sm text-brand-gray-900
-              file:mr-3 file:py-2 file:px-4
-              file:rounded-lg file:border-0
-              file:text-sm file:font-semibold
-              file:bg-[#F5F5F7] file:text-brand-gray-900
-              hover:file:bg-[#eee]
-              file:cursor-pointer cursor-pointer"
-          />
-          {isUploading && (
-            <span className="text-xs text-brand-magenta font-medium whitespace-nowrap">
-              Keliama…
-            </span>
-          )}
-        </div>
-        <p className="text-[11px] text-brand-gray-500 mt-1.5">
-          JPG, PNG, WebP arba AVIF · max 10 MB · ta pati nuotrauka matysis visomis kalbomis (LT, EN, RU)
-        </p>
+      {/* Viršeliai pagal kalbą */}
+      <div className="space-y-5">
+        <CoverUploader
+          name="cover_image_url"
+          label="Viršelis — LT (numatytasis)"
+          hint="JPG, PNG, WebP arba AVIF · max 10 MB · rekomenduojama 1200×630. Jei EN/RU neturi savo viršelio — bus rodomas šis."
+          initialUrl={post?.coverImageUrl ?? ''}
+        />
+        <CoverUploader
+          name="cover_image_url_en"
+          label="Viršelis — EN (nebūtina)"
+          hint="Jei tuščia — EN puslapyje rodomas LT viršelis."
+          initialUrl={post?.coverImageUrlEn ?? ''}
+        />
+        <CoverUploader
+          name="cover_image_url_ru"
+          label="Viršelis — RU (nebūtina)"
+          hint="Jei tuščia — RU puslapyje rodomas LT viršelis."
+          initialUrl={post?.coverImageUrlRu ?? ''}
+        />
       </div>
 
       {/* Language tabs */}

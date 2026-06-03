@@ -95,6 +95,10 @@ export async function saveBlogPostAction(
   const contentRu = (formData.get('content_ru') as string)?.trim() || null
   const coverImageUrl =
     (formData.get('cover_image_url') as string)?.trim() || null
+  const coverImageUrlEn =
+    (formData.get('cover_image_url_en') as string)?.trim() || null
+  const coverImageUrlRu =
+    (formData.get('cover_image_url_ru') as string)?.trim() || null
   const author = (formData.get('author') as string)?.trim() || null
   const category = (formData.get('category') as string)?.trim() || null
   const isPublished = formData.get('is_published') === 'true'
@@ -121,6 +125,8 @@ export async function saveBlogPostAction(
     content_en: contentEn,
     content_ru: contentRu,
     cover_image_url: coverImageUrl,
+    cover_image_url_en: coverImageUrlEn,
+    cover_image_url_ru: coverImageUrlRu,
     author,
     category,
     is_published: isPublished,

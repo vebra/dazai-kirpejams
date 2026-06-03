@@ -1731,6 +1731,8 @@ export type BlogPostRow = {
   contentEn: string | null
   contentRu: string | null
   coverImageUrl: string | null
+  coverImageUrlEn: string | null
+  coverImageUrlRu: string | null
   author: string | null
   category: string | null
   isPublished: boolean
@@ -1764,6 +1766,8 @@ export async function getBlogPosts(): Promise<BlogPostRow[]> {
     contentEn: r.content_en,
     contentRu: r.content_ru,
     coverImageUrl: r.cover_image_url,
+    coverImageUrlEn: r.cover_image_url_en ?? null,
+    coverImageUrlRu: r.cover_image_url_ru ?? null,
     author: r.author,
     category: r.category,
     isPublished: r.is_published,
@@ -1798,6 +1802,8 @@ export async function getBlogPostById(
     contentEn: data.content_en,
     contentRu: data.content_ru,
     coverImageUrl: data.cover_image_url,
+    coverImageUrlEn: data.cover_image_url_en ?? null,
+    coverImageUrlRu: data.cover_image_url_ru ?? null,
     author: data.author,
     category: data.category,
     isPublished: data.is_published,

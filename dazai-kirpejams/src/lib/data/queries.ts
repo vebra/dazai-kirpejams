@@ -481,6 +481,24 @@ function pickLang<T>(lt: T, en: T, ru: T, lang: Locale): T {
   return lang === 'en' ? en : lang === 'ru' ? ru : lt
 }
 
+/**
+ * Viršelis pagal kalbą su atsarga į LT (cover_image_url). Jei EN/RU stulpelio
+ * nėra arba jis tuščias — naudojamas LT viršelis.
+ */
+function pickCover(
+  r: {
+    cover_image_url: string | null
+    cover_image_url_en?: string | null
+    cover_image_url_ru?: string | null
+  },
+  lang: Locale
+): string | null {
+  const lt = r.cover_image_url ?? null
+  if (lang === 'en') return r.cover_image_url_en || lt
+  if (lang === 'ru') return r.cover_image_url_ru || lt
+  return lt
+}
+
 async function _getBlogPosts(lang: Locale = 'lt'): Promise<BlogPost[]> {
   if (!isSupabaseConfigured) return []
   const supabase = getSupabase()
@@ -502,7 +520,7 @@ async function _getBlogPosts(lang: Locale = 'lt'): Promise<BlogPost[]> {
     title: pickLang(r.title_lt, r.title_en, r.title_ru, lang),
     excerpt: pickLang(r.excerpt_lt, r.excerpt_en, r.excerpt_ru, lang),
     content: pickLang(r.content_lt, r.content_en, r.content_ru, lang),
-    coverImageUrl: r.cover_image_url,
+    coverImageUrl: pickCover(r, lang),
     author: r.author,
     category: r.category,
     publishedAt: r.published_at,
@@ -540,7 +558,7 @@ async function _getBlogPostBySlug(
     title: pickLang(data.title_lt, data.title_en, data.title_ru, lang),
     excerpt: pickLang(data.excerpt_lt, data.excerpt_en, data.excerpt_ru, lang),
     content: pickLang(data.content_lt, data.content_en, data.content_ru, lang),
-    coverImageUrl: data.cover_image_url,
+    coverImageUrl: pickCover(data, lang),
     author: data.author,
     category: data.category,
     publishedAt: data.published_at,
