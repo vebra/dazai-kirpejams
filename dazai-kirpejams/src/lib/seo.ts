@@ -65,13 +65,30 @@ export function buildPageMetadata({
   path,
   title,
   description,
+  imageUrl,
 }: {
   lang: Locale
   path: string
   title: string
   description?: string
+  /**
+   * Pasirinktinė OG nuotrauka (absoliutus URL) — pvz. blogo straipsnio
+   * viršelis. Jei nenurodyta, naudojamas numatytasis statinis /og-image.jpg.
+   * Su custom URL Facebook/Twitter rodo konkrečios nuotraukos peržiūrą.
+   */
+  imageUrl?: string | null
 }): Metadata {
   const canonical = buildCanonicalUrl(lang, path)
+  const ogImages = imageUrl
+    ? [{ url: imageUrl }]
+    : [
+        {
+          url: OG_IMAGE_URL,
+          width: OG_IMAGE_WIDTH,
+          height: OG_IMAGE_HEIGHT,
+          type: 'image/jpeg',
+        },
+      ]
   return {
     title,
     description,
@@ -84,20 +101,13 @@ export function buildPageMetadata({
       description,
       url: canonical,
       type: 'website',
-      images: [
-        {
-          url: OG_IMAGE_URL,
-          width: OG_IMAGE_WIDTH,
-          height: OG_IMAGE_HEIGHT,
-          type: 'image/jpeg',
-        },
-      ],
+      images: ogImages,
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: [OG_IMAGE_URL],
+      images: [imageUrl ?? OG_IMAGE_URL],
     },
   }
 }

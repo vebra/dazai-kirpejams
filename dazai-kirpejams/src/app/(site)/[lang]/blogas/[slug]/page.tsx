@@ -91,6 +91,9 @@ export async function generateMetadata({
     // Brand suffix prideda parent layout'o `title.template`.
     title: post.title,
     description: post.excerpt ?? '',
+    // Straipsnio viršelis kaip OG nuotrauka — kad dalinantis FB/soc. tinkluose
+    // rodytųsi konkreti straipsnio foto, ne bendras /og-image.jpg.
+    imageUrl: post.coverImageUrl ?? undefined,
   })
 }
 
