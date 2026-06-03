@@ -3,7 +3,7 @@ import { unstable_cache } from 'next/cache'
 import { cache } from 'react'
 import { isUserVerified } from '@/lib/auth/verification'
 import { mockCategories, mockProducts } from './mock-products'
-import { stripProductPricing } from './pricing-gate'
+import { stripProductPricing, stripInternalFields } from './pricing-gate'
 import type { Category, Product } from '@/lib/types'
 
 /**
@@ -58,7 +58,8 @@ const arePricesVisible = cache(async (): Promise<boolean> => {
 })
 
 async function gateProducts(products: Product[]): Promise<Product[]> {
-  if (await arePricesVisible()) return products
+  // Savikaina (cost_price_cents) šalinama VISADA — net patvirtintiems.
+  if (await arePricesVisible()) return products.map(stripInternalFields)
   return products.map(stripProductPricing)
 }
 
@@ -66,7 +67,7 @@ async function gateProduct(
   product: Product | null
 ): Promise<Product | null> {
   if (!product) return null
-  if (await arePricesVisible()) return product
+  if (await arePricesVisible()) return stripInternalFields(product)
   return stripProductPricing(product)
 }
 
@@ -272,6 +273,43 @@ export const getProductBySlug = async (
   return gateProduct(product)
 }
 
+/**
+ * Kainos pagal slug'ų sąrašą — RAW (BE kainų vartų). Naudoti TIK iš
+ * autentifikuoto `/api/prices` maršruto, kuris pats patikrina, ar vartotojas
+ * patvirtintas, PRIEŠ kviesdamas šią funkciją. Niekada nekviesti tiesiogiai
+ * iš render'io — kaina pateks į payload'ą neapsaugota.
+ */
+export async function getProductPricesBySlugs(
+  slugs: string[]
+): Promise<Record<string, { priceCents: number; comparePriceCents: number | null }>> {
+  const out: Record<string, { priceCents: number; comparePriceCents: number | null }> = {}
+  if (slugs.length === 0) return out
+  const supabase = getSupabase()
+  if (!supabase) {
+    for (const s of slugs) {
+      const p = mockProducts.find((m) => m.slug === s && m.is_active)
+      if (p) out[s] = { priceCents: p.price_cents, comparePriceCents: p.compare_price_cents ?? null }
+    }
+    return out
+  }
+  const { data, error } = await supabase
+    .from('products')
+    .select('slug, price_cents, compare_price_cents')
+    .in('slug', slugs)
+    .eq('is_active', true)
+  if (error) {
+    console.error('[queries.getProductPricesBySlugs]', error)
+    return out
+  }
+  for (const r of data ?? []) {
+    out[r.slug] = {
+      priceCents: r.price_cents,
+      comparePriceCents: r.compare_price_cents ?? null,
+    }
+  }
+  return out
+}
+
 async function _getRelatedProducts(
   productId: string,
   categoryId: string,
@@ -316,6 +354,17 @@ export const getRelatedProducts = async (
   )()
   return gateProducts(related)
 }
+
+/** Cached, BE kainų vartų — žr. `getProductsForBuild`. Statiniam renderiui. */
+export const getRelatedProductsForBuild = (
+  product: Product,
+  limit = 4
+): Promise<Product[]> =>
+  unstable_cache(
+    () => _getRelatedProducts(product.id, product.category_id, limit),
+    ['related', product.id, String(limit)],
+    { revalidate: 60, tags: ['products'] }
+  )()
 
 // ============================================
 // Mock fallback filtravimo helper'is
