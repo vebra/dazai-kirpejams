@@ -8,7 +8,7 @@ import { Newsletter } from '@/components/home/Newsletter'
 import { buildPageMetadata, buildCanonicalUrl, SITE_URL } from '@/lib/seo'
 import { getBlogPostBySlug, getBlogPosts } from '@/lib/data/queries'
 import { JsonLd } from '@/components/seo/JsonLd'
-import { blogPostingSchema, breadcrumbSchema } from '@/lib/schema'
+import { blogPostingSchema, breadcrumbSchema, faqPageSchema } from '@/lib/schema'
 import { ShareButtons } from '@/components/blog/ShareButtons'
 import { CATEGORY_STYLES, type ArticleCategory } from '@/lib/data/articles'
 import { getAuthorByName } from '@/lib/data/authors'
@@ -16,6 +16,54 @@ import { langPrefix } from '@/lib/utils'
 import { sanitizeHtml } from '@/lib/sanitize'
 
 export const revalidate = 60
+
+// DUK sekcijos antraštės visomis kalbomis — pagal jas randame FAQ bloką turinyje.
+const FAQ_HEADINGS = [
+  'Dažni klausimai',
+  'Frequently Asked Questions',
+  'Часто задаваемые вопросы',
+]
+
+function stripTags(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/**
+ * Ištraukia DUK (FAQ) klausimų–atsakymų poras iš straipsnio HTML: sekcijos
+ * po „Dažni klausimai" antrašte, kur h3 = klausimas, po jo p = atsakymas.
+ * Grąžina tuščią masyvą, jei straipsnis DUK sekcijos neturi — tada FAQ schema
+ * nerenderinama. Veikia bet kuriam straipsniui, ne tik 180 ml.
+ */
+function extractFaqItems(
+  html: string
+): { question: string; answer: string }[] {
+  const headingPattern = FAQ_HEADINGS.map((h) =>
+    h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  ).join('|')
+  const section = new RegExp(
+    `<h2>\\s*(?:${headingPattern})\\s*</h2>([\\s\\S]*?)(?:<h2>|$)`
+  ).exec(html)
+  if (!section) return []
+
+  const items: { question: string; answer: string }[] = []
+  const pairRe = /<h3>([\s\S]*?)<\/h3>\s*<p>([\s\S]*?)<\/p>/g
+  let m: RegExpExecArray | null
+  while ((m = pairRe.exec(section[1])) !== null) {
+    const question = stripTags(m[1])
+    const answer = stripTags(m[2])
+    if (question && answer) items.push({ question, answer })
+  }
+  return items
+}
 
 export async function generateStaticParams() {
   const posts = await getBlogPosts()
@@ -76,6 +124,7 @@ export default async function ArticlePage({
     .slice(0, 2)
 
   const postUrl = buildCanonicalUrl(lang, `/blogas/${slug}`)
+  const faqItems = post.content ? extractFaqItems(post.content) : []
   const authorEntry = getAuthorByName(post.author)
   const authorUrl = authorEntry
     ? buildCanonicalUrl(lang, `/autorius/${authorEntry.slug}`)
@@ -104,6 +153,7 @@ export default async function ArticlePage({
           { name: post.title, url: postUrl },
         ])}
       />
+      {faqItems.length > 0 && <JsonLd data={faqPageSchema(faqItems)} />}
 
       {/* Breadcrumb */}
       <section className="py-3 text-[0.85rem] text-brand-gray-500">

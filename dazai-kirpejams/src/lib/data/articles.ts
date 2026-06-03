@@ -157,15 +157,15 @@ export const articles: Article[] = [
         ],
         rows: [
           ['Talpa', '60 ml', '180 ml'],
-          ['Kaina', '~5,00 €', '7,90 €'],
-          ['Kaina per ml', '~0,083 €/ml', '0,044 €/ml'],
+          ['Kaina', '~11,00 €', '7,90 €'],
+          ['Kaina per ml', '~0,183 €/ml', '0,044 €/ml'],
           ['Pakuočių per mėnesį (80 dažymų)', '~80 vnt.', '~27 vnt.'],
           ['Atliekos per mėnesį', '80 tūbių', '27 tūbiai'],
         ],
       },
       {
         type: 'blockquote',
-        html: 'Kaina per ml — tai objektyviausias būdas palyginti dažų vertę. Color SHOCK 180 ml pakuotėje vienas mililitras kainuoja beveik dvigubai pigiau nei standartiniuose dažuose.',
+        html: 'Kaina per ml — tai objektyviausias būdas palyginti dažų vertę. Color SHOCK 180 ml pakuotėje vienas mililitras kainuoja beveik keturis kartus pigiau nei standartiniuose dažuose.',
       },
       { type: 'h2', text: 'Ekonominis skaičiavimas' },
       {
@@ -176,9 +176,9 @@ export const articles: Article[] = [
       {
         type: 'ul',
         items: [
-          'Per savaitę: 20 pakuočių × 5,00 € = <strong>100,00 €</strong>',
-          'Per mėnesį: 80 pakuočių × 5,00 € = <strong>400,00 €</strong>',
-          'Per metus: 960 pakuočių × 5,00 € = <strong>4 800,00 €</strong>',
+          'Per savaitę: 20 pakuočių × 11,00 € = <strong>220,00 €</strong>',
+          'Per mėnesį: 80 pakuočių × 11,00 € = <strong>880,00 €</strong>',
+          'Per metus: 960 pakuočių × 11,00 € = <strong>10 560,00 €</strong>',
         ],
       },
       { type: 'h3', text: 'Su Color SHOCK 180 ml:' },
@@ -192,7 +192,7 @@ export const articles: Article[] = [
       },
       {
         type: 'blockquote',
-        html: 'Metinis sutaupymas — daugiau nei <strong>2 200 €</strong>. Tai reikšminga suma, kurią galima investuoti į salono plėtrą, naują įrangą ar darbuotojų mokymus.',
+        html: 'Metinis sutaupymas — daugiau nei <strong>8 000 €</strong>. Tai reikšminga suma, kurią galima investuoti į salono plėtrą, naują įrangą ar darbuotojų mokymus.',
       },
       { type: 'h2', text: 'Praktinė nauda kasdien' },
       {
@@ -219,6 +219,27 @@ export const articles: Article[] = [
       {
         type: 'p',
         html: 'Pakuotės dydis — tai ne smulkmena. Tai sprendimas, kuris kasdien veikia Jūsų salono pelningumą, darbo patogumus ir išlaidų kontrolę. Color SHOCK 180 ml pakuotė sukurta būtent tam — suteikti profesionalui daugiau produkto, mažesne kaina per ml, su mažiau rūpesčių dėl logistikos ir atliekų.',
+      },
+      { type: 'h2', text: 'Dažni klausimai' },
+      { type: 'h3', text: 'Ar 180 ml dažai skiriasi formule nuo standartinių?' },
+      {
+        type: 'p',
+        html: 'Skiriasi tik pakuotės dydis. Color SHOCK formulė yra profesionali, skirta darbui salone — daugiau produkto pakuotėje neturi įtakos kokybei.',
+      },
+      { type: 'h3', text: 'Kiek dažymų išeina iš vienos 180 ml pakuotės?' },
+      {
+        type: 'p',
+        html: 'Priklauso nuo plaukų ilgio ir technikos. Vidutinio ilgio plaukams, naudojant apie 60 ml vienam dažymui, vienos pakuotės užtenka maždaug trims dažymams — tris kartus daugiau nei iš 60 ml tūbelės.',
+      },
+      { type: 'h3', text: 'Kiek realiai sutaupo salonas per metus?' },
+      {
+        type: 'p',
+        html: 'Salonas, atliekantis 20 dažymų per savaitę, per metus sutaupo daugiau nei 8 000 € vien dažams (lyginant su ~11 € kainuojančia 60 ml standartine pakuote). Tikslų skaičių pagal savo apkrovą apskaičiuokite <a href="/lt/skaiciuokle" style="color: var(--magenta); font-weight: 600;">kainų skaičiuoklėje</a>.',
+      },
+      { type: 'h3', text: 'Ar didelė pakuotė tinka mažam salonui ar pavieniam kirpėjui?' },
+      {
+        type: 'p',
+        html: 'Taip. Net ir dirbant mažesniu tempu, mažesnė kaina per ml ir rečiau keičiamos pakuotės darbo metu išlieka naudingos. Didžiausią naudą pajunta tie, kas tuos pačius atspalvius naudoja reguliariai.',
       },
     ],
   },
@@ -336,7 +357,7 @@ export const articles: Article[] = [
       { type: 'h2', text: '2. Didesnė pakuotė = mažesnė kaina per ml' },
       {
         type: 'p',
-        html: 'Kaip jau nagrinėjome <a href="/lt/blogas/180ml-vs-60ml" style="color: var(--magenta); font-weight: 600;">ankstesniame straipsnyje</a>, 180 ml pakuotėje kaina per ml yra beveik dvigubai mažesnė nei 60 ml standartinėse. Jei kol kas nesate perėję — apsiskaičiuokite metinį sutaupymą skaičiuoklėje.',
+        html: 'Kaip jau nagrinėjome <a href="/lt/blogas/180ml-vs-60ml" style="color: var(--magenta); font-weight: 600;">ankstesniame straipsnyje</a>, 180 ml pakuotėje kaina per ml yra kelis kartus mažesnė nei 60 ml standartinėse. Jei kol kas nesate perėję — apsiskaičiuokite metinį sutaupymą skaičiuoklėje.',
       },
       { type: 'h2', text: '3. Standartizuoti protokolai pagal plaukų ilgį' },
       {

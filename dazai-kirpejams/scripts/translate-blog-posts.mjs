@@ -169,7 +169,7 @@ const translations = {
 <h2>1. Precise Dye Weighing</h2>
 <p>Scales cost €15–30 and pay for themselves from the first week. Instead of squeezing "by eye" from the tube — precise weighing of 30, 45, 60 g. Result: no more "over-mixed" mixture that ends up in the bin.</p>
 <h2>2. Larger Package = Lower Price per ml</h2>
-<p>As we discussed in a <a href="/en/blogas/180ml-vs-60ml" style="color: var(--magenta); font-weight: 600;">previous article</a>, the price per ml in a 180 ml package is almost twice lower than in standard 60 ml packages. If you haven't switched yet — calculate your annual savings with the calculator.</p>
+<p>As we discussed in a <a href="/en/blogas/180ml-vs-60ml" style="color: var(--magenta); font-weight: 600;">previous article</a>, the price per ml in a 180 ml package is several times lower than in standard 60 ml packages. If you haven't switched yet — calculate your annual savings with the calculator.</p>
 <h2>3. Standardised Protocols by Hair Length</h2>
 <p>Create an internal document: <strong>short hair — 30 g, medium — 45 g, long — 60–80 g</strong>. When the entire team works with the same measurements, costs become predictable and economies of scale kick in when buying wholesale.</p>
 <h2>4. FIFO Stock Rotation</h2>
@@ -182,7 +182,7 @@ const translations = {
 <h2>1. Точное взвешивание краски</h2>
 <p>Весы стоят 15–30 €, а окупаются с первой недели. Вместо выдавливания «на глаз» из тюбика — точное взвешивание 30, 45, 60 г. Результат: больше не остаётся «перемешанной лишней» смеси, которая отправляется в мусор.</p>
 <h2>2. Большая упаковка = ниже цена за мл</h2>
-<p>Как мы рассматривали в <a href="/ru/blogas/180ml-vs-60ml" style="color: var(--magenta); font-weight: 600;">предыдущей статье</a>, цена за мл в упаковке 180 мл почти вдвое ниже, чем в стандартных 60 мл. Если вы ещё не перешли — рассчитайте годовую экономию в калькуляторе.</p>
+<p>Как мы рассматривали в <a href="/ru/blogas/180ml-vs-60ml" style="color: var(--magenta); font-weight: 600;">предыдущей статье</a>, цена за мл в упаковке 180 мл в несколько раз ниже, чем в стандартных 60 мл. Если вы ещё не перешли — рассчитайте годовую экономию в калькуляторе.</p>
 <h2>3. Стандартизированные протоколы по длине волос</h2>
 <p>Создайте внутренний документ: <strong>короткие волосы — 30 г, средние — 45 г, длинные — 60–80 г</strong>. Когда вся команда работает по одинаковым нормам, расходы становятся прогнозируемыми, а при оптовых закупках включается эффект масштаба.</p>
 <h2>4. Ротация запасов по принципу FIFO</h2>
