@@ -19,6 +19,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { href: '/admin/sandelis', label: 'Sandėlis', icon: '📋' },
   { href: '/admin/klientai', label: 'Klientai', icon: '👥' },
   { href: '/admin/kainos', label: 'Kainos ir nuolaidos', icon: '💰' },
+  { href: '/admin/didmenos-kainos', label: 'Didmeninės kainos', icon: '🏷️' },
   { href: '/admin/nustatymai', label: 'Nustatymai', icon: '⚙️' },
   { href: '/admin/ataskaitos', label: 'Ataskaitos', icon: '📈' },
   { href: '/admin/blogas', label: 'Blogas', icon: '✏️' },

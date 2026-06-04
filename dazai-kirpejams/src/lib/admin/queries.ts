@@ -2119,3 +2119,61 @@ export async function getPendingRepOrders(): Promise<PendingRepOrder[]> {
     })),
   }))
 }
+
+// ============================================
+// Didmeninės kainos (product_prices) — admin valdymas
+// ============================================
+
+export type AdminWholesaleRow = {
+  id: string
+  nameLt: string
+  sku: string | null
+  colorNumber: string | null
+  retailCents: number
+  /** tier → kaina centais (jei tier nėra — nenustatyta) */
+  prices: Record<string, number>
+}
+
+/**
+ * Aktyvūs produktai su retail kaina (atskaitai) + esamomis didmenos kainomis
+ * pagal tier. Admin nustato product_prices reikšmes per /admin/didmenos-kainos.
+ */
+export async function getProductsWithWholesalePrices(): Promise<AdminWholesaleRow[]> {
+  const supabase = await createServerSupabase()
+  const { data, error } = await supabase
+    .from('products')
+    .select(
+      `id, name_lt, sku, color_number, price_cents, is_active,
+       product_prices ( tier, price_cents )`
+    )
+    .eq('is_active', true)
+    .order('name_lt', { ascending: true })
+    .limit(1000)
+
+  if (error) {
+    console.error('[admin/queries] getProductsWithWholesalePrices:', error.message)
+    return []
+  }
+
+  type Row = {
+    id: string
+    name_lt: string
+    sku: string | null
+    color_number: string | null
+    price_cents: number
+    product_prices: Array<{ tier: string; price_cents: number }> | null
+  }
+
+  return (data as unknown as Row[]).map((p) => {
+    const prices: Record<string, number> = {}
+    for (const pp of p.product_prices ?? []) prices[pp.tier] = pp.price_cents
+    return {
+      id: p.id,
+      nameLt: p.name_lt,
+      sku: p.sku,
+      colorNumber: p.color_number,
+      retailCents: p.price_cents,
+      prices,
+    }
+  })
+}
