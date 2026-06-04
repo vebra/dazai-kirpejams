@@ -6,6 +6,7 @@ import '../../globals.css'
 import { locales } from '@/i18n/config'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Header } from '@/components/layout/Header'
+import { AnnouncementBar } from '@/components/layout/AnnouncementBar'
 import { Footer } from '@/components/layout/Footer'
 import { WhatsAppButton } from '@/components/layout/WhatsAppButton'
 import { Suspense } from 'react'
@@ -134,7 +135,12 @@ export default async function RootLayout({
         <JsonLd data={returnPolicySchema()} />
         <VerificationProvider>
           <Header lang={lang} dict={dict} />
-          <main className="flex-1 pt-[72px] lg:pt-[100px]">{children}</main>
+          <main className="flex-1 pt-[72px] lg:pt-[100px]">
+            <Suspense fallback={null}>
+              <AnnouncementBar lang={lang} />
+            </Suspense>
+            {children}
+          </main>
           <Footer lang={lang} dict={dict} />
           <Suspense fallback={null}>
             <RouteTracker />
