@@ -22,6 +22,18 @@ export const metadata: Metadata = {
 }
 
 /**
+ * Visa admin zona — dinaminė. Layout'as kiekvienam užklausimui kviečia
+ * `getAdminUser()` (cookies + auth per Supabase), tad statiškai prerender'inti
+ * nėra ko — admin niekada nekešuojamas. Deklaruojam VIENĄ kartą čia (ne po
+ * `force-dynamic` kiekviename puslapyje), kad:
+ *  1) nei vienas admin puslapis (įsk. /admin/login, /naujas formas) nebūtų
+ *     bandomas prerender'inti build metu → build nebepriklauso nuo build-time env;
+ *  2) ateityje pridėtas naujas admin puslapis automatiškai būtų dinaminis.
+ * (Tai NEpakeičia env būtinybės runtime'e — tik pašalina klaidingą build'o kritimą.)
+ */
+export const dynamic = 'force-dynamic'
+
+/**
  * Admin root layout — atskiras nuo viešos svetainės (route group `(admin)`).
  * Pateikia html/body, sidebar'ą ir topbar'ą. Login puslapis (`/admin/login`)
  * turi savo nested layout'ą kuris perdengia šį (skirtingas turinys be sidebar).
