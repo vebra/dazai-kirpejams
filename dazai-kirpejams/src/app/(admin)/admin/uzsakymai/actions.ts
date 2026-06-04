@@ -32,6 +32,30 @@ function isValidStatus(value: unknown): value is OrderStatus {
   )
 }
 
+/**
+ * Apsauga veiksmo lygyje: rep užsakymai, laukiantys patvirtinimo (pending) ar
+ * atmesti (rejected), NEgali būti apdorojami įprastame Užsakymų sraute —
+ * statuso keitimas / sąskaitos generavimas blokuojami. Juos tvarko TIK
+ * /admin/patvirtinimai (approve_rep_order / reject_rep_order). Sąrašo filtras
+ * (queries.ts) yra tik UX — tikra apsauga yra čia (blokuoja ir per tiesioginį URL).
+ */
+async function assertNotAwaitingApproval(
+  supabase: ReturnType<typeof createServerClient>,
+  id: string
+): Promise<void> {
+  const { data } = await supabase
+    .from('orders')
+    .select('approval_status')
+    .eq('id', id)
+    .maybeSingle<{ approval_status: string | null }>()
+  if (
+    data?.approval_status === 'pending' ||
+    data?.approval_status === 'rejected'
+  ) {
+    redirect('/admin/uzsakymai?error=approval-locked')
+  }
+}
+
 // ============================================
 // Būsenos keitimas
 // ============================================
@@ -49,6 +73,10 @@ export async function updateOrderStatusAction(
   if (!isValidStatus(status)) {
     redirect(`/admin/uzsakymai/${id}?error=invalid-status`)
   }
+
+  // Pending/rejected rep užsakymo statuso čia keisti negalima — tik per
+  // patvirtinimo ekraną (kitaip apeitume sandėlio nuskaitymą per approve).
+  await assertNotAwaitingApproval(supabase, id)
 
   // Jei statusas keičiamas į shipped/cancelled/paid/delivered — reikės
   // kliento duomenų email pranešimui. Paimam vieną kartą prieš update'ą.
@@ -307,6 +335,9 @@ export async function generateInvoiceAction(formData: FormData): Promise<void> {
 
   const id = formData.get('id') as string | null
   if (!id) redirect('/admin/uzsakymai?error=invalid-id')
+
+  // Apsauga: sąskaitos negeneruojam neapprovintam rep užsakymui.
+  await assertNotAwaitingApproval(createServerClient(), id)
 
   // Opcijonalūs override'ai iš /admin/uzsakymai/[id]/saskaita formos.
   // Jei laukai nepateikti (pvz. kvietimas iš paprastos „Sugeneruoti PDF"

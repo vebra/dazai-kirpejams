@@ -92,7 +92,9 @@ export default async function AdminOrdersPage({
       ? 'Trūksta užsakymo ID.'
       : errorParam === 'update-failed'
         ? 'Nepavyko išsaugoti pakeitimų.'
-        : null
+        : errorParam === 'approval-locked'
+          ? 'Šis užsakymas laukia patvirtinimo — tvarkykite jį „Patvirtinimai" ekrane (Approve/Reject), ne čia.'
+          : null
 
   return (
     <div className="space-y-6">

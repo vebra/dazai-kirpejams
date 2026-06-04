@@ -456,6 +456,12 @@ export async function getAdminOrders(
     )
     .order('created_at', { ascending: false })
     .limit(200)
+    // Rep užsakymai, laukiantys patvirtinimo (pending) ar atmesti (rejected),
+    // tvarkomi TIK /admin/patvirtinimai ekrane — slepiam iš įprasto sąrašo.
+    // Rodom: savitarna (approval_status NULL) + patvirtinti rep (approved).
+    // (Negalima naudoti NOT IN — SQL'e NULL NOT IN (...) = NULL → paslėptų ir
+    //  savitarnos užsakymus; todėl eksplicitiškai „is null OR approved".)
+    .or('approval_status.is.null,approval_status.eq.approved')
 
   if (options.search) {
     const term = `%${options.search}%`
