@@ -243,3 +243,118 @@ export async function downloadCustomerInvoiceAction(
 
   redirect(url)
 }
+
+// ============================================
+// Pakartoti užsakymą (Reorder) → krepšelis
+// ============================================
+
+export type ReorderItem = {
+  productId: string
+  slug: string
+  categorySlug: string
+  sku: string | null
+  name: string
+  priceCents: number
+  volumeMl: number | null
+  imageUrl: string | null
+  colorHex: string | null
+  colorNumber: string | null
+  quantity: number
+}
+
+export type ReorderResult =
+  | { ok: true; items: ReorderItem[]; unavailable: string[] }
+  | { ok: false; error: string }
+
+/**
+ * Surenka esamus (dabartinius) produktus pagal seno užsakymo prekes, kad
+ * klientas galėtų vienu paspaudimu sudėti juos į krepšelį. Naudoja DABARTINES
+ * kainas ir praleidžia nebeaktyvius / išparduotus produktus (juos grąžina
+ * `unavailable` sąraše). Savininkystė tikrinama pagal el. paštą.
+ */
+export async function reorderToCart(
+  orderId: string,
+  lang: Locale
+): Promise<ReorderResult> {
+  const supabase = await createServerSupabase()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { ok: false, error: 'Prisijunkite.' }
+
+  const admin = createServerClient()
+
+  const { data: order } = await admin
+    .from('orders')
+    .select('id, email')
+    .eq('id', orderId)
+    .maybeSingle<{ id: string; email: string | null }>()
+  if (
+    !order ||
+    (order.email ?? '').toLowerCase() !== (user.email ?? '').toLowerCase()
+  ) {
+    return { ok: false, error: 'Užsakymas nerastas.' }
+  }
+
+  const { data: items } = await admin
+    .from('order_items')
+    .select('product_id, quantity, product_name')
+    .eq('order_id', orderId)
+  if (!items || items.length === 0) {
+    return { ok: false, error: 'Užsakyme nėra prekių.' }
+  }
+
+  const ids = items
+    .map((i) => i.product_id)
+    .filter((x): x is string => typeof x === 'string')
+
+  let products: Array<Record<string, unknown>> = []
+  if (ids.length > 0) {
+    const { data } = await admin
+      .from('products')
+      .select(
+        'id, slug, sku, name_lt, name_en, name_ru, price_cents, volume_ml, image_urls, color_hex, color_number, is_active, stock_quantity, category:categories(slug)'
+      )
+      .in('id', ids)
+    products = (data as Array<Record<string, unknown>>) ?? []
+  }
+  const pMap = new Map(products.map((p) => [p.id as string, p]))
+
+  const cart: ReorderItem[] = []
+  const unavailable: string[] = []
+  for (const it of items) {
+    const p = it.product_id ? pMap.get(it.product_id) : undefined
+    const active = p?.is_active === true
+    const inStock = ((p?.stock_quantity as number) ?? 0) > 0
+    if (!p || !active || !inStock) {
+      unavailable.push((it.product_name as string) ?? '—')
+      continue
+    }
+    const name =
+      lang === 'en'
+        ? (p.name_en as string)
+        : lang === 'ru'
+          ? (p.name_ru as string)
+          : (p.name_lt as string)
+    const imgs = p.image_urls as string[] | null
+    const cat = p.category as { slug: string } | null
+    cart.push({
+      productId: p.id as string,
+      slug: p.slug as string,
+      categorySlug: cat?.slug ?? '',
+      sku: (p.sku as string) ?? null,
+      name,
+      priceCents: p.price_cents as number,
+      volumeMl: (p.volume_ml as number) ?? null,
+      imageUrl: Array.isArray(imgs) && imgs.length > 0 ? imgs[0] : null,
+      colorHex: (p.color_hex as string) ?? null,
+      colorNumber: (p.color_number as string) ?? null,
+      quantity: (it.quantity as number) ?? 1,
+    })
+  }
+
+  if (cart.length === 0) {
+    return { ok: false, error: 'Šių prekių nebėra parduotuvėje.' }
+  }
+  return { ok: true, items: cart, unavailable }
+}
