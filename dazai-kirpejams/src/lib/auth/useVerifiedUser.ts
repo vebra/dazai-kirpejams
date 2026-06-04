@@ -63,10 +63,15 @@ export function useVerifiedUser(
     const controller = new AbortController()
 
     async function check() {
+      // getSession() skaito sesiją LOKALIAI (iš slapukų), be tinklo užklausos —
+      // patikima net silpnu mobiliu ryšiu / in-app naršyklėje. getUser() darydavo
+      // tinklo validaciją, kuri mobiliajame neretai neįvyksta → kainos nedingdavo.
+      // Kainų rodymas nėra saugumo riba (užsakymas perskaičiuojamas serveryje).
       const {
-        data: { user },
+        data: { session },
         error: userErr,
-      } = await supabase.auth.getUser()
+      } = await supabase.auth.getSession()
+      const user = session?.user ?? null
 
       if (controller.signal.aborted) return
 

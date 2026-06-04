@@ -15,6 +15,7 @@ import {
   type UploadDocState,
 } from './actions'
 import { ProfileEditForm } from './ProfileEditForm'
+import { ReorderButton } from './ReorderButton'
 import { LogoutButton } from '@/components/auth/LogoutButton'
 
 const LOCALE_MAP: Record<string, string> = { lt: 'lt-LT', en: 'en-GB', ru: 'ru-RU' }
@@ -301,10 +302,11 @@ export function AccountView({
                     {o.itemsCount > 0 ? ` · × ${o.itemsCount}` : ''}
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap justify-end">
                   <span className="text-sm font-semibold text-brand-gray-900">
                     {priceFormatter.format(o.totalCents / 100)}
                   </span>
+                  <ReorderButton orderId={o.id} lang={lang} />
                   <a
                     href={`${langPrefix(lang)}/uzsakymas/${o.orderNumber}`}
                     className="px-4 py-2 bg-brand-gray-900 text-white rounded-lg text-[13px] font-semibold hover:bg-brand-gray-900/90 transition-colors whitespace-nowrap"
