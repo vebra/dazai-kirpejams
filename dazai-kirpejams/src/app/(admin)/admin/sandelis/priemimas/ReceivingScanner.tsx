@@ -51,26 +51,35 @@ export function ReceivingScanner() {
     if (processingRef.current) return
     processingRef.current = true
     setBusy(true)
-    while (queueRef.current.length > 0) {
-      const job = queueRef.current.shift()!
-      const res = await receiveScannedItem(job.ean, job.qty)
-      const id = ++idRef.current
-      if (res.ok && res.found) {
-        beep(true)
-        setLog((l) => [
-          { id, kind: 'ok', name: res.name, sku: res.sku, stock: res.stock, added: res.added },
-          ...l,
-        ])
-      } else if (res.ok && !res.found) {
-        beep(false)
-        setLog((l) => [{ id, kind: 'notfound', ean: res.ean }, ...l])
-      } else {
-        beep(false)
-        setLog((l) => [{ id, kind: 'error', message: res.error }, ...l])
+    try {
+      while (queueRef.current.length > 0) {
+        const job = queueRef.current.shift()!
+        const id = ++idRef.current
+        try {
+          const res = await receiveScannedItem(job.ean, job.qty)
+          if (res.ok && res.found) {
+            beep(true)
+            setLog((l) => [
+              { id, kind: 'ok', name: res.name, sku: res.sku, stock: res.stock, added: res.added },
+              ...l,
+            ])
+          } else if (res.ok && !res.found) {
+            beep(false)
+            setLog((l) => [{ id, kind: 'notfound', ean: res.ean }, ...l])
+          } else {
+            beep(false)
+            setLog((l) => [{ id, kind: 'error', message: res.error }, ...l])
+          }
+        } catch (err) {
+          beep(false)
+          const message = err instanceof Error ? err.message : 'Nenumatyta klaida'
+          setLog((l) => [{ id, kind: 'error', message }, ...l])
+        }
       }
+    } finally {
+      processingRef.current = false
+      setBusy(false)
     }
-    processingRef.current = false
-    setBusy(false)
   }
 
   function onSubmit(e: React.FormEvent) {
@@ -143,14 +152,22 @@ export function ReceivingScanner() {
           <label htmlFor="scan" className="block text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500 mb-1.5">
             Nuskenuokite barkodą {busy && <span className="text-brand-magenta">· apdorojama…</span>}
           </label>
-          <input
-            ref={inputRef}
-            id="scan"
-            autoComplete="off"
-            autoFocus
-            placeholder="Nukreipkite skanerį čia ir skenuokite…"
-            className="w-full px-4 py-3 bg-[#F5F5F7] border-2 border-brand-magenta rounded-lg text-base focus:outline-none focus:bg-white"
-          />
+          <div className="flex gap-2">
+            <input
+              ref={inputRef}
+              id="scan"
+              autoComplete="off"
+              autoFocus
+              placeholder="Nukreipkite skanerį čia ir skenuokite…"
+              className="flex-1 px-4 py-3 bg-[#F5F5F7] border-2 border-brand-magenta rounded-lg text-base focus:outline-none focus:bg-white"
+            />
+            <button
+              type="submit"
+              className="px-5 py-3 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark transition-colors whitespace-nowrap"
+            >
+              Pridėti
+            </button>
+          </div>
           <p className="mt-2 text-[12px] text-brand-gray-500">
             Skaneris prideda <strong>+{qty}</strong> prie likučio pagal barkodą (EAN). Dėžėms —
             nustatykite kiekį (pvz. 24) ir nuskenuokite vieną kartą. Singliniams — palikite 1.
