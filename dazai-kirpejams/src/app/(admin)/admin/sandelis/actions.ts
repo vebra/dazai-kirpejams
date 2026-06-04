@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/admin/auth'
 import { createServerClient } from '@/lib/supabase/server'
+import { createServerSupabase } from '@/lib/supabase/ssr'
 
 /**
  * Produkto redagavimo Server Action'ai.
@@ -750,4 +751,52 @@ export async function bulkDeactivateActiveAction(): Promise<void> {
   revalidatePath('/admin')
   revalidateTag('products', 'max')
   redirect(`/admin/sandelis?deactivated=${count ?? 0}`)
+}
+
+// ============================================
+// Prekių priėmimas barkodu (skaneris) — +1 likučio pagal EAN
+// ============================================
+
+export type ReceiveScanResult =
+  | { ok: true; found: true; name: string; sku: string | null; stock: number; added: number }
+  | { ok: true; found: false; ean: string }
+  | { ok: false; error: string }
+
+/**
+ * Priima nuskenuotą barkodą: atomiškai +qty prie likučio pagal EAN (qty=1 pagal
+ * nutylėjimą; dėžėms galima perduoti pvz. 24). Kviečiama per admin SESIJOS
+ * klientą (RPC viduje is_admin() pagal auth.uid()).
+ */
+export async function receiveScannedItem(
+  ean: string,
+  qty = 1
+): Promise<ReceiveScanResult> {
+  await requireAdmin()
+  const code = (ean ?? '').trim()
+  if (!code) return { ok: false, error: 'Tuščias barkodas.' }
+  const delta = Number.isInteger(qty) && qty > 0 && qty <= 100000 ? qty : 1
+
+  const supabase = await createServerSupabase()
+  const { data, error } = await supabase.rpc('receive_stock_by_ean', {
+    p_ean: code,
+    p_delta: delta,
+  })
+  if (error) {
+    console.error('[admin/sandelis/actions] receiveScannedItem:', error.message)
+    return { ok: false, error: 'Nepavyko atnaujinti likučio.' }
+  }
+
+  const r = data as { found?: boolean; name?: string; sku?: string | null; stock?: number }
+  if (!r?.found) return { ok: true, found: false, ean: code }
+
+  revalidatePath('/admin/sandelis', 'layout')
+  revalidateTag('products', 'max')
+  return {
+    ok: true,
+    found: true,
+    name: r.name ?? '—',
+    sku: r.sku ?? null,
+    stock: r.stock ?? 0,
+    added: delta,
+  }
 }

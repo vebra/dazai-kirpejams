@@ -9,6 +9,7 @@ const initialState: BannerFormState = {}
 
 const PLACEMENTS = [
   { value: 'hero', label: 'Hero (pagrindinis puslapis)' },
+  { value: 'announcement', label: 'Akcijų juosta (viršuje, visur)' },
   { value: 'category', label: 'Kategorijos puslapis' },
 ]
 
@@ -79,13 +80,24 @@ export function BannerForm({ banner }: { banner?: BannerRow }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-[12px] font-semibold text-brand-gray-500 uppercase tracking-[0.5px] mb-1.5">
-            Nuotraukos URL
+            Nuotrauka
           </label>
+          <input
+            type="file"
+            name="image_file"
+            accept="image/jpeg,image/png,image/webp,image/avif"
+            className="block w-full text-sm text-brand-gray-600 file:mr-3 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-brand-magenta file:text-white file:font-semibold file:cursor-pointer hover:file:bg-brand-magenta-dark"
+          />
+          {banner?.imageUrl && (
+            <p className="mt-1 text-[11px] text-brand-gray-500 truncate">
+              Dabartinė: {banner.imageUrl}
+            </p>
+          )}
           <input
             name="image_url"
             defaultValue={banner?.imageUrl ?? ''}
-            placeholder="https://..."
-            className="w-full px-4 py-2.5 border border-[#E0E0E0] rounded-lg text-sm bg-white focus:outline-none focus:border-brand-magenta transition-colors"
+            placeholder="arba įklijuokite nuotraukos URL"
+            className="mt-2 w-full px-4 py-2.5 border border-[#E0E0E0] rounded-lg text-sm bg-white focus:outline-none focus:border-brand-magenta transition-colors"
           />
         </div>
         <div className="grid grid-cols-2 gap-4">

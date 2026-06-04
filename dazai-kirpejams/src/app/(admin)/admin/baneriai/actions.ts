@@ -2,6 +2,7 @@
 
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { randomUUID } from 'crypto'
 import { requireAdmin } from '@/lib/admin/auth'
 import { createServerClient } from '@/lib/supabase/server'
 
@@ -9,6 +10,12 @@ export type BannerFormState = {
   error?: string
   success?: boolean
 }
+
+// Banerių nuotraukos — viešas „products" bucket'as su `banners/` prefiksu (kad
+// nereikėtų atskiro bucket'o). Tie patys leidžiami formatai kaip produktams.
+const BANNER_BUCKET = 'products'
+const BANNER_MAX = 10 * 1024 * 1024
+const BANNER_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif'])
 
 export async function saveBannerAction(
   _prev: BannerFormState,
@@ -26,6 +33,29 @@ export async function saveBannerAction(
 
   if (!titleLt && !titleEn) {
     return { error: 'Reikia bent vieno pavadinimo (LT arba EN).' }
+  }
+
+  // Nuotrauka: jei įkeltas failas — į Storage; kitaip naudojam URL lauką.
+  let imageUrl = (formData.get('image_url') as string)?.trim() || null
+  const file = formData.get('image_file')
+  if (file instanceof File && file.size > 0) {
+    if (file.size > BANNER_MAX) {
+      return { error: 'Nuotrauka per didelė (max 10 MB).' }
+    }
+    if (!BANNER_MIME.has(file.type)) {
+      return { error: 'Netinkamas nuotraukos formatas (JPG, PNG, WebP, AVIF).' }
+    }
+    const ext = (file.name.split('.').pop() ?? 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg'
+    const path = `banners/${randomUUID()}.${ext}`
+    const buffer = Buffer.from(await file.arrayBuffer())
+    const { error: upErr } = await supabase.storage
+      .from(BANNER_BUCKET)
+      .upload(path, buffer, { contentType: file.type, upsert: true })
+    if (upErr) {
+      console.error('[admin/baneriai/actions] image upload:', upErr.message)
+      return { error: 'Nepavyko įkelti nuotraukos.' }
+    }
+    imageUrl = supabase.storage.from(BANNER_BUCKET).getPublicUrl(path).data.publicUrl
   }
 
   const row = {
@@ -51,7 +81,7 @@ export async function saveBannerAction(
       (formData.get('cta_secondary_text_ru') as string)?.trim() || null,
     cta_secondary_url:
       (formData.get('cta_secondary_url') as string)?.trim() || null,
-    image_url: (formData.get('image_url') as string)?.trim() || null,
+    image_url: imageUrl,
     background_color:
       (formData.get('background_color') as string)?.trim() || null,
     sort_order: parseInt((formData.get('sort_order') as string) || '0', 10),

@@ -115,6 +115,12 @@ export default async function AdminInventoryPage({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-end gap-2 flex-wrap">
+        <Link
+          href="/admin/sandelis/priemimas"
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-[#F5F5F7] transition-colors"
+        >
+          📥 Priimti prekes
+        </Link>
         <a
           href="/admin/sandelis/eksportas"
           download
