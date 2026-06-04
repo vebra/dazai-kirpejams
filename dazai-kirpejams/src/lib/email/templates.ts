@@ -1407,3 +1407,100 @@ ${input.siteUrl}
 
   return { subject, html, text }
 }
+
+// ============================================
+// Vadybininkės užsakymai — pranešimai
+// ============================================
+
+type RepOrderAdminEmailInput = {
+  orderNumber: string
+  clientName: string
+  repName: string
+  totalCents: number
+  itemCount: number
+  adminUrl: string
+  createdAt: string
+}
+
+/** Adminui — vadybininkė pateikė naują užsakymą, laukia patvirtinimo. */
+export function buildRepOrderAdminEmail(input: RepOrderAdminEmailInput): {
+  subject: string
+  html: string
+  text: string
+} {
+  const subject = `Naujas vadybininkės užsakymas ${input.orderNumber} · laukia patvirtinimo`
+  const html = `<!doctype html>
+<html lang="lt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(subject)}</title></head>
+<body style="margin:0;padding:0;background:${GRAY_50};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:${GRAY_900};">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};padding:32px 16px;"><tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
+  <tr><td style="padding:24px 32px;background:${BRAND_MAGENTA};">
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.8);">Admin · Laukia patvirtinimo</div>
+    <div style="font-size:22px;font-weight:700;color:#ffffff;font-family:monospace;margin-top:4px;">${escapeHtml(input.orderNumber)}</div>
+  </td></tr>
+  <tr><td style="padding:24px 32px;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr><td style="padding:8px 0;color:${GRAY_500};font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;width:40%;">Data</td><td style="padding:8px 0;color:${GRAY_900};font-size:14px;">${escapeHtml(formatDate(input.createdAt))}</td></tr>
+      <tr><td style="padding:8px 0;color:${GRAY_500};font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;border-top:1px solid ${BORDER};">Vadybininkė</td><td style="padding:8px 0;color:${GRAY_900};font-size:14px;border-top:1px solid ${BORDER};">${escapeHtml(input.repName)}</td></tr>
+      <tr><td style="padding:8px 0;color:${GRAY_500};font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;border-top:1px solid ${BORDER};">Klientas</td><td style="padding:8px 0;color:${GRAY_900};font-size:14px;border-top:1px solid ${BORDER};">${escapeHtml(input.clientName)}</td></tr>
+      <tr><td style="padding:8px 0;color:${GRAY_500};font-size:12px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;border-top:1px solid ${BORDER};">Prekių</td><td style="padding:8px 0;color:${GRAY_900};font-size:14px;border-top:1px solid ${BORDER};">${input.itemCount} vnt.</td></tr>
+      <tr><td style="padding:12px 0;color:${GRAY_900};font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-top:1px solid ${BORDER};">Iš viso</td><td style="padding:12px 0;color:${GRAY_900};font-size:22px;font-weight:700;border-top:1px solid ${BORDER};">${formatEur(input.totalCents)}</td></tr>
+    </table>
+    <div style="margin-top:24px;text-align:center;">
+      <a href="${input.adminUrl}" style="display:inline-block;background:${BRAND_MAGENTA};color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;padding:12px 28px;border-radius:10px;">Peržiūrėti ir patvirtinti</a>
+    </div>
+  </td></tr>
+</table></td></tr></table></body></html>`
+  const text = `Naujas vadybininkės užsakymas ${input.orderNumber}\nVadybininkė: ${input.repName}\nKlientas: ${input.clientName}\nPrekių: ${input.itemCount} vnt.\nIš viso: ${formatEur(input.totalCents)}\n\nPatvirtinti: ${input.adminUrl}`.trim()
+  return { subject, html, text }
+}
+
+type RepOrderDecisionEmailInput = {
+  orderNumber: string
+  clientName: string
+  decision: 'approved' | 'rejected'
+  rejectionReason: string | null
+  totalCents: number
+  firstName: string
+  repOrdersUrl: string
+}
+
+/** Vadybininkei — jos užsakymas patvirtintas arba atmestas. */
+export function buildRepOrderDecisionEmail(input: RepOrderDecisionEmailInput): {
+  subject: string
+  html: string
+  text: string
+} {
+  const approved = input.decision === 'approved'
+  const statusLt = approved ? 'patvirtintas' : 'atmestas'
+  const accent = approved ? '#059669' : '#DC2626'
+  const subject = `Užsakymas ${input.orderNumber} ${statusLt}`
+  const greeting = input.firstName ? `Sveiki, ${escapeHtml(input.firstName)},` : 'Sveiki,'
+  const reasonBlock =
+    !approved && input.rejectionReason
+      ? `<div style="margin-top:16px;padding:12px 16px;background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;color:#991B1B;font-size:14px;"><strong>Atmetimo priežastis:</strong><br>${escapeHtml(input.rejectionReason)}</div>`
+      : ''
+  const html = `<!doctype html>
+<html lang="lt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(subject)}</title></head>
+<body style="margin:0;padding:0;background:${GRAY_50};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:${GRAY_900};">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};padding:32px 16px;"><tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
+  <tr><td style="padding:24px 32px;background:${accent};">
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.85);">Užsakymas ${escapeHtml(statusLt)}</div>
+    <div style="font-size:22px;font-weight:700;color:#ffffff;font-family:monospace;margin-top:4px;">${escapeHtml(input.orderNumber)}</div>
+  </td></tr>
+  <tr><td style="padding:24px 32px;">
+    <p style="margin:0 0 12px;font-size:15px;color:${GRAY_900};">${greeting}</p>
+    <p style="margin:0;font-size:14px;color:${GRAY_900};line-height:1.6;">
+      Jūsų pateiktas užsakymas <strong>${escapeHtml(input.orderNumber)}</strong> klientui
+      <strong>${escapeHtml(input.clientName)}</strong> (${formatEur(input.totalCents)}) buvo <strong>${escapeHtml(statusLt)}</strong>.
+    </p>
+    ${reasonBlock}
+    <div style="margin-top:24px;text-align:center;">
+      <a href="${input.repOrdersUrl}" style="display:inline-block;background:${BRAND_MAGENTA};color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;padding:12px 28px;border-radius:10px;">Mano užsakymai</a>
+    </div>
+  </td></tr>
+</table></td></tr></table></body></html>`
+  const text = `${input.firstName ? 'Sveiki, ' + input.firstName + ',' : 'Sveiki,'}\n\nUžsakymas ${input.orderNumber} klientui ${input.clientName} (${formatEur(input.totalCents)}) buvo ${statusLt}.${!approved && input.rejectionReason ? '\nAtmetimo priežastis: ' + input.rejectionReason : ''}\n\nMano užsakymai: ${input.repOrdersUrl}`.trim()
+  return { subject, html, text }
+}

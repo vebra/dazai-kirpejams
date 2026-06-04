@@ -1,6 +1,7 @@
 import 'server-only'
 import { createServerSupabase } from '@/lib/supabase/ssr'
 import { DYE_CATEGORIES, type DyeCategoryKey } from '@/lib/data/dye-categories'
+import type { PendingRepOrder } from './rep-orders-shared'
 
 /**
  * Admin'o duomenų užklausos — VISOS per `createServerSupabase()`, kuris
@@ -455,6 +456,12 @@ export async function getAdminOrders(
     )
     .order('created_at', { ascending: false })
     .limit(200)
+    // Rep užsakymai, laukiantys patvirtinimo (pending) ar atmesti (rejected),
+    // tvarkomi TIK /admin/patvirtinimai ekrane — slepiam iš įprasto sąrašo.
+    // Rodom: savitarna (approval_status NULL) + patvirtinti rep (approved).
+    // (Negalima naudoti NOT IN — SQL'e NULL NOT IN (...) = NULL → paslėptų ir
+    //  savitarnos užsakymus; todėl eksplicitiškai „is null OR approved".)
+    .or('approval_status.is.null,approval_status.eq.approved')
 
   if (options.search) {
     const term = `%${options.search}%`
@@ -2002,4 +2009,171 @@ export async function getReportsData(
     deliveryBreakdown,
     paymentBreakdown,
   }
+}
+
+// ============================================
+// Vadybininkės (sales_rep) užsakymų patvirtinimai
+// ============================================
+// Tipai + TIER_LABELS gyvena client-safe modulyje (rep-orders-shared), nes
+// juos naudoja ir client komponentas — re-eksportuojam dėl patogumo.
+export { TIER_LABELS } from './rep-orders-shared'
+export type { PendingRepOrder, PendingRepOrderItem } from './rep-orders-shared'
+
+/**
+ * Visi laukiantys patvirtinimo rep užsakymai (approval_status='pending'),
+ * naujausi viršuje. Naudoja admin sesiją (RLS „Admin full access").
+ *
+ * placed_by → user_profiles jungimas atskira užklausa (nėra tiesioginio FK į
+ * user_profiles, tik į auth.users), todėl PostgREST embedding negalimas.
+ */
+export async function getPendingRepOrders(): Promise<PendingRepOrder[]> {
+  const supabase = await createServerSupabase()
+
+  const { data, error } = await supabase
+    .from('orders')
+    .select(
+      `id, order_number, created_at, notes,
+       subtotal_cents, vat_cents, delivery_cost_cents, total_cents,
+       delivery_method, payment_method,
+       delivery_city, delivery_address, delivery_postal_code,
+       placed_by,
+       clients ( name, pricing_tier ),
+       order_items ( product_name, product_sku, quantity, unit_price_cents, total_cents )`
+    )
+    .eq('approval_status', 'pending')
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('[admin/queries] getPendingRepOrders:', error.message)
+    return []
+  }
+
+  const rows = (data ?? []) as unknown as Array<{
+    id: string
+    order_number: string
+    created_at: string
+    notes: string | null
+    subtotal_cents: number
+    vat_cents: number
+    delivery_cost_cents: number
+    total_cents: number
+    delivery_method: string
+    payment_method: string
+    delivery_city: string | null
+    delivery_address: string | null
+    delivery_postal_code: string | null
+    placed_by: string | null
+    clients: { name: string; pricing_tier: string } | null
+    order_items: Array<{
+      product_name: string
+      product_sku: string | null
+      quantity: number
+      unit_price_cents: number
+      total_cents: number
+    }> | null
+  }>
+
+  // Rep vardai per atskirą user_profiles užklausą
+  const repIds = Array.from(
+    new Set(rows.map((r) => r.placed_by).filter((x): x is string => !!x))
+  )
+  const repNames = new Map<string, string>()
+  if (repIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('user_profiles')
+      .select('id, first_name, last_name')
+      .in('id', repIds)
+    for (const p of (profiles ?? []) as Array<{
+      id: string
+      first_name: string | null
+      last_name: string | null
+    }>) {
+      const name = `${p.first_name ?? ''} ${p.last_name ?? ''}`.trim()
+      if (name) repNames.set(p.id, name)
+    }
+  }
+
+  return rows.map((r) => ({
+    id: r.id,
+    orderNumber: r.order_number,
+    createdAt: r.created_at,
+    notes: r.notes,
+    subtotalCents: r.subtotal_cents,
+    vatCents: r.vat_cents,
+    deliveryCents: r.delivery_cost_cents,
+    totalCents: r.total_cents,
+    deliveryMethod: r.delivery_method,
+    paymentMethod: r.payment_method,
+    deliveryCity: r.delivery_city,
+    deliveryAddress: r.delivery_address,
+    deliveryPostalCode: r.delivery_postal_code,
+    clientName: r.clients?.name ?? null,
+    clientTier: r.clients?.pricing_tier ?? null,
+    repName: r.placed_by ? repNames.get(r.placed_by) ?? null : null,
+    items: (r.order_items ?? []).map((i) => ({
+      productName: i.product_name,
+      productSku: i.product_sku,
+      quantity: i.quantity,
+      unitPriceCents: i.unit_price_cents,
+      totalCents: i.total_cents,
+    })),
+  }))
+}
+
+// ============================================
+// Didmeninės kainos (product_prices) — admin valdymas
+// ============================================
+
+export type AdminWholesaleRow = {
+  id: string
+  nameLt: string
+  sku: string | null
+  colorNumber: string | null
+  retailCents: number
+  /** tier → kaina centais (jei tier nėra — nenustatyta) */
+  prices: Record<string, number>
+}
+
+/**
+ * Aktyvūs produktai su retail kaina (atskaitai) + esamomis didmenos kainomis
+ * pagal tier. Admin nustato product_prices reikšmes per /admin/didmenos-kainos.
+ */
+export async function getProductsWithWholesalePrices(): Promise<AdminWholesaleRow[]> {
+  const supabase = await createServerSupabase()
+  const { data, error } = await supabase
+    .from('products')
+    .select(
+      `id, name_lt, sku, color_number, price_cents, is_active,
+       product_prices ( tier, price_cents )`
+    )
+    .eq('is_active', true)
+    .order('name_lt', { ascending: true })
+    .limit(1000)
+
+  if (error) {
+    console.error('[admin/queries] getProductsWithWholesalePrices:', error.message)
+    return []
+  }
+
+  type Row = {
+    id: string
+    name_lt: string
+    sku: string | null
+    color_number: string | null
+    price_cents: number
+    product_prices: Array<{ tier: string; price_cents: number }> | null
+  }
+
+  return (data as unknown as Row[]).map((p) => {
+    const prices: Record<string, number> = {}
+    for (const pp of p.product_prices ?? []) prices[pp.tier] = pp.price_cents
+    return {
+      id: p.id,
+      nameLt: p.name_lt,
+      sku: p.sku,
+      colorNumber: p.color_number,
+      retailCents: p.price_cents,
+      prices,
+    }
+  })
 }

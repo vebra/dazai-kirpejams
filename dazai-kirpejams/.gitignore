@@ -58,6 +58,11 @@ scripts/test-*.ts
 scripts/backfill-*.ts
 scripts/probe-*
 scripts/*.png
+# Vadybininkės integracinis testas — service_role + rašo į PROD (tik TEST žymekliai)
+scripts/_rep_test.ts
+scripts/_*.ts
+# Gyvos rep paskyros kūrimas — service_role, kuria tikrą paskyrą
+scripts/create-rep-account.ts
 
 # debug docs
 docs/extracted/

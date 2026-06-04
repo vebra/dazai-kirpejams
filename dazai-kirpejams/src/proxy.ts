@@ -87,6 +87,42 @@ async function checkAdminAuth(
   return copyCookies(response, NextResponse.next({ request }))
 }
 
+/**
+ * Vadybininkės (/vadybininke) zona — analogiška /admin: optimistinis sesijos
+ * patikrinimas proxy'je, realų role patikrinimą (sales_rep arba admin) daro
+ * requireSalesRep() puslapyje. Login puslapis viešas.
+ */
+async function checkRepAuth(
+  request: NextRequest,
+  response: NextResponse
+): Promise<NextResponse> {
+  const { pathname } = request.nextUrl
+
+  if (pathname === '/vadybininke/login' || pathname.startsWith('/vadybininke/login/')) {
+    return response
+  }
+
+  try {
+    const supabase = createProxySupabase(request, response)
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) {
+      const loginUrl = request.nextUrl.clone()
+      loginUrl.pathname = '/vadybininke/login'
+      loginUrl.search = ''
+      return copyCookies(response, NextResponse.redirect(loginUrl))
+    }
+  } catch {
+    const loginUrl = request.nextUrl.clone()
+    loginUrl.pathname = '/vadybininke/login'
+    loginUrl.search = ''
+    return copyCookies(response, NextResponse.redirect(loginUrl))
+  }
+
+  return copyCookies(response, NextResponse.next({ request }))
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -124,6 +160,11 @@ export async function proxy(request: NextRequest) {
   // /admin/* — atskira šaka su savo auth logika (taip pat refresh'ina sesiją)
   if (pathname === '/admin' || pathname.startsWith('/admin/')) {
     return await checkAdminAuth(request, response)
+  }
+
+  // /vadybininke/* — vadybininkės sritis (atskira šaka, sava auth logika)
+  if (pathname === '/vadybininke' || pathname.startsWith('/vadybininke/')) {
+    return await checkRepAuth(request, response)
   }
 
   // /auth/* (pvz. /auth/callback) — Supabase OAuth callback route'os
