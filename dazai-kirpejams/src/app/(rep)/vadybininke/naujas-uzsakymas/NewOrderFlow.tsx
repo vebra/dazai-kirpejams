@@ -229,7 +229,9 @@ export function NewOrderFlow({
               <div className="text-sm space-y-1 border-t border-[#eee] pt-3">
                 <Row label="Tarpinė suma" value={fmt(subtotal)} />
                 <Row label="Pristatymas" value={shipping === 0 ? 'Nemokamas' : fmt(shipping)} />
-                <Row label={`PVM (${Math.round(vatRate * 100)}%)`} value={fmt(vat)} />
+                {vatRate > 0 && (
+                  <Row label={`PVM (${Math.round(vatRate * 100)}%)`} value={fmt(vat)} />
+                )}
                 <div className="flex justify-between font-bold text-brand-gray-900 border-t border-[#eee] pt-2 mt-1">
                   <span>Iš viso</span>
                   <span>{fmt(total)}</span>

@@ -6,8 +6,9 @@ import { createServerSupabase } from '@/lib/supabase/ssr'
 import {
   DELIVERY_METHODS,
   FREE_SHIPPING_THRESHOLD_CENTS,
-  VAT_RATE,
+  vatRateFromVatCode,
 } from '@/lib/commerce/constants'
+import { getCompanyInfo } from '@/lib/admin/queries'
 import type { RepClient } from '@/lib/rep/types'
 
 // ───────────────────────── Kliento kūrimas ─────────────────────────
@@ -102,6 +103,12 @@ export async function submitRepOrder(input: {
     }
   }
 
+  // PVM tarifas — tas pats vienas šaltinis kaip viešam checkout'ui: įmonės PVM
+  // kodas (shop settings). Nėra kodo (ne PVM mokėtojas) → 0. Užpildžius kodą
+  // (tapus PVM mokėtoju) — automatiškai 21%, ir čia, ir viešam sraute.
+  const company = await getCompanyInfo().catch(() => null)
+  const vatRate = vatRateFromVatCode(company?.vatCode)
+
   const supabase = await createServerSupabase()
   const { data, error } = await supabase.rpc('create_rep_order', {
     p_client_id: input.clientId,
@@ -115,7 +122,7 @@ export async function submitRepOrder(input: {
     p_notes: input.notes?.trim() || null,
     p_shipping_base_cents: dm.priceCents,
     p_free_shipping_threshold_cents: FREE_SHIPPING_THRESHOLD_CENTS,
-    p_vat_rate: VAT_RATE,
+    p_vat_rate: vatRate,
   })
 
   if (error || !data) {

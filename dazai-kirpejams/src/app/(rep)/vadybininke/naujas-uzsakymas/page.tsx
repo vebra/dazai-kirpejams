@@ -1,9 +1,10 @@
 import { requireSalesRep } from '@/lib/rep/auth'
 import { getMyClients, getRepOrderProducts } from '@/lib/rep/queries'
+import { getCompanyInfo } from '@/lib/admin/queries'
 import {
   DELIVERY_METHODS,
   FREE_SHIPPING_THRESHOLD_CENTS,
-  VAT_RATE,
+  vatRateFromVatCode,
 } from '@/lib/commerce/constants'
 import { NewOrderFlow } from './NewOrderFlow'
 
@@ -19,10 +20,14 @@ const DELIVERY_LABELS: Record<string, string> = {
 export default async function NewRepOrderPage() {
   await requireSalesRep()
 
-  const [clients, products] = await Promise.all([
+  const [clients, products, company] = await Promise.all([
     getMyClients(),
     getRepOrderProducts(),
+    getCompanyInfo().catch(() => null),
   ])
+  // PVM tarifas iš įmonės PVM kodo (tas pats šaltinis kaip viešas checkout).
+  // Ne PVM mokėtojas → 0. Peržiūra atitiks serverio apskaičiavimą.
+  const vatRate = vatRateFromVatCode(company?.vatCode)
 
   const deliveryOptions = (
     Object.keys(DELIVERY_METHODS) as Array<keyof typeof DELIVERY_METHODS>
@@ -44,7 +49,7 @@ export default async function NewRepOrderPage() {
         products={products}
         deliveryOptions={deliveryOptions}
         freeShippingThresholdCents={FREE_SHIPPING_THRESHOLD_CENTS}
-        vatRate={VAT_RATE}
+        vatRate={vatRate}
       />
     </div>
   )
