@@ -144,6 +144,181 @@ export async function updateProductAction(
 }
 
 // ============================================
+// Naujo produkto kūrimas
+// ============================================
+
+const LT_MAP: Record<string, string> = {
+  ą: 'a', č: 'c', ę: 'e', ė: 'e', į: 'i', š: 's', ų: 'u', ū: 'u', ž: 'z',
+}
+function slugify(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/[ąčęėįšųūž]/g, (c) => LT_MAP[c] ?? c)
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80)
+}
+
+export async function createProductAction(
+  _prev: UpdateProductState,
+  formData: FormData
+): Promise<UpdateProductState> {
+  await requireAdmin()
+  const supabase = createServerClient()
+
+  const nameLt = (formData.get('name_lt') as string)?.trim() ?? ''
+  const nameEn = (formData.get('name_en') as string)?.trim() ?? ''
+  const nameRu = (formData.get('name_ru') as string)?.trim() ?? ''
+  if (!nameLt || !nameEn || !nameRu) {
+    return { error: 'Pavadinimas privalomas visomis kalbomis (LT/EN/RU).' }
+  }
+
+  const categoryId = ((formData.get('category_id') as string) || '').trim()
+  if (!categoryId) return { error: 'Pasirinkite kategoriją.' }
+
+  const priceCents = toCents((formData.get('price_eur') as string) ?? '')
+  if (priceCents === null || priceCents <= 0) {
+    return { error: 'Neteisinga kaina. Pavyzdys: 7.90' }
+  }
+
+  const comparePriceRaw = (formData.get('compare_price_eur') as string) ?? ''
+  const comparePriceCents = comparePriceRaw.trim() === '' ? null : toCents(comparePriceRaw)
+  if (comparePriceRaw.trim() !== '' && comparePriceCents === null) {
+    return { error: 'Neteisinga sena kaina.' }
+  }
+  const b2bPriceRaw = (formData.get('b2b_price_eur') as string) ?? ''
+  const b2bPriceCents = b2bPriceRaw.trim() === '' ? null : toCents(b2bPriceRaw)
+  if (b2bPriceRaw.trim() !== '' && b2bPriceCents === null) {
+    return { error: 'Neteisinga B2B kaina.' }
+  }
+  const costPriceRaw = (formData.get('cost_price_eur') as string) ?? ''
+  const costPriceCents = costPriceRaw.trim() === '' ? null : toCents(costPriceRaw)
+  if (costPriceRaw.trim() !== '' && costPriceCents === null) {
+    return { error: 'Neteisinga savikaina.' }
+  }
+
+  const stockQuantity = toInt((formData.get('stock_quantity') as string) ?? '0') ?? 0
+  const volumeRaw = (formData.get('volume_ml') as string) ?? ''
+  const volumeMl = volumeRaw.trim() === '' ? null : toInt(volumeRaw)
+
+  const sku = ((formData.get('sku') as string) || '').trim() || null
+  const ean = ((formData.get('ean') as string) || '').trim() || null
+  const colorNumber = ((formData.get('color_number') as string) || '').trim() || null
+  const colorName = ((formData.get('color_name') as string) || '').trim() || null
+  const colorHex = ((formData.get('color_hex') as string) || '').trim() || null
+  const descriptionLt = ((formData.get('description_lt') as string) || '').trim() || null
+  const descriptionEn = ((formData.get('description_en') as string) || '').trim() || null
+  const descriptionRu = ((formData.get('description_ru') as string) || '').trim() || null
+  const isActive = formData.get('is_active') === 'on'
+  const isFeatured = formData.get('is_featured') === 'on'
+
+  // Nuotraukos — validuojam PRIEŠ insertą (kad nesukurtume produkto, jei failas blogas)
+  const files = formData
+    .getAll('images')
+    .filter((f): f is File => f instanceof File && f.size > 0)
+  for (const file of files) {
+    if (file.size > MAX_FILE_SIZE) {
+      return { error: `Nuotrauka „${file.name}" per didelė (max 10 MB).` }
+    }
+    if (!ALLOWED_MIME.has(file.type)) {
+      return { error: `Nuotrauka „${file.name}" — netinkamas formatas (JPG, PNG, WebP, AVIF).` }
+    }
+  }
+
+  // Slug: iš formos arba generuojam iš LT pavadinimo; užtikrinam unikalumą
+  let baseSlug = ((formData.get('slug') as string) || '').trim()
+  baseSlug = baseSlug ? slugify(baseSlug) : slugify(nameLt)
+  if (!baseSlug) baseSlug = 'produktas'
+  let slug = baseSlug
+  for (let i = 2; i < 100; i++) {
+    const { data: existing } = await supabase
+      .from('products')
+      .select('id')
+      .eq('slug', slug)
+      .maybeSingle()
+    if (!existing) break
+    slug = `${baseSlug}-${i}`
+  }
+
+  const { data, error } = await supabase
+    .from('products')
+    .insert({
+      slug,
+      sku,
+      ean,
+      category_id: categoryId,
+      name_lt: nameLt,
+      name_en: nameEn,
+      name_ru: nameRu,
+      description_lt: descriptionLt,
+      description_en: descriptionEn,
+      description_ru: descriptionRu,
+      price_cents: priceCents,
+      compare_price_cents: comparePriceCents,
+      b2b_price_cents: b2bPriceCents,
+      cost_price_cents: costPriceCents,
+      volume_ml: volumeMl,
+      color_number: colorNumber,
+      color_name: colorName,
+      color_hex: colorHex,
+      stock_quantity: stockQuantity,
+      is_in_stock: stockQuantity > 0,
+      is_active: isActive,
+      is_featured: isFeatured,
+    })
+    .select('id')
+    .single()
+
+  if (error || !data) {
+    console.error('[admin/sandelis/actions] createProduct:', error?.message)
+    if ((error?.message ?? '').includes('products_sku_key')) {
+      return { error: 'Toks SKU jau egzistuoja. Naudokite kitą.' }
+    }
+    if ((error?.message ?? '').includes('products_ean')) {
+      return { error: 'Toks EAN jau egzistuoja. Naudokite kitą.' }
+    }
+    return { error: `Nepavyko sukurti: ${error?.message ?? 'klaida'}` }
+  }
+
+  // Nuotraukos — įkeliam į Storage ir užpildom image_urls (best-effort: produktas
+  // jau sukurtas, tad įkėlimo klaida neblokuoja — nuotraukas galima pridėti ir
+  // redagavimo lange).
+  if (files.length > 0) {
+    const urls: string[] = []
+    for (const file of files) {
+      try {
+        const path = buildStoragePath(data.id, file)
+        const buffer = Buffer.from(await file.arrayBuffer())
+        const { error: upErr } = await supabase.storage
+          .from(PRODUCTS_BUCKET)
+          .upload(path, buffer, { contentType: file.type, upsert: true })
+        if (upErr) {
+          console.error('[admin/sandelis/actions] create image upload:', upErr.message)
+          continue
+        }
+        urls.push(supabase.storage.from(PRODUCTS_BUCKET).getPublicUrl(path).data.publicUrl)
+      } catch (e) {
+        console.error('[admin/sandelis/actions] create image exception:', e)
+      }
+    }
+    if (urls.length > 0) {
+      await supabase
+        .from('products')
+        .update({ image_urls: urls, updated_at: new Date().toISOString() })
+        .eq('id', data.id)
+    }
+  }
+
+  revalidatePath('/admin/sandelis', 'layout')
+  revalidatePath('/admin')
+  revalidateTag('products', 'max')
+  // Į redagavimo puslapį — ten admin gali pridėti daugiau nuotraukų, didmenos kainas
+  redirect(`/admin/sandelis/${data.id}?created=1`)
+}
+
+// ============================================
 // Greitas stock atnaujinimas (sąrašo puslapyje)
 // ============================================
 

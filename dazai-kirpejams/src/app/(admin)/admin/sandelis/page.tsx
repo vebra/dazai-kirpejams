@@ -114,6 +114,28 @@ export default async function AdminInventoryPage({
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-end gap-2 flex-wrap">
+        <a
+          href="/admin/sandelis/eksportas"
+          download
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-[#F5F5F7] transition-colors"
+        >
+          ⬇ Atsisiųsti CSV
+        </a>
+        <Link
+          href="/admin/sandelis/spausdinti"
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-[#F5F5F7] transition-colors"
+        >
+          🖨 Spausdinti
+        </Link>
+        <Link
+          href="/admin/sandelis/naujas"
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark transition-colors"
+        >
+          + Naujas produktas
+        </Link>
+      </div>
+
       {errorMessage && (
         <div className="px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
           {errorMessage}
