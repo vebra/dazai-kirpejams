@@ -3,6 +3,62 @@
 import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/admin/auth'
 import { createServerSupabase } from '@/lib/supabase/ssr'
+import { createServerClient } from '@/lib/supabase/server'
+import { sendEmail } from '@/lib/email/resend'
+import { buildRepOrderDecisionEmail } from '@/lib/email/templates'
+
+/**
+ * Pranešimas vadybininkei apie sprendimą (patvirtinta/atmesta). Service-role
+ * (kad gautume rep el. paštą iš auth.users). Non-blocking: laiško klaida
+ * nenutraukia veiksmo. Atmetimo priežastį skaitom iš orders (RPC ją įrašė).
+ */
+async function notifyRepDecision(
+  orderId: string,
+  decision: 'approved' | 'rejected'
+): Promise<void> {
+  try {
+    const sb = createServerClient()
+    const { data: o } = await sb
+      .from('orders')
+      .select('order_number, placed_by, total_cents, rejection_reason, clients(name)')
+      .eq('id', orderId)
+      .maybeSingle<{
+        order_number: string
+        placed_by: string | null
+        total_cents: number
+        rejection_reason: string | null
+        clients: { name: string } | null
+      }>()
+    if (!o?.placed_by) return
+
+    const { data: u } = await sb.auth.admin.getUserById(o.placed_by)
+    const email = u?.user?.email
+    if (!email) return
+
+    const { data: prof } = await sb
+      .from('user_profiles')
+      .select('first_name')
+      .eq('id', o.placed_by)
+      .maybeSingle<{ first_name: string | null }>()
+
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
+      'https://www.dazaikirpejams.lt'
+
+    const payload = buildRepOrderDecisionEmail({
+      orderNumber: o.order_number,
+      clientName: o.clients?.name ?? '—',
+      decision,
+      rejectionReason: o.rejection_reason ?? null,
+      totalCents: o.total_cents,
+      firstName: prof?.first_name ?? '',
+      repOrdersUrl: `${siteUrl}/vadybininke/uzsakymai`,
+    })
+    await sendEmail({ to: email, subject: payload.subject, html: payload.html, text: payload.text })
+  } catch (e) {
+    console.error('[admin/patvirtinimai] notifyRepDecision failed (non-blocking):', e)
+  }
+}
 
 /**
  * Vadybininkės užsakymų patvirtinimo Server Action'ai.
@@ -42,6 +98,8 @@ export async function approveRepOrder(orderId: string): Promise<ApprovalResult> 
     return { ok: false, error: humanError(error.message) }
   }
 
+  await notifyRepDecision(orderId, 'approved')
+
   revalidatePath('/admin/patvirtinimai')
   revalidatePath('/admin/uzsakymai', 'layout')
   revalidatePath('/admin')
@@ -69,6 +127,8 @@ export async function rejectRepOrder(
     console.error('[admin/patvirtinimai] reject:', error.message)
     return { ok: false, error: humanError(error.message) }
   }
+
+  await notifyRepDecision(orderId, 'rejected')
 
   revalidatePath('/admin/patvirtinimai')
   revalidatePath('/admin/uzsakymai', 'layout')

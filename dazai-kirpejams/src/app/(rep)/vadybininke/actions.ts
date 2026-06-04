@@ -9,7 +9,16 @@ import {
   vatRateFromVatCode,
 } from '@/lib/commerce/constants'
 import { getCompanyInfo } from '@/lib/admin/queries'
+import { sendEmail, getAdminNotificationEmail } from '@/lib/email/resend'
+import { buildRepOrderAdminEmail } from '@/lib/email/templates'
 import type { RepClient } from '@/lib/rep/types'
+
+function siteUrl(): string {
+  return (
+    process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
+    'https://www.dazaikirpejams.lt'
+  )
+}
 
 // ───────────────────────── Kliento kūrimas ─────────────────────────
 
@@ -88,7 +97,7 @@ export async function submitRepOrder(input: {
   paymentMethod: string
   notes?: string
 }): Promise<SubmitOrderResult> {
-  await requireSalesRep()
+  const { user } = await requireSalesRep()
 
   if (!input.clientId) return { ok: false, error: 'Pasirinkite klientą.' }
   if (!input.items?.length) return { ok: false, error: 'Pridėkite bent vieną prekę.' }
@@ -130,6 +139,35 @@ export async function submitRepOrder(input: {
     return { ok: false, error: humanError(error?.message) }
   }
 
+  const result = data as { order_number: string; total_cents: number }
+
+  // Pranešimas adminui — naujas užsakymas laukia patvirtinimo. Non-blocking:
+  // jei laiškas nepavyks, užsakymas vis tiek sėkmingas.
+  try {
+    const adminTo = getAdminNotificationEmail()
+    if (adminTo) {
+      const [{ data: cl }, { data: prof }] = await Promise.all([
+        supabase.from('clients').select('name').eq('id', input.clientId).maybeSingle(),
+        supabase.from('user_profiles').select('first_name, last_name').eq('id', user.id).maybeSingle(),
+      ])
+      const repName =
+        `${prof?.first_name ?? ''} ${prof?.last_name ?? ''}`.trim() || user.email || 'Vadybininkė'
+      const itemCount = input.items.reduce((s, i) => s + (i.quantity || 0), 0)
+      const payload = buildRepOrderAdminEmail({
+        orderNumber: result.order_number,
+        clientName: cl?.name ?? '—',
+        repName,
+        totalCents: result.total_cents,
+        itemCount,
+        adminUrl: `${siteUrl()}/admin/patvirtinimai`,
+        createdAt: new Date().toISOString(),
+      })
+      await sendEmail({ to: adminTo, subject: payload.subject, html: payload.html, text: payload.text })
+    }
+  } catch (e) {
+    console.error('[rep/actions] admin notify failed (non-blocking):', e)
+  }
+
   revalidatePath('/vadybininke/uzsakymai')
-  return { ok: true, orderNumber: (data as { order_number: string }).order_number }
+  return { ok: true, orderNumber: result.order_number }
 }
