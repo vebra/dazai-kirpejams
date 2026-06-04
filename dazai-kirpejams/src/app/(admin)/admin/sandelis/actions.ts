@@ -214,6 +214,19 @@ export async function createProductAction(
   const isActive = formData.get('is_active') === 'on'
   const isFeatured = formData.get('is_featured') === 'on'
 
+  // Nuotraukos — validuojam PRIEŠ insertą (kad nesukurtume produkto, jei failas blogas)
+  const files = formData
+    .getAll('images')
+    .filter((f): f is File => f instanceof File && f.size > 0)
+  for (const file of files) {
+    if (file.size > MAX_FILE_SIZE) {
+      return { error: `Nuotrauka „${file.name}" per didelė (max 10 MB).` }
+    }
+    if (!ALLOWED_MIME.has(file.type)) {
+      return { error: `Nuotrauka „${file.name}" — netinkamas formatas (JPG, PNG, WebP, AVIF).` }
+    }
+  }
+
   // Slug: iš formos arba generuojam iš LT pavadinimo; užtikrinam unikalumą
   let baseSlug = ((formData.get('slug') as string) || '').trim()
   baseSlug = baseSlug ? slugify(baseSlug) : slugify(nameLt)
@@ -269,10 +282,39 @@ export async function createProductAction(
     return { error: `Nepavyko sukurti: ${error?.message ?? 'klaida'}` }
   }
 
+  // Nuotraukos — įkeliam į Storage ir užpildom image_urls (best-effort: produktas
+  // jau sukurtas, tad įkėlimo klaida neblokuoja — nuotraukas galima pridėti ir
+  // redagavimo lange).
+  if (files.length > 0) {
+    const urls: string[] = []
+    for (const file of files) {
+      try {
+        const path = buildStoragePath(data.id, file)
+        const buffer = Buffer.from(await file.arrayBuffer())
+        const { error: upErr } = await supabase.storage
+          .from(PRODUCTS_BUCKET)
+          .upload(path, buffer, { contentType: file.type, upsert: true })
+        if (upErr) {
+          console.error('[admin/sandelis/actions] create image upload:', upErr.message)
+          continue
+        }
+        urls.push(supabase.storage.from(PRODUCTS_BUCKET).getPublicUrl(path).data.publicUrl)
+      } catch (e) {
+        console.error('[admin/sandelis/actions] create image exception:', e)
+      }
+    }
+    if (urls.length > 0) {
+      await supabase
+        .from('products')
+        .update({ image_urls: urls, updated_at: new Date().toISOString() })
+        .eq('id', data.id)
+    }
+  }
+
   revalidatePath('/admin/sandelis', 'layout')
   revalidatePath('/admin')
   revalidateTag('products', 'max')
-  // Į redagavimo puslapį — ten admin gali pridėti nuotraukas, didmenos kainas
+  // Į redagavimo puslapį — ten admin gali pridėti daugiau nuotraukų, didmenos kainas
   redirect(`/admin/sandelis/${data.id}?created=1`)
 }
 

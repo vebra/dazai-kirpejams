@@ -127,6 +127,22 @@ export function NewProductForm({ categories }: { categories: AdminCategoryOption
         </div>
       </section>
 
+      {/* Nuotraukos */}
+      <section className={sectionCls}>
+        <h3 className={headCls}>Nuotraukos (nebūtina)</h3>
+        <input
+          type="file"
+          name="images"
+          multiple
+          accept="image/jpeg,image/png,image/webp,image/avif"
+          className="block w-full text-sm text-brand-gray-600 file:mr-3 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-brand-magenta file:text-white file:font-semibold file:cursor-pointer hover:file:bg-brand-magenta-dark"
+        />
+        <p className="text-[11px] text-brand-gray-500">
+          JPG, PNG, WebP, AVIF · iki 10 MB. Galima pasirinkti kelias. Daugiau ir
+          pagrindinės nuotraukos parinkimą galėsite tvarkyti redaguojant.
+        </p>
+      </section>
+
       {/* Aprašymai */}
       <section className={sectionCls}>
         <h3 className={headCls}>Aprašymas (nebūtina)</h3>
