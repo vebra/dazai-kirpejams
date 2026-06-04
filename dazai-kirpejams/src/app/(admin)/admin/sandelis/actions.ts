@@ -758,23 +758,28 @@ export async function bulkDeactivateActiveAction(): Promise<void> {
 // ============================================
 
 export type ReceiveScanResult =
-  | { ok: true; found: true; name: string; sku: string | null; stock: number }
+  | { ok: true; found: true; name: string; sku: string | null; stock: number; added: number }
   | { ok: true; found: false; ean: string }
   | { ok: false; error: string }
 
 /**
- * Priima vieną nuskenuotą barkodą: atomiškai +1 prie likučio pagal EAN.
- * Kviečiama per admin SESIJOS klientą (RPC viduje is_admin() pagal auth.uid()).
+ * Priima nuskenuotą barkodą: atomiškai +qty prie likučio pagal EAN (qty=1 pagal
+ * nutylėjimą; dėžėms galima perduoti pvz. 24). Kviečiama per admin SESIJOS
+ * klientą (RPC viduje is_admin() pagal auth.uid()).
  */
-export async function receiveScannedItem(ean: string): Promise<ReceiveScanResult> {
+export async function receiveScannedItem(
+  ean: string,
+  qty = 1
+): Promise<ReceiveScanResult> {
   await requireAdmin()
   const code = (ean ?? '').trim()
   if (!code) return { ok: false, error: 'Tuščias barkodas.' }
+  const delta = Number.isInteger(qty) && qty > 0 && qty <= 100000 ? qty : 1
 
   const supabase = await createServerSupabase()
   const { data, error } = await supabase.rpc('receive_stock_by_ean', {
     p_ean: code,
-    p_delta: 1,
+    p_delta: delta,
   })
   if (error) {
     console.error('[admin/sandelis/actions] receiveScannedItem:', error.message)
@@ -792,5 +797,6 @@ export async function receiveScannedItem(ean: string): Promise<ReceiveScanResult
     name: r.name ?? '—',
     sku: r.sku ?? null,
     stock: r.stock ?? 0,
+    added: delta,
   }
 }
