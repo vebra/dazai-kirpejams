@@ -53,6 +53,17 @@ export default async function AdminRootLayout({
   return (
     <html lang="lt" className={`${inter.variable} h-full`}>
       <body className="min-h-full bg-[#F5F5F7] text-brand-gray-900 antialiased">
+        {/* Mobilus: 16px įvesties šriftas neleidžia iOS Safari „zoom on focus"
+            (kai laukas <16px, telefonas priartina ekraną pildant) + patogesnis
+            tapas. Tik admin zonoje, tik ≤640px. */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `@media (max-width: 640px) {
+              input:not([type=checkbox]):not([type=radio]):not([type=file]),
+              select, textarea { font-size: 16px !important; }
+            }`,
+          }}
+        />
         {user ? (
           <AdminSidebarProvider>
             <div className="flex min-h-screen">
