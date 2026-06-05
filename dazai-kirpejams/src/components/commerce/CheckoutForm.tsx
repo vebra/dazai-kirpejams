@@ -164,7 +164,15 @@ export function CheckoutForm({
     }
     setDiscountValidating(true)
     try {
-      const result = await validateDiscountCodeAction(code, subtotalCents, lang)
+      const result = await validateDiscountCodeAction(
+        code,
+        items.map((i) => ({
+          product_id: i.productId,
+          unit_price_cents: i.priceCents,
+          quantity: i.quantity,
+        })),
+        lang
+      )
       if (!result.ok) {
         setDiscountError(result.error)
         setAppliedDiscount(null)

@@ -1039,6 +1039,8 @@ export type AdminDiscountCode = {
   validFrom: string | null
   validUntil: string | null
   isActive: boolean
+  productCount: number
+  categoryCount: number
   createdAt: string
 }
 
@@ -1048,7 +1050,8 @@ export async function getAdminDiscountCodes(): Promise<AdminDiscountCode[]> {
     .from('discount_codes')
     .select(
       `id, code, description, discount_type, value, min_order_cents,
-       max_uses, used_count, valid_from, valid_until, is_active, created_at`
+       max_uses, used_count, valid_from, valid_until, is_active,
+       product_ids, category_ids, created_at`
     )
     .order('is_active', { ascending: false })
     .order('created_at', { ascending: false })
@@ -1070,6 +1073,8 @@ export async function getAdminDiscountCodes(): Promise<AdminDiscountCode[]> {
     validFrom: row.valid_from ?? null,
     validUntil: row.valid_until ?? null,
     isActive: row.is_active ?? true,
+    productCount: Array.isArray(row.product_ids) ? row.product_ids.length : 0,
+    categoryCount: Array.isArray(row.category_ids) ? row.category_ids.length : 0,
     createdAt: row.created_at,
   }))
 }

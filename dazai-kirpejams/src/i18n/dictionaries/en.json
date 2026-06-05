@@ -419,6 +419,7 @@
       "couponMinOrder": "This coupon requires a minimum order of {amount} €.",
       "couponMinOrderGeneric": "Minimum order amount for this coupon has not been reached.",
       "couponInvalidCart": "Invalid cart data.",
+      "couponNoEligibleItems": "This coupon does not apply to the items in your cart.",
       "couponGeneric": "Failed to apply coupon.",
       "couponCodeLength": "Coupon code must be 3–32 characters long.",
       "discountSystemUnavailable": "The discount system is currently unavailable.",
