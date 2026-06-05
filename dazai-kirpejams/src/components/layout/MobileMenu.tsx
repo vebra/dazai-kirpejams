@@ -121,10 +121,10 @@ export function MobileMenu({ lang, links, labels }: MobileMenuProps) {
               return (
                 <li
                   key={link.href}
-                  className={`transition-all duration-300 ease-out ${
-                    open ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-6'
+                  className={`transition-all duration-[380ms] ease-out ${
+                    open ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
                   }`}
-                  style={{ transitionDelay: open ? `${120 + i * 45}ms` : '0ms' }}
+                  style={{ transitionDelay: open ? `${140 + i * 80}ms` : '0ms' }}
                 >
                   <Link
                     href={link.href}
