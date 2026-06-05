@@ -8,6 +8,7 @@ import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Header } from '@/components/layout/Header'
 import { AnnouncementBar } from '@/components/layout/AnnouncementBar'
 import { Marquee } from '@/components/layout/Marquee'
+import { ScrollProgress } from '@/components/ui/ScrollProgress'
 import { Footer } from '@/components/layout/Footer'
 import { WhatsAppButton } from '@/components/layout/WhatsAppButton'
 import { Suspense } from 'react'
@@ -134,6 +135,7 @@ export default async function RootLayout({
         <JsonLd data={websiteSchema(lang)} />
         <JsonLd data={shippingDetailsSchema()} />
         <JsonLd data={returnPolicySchema()} />
+        <ScrollProgress />
         <VerificationProvider>
           <Header lang={lang} dict={dict} />
           <main className="flex-1 pt-[72px] lg:pt-[100px]">

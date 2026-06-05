@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
+import { StaggerReveal } from '@/components/ui/StaggerReveal'
+import { TiltCard } from '@/components/ui/TiltCard'
 import type { Locale } from '@/i18n/config'
 import { langPrefix } from '@/lib/utils'
 
@@ -35,12 +37,12 @@ export function Categories({ lang, dict }: CategoriesProps) {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <StaggerReveal className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {items.map((cat) => (
+            <TiltCard key={cat.slug}>
             <Link
-              key={cat.slug}
               href={`${langPrefix(lang)}/produktai/${cat.slug}`}
-              className="group bg-white rounded-xl overflow-hidden border border-[#E0E0E0] hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
+              className="group block h-full bg-white rounded-xl overflow-hidden border border-[#E0E0E0] hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
             >
               {isImagePath(cat.icon) ? (
                 <div className="relative aspect-square bg-[linear-gradient(135deg,#f5f5f7_0%,#e8e8ec_100%)] overflow-hidden">
@@ -66,8 +68,9 @@ export function Categories({ lang, dict }: CategoriesProps) {
                 </div>
               </div>
             </Link>
+            </TiltCard>
           ))}
-        </div>
+        </StaggerReveal>
       </Container>
     </section>
   )
