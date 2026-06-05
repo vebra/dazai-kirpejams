@@ -38,15 +38,15 @@ export default async function HomePage({ params }: PageProps<'/[lang]'>) {
       ])} />
       <Hero lang={lang} dict={dict} />
       <EventCountdownSection lang={lang} />
-      <Reveal><TrustBar dict={dict} /></Reveal>
+      <TrustBar dict={dict} />
       <Advantages dict={dict} />
       <Reveal><Categories lang={lang} dict={dict} /></Reveal>
       <Reveal><Comparison lang={lang} dict={dict} /></Reveal>
       <Reveal><FeaturedProducts lang={lang} dict={dict} /></Reveal>
       <BrandStrip lang={lang} />
-      <Reveal><Audience dict={dict} /></Reveal>
+      <Audience dict={dict} />
       <Reveal><MiniCalculator lang={lang} dict={dict.miniCalculator} /></Reveal>
-      <Reveal><Testimonials dict={dict} /></Reveal>
+      <Testimonials dict={dict} />
       <Reveal><B2BCta lang={lang} dict={dict} /></Reveal>
       <Reveal><Newsletter lang={lang} dict={dict.newsletter} /></Reveal>
       <Reveal><FinalCta lang={lang} dict={dict} /></Reveal>

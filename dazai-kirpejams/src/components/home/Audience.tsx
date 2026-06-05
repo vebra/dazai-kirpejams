@@ -1,5 +1,7 @@
 import Image from 'next/image'
 import { Container } from '@/components/ui/Container'
+import { SlideReveal } from '@/components/ui/SlideReveal'
+import { Reveal } from '@/components/ui/Reveal'
 
 type Card = { icon: string; title: string; desc: string }
 
@@ -15,46 +17,51 @@ export function Audience({ dict }: { dict: any }) {
   return (
     <section id="kam-skirta" className="py-20 bg-brand-gray-50">
       <Container>
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-            {t.label}
-          </span>
-          <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-3 leading-tight">
-            {t.titleFull}
-          </h2>
-          <p className="text-[1.1rem] text-brand-gray-500">
-            {t.subtitle}
-          </p>
-        </div>
+        <Reveal>
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
+              {t.label}
+            </span>
+            <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-3 leading-tight">
+              {t.titleFull}
+            </h2>
+            <p className="text-[1.1rem] text-brand-gray-500">
+              {t.subtitle}
+            </p>
+          </div>
+        </Reveal>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {cards.map((card) => (
-            <div
+          {cards.map((card, i) => (
+            <SlideReveal
               key={card.title}
-              className="bg-white rounded-xl p-9 px-7 text-center border border-[#E0E0E0] hover:border-brand-magenta hover:shadow-[0_2px_16px_rgba(0,0,0,0.07)] transition-all"
+              from={i % 2 === 0 ? 'left' : 'right'}
+              className="h-full"
             >
-              {isImagePath(card.icon) ? (
-                <div className="relative w-20 h-20 mx-auto mb-4 rounded-xl overflow-hidden bg-white">
-                  <Image
-                    src={card.icon}
-                    alt=""
-                    fill
-                    sizes="80px"
-                    className="object-contain"
-                  />
-                </div>
-              ) : (
-                <div className="text-[2.5rem] mb-4" aria-hidden>
-                  {card.icon}
-                </div>
-              )}
-              <h4 className="text-[1.1rem] font-bold text-brand-gray-900 mb-2.5">
-                {card.title}
-              </h4>
-              <p className="text-[0.9rem] text-brand-gray-500 leading-[1.65]">
-                {card.desc}
-              </p>
-            </div>
+              <div className="h-full bg-white rounded-xl p-9 px-7 text-center border border-[#E0E0E0] hover:border-brand-magenta hover:shadow-[0_2px_16px_rgba(0,0,0,0.07)] transition-all">
+                {isImagePath(card.icon) ? (
+                  <div className="relative w-20 h-20 mx-auto mb-4 rounded-xl overflow-hidden bg-white">
+                    <Image
+                      src={card.icon}
+                      alt=""
+                      fill
+                      sizes="80px"
+                      className="object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="text-[2.5rem] mb-4" aria-hidden>
+                    {card.icon}
+                  </div>
+                )}
+                <h4 className="text-[1.1rem] font-bold text-brand-gray-900 mb-2.5">
+                  {card.title}
+                </h4>
+                <p className="text-[0.9rem] text-brand-gray-500 leading-[1.65]">
+                  {card.desc}
+                </p>
+              </div>
+            </SlideReveal>
           ))}
         </div>
       </Container>
