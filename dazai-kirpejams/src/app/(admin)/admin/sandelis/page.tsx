@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { requireAdmin } from '@/lib/admin/auth'
 import {
   getAdminProducts,
@@ -388,14 +389,28 @@ export default async function AdminInventoryPage({
                     {/* Produktas */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        {p.colorHex ? (
+                        {p.imageUrl ? (
+                          <Image
+                            src={p.imageUrl}
+                            alt=""
+                            width={36}
+                            height={36}
+                            sizes="36px"
+                            className="flex-shrink-0 w-9 h-9 rounded-lg border border-[#ddd] object-cover bg-white"
+                          />
+                        ) : p.colorHex ? (
                           <div
                             className="flex-shrink-0 w-9 h-9 rounded-lg border border-[#ddd]"
                             style={{ backgroundColor: p.colorHex }}
                             aria-hidden
                           />
                         ) : (
-                          <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-[#F5F5F7] border border-[#ddd]" />
+                          <div
+                            className="flex-shrink-0 w-9 h-9 rounded-lg bg-[#F5F5F7] border border-[#ddd] flex items-center justify-center text-brand-gray-400 text-[14px]"
+                            aria-hidden
+                          >
+                            📦
+                          </div>
                         )}
                         <div className="min-w-0">
                           <div className="font-medium text-brand-gray-900 truncate">
