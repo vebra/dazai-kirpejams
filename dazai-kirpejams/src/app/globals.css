@@ -156,6 +156,39 @@ body {
 .dk-glow-screen[data-on="1"] {
   opacity: 0.32;
 }
+/* „Brand žodžių" juosta (BrandMarquee.tsx) — outline (contour) tekstas
+   brand spalvomis, dvi eilutės priešingomis kryptimis. */
+.dk-brand-marquee {
+  padding: clamp(2rem, 5vw, 3.5rem) 0;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.1rem, 1vw, 0.5rem);
+}
+.dk-brand-word {
+  display: inline-block;
+  padding-right: 0.15em;
+  font-size: clamp(2rem, 7vw, 4.75rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 1.08;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1.4px var(--color-magenta);
+}
+.dk-brand-word--magenta {
+  -webkit-text-stroke-color: var(--color-magenta);
+}
+.dk-brand-word--blue {
+  -webkit-text-stroke-color: var(--color-blue);
+}
+@media (max-width: 640px) {
+  .dk-brand-word {
+    -webkit-text-stroke-width: 1px;
+  }
+}
+
 @media (pointer: coarse) {
   .dk-cursor-glow {
     display: none;

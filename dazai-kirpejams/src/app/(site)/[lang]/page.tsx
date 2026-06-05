@@ -20,6 +20,7 @@ import { B2BCta } from '@/components/home/B2BCta'
 import { Newsletter } from '@/components/home/Newsletter'
 import { FinalCta } from '@/components/home/FinalCta'
 import { MiniCalculator } from '@/components/home/MiniCalculator'
+import { BrandStrip } from '@/components/home/BrandStrip'
 import { EventCountdownSection } from '@/components/events/EventCountdownSection'
 import { Reveal } from '@/components/ui/Reveal'
 
@@ -42,6 +43,7 @@ export default async function HomePage({ params }: PageProps<'/[lang]'>) {
       <Reveal><Categories lang={lang} dict={dict} /></Reveal>
       <Reveal><Comparison lang={lang} dict={dict} /></Reveal>
       <Reveal><FeaturedProducts lang={lang} dict={dict} /></Reveal>
+      <BrandStrip lang={lang} />
       <Reveal><Audience dict={dict} /></Reveal>
       <Reveal><MiniCalculator lang={lang} dict={dict.miniCalculator} /></Reveal>
       <Reveal><Testimonials dict={dict} /></Reveal>
