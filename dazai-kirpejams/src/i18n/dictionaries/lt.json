@@ -419,6 +419,7 @@
       "couponMinOrder": "Kuponui pritaikyti reikia mažiausiai {amount} € užsakymo sumos.",
       "couponMinOrderGeneric": "Nepasiekta minimali kupono suma.",
       "couponInvalidCart": "Neteisingi krepšelio duomenys.",
+      "couponNoEligibleItems": "Šis kuponas negalioja jūsų krepšelio prekėms.",
       "couponGeneric": "Nepavyko pritaikyti kupono.",
       "couponCodeLength": "Kupono kodas yra 3–32 simbolių ilgio.",
       "discountSystemUnavailable": "Nuolaidų sistema šiuo metu neprieinama.",

@@ -30,6 +30,13 @@ export type ValidateDiscountResult =
     }
   | { ok: false; error: string }
 
+/** Krepšelio prekė, perduodama nuolaidos skaičiavimui (apimties patikrai). */
+export type DiscountCartItem = {
+  product_id: string
+  unit_price_cents: number
+  quantity: number
+}
+
 type CheckoutErrors = Awaited<
   ReturnType<typeof getDictionary>
 >['checkout']['errors']
@@ -60,6 +67,8 @@ function reasonToMessage(
     }
     case 'invalid_cart':
       return errs.couponInvalidCart
+    case 'no_eligible_items':
+      return errs.couponNoEligibleItems
     default:
       return errs.couponGeneric
   }
@@ -67,7 +76,7 @@ function reasonToMessage(
 
 export async function validateDiscountCodeAction(
   code: string,
-  subtotalCents: number,
+  items: DiscountCartItem[],
   locale: Locale
 ): Promise<ValidateDiscountResult> {
   const checkout = (await getDictionary(locale)).checkout
@@ -81,7 +90,7 @@ export async function validateDiscountCodeAction(
   if (trimmed.length < 3 || trimmed.length > 32) {
     return { ok: false, error: errs.couponCodeLength }
   }
-  if (!Number.isFinite(subtotalCents) || subtotalCents < 0) {
+  if (!Array.isArray(items) || items.length === 0) {
     return { ok: false, error: errs.couponInvalidCart }
   }
 
@@ -90,9 +99,9 @@ export async function validateDiscountCodeAction(
   }
 
   const supabase = createServerClient()
-  const { data, error } = await supabase.rpc('validate_discount_code', {
+  const { data, error } = await supabase.rpc('validate_discount_code_v2', {
     p_code: trimmed,
-    p_cart_subtotal_cents: subtotalCents,
+    p_items: items,
   })
 
   if (error) {

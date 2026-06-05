@@ -71,7 +71,11 @@ export default async function AdminPricingPage({
           </p>
         </div>
 
-        <DiscountCodesSection codes={discountCodes} />
+        <DiscountCodesSection
+          codes={discountCodes}
+          products={products}
+          categories={categories}
+        />
       </section>
 
       {/* 2. Parduotuvės nustatymai */}

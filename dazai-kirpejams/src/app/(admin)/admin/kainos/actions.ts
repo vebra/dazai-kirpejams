@@ -105,6 +105,28 @@ export async function createDiscountCodeAction(
 
   const description = ((formData.get('description') as string) || '').trim() || null
 
+  // Apimtis: visoms prekėms (all) arba tik išrinktoms prekėms/kategorijoms.
+  const scope = (formData.get('scope') as string) ?? 'all'
+  let productIds: string[] | null = null
+  let categoryIds: string[] | null = null
+  if (scope === 'scoped') {
+    const pIds = formData
+      .getAll('product_ids')
+      .map((v) => String(v).trim())
+      .filter(Boolean)
+    const cIds = formData
+      .getAll('category_ids')
+      .map((v) => String(v).trim())
+      .filter(Boolean)
+    if (pIds.length === 0 && cIds.length === 0) {
+      return {
+        error: 'Pažymėkite bent vieną prekę arba kategoriją, arba pasirinkite „Visoms prekėms".',
+      }
+    }
+    productIds = pIds.length > 0 ? pIds : null
+    categoryIds = cIds.length > 0 ? cIds : null
+  }
+
   const { error } = await supabase.from('discount_codes').insert({
     code,
     description,
@@ -114,6 +136,8 @@ export async function createDiscountCodeAction(
     max_uses: maxUses,
     valid_from: validFrom,
     valid_until: validUntil,
+    product_ids: productIds,
+    category_ids: categoryIds,
     is_active: true,
   })
 

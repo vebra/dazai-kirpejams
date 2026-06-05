@@ -1,13 +1,19 @@
 'use client'
 
-import { useState, useActionState, useRef, useEffect } from 'react'
+import { useState, useMemo, useActionState, useRef, useEffect } from 'react'
 import {
   createDiscountCodeAction,
   toggleDiscountCodeAction,
   deleteDiscountCodeAction,
   type CreateDiscountCodeState,
 } from './actions'
-import type { AdminDiscountCode } from '@/lib/admin/queries'
+import type { AdminDiscountCode, AdminProductListRow } from '@/lib/admin/queries'
+
+type CategoryOption = {
+  categoryId: string
+  categoryNameLt: string
+  count: number
+}
 
 const initialState: CreateDiscountCodeState = {}
 
@@ -35,8 +41,12 @@ function discountDisplay(code: AdminDiscountCode): string {
 
 export function DiscountCodesSection({
   codes,
+  products = [],
+  categories = [],
 }: {
   codes: AdminDiscountCode[]
+  products?: AdminProductListRow[]
+  categories?: CategoryOption[]
 }) {
   const [showForm, setShowForm] = useState(codes.length === 0)
   const [state, formAction, isPending] = useActionState(
@@ -45,10 +55,30 @@ export function DiscountCodesSection({
   )
   const formRef = useRef<HTMLFormElement>(null)
 
+  const [scope, setScope] = useState<'all' | 'scoped'>('all')
+  const [search, setSearch] = useState('')
+  const [selProducts, setSelProducts] = useState<Set<string>>(new Set())
+  const [selCategories, setSelCategories] = useState<Set<string>>(new Set())
+
+  const filteredProducts = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return products
+    return products.filter(
+      (p) =>
+        p.nameLt.toLowerCase().includes(q) ||
+        (p.colorNumber ?? '').toLowerCase().includes(q) ||
+        (p.sku ?? '').toLowerCase().includes(q)
+    )
+  }, [products, search])
+
   // Po sėkmingo sukūrimo išvalom formą, kad naujo kodo laukai nesikartotų
   useEffect(() => {
     if (state.success) {
       formRef.current?.reset()
+      setScope('all')
+      setSelProducts(new Set())
+      setSelCategories(new Set())
+      setSearch('')
     }
   }, [state.success])
 
@@ -251,6 +281,148 @@ export function DiscountCodesSection({
             </div>
           </div>
 
+          {/* Apimtis — kam galioja */}
+          <div className="border-t border-[#eee] pt-4 space-y-3">
+            <div className="text-[12px] font-semibold text-brand-gray-900">
+              Kam galioja
+            </div>
+            <input type="hidden" name="scope" value={scope} />
+            <div className="flex flex-wrap gap-2">
+              {(
+                [
+                  ['all', 'Visoms prekėms'],
+                  ['scoped', 'Tik išrinktoms prekėms / kategorijoms'],
+                ] as const
+              ).map(([val, label]) => (
+                <label
+                  key={val}
+                  className={`px-4 py-2 rounded-lg border text-sm font-semibold cursor-pointer transition-colors ${
+                    scope === val
+                      ? 'bg-brand-magenta text-white border-brand-magenta'
+                      : 'bg-white text-brand-gray-900 border-[#ddd] hover:border-brand-magenta'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="_scope_radio"
+                    value={val}
+                    checked={scope === val}
+                    onChange={() => setScope(val)}
+                    className="sr-only"
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+
+            {scope === 'scoped' && (
+              <div className="space-y-4 pt-1">
+                {/* Kategorijos */}
+                {categories.length > 0 && (
+                  <div>
+                    <div className="text-[12px] font-semibold text-brand-gray-900 mb-1.5">
+                      Kategorijos
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {categories.map((c) => {
+                        const on = selCategories.has(c.categoryId)
+                        return (
+                          <label
+                            key={c.categoryId}
+                            className={`px-3 py-1.5 rounded-lg border text-[13px] cursor-pointer transition-colors ${
+                              on
+                                ? 'bg-brand-magenta/10 border-brand-magenta text-brand-magenta font-semibold'
+                                : 'bg-white border-[#ddd] text-brand-gray-900 hover:border-brand-magenta'
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={on}
+                              onChange={() =>
+                                setSelCategories((prev) => {
+                                  const next = new Set(prev)
+                                  if (next.has(c.categoryId)) next.delete(c.categoryId)
+                                  else next.add(c.categoryId)
+                                  return next
+                                })
+                              }
+                              className="sr-only"
+                            />
+                            {c.categoryNameLt} ({c.count})
+                          </label>
+                        )
+                      })}
+                    </div>
+                    {Array.from(selCategories).map((id) => (
+                      <input key={id} type="hidden" name="category_ids" value={id} />
+                    ))}
+                  </div>
+                )}
+
+                {/* Prekės */}
+                <div>
+                  <div className="flex items-center justify-between gap-3 mb-1.5">
+                    <div className="text-[12px] font-semibold text-brand-gray-900">
+                      Prekės
+                    </div>
+                    <span className="text-[11px] text-brand-gray-500">
+                      Pažymėta: {selProducts.size}
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Ieškoti pagal pavadinimą, numerį, SKU…"
+                    className="w-full px-3.5 py-2 bg-white border border-[#ddd] rounded-lg text-sm mb-2 focus:outline-none focus:border-brand-magenta"
+                  />
+                  <div className="max-h-60 overflow-y-auto border border-[#eee] rounded-lg divide-y divide-[#f0f0f0]">
+                    {filteredProducts.length === 0 ? (
+                      <div className="px-4 py-5 text-center text-sm text-brand-gray-500">
+                        Nieko nerasta.
+                      </div>
+                    ) : (
+                      filteredProducts.map((pr) => {
+                        const on = selProducts.has(pr.id)
+                        return (
+                          <label
+                            key={pr.id}
+                            className="flex items-center gap-3 px-3 py-2 hover:bg-[#F9F9FB] cursor-pointer text-sm"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={on}
+                              onChange={() =>
+                                setSelProducts((prev) => {
+                                  const next = new Set(prev)
+                                  if (next.has(pr.id)) next.delete(pr.id)
+                                  else next.add(pr.id)
+                                  return next
+                                })
+                              }
+                              className="w-4 h-4 accent-brand-magenta"
+                            />
+                            <span className="flex-1 text-brand-gray-900">
+                              {pr.colorNumber ? `${pr.colorNumber} · ` : ''}
+                              {pr.nameLt}
+                            </span>
+                          </label>
+                        )
+                      })
+                    )}
+                  </div>
+                  {Array.from(selProducts).map((id) => (
+                    <input key={id} type="hidden" name="product_ids" value={id} />
+                  ))}
+                </div>
+                <p className="text-[11px] text-brand-gray-500">
+                  Nuolaida bus skaičiuojama tik nuo pažymėtų prekių / kategorijų
+                  sumos krepšelyje.
+                </p>
+              </div>
+            )}
+          </div>
+
           <div className="flex justify-end gap-2">
             <button
               type="submit"
@@ -304,6 +476,13 @@ export function DiscountCodesSection({
                         <span className="font-mono font-bold text-brand-gray-900">
                           {c.code}
                         </span>
+                        {c.productCount + c.categoryCount > 0 && (
+                          <span className="block mt-0.5 text-[10px] text-brand-magenta font-semibold">
+                            tik išrinktoms
+                            {c.productCount > 0 ? ` · ${c.productCount} prekė(s)` : ''}
+                            {c.categoryCount > 0 ? ` · ${c.categoryCount} kat.` : ''}
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-brand-gray-500 text-[12px]">
                         {c.description ?? '—'}
