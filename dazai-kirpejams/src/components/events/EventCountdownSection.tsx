@@ -49,7 +49,7 @@ export async function EventCountdownSection({
             </p>
             <Link
               href={detailHref}
-              className="inline-flex items-center justify-center gap-2 px-9 py-[16px] bg-brand-magenta text-white rounded-lg text-[1.05rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.4)] transition-all"
+              className="inline-flex items-center justify-center gap-2 px-9 py-[16px] bg-brand-gradient text-white rounded-lg text-[1.05rem] font-semibold hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.4)] transition-all"
             >
               {isFull ? 'Susisiekti dėl laukimo sąrašo' : 'Registruotis nemokamai'} →
             </Link>

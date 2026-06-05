@@ -117,7 +117,7 @@ export function CookieConsent({ lang, dict }: { lang: Locale; dict: Dict }) {
             <button
               type="button"
               onClick={() => decide('accepted')}
-              className="min-h-[44px] px-3 py-2 rounded-md bg-brand-magenta text-white text-[0.72rem] font-semibold hover:bg-brand-magenta-dark transition-colors"
+              className="min-h-[44px] px-3 py-2 rounded-md bg-brand-gradient text-white text-[0.72rem] font-semibold hover:brightness-110 transition-colors"
             >
               {dict.accept}
             </button>
@@ -153,7 +153,7 @@ export function CookieConsent({ lang, dict }: { lang: Locale; dict: Dict }) {
             <button
               type="button"
               onClick={() => decide('accepted')}
-              className="px-6 py-3 rounded-lg bg-brand-magenta text-white text-[0.92rem] font-semibold hover:bg-brand-magenta-dark transition-colors"
+              className="px-6 py-3 rounded-lg bg-brand-gradient text-white text-[0.92rem] font-semibold hover:brightness-110 transition-colors"
             >
               {dict.accept}
             </button>

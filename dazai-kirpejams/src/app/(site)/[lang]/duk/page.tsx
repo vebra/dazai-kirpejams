@@ -197,7 +197,7 @@ export default async function FaqPage({ params }: PageProps<'/[lang]/duk'>) {
             <div className="flex flex-wrap justify-center gap-4">
               <a
                 href="mailto:info@dazaikirpejams.lt"
-                className="inline-flex items-center justify-center gap-2 px-8 py-[14px] bg-brand-magenta text-white rounded-lg text-[1rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
+                className="inline-flex items-center justify-center gap-2 px-8 py-[14px] bg-brand-gradient text-white rounded-lg text-[1rem] font-semibold hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
               >
                 {t.ctaEmail}
               </a>

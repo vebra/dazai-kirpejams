@@ -196,7 +196,7 @@ export function ProductPriceBlock({
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="inline-flex items-center justify-center min-h-[44px] px-6 py-3 bg-brand-magenta text-white rounded-lg text-[0.95rem] font-semibold hover:bg-brand-magenta-dark transition-colors"
+            className="inline-flex items-center justify-center min-h-[44px] px-6 py-3 bg-brand-gradient text-white rounded-lg text-[0.95rem] font-semibold hover:brightness-110 transition-colors"
           >
             {labels.refreshPage}
           </button>
@@ -213,7 +213,7 @@ export function ProductPriceBlock({
             <Link
               href={`${langPrefixStr}/prisijungimas`}
               onClick={() => handlePriceUnlock('login')}
-              className="flex-1 flex items-center justify-center min-h-[48px] px-6 py-3 bg-brand-magenta text-white rounded-lg text-[0.95rem] font-semibold hover:bg-brand-magenta-dark transition-colors"
+              className="flex-1 flex items-center justify-center min-h-[48px] px-6 py-3 bg-brand-gradient text-white rounded-lg text-[0.95rem] font-semibold hover:brightness-110 transition-colors"
             >
               {labels.login}
             </Link>
