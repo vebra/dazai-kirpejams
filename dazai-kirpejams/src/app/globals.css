@@ -61,6 +61,150 @@ body {
   color: white;
 }
 
+/* Brand gradientas (magenta → mėlyna) — akcentams: CTA, ženkliukai.
+   Naudoja TIK 2 esamas akcentines spalvas, kad liktų premium ir on-brand. */
+.bg-brand-gradient {
+  background-image: linear-gradient(135deg, var(--color-magenta) 0%, var(--color-blue) 100%);
+}
+.text-brand-gradient {
+  background-image: linear-gradient(135deg, var(--color-magenta) 0%, var(--color-blue) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Įėjimo animacija — scroll-reveal sekcijoms ir spalvų paletės stagger'iui.
+   Subtilus fade + slide-up (premium, ne „šokinėjimas"). */
+@keyframes dk-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.dk-fade-up {
+  animation: dk-fade-up 0.5s ease-out both;
+}
+
+/* Bėganti reklaminė juosta (marquee). Du identiški segmentai → -50% = sklandus ciklas. */
+@keyframes dk-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Mygtukų „shine" — užvedus per mygtuką nuslysta šviesos blikas. Premium, subtilus.
+   Naudoti su .bg-brand-gradient mygtukais (overflow paslepia bliką už kampų). */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 65%
+  );
+  transform: translateX(-130%);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+}
+.btn-shine:hover::after {
+  transform: translateX(130%);
+}
+
+/* Pelę sekantis spalvų „pliūpsnio" švytėjimas (CursorGlow.tsx).
+   Du sluoksniai: multiply matosi ant šviesaus fono (baltos purslų dalys dingsta),
+   screen matosi ant tamsaus fono. Kartu — matomas visur, tekstas įskaitomas.
+   Tik desktop; reduced-motion / lietimas — paslepiama. */
+.dk-cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 440px;
+  height: 440px;
+  pointer-events: none;
+  z-index: 30;
+  background-image: url("/cursor-splash.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: blur(6px) saturate(1.05);
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  will-change: transform;
+}
+.dk-glow-multiply {
+  mix-blend-mode: multiply;
+}
+.dk-glow-screen {
+  mix-blend-mode: screen;
+}
+.dk-glow-multiply[data-on="1"] {
+  opacity: 0.45;
+}
+.dk-glow-screen[data-on="1"] {
+  opacity: 0.32;
+}
+/* „Brand žodžių" juosta (BrandMarquee.tsx) — outline (contour) tekstas
+   brand spalvomis, dvi eilutės priešingomis kryptimis. */
+.dk-brand-marquee {
+  padding: clamp(2rem, 5vw, 3.5rem) 0;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.25rem, 1.5vw, 0.75rem);
+}
+/* Eilutės talpa — su vertikaliu tarpu, kad lietuviškų raidžių diakritikai
+   (Ų, Š, Ž, Ė ir kt.) nebūtų apkarpomi overflow:hidden. */
+.dk-brand-marquee > div {
+  padding-block: 0.12em;
+}
+.dk-brand-word {
+  display: inline-block;
+  padding-right: 0.15em;
+  font-size: clamp(2rem, 7vw, 4.75rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1.4px var(--color-magenta);
+}
+.dk-brand-word--magenta {
+  -webkit-text-stroke-color: var(--color-magenta);
+}
+.dk-brand-word--blue {
+  -webkit-text-stroke-color: var(--color-blue);
+}
+@media (max-width: 640px) {
+  .dk-brand-word {
+    -webkit-text-stroke-width: 1px;
+  }
+}
+
+@media (pointer: coarse) {
+  .dk-cursor-glow {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dk-cursor-glow {
+    display: none;
+  }
+}
+
 /* iOS Safari priartina puslapį, kai įvesties laukelio šriftas <16px.
    Mobiliai priverstinai 16px (!important nugali Tailwind text-sm utility). */
 @media (max-width: 640px) {
@@ -79,6 +223,7 @@ body {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;

@@ -56,7 +56,7 @@ export async function Hero({ lang, dict }: HeroProps) {
             ) : (
               <h1 className="text-[clamp(1.85rem,4.5vw,3rem)] font-bold leading-[1.15] text-brand-gray-900 mb-4">
                 {hero.titleStart}{' '}
-                <span className="text-brand-magenta">{hero.titleAccent}</span>{' '}
+                <span className="text-brand-gradient">{hero.titleAccent}</span>{' '}
                 {hero.titleEnd}
               </h1>
             )}
@@ -68,7 +68,7 @@ export async function Hero({ lang, dict }: HeroProps) {
             <div className="flex flex-wrap gap-3 justify-center lg:justify-start mb-4">
               <Link
                 href={ctaUrl}
-                className="inline-flex items-center justify-center gap-2 px-9 py-[16px] bg-brand-magenta text-white rounded-lg text-[1.05rem] font-semibold hover:bg-brand-magenta-dark hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
+                className="inline-flex items-center justify-center gap-2 px-9 py-[16px] btn-shine bg-brand-gradient text-white rounded-lg text-[1.05rem] font-semibold hover:-translate-y-0.5 hover:shadow-[0_6px_22px_rgba(233,30,140,0.4)] hover:brightness-105 transition-all"
               >
                 {ctaText}
               </Link>

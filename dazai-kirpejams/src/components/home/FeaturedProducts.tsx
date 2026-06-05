@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
+import { StaggerReveal } from '@/components/ui/StaggerReveal'
 import { getProducts, getCategories } from '@/lib/data/queries'
 import type { Locale } from '@/i18n/config'
 import { langPrefix } from '@/lib/utils'
@@ -47,7 +48,7 @@ export async function FeaturedProducts({ lang, dict }: FeaturedProductsProps) {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
+        <StaggerReveal className="grid grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
           {products.map((product) => {
             const categorySlug = categoryById.get(product.category_id) || 'dazai'
             return (
@@ -60,7 +61,7 @@ export async function FeaturedProducts({ lang, dict }: FeaturedProductsProps) {
               />
             )
           })}
-        </div>
+        </StaggerReveal>
       </Container>
     </section>
   )

@@ -270,7 +270,7 @@ function EventFinishedBlock() {
       </p>
       <a
         href="/lt/produktai"
-        className="mt-6 inline-block px-6 py-3 bg-brand-magenta text-white rounded-lg font-semibold hover:bg-brand-magenta-dark transition-colors"
+        className="mt-6 inline-block px-6 py-3 btn-shine bg-brand-gradient text-white rounded-lg font-semibold hover:brightness-110 transition-colors"
       >
         Peržiūrėti Color SHOCK produktus
       </a>

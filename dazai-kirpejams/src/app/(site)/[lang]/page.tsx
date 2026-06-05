@@ -20,7 +20,9 @@ import { B2BCta } from '@/components/home/B2BCta'
 import { Newsletter } from '@/components/home/Newsletter'
 import { FinalCta } from '@/components/home/FinalCta'
 import { MiniCalculator } from '@/components/home/MiniCalculator'
+import { BrandStrip } from '@/components/home/BrandStrip'
 import { EventCountdownSection } from '@/components/events/EventCountdownSection'
+import { Reveal } from '@/components/ui/Reveal'
 
 export default async function HomePage({ params }: PageProps<'/[lang]'>) {
   const { lang } = await params
@@ -36,17 +38,18 @@ export default async function HomePage({ params }: PageProps<'/[lang]'>) {
       ])} />
       <Hero lang={lang} dict={dict} />
       <EventCountdownSection lang={lang} />
-      <TrustBar dict={dict} />
-      <Advantages dict={dict} />
-      <Categories lang={lang} dict={dict} />
-      <Comparison lang={lang} dict={dict} />
-      <FeaturedProducts lang={lang} dict={dict} />
-      <Audience dict={dict} />
-      <MiniCalculator lang={lang} dict={dict.miniCalculator} />
-      <Testimonials dict={dict} />
-      <B2BCta lang={lang} dict={dict} />
-      <Newsletter lang={lang} dict={dict.newsletter} />
-      <FinalCta lang={lang} dict={dict} />
+      <Reveal><TrustBar dict={dict} /></Reveal>
+      <Reveal><Advantages dict={dict} /></Reveal>
+      <Reveal><Categories lang={lang} dict={dict} /></Reveal>
+      <Reveal><Comparison lang={lang} dict={dict} /></Reveal>
+      <Reveal><FeaturedProducts lang={lang} dict={dict} /></Reveal>
+      <BrandStrip lang={lang} />
+      <Reveal><Audience dict={dict} /></Reveal>
+      <Reveal><MiniCalculator lang={lang} dict={dict.miniCalculator} /></Reveal>
+      <Reveal><Testimonials dict={dict} /></Reveal>
+      <Reveal><B2BCta lang={lang} dict={dict} /></Reveal>
+      <Reveal><Newsletter lang={lang} dict={dict.newsletter} /></Reveal>
+      <Reveal><FinalCta lang={lang} dict={dict} /></Reveal>
     </>
   )
 }
