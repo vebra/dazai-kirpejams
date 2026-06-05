@@ -123,6 +123,42 @@ body {
   transform: translateX(130%);
 }
 
+/* Pelę sekantis spalvų „pliūpsnio" švytėjimas (CursorGlow.tsx).
+   mix-blend: multiply — baltas fonas nudažomas spalva, baltos purslų dalys
+   dingsta (white*x=x), todėl matosi tik spalvotas branduolys; tekstas lieka
+   įskaitomas. Tik desktop; reduced-motion / lietimas — paslepiama. */
+.dk-cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 440px;
+  height: 440px;
+  pointer-events: none;
+  z-index: 30;
+  background-image: url("/cursor-splash.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: blur(6px) saturate(1.05);
+  opacity: 0;
+  mix-blend-mode: multiply;
+  transition: opacity 0.45s ease;
+  will-change: transform;
+}
+.dk-cursor-glow[data-on="1"] {
+  opacity: 0.42;
+}
+@media (pointer: coarse) {
+  .dk-cursor-glow {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dk-cursor-glow {
+    display: none;
+  }
+}
+
 /* iOS Safari priartina puslapį, kai įvesties laukelio šriftas <16px.
    Mobiliai priverstinai 16px (!important nugali Tailwind text-sm utility). */
 @media (max-width: 640px) {
