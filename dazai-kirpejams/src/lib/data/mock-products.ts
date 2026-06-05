@@ -96,6 +96,7 @@ function makeProduct(p: Partial<Product>): Product {
     price_cents: 0,
     compare_price_cents: null,
     b2b_price_cents: null,
+    sale_price_cents: null,
     volume_ml: null,
     weight_g: null,
     color_number: null,

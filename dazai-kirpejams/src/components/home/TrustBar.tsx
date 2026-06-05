@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { Container } from '@/components/ui/Container'
+import { SlideReveal } from '@/components/ui/SlideReveal'
 
 /**
  * Trust bar — balta juosta su apatiniu rėmeliu po Hero.
@@ -36,27 +37,30 @@ export function TrustBar({ dict }: { dict: any }) {
     <section className="py-8 bg-white border-b border-[#E0E0E0]">
       <Container>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          {items.map((item) => (
-            <div
+          {items.map((item, i) => (
+            <SlideReveal
               key={item.title}
-              className="flex flex-col items-center gap-2"
+              from={i % 2 === 0 ? 'left' : 'right'}
+              className="h-full"
             >
-              <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-white">
-                <Image
-                  src={item.icon}
-                  alt=""
-                  fill
-                  sizes="48px"
-                  className="object-contain"
-                />
+              <div className="flex h-full flex-col items-center gap-2">
+                <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-white">
+                  <Image
+                    src={item.icon}
+                    alt=""
+                    fill
+                    sizes="48px"
+                    className="object-contain"
+                  />
+                </div>
+                <h4 className="text-[0.95rem] font-bold text-brand-gray-900 leading-tight">
+                  {item.title}
+                </h4>
+                <p className="text-[0.85rem] text-brand-gray-500 leading-snug">
+                  {item.desc}
+                </p>
               </div>
-              <h4 className="text-[0.95rem] font-bold text-brand-gray-900 leading-tight">
-                {item.title}
-              </h4>
-              <p className="text-[0.85rem] text-brand-gray-500 leading-snug">
-                {item.desc}
-              </p>
-            </div>
+            </SlideReveal>
           ))}
         </div>
       </Container>

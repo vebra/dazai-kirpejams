@@ -47,6 +47,7 @@ export type Product = {
   price_cents: number
   compare_price_cents: number | null
   b2b_price_cents: number | null
+  sale_price_cents: number | null
 
   volume_ml: number | null
   weight_g: number | null
@@ -82,6 +83,26 @@ export function localizedField<
 
 export function getProductName(product: Product, locale: Locale): string {
   return localizedField(product, 'name', locale)
+}
+
+/** Ar prekė turi galiojančią akcijos kainą (mažesnę už įprastą). */
+export function isOnSale(product: {
+  sale_price_cents: number | null
+  price_cents: number
+}): boolean {
+  return (
+    product.sale_price_cents != null &&
+    product.sale_price_cents > 0 &&
+    product.sale_price_cents < product.price_cents
+  )
+}
+
+/** Galiojanti kaina centais — akcijos kaina, jei aktyvi, kitaip įprasta. */
+export function getEffectivePriceCents(product: {
+  sale_price_cents: number | null
+  price_cents: number
+}): number {
+  return isOnSale(product) ? (product.sale_price_cents as number) : product.price_cents
 }
 
 export function getProductDescription(

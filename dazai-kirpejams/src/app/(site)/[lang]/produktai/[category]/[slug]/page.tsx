@@ -19,11 +19,14 @@ import {
   getProductDescription,
   getCategoryName,
   localizedField,
+  isOnSale,
+  getEffectivePriceCents,
 } from '@/lib/types'
 import { formatPrice, langPrefix } from '@/lib/utils'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
 import { ProductPriceBlock } from '@/components/products/ProductPriceBlock'
+import { StickyBuyBar } from '@/components/products/StickyBuyBar'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { productSchema, breadcrumbSchema } from '@/lib/schema'
 import { buildCanonicalUrl, buildLanguageAlternates, SITE_URL } from '@/lib/seo'
@@ -115,10 +118,15 @@ export default async function ProductPage({
   const ingredients = localizedField(product, 'ingredients', lang)
   const usage = localizedField(product, 'usage', lang)
 
-  const price = product.price_cents / 100
-  const comparePrice = product.compare_price_cents
-    ? product.compare_price_cents / 100
-    : null
+  const onSale = isOnSale(product)
+  const effectiveCents = getEffectivePriceCents(product)
+  const price = effectiveCents / 100
+  // Akcijos metu perbraukiama įprasta kaina; kitu atveju — tiekėjo „compare" kaina.
+  const comparePrice = onSale
+    ? product.price_cents / 100
+    : product.compare_price_cents
+      ? product.compare_price_cents / 100
+      : null
   const savings = comparePrice ? comparePrice - price : null
   const pricePerMl = product.volume_ml
     ? (price / product.volume_ml).toFixed(3)
@@ -140,6 +148,19 @@ export default async function ProductPage({
     product.image_urls && product.image_urls.length > 0
       ? product.image_urls
       : []
+
+  const cartItem = {
+    productId: product.id,
+    slug: product.slug,
+    categorySlug,
+    sku: product.sku,
+    name,
+    priceCents: effectiveCents,
+    volumeMl: product.volume_ml,
+    imageUrl: images[0] ?? null,
+    colorHex: product.color_hex,
+    colorNumber: product.color_number,
+  }
 
   return (
     <>
@@ -239,18 +260,7 @@ export default async function ProductPage({
                 savings={savings}
                 pricePerMl={pricePerMl}
                 volumeMl={product.volume_ml}
-                cartItem={{
-                  productId: product.id,
-                  slug: product.slug,
-                  categorySlug,
-                  sku: product.sku,
-                  name,
-                  priceCents: product.price_cents,
-                  volumeMl: product.volume_ml,
-                  imageUrl: images[0] ?? null,
-                  colorHex: product.color_hex,
-                  colorNumber: product.color_number,
-                }}
+                cartItem={cartItem}
                 labels={{
                   volumeDouble: t.volumeDouble,
                   pricePerMl: t.pricePerMl,
@@ -273,6 +283,9 @@ export default async function ProductPage({
                   goToAccount: t.goToAccount,
                 }}
               />
+
+              {/* Sticky juostos slenkstis — kai nuslenkama žemiau, parodoma juosta */}
+              <div id="buybar-anchor" aria-hidden className="h-px w-full" />
 
               {/* Description */}
               {description && (
@@ -438,6 +451,19 @@ export default async function ProductPage({
           </div>
         </Container>
       </section>
+
+      <StickyBuyBar
+        lang={lang}
+        langPrefixStr={langPrefix(lang)}
+        price={price}
+        cartItem={cartItem}
+        labels={{
+          addToCart: dict.popular.addToCart,
+          addedToCart: dict.popular.added,
+          login: t.login,
+          priceOnlyPro: t.priceOnlyPro,
+        }}
+      />
     </>
   )
 }

@@ -3,10 +3,12 @@ import {
   getAdminDiscountCodes,
   getShopSettings,
   getProductsCountByCategory,
+  getAdminProducts,
 } from '@/lib/admin/queries'
 import { ShopSettingsForm } from './ShopSettingsForm'
 import { DiscountCodesSection } from './DiscountCodesSection'
 import { BulkPriceUpdateForm } from './BulkPriceUpdateForm'
+import { SaleSection } from './SaleSection'
 
 export const metadata = {
   title: 'Kainos ir nuolaidos',
@@ -32,10 +34,11 @@ export default async function AdminPricingPage({
           : null
 
   // Paraleliai gaunam visus duomenis — jie nepriklausomi
-  const [settings, discountCodes, categories] = await Promise.all([
+  const [settings, discountCodes, categories, products] = await Promise.all([
     getShopSettings(),
     getAdminDiscountCodes(),
     getProductsCountByCategory(),
+    getAdminProducts({ sortBy: 'name' }),
   ])
 
   return (
@@ -86,7 +89,22 @@ export default async function AdminPricingPage({
         <ShopSettingsForm settings={settings} />
       </section>
 
-      {/* 3. Masinis kainų atnaujinimas */}
+      {/* 3. Akcijos (matoma akcijos kaina) */}
+      <section className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6 space-y-5">
+        <div className="pb-4 border-b border-[#eee]">
+          <h3 className="text-lg font-bold text-brand-gray-900">
+            Akcijos (akcijos kaina)
+          </h3>
+          <p className="mt-1 text-[13px] text-brand-gray-500">
+            Uždėkite sumažintą kainą visoms, kategorijos ar išrinktoms prekėms.
+            Svetainėje rodoma akcijos kaina, sena kaina perbraukta.
+          </p>
+        </div>
+
+        <SaleSection categories={categories} products={products} />
+      </section>
+
+      {/* 4. Masinis kainų atnaujinimas */}
       <section className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6 space-y-5">
         <div className="pb-4 border-b border-[#eee]">
           <h3 className="text-lg font-bold text-brand-gray-900">

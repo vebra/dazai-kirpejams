@@ -1,5 +1,7 @@
 import Image from 'next/image'
 import { Container } from '@/components/ui/Container'
+import { SlideReveal } from '@/components/ui/SlideReveal'
+import { Reveal } from '@/components/ui/Reveal'
 
 type TestimonialItem = {
   quote: string
@@ -23,24 +25,28 @@ export function Testimonials({ dict }: { dict: any }) {
   return (
     <section className="py-20 bg-white">
       <Container>
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-            {t.badge}
-          </span>
-          <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-3 leading-tight">
-            {t.title}
-          </h2>
-          <p className="text-[1.1rem] text-brand-gray-500">
-            {t.subtitle}
-          </p>
-        </div>
+        <Reveal>
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="inline-block text-xs font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
+              {t.badge}
+            </span>
+            <h2 className="text-[clamp(1.5rem,3.5vw,2.25rem)] font-bold text-brand-gray-900 mb-3 leading-tight">
+              {t.title}
+            </h2>
+            <p className="text-[1.1rem] text-brand-gray-500">
+              {t.subtitle}
+            </p>
+          </div>
+        </Reveal>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-          {(t.items as TestimonialItem[]).map((item) => (
-            <div
+          {(t.items as TestimonialItem[]).map((item, i) => (
+            <SlideReveal
               key={item.name}
-              className="bg-brand-gray-50 rounded-xl p-8 relative"
+              from={i % 2 === 0 ? 'left' : 'right'}
+              className="h-full"
             >
+              <div className="h-full bg-brand-gray-50 rounded-xl p-8 relative">
               <div
                 className="text-[#F5A623] text-base tracking-[2px] mb-4"
                 aria-label={t.starsLabel}
@@ -75,7 +81,8 @@ export function Testimonials({ dict }: { dict: any }) {
                   </div>
                 </div>
               </div>
-            </div>
+              </div>
+            </SlideReveal>
           ))}
         </div>
       </Container>

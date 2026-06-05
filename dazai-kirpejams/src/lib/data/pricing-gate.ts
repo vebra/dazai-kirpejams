@@ -12,5 +12,6 @@ export function stripProductPricing(p: Product): Product {
     price_cents: 0,
     compare_price_cents: null,
     b2b_price_cents: null,
+    sale_price_cents: null,
   }
 }

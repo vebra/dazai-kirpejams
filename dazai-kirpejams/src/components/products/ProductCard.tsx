@@ -2,7 +2,13 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { getProductName, getColorName, type Product } from '@/lib/types'
+import {
+  getProductName,
+  getColorName,
+  isOnSale,
+  getEffectivePriceCents,
+  type Product,
+} from '@/lib/types'
 import { formatPrice, langPrefix } from '@/lib/utils'
 import type { Locale } from '@/i18n/config'
 import { useVerification } from '@/components/auth/VerificationProvider'
@@ -29,6 +35,8 @@ export function ProductCard({
   const name = getProductName(product, lang)
   const href = `${langPrefix(lang)}/produktai/${categorySlug}/${product.slug}`
   const primaryImage = product.image_urls?.[0]
+  const onSale = isOnSale(product)
+  const effectiveCents = getEffectivePriceCents(product)
 
   const p = dict.popular
   const loginForPrice = p.loginForPrice
@@ -126,8 +134,17 @@ export function ProductCard({
 
         {isVerified ? (
           <div className="flex items-center justify-between">
-            <div className="text-[1.15rem] font-bold text-brand-gray-900">
-              {formatPrice(product.price_cents / 100, lang)}
+            <div className="flex items-baseline gap-2">
+              {onSale && (
+                <span className="text-[0.9rem] text-brand-gray-500 line-through">
+                  {formatPrice(product.price_cents / 100, lang)}
+                </span>
+              )}
+              <span
+                className={`text-[1.15rem] font-bold ${onSale ? 'text-brand-magenta' : 'text-brand-gray-900'}`}
+              >
+                {formatPrice(effectiveCents / 100, lang)}
+              </span>
             </div>
             <AddToCartButton
               variant="icon"
@@ -139,7 +156,7 @@ export function ProductCard({
                 categorySlug,
                 sku: product.sku,
                 name,
-                priceCents: product.price_cents,
+                priceCents: effectiveCents,
                 volumeMl: product.volume_ml,
                 imageUrl: primaryImage ?? null,
                 colorHex: product.color_hex,
