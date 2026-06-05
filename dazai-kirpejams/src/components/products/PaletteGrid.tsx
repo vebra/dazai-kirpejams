@@ -47,6 +47,7 @@ type FilterDef = {
 export function PaletteGrid({ products, lang, labels }: PaletteGridProps) {
   const [search, setSearch] = useState('')
   const [activeFilter, setActiveFilter] = useState<FilterValue>('all')
+  const [active, setActive] = useState<Product | null>(products[0] ?? null)
 
   const filters: FilterDef[] = [
     { value: 'all', label: labels.filterAll, match: () => true },
@@ -118,6 +119,39 @@ export function PaletteGrid({ products, lang, labels }: PaletteGridProps) {
         })}
       </div>
 
+      {/* Aktyvios spalvos blokas — atsinaujina užvedus ant atspalvio (desktop) */}
+      {active && (
+        <div className="hidden md:flex items-center gap-5 mb-8 p-4 bg-white rounded-2xl border border-[#E0E0E0] shadow-[0_2px_16px_rgba(0,0,0,0.06)]">
+          <div
+            className="relative w-[64px] h-[88px] rounded-md overflow-hidden bg-white border border-[#E0E0E0] shadow-[0_2px_8px_rgba(0,0,0,0.1)] flex-shrink-0 transition-all duration-300"
+            style={!active.image_urls[0] ? { backgroundColor: active.color_hex || '#f5f5f7' } : undefined}
+          >
+            {active.image_urls[0] && (
+              <Image src={active.image_urls[0]} alt={active.color_name || active.name_lt} fill sizes="64px" className="object-cover" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <div className="text-[0.72rem] font-bold text-brand-magenta uppercase tracking-[0.15em]">
+              {active.color_number}
+            </div>
+            <div className="text-[1.35rem] font-bold text-brand-gray-900 leading-tight truncate">
+              {active.color_name || active.name_lt}
+            </div>
+            {active.color_family && (
+              <div className="text-[0.82rem] text-brand-gray-500">
+                {familyLabels[active.color_family] || active.color_family} · 180 ml
+              </div>
+            )}
+          </div>
+          <Link
+            href={`${langPrefix(lang)}/produktai/dazai/${active.slug}`}
+            className="ml-auto flex-shrink-0 btn-shine bg-brand-gradient text-white px-6 py-3 rounded-lg text-[0.85rem] font-semibold hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
+          >
+            {labels.viewMore} →
+          </Link>
+        </div>
+      )}
+
       {/* Color grid */}
       {filtered.length === 0 ? (
         <div className="text-center py-16 text-brand-gray-500">
@@ -132,6 +166,8 @@ export function PaletteGrid({ products, lang, labels }: PaletteGridProps) {
             <Link
               key={product.id}
               href={`${langPrefix(lang)}/produktai/dazai/${product.slug}`}
+              onMouseEnter={() => setActive(product)}
+              onFocus={() => setActive(product)}
               className="dk-fade-up group bg-brand-gray-50 rounded-xl p-4 text-center border border-transparent hover:border-brand-magenta hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
               style={{ animationDelay: `${Math.min(i, 16) * 35}ms` }}
             >

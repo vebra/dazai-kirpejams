@@ -48,7 +48,7 @@ export function ProductCard({
   let ctaHref = `${langPrefix(lang)}/prisijungimas`
   let ctaLabel = loginForPrice
   let ctaClassName =
-    'bg-brand-gradient text-white hover:brightness-110'
+    'btn-shine bg-brand-gradient text-white hover:brightness-110'
 
   if (isLoggedIn && status === 'pending') {
     ctaHref = `${langPrefix(lang)}/paskyra`

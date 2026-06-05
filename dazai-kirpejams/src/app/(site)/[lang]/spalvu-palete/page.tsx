@@ -107,7 +107,7 @@ export default async function ColorPalettePage({
               <a
                 href="/color-shock-paleta.pdf"
                 download
-                className="inline-flex items-center gap-3 px-7 py-[14px] bg-brand-gradient text-white rounded-full text-[0.95rem] font-semibold hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(233,30,140,0.35)] transition-all"
+                className="inline-flex items-center gap-3 px-7 py-[14px] btn-shine bg-brand-gradient text-white rounded-full text-[0.95rem] font-semibold hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(233,30,140,0.35)] transition-all"
               >
                 <svg
                   width="18"
@@ -172,7 +172,7 @@ export default async function ColorPalettePage({
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
                 href={`${langPrefix(lang)}/produktai/dazai`}
-                className="inline-flex items-center justify-center gap-2 px-8 py-[14px] bg-brand-gradient text-white rounded-lg text-[1rem] font-semibold hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
+                className="inline-flex items-center justify-center gap-2 px-8 py-[14px] btn-shine bg-brand-gradient text-white rounded-lg text-[1rem] font-semibold hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
               >
                 {dict.colorPaletteHero.ctaBuy} →
               </Link>

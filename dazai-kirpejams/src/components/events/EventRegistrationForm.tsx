@@ -168,7 +168,7 @@ export function EventRegistrationForm({ eventSlug }: { eventSlug: string }) {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full px-8 py-4 bg-brand-gradient text-white rounded-lg text-[1.05rem] font-semibold hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full px-8 py-4 btn-shine bg-brand-gradient text-white rounded-lg text-[1.05rem] font-semibold hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isPending ? 'Registruojama…' : 'Registruotis nemokamai'}
       </button>

@@ -138,7 +138,7 @@ export function B2BCtaForm({
         <button
           type="submit"
           disabled={isPending}
-          className="w-full px-8 py-[14px] bg-brand-gradient text-white rounded-lg font-semibold hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+          className="w-full px-8 py-[14px] btn-shine bg-brand-gradient text-white rounded-lg font-semibold hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
         >
           {isPending ? labels.formSubmitting : `${labels.formSubmit} →`}
         </button>

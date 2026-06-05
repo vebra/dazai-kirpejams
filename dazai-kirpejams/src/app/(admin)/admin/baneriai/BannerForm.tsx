@@ -10,6 +10,7 @@ const initialState: BannerFormState = {}
 const PLACEMENTS = [
   { value: 'hero', label: 'Hero (pagrindinis puslapis)' },
   { value: 'announcement', label: 'Akcijų juosta (viršuje, visur)' },
+  { value: 'marquee', label: 'Bėganti juosta (viršuje, visur)' },
   { value: 'category', label: 'Kategorijos puslapis' },
 ]
 

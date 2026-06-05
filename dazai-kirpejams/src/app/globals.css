@@ -89,6 +89,40 @@ body {
   animation: dk-fade-up 0.5s ease-out both;
 }
 
+/* Bėganti reklaminė juosta (marquee). Du identiški segmentai → -50% = sklandus ciklas. */
+@keyframes dk-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Mygtukų „shine" — užvedus per mygtuką nuslysta šviesos blikas. Premium, subtilus.
+   Naudoti su .bg-brand-gradient mygtukais (overflow paslepia bliką už kampų). */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 65%
+  );
+  transform: translateX(-130%);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+}
+.btn-shine:hover::after {
+  transform: translateX(130%);
+}
+
 /* iOS Safari priartina puslapį, kai įvesties laukelio šriftas <16px.
    Mobiliai priverstinai 16px (!important nugali Tailwind text-sm utility). */
 @media (max-width: 640px) {

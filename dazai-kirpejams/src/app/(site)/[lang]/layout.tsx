@@ -7,6 +7,7 @@ import { locales } from '@/i18n/config'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Header } from '@/components/layout/Header'
 import { AnnouncementBar } from '@/components/layout/AnnouncementBar'
+import { Marquee } from '@/components/layout/Marquee'
 import { Footer } from '@/components/layout/Footer'
 import { WhatsAppButton } from '@/components/layout/WhatsAppButton'
 import { Suspense } from 'react'
@@ -136,6 +137,9 @@ export default async function RootLayout({
         <VerificationProvider>
           <Header lang={lang} dict={dict} />
           <main className="flex-1 pt-[72px] lg:pt-[100px]">
+            <Suspense fallback={null}>
+              <Marquee lang={lang} />
+            </Suspense>
             <Suspense fallback={null}>
               <AnnouncementBar lang={lang} />
             </Suspense>

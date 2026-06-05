@@ -48,7 +48,7 @@ export default function NotFound() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href={prefix || '/'}
-              className="px-8 py-3.5 bg-brand-gradient text-white rounded-lg font-semibold hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
+              className="px-8 py-3.5 btn-shine bg-brand-gradient text-white rounded-lg font-semibold hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all"
             >
               {t.home}
             </Link>

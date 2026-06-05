@@ -108,7 +108,7 @@ export function Newsletter({
               <button
                 type="submit"
                 disabled={isPending}
-                className="px-8 py-[14px] bg-brand-gradient text-white rounded-lg font-semibold hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-8 py-[14px] btn-shine bg-brand-gradient text-white rounded-lg font-semibold hover:brightness-110 hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(233,30,140,0.3)] transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isPending ? dict.sending : dict.cta}
               </button>
