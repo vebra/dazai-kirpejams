@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import type { Product } from '@/lib/types'
+import { getColorName, type Product } from '@/lib/types'
 import type { Locale } from '@/i18n/config'
 import { langPrefix } from '@/lib/utils'
 
@@ -73,11 +73,11 @@ export function PaletteGrid({ products, lang, labels }: PaletteGridProps) {
       if (!filterDef.match(p)) return false
       if (!query) return true
       const num = (p.color_number || '').toLowerCase()
-      const name = (p.color_name || '').toLowerCase()
+      const name = getColorName(p, lang).toLowerCase()
       return num.includes(query) || name.includes(query)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [products, search, activeFilter])
+  }, [products, search, activeFilter, lang])
 
   return (
     <>
@@ -127,7 +127,7 @@ export function PaletteGrid({ products, lang, labels }: PaletteGridProps) {
             style={!active.image_urls[0] ? { backgroundColor: active.color_hex || '#f5f5f7' } : undefined}
           >
             {active.image_urls[0] && (
-              <Image src={active.image_urls[0]} alt={active.color_name || active.name_lt} fill sizes="64px" className="object-cover" />
+              <Image src={active.image_urls[0]} alt={getColorName(active, lang)} fill sizes="64px" className="object-cover" />
             )}
           </div>
           <div className="min-w-0">
@@ -135,7 +135,7 @@ export function PaletteGrid({ products, lang, labels }: PaletteGridProps) {
               {active.color_number}
             </div>
             <div className="text-[1.35rem] font-bold text-brand-gray-900 leading-tight truncate">
-              {active.color_name || active.name_lt}
+              {getColorName(active, lang)}
             </div>
             {active.color_family && (
               <div className="text-[0.82rem] text-brand-gray-500">
@@ -175,7 +175,7 @@ export function PaletteGrid({ products, lang, labels }: PaletteGridProps) {
                 {product.image_urls[0] ? (
                   <Image
                     src={product.image_urls[0]}
-                    alt={product.color_name || product.name_lt}
+                    alt={getColorName(product, lang)}
                     fill
                     sizes="108px"
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -192,7 +192,7 @@ export function PaletteGrid({ products, lang, labels }: PaletteGridProps) {
                 {product.color_number}
               </div>
               <div className="text-[0.88rem] font-bold text-brand-gray-900 mb-1 line-clamp-1">
-                {product.color_name}
+                {getColorName(product, lang)}
               </div>
               {product.color_family && (
                 <div className="text-[0.72rem] text-brand-gray-500 mb-3">

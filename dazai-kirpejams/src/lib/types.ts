@@ -91,6 +91,20 @@ export function getProductDescription(
   return localizedField(product, 'description', locale)
 }
 
+/**
+ * Lokalizuotas spalvos pavadinimas (be „nr Color SHOCK —" priešdėlio).
+ * `color_name` laukas yra tik LT, todėl EN/RU pavadinimas išvedamas iš
+ * lokalizuoto `name_en`/`name_ru`, nukerpant viską iki em brūkšnio „—".
+ * LT — naudojam švarų `color_name` lauką.
+ */
+export function getColorName(product: Product, locale: Locale): string {
+  if (locale === 'lt' && product.color_name) return product.color_name
+  const full = getProductName(product, locale)
+  const idx = full.indexOf('—')
+  const derived = idx >= 0 ? full.slice(idx + 1).trim() : full.trim()
+  return derived || product.color_name || ''
+}
+
 export function getCategoryName(category: Category, locale: Locale): string {
   return localizedField(category, 'name', locale)
 }

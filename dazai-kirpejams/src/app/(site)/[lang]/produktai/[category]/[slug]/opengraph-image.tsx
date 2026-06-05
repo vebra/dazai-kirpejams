@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og'
 import { getProductBySlugForBuild } from '@/lib/data/queries'
-import { getProductName } from '@/lib/types'
+import { getProductName, getColorName } from '@/lib/types'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import {
   OG_SIZE,
@@ -133,7 +133,9 @@ export default async function Image({
                 )}
                 <span style={{ fontSize: 18, color: GRAY }}>
                   {product.color_number}
-                  {product.color_name ? ` — ${product.color_name}` : ''}
+                  {product.color_name
+                    ? ` — ${getColorName(product, locale as 'lt' | 'en' | 'ru')}`
+                    : ''}
                 </span>
               </div>
             )}
