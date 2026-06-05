@@ -398,3 +398,189 @@ export async function bulkUpdatePricesAction(
   revalidateTag('products', 'max')
   return { success: true, updatedCount: updates.length }
 }
+
+// ============================================
+// Akcijos (sale_price_cents) — visos / kategorija / išrinktos prekės
+// ============================================
+
+export type SaleActionState = {
+  error?: string
+  success?: boolean
+  updatedCount?: number
+  message?: string
+}
+
+type SaleScope = 'all' | 'category' | 'products'
+
+function isSaleScope(v: unknown): v is SaleScope {
+  return v === 'all' || v === 'category' || v === 'products'
+}
+
+function readProductIds(formData: FormData): string[] {
+  return formData
+    .getAll('product_ids')
+    .map((v) => String(v).trim())
+    .filter((v) => v.length > 0)
+}
+
+/**
+ * Uždeda akcijos kainą pasirinktoms prekėms.
+ *  - scope: all | category | products
+ *  - discount_type: percent (sumažina X%) | fixed (sumažina X €)
+ * Akcijos kaina = round(price * (1 - %/100)) arba price - €. Jei rezultatas
+ * nemažesnis už įprastą kainą — praleidžiam (akcijos nebūtų).
+ */
+export async function applySaleAction(
+  _prev: SaleActionState,
+  formData: FormData
+): Promise<SaleActionState> {
+  await requireAdmin()
+  const supabase = createServerClient()
+
+  const scope = formData.get('scope')
+  if (!isSaleScope(scope)) {
+    return { error: 'Pasirinkite, kurioms prekėms taikyti akciją.' }
+  }
+
+  const discountType = formData.get('discount_type')
+  if (discountType !== 'percent' && discountType !== 'fixed') {
+    return { error: 'Pasirinkite nuolaidos tipą.' }
+  }
+
+  const valueRaw = ((formData.get('value') as string) ?? '').trim()
+  const numericValue = Number(valueRaw.replace(',', '.'))
+  if (!Number.isFinite(numericValue) || numericValue <= 0) {
+    return { error: 'Nuolaidos dydis turi būti teigiamas skaičius.' }
+  }
+  if (discountType === 'percent' && numericValue >= 100) {
+    return { error: 'Procentas turi būti nuo 1 iki 99.' }
+  }
+
+  let query = supabase
+    .from('products')
+    .select('id, price_cents')
+    .eq('is_active', true)
+
+  if (scope === 'category') {
+    const categoryId = ((formData.get('category_id') as string) ?? '').trim()
+    if (!categoryId) return { error: 'Pasirinkite kategoriją.' }
+    query = query.eq('category_id', categoryId)
+  } else if (scope === 'products') {
+    const ids = readProductIds(formData)
+    if (ids.length === 0) return { error: 'Pažymėkite bent vieną prekę.' }
+    query = query.in('id', ids)
+  }
+
+  const { data: products, error: fetchError } = await query
+  if (fetchError) {
+    console.error('[admin/kainos] applySale fetch:', fetchError.message)
+    return { error: `Nepavyko gauti prekių: ${fetchError.message}` }
+  }
+  if (!products || products.length === 0) {
+    return { error: 'Nerasta prekių pagal pasirinkimą.' }
+  }
+
+  const fixedCents = Math.round(numericValue * 100)
+  const updates: Array<{ id: string; sale: number }> = []
+  for (const p of products) {
+    const base = p.price_cents as number
+    let sale: number
+    if (discountType === 'percent') {
+      sale = Math.round(base * (1 - numericValue / 100))
+    } else {
+      sale = base - fixedCents
+    }
+    if (sale < 0) sale = 0
+    // Jei akcija nesumažintų kainos — praleidžiam
+    if (sale >= base) continue
+    updates.push({ id: p.id, sale })
+  }
+
+  if (updates.length === 0) {
+    return { error: 'Akcija nesumažintų nė vienos prekės kainos.' }
+  }
+
+  const results = await Promise.all(
+    updates.map((u) =>
+      supabase
+        .from('products')
+        .update({
+          sale_price_cents: u.sale,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', u.id)
+    )
+  )
+
+  const failed = results.filter((r) => r.error)
+  if (failed.length > 0) {
+    console.error(
+      '[admin/kainos] applySale failures:',
+      failed.map((r) => r.error?.message)
+    )
+    return { error: `Nepavyko atnaujinti ${failed.length} iš ${updates.length} prekių.` }
+  }
+
+  revalidatePath('/admin/kainos')
+  revalidatePath('/admin/sandelis', 'layout')
+  revalidateTag('products', 'max')
+  return {
+    success: true,
+    updatedCount: updates.length,
+    message: `Akcija uždėta ${updates.length} prek(ėms).`,
+  }
+}
+
+/**
+ * Vienas action formai su dviem mygtukais (intent=apply|remove).
+ */
+export async function saleAction(
+  prev: SaleActionState,
+  formData: FormData
+): Promise<SaleActionState> {
+  return formData.get('intent') === 'remove'
+    ? removeSaleAction(prev, formData)
+    : applySaleAction(prev, formData)
+}
+
+/**
+ * Nuima akciją (sale_price_cents = null) pasirinktoms prekėms.
+ */
+export async function removeSaleAction(
+  _prev: SaleActionState,
+  formData: FormData
+): Promise<SaleActionState> {
+  await requireAdmin()
+  const supabase = createServerClient()
+
+  const scope = formData.get('scope')
+  if (!isSaleScope(scope)) {
+    return { error: 'Pasirinkite, kurioms prekėms nuimti akciją.' }
+  }
+
+  let query = supabase
+    .from('products')
+    .update({ sale_price_cents: null, updated_at: new Date().toISOString() })
+    .not('sale_price_cents', 'is', null)
+
+  if (scope === 'category') {
+    const categoryId = ((formData.get('category_id') as string) ?? '').trim()
+    if (!categoryId) return { error: 'Pasirinkite kategoriją.' }
+    query = query.eq('category_id', categoryId)
+  } else if (scope === 'products') {
+    const ids = readProductIds(formData)
+    if (ids.length === 0) return { error: 'Pažymėkite bent vieną prekę.' }
+    query = query.in('id', ids)
+  }
+
+  const { error } = await query
+  if (error) {
+    console.error('[admin/kainos] removeSale:', error.message)
+    return { error: `Nepavyko nuimti akcijos: ${error.message}` }
+  }
+
+  revalidatePath('/admin/kainos')
+  revalidatePath('/admin/sandelis', 'layout')
+  revalidateTag('products', 'max')
+  return { success: true, message: 'Akcija nuimta.' }
+}

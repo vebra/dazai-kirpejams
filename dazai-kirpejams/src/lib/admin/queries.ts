@@ -71,6 +71,7 @@ export type AdminProductListRow = {
   colorNumber: string | null
   colorHex: string | null
   priceCents: number
+  salePriceCents: number | null
   costPriceCents: number | null
   stockQuantity: number
   isActive: boolean
@@ -247,7 +248,7 @@ export async function getAdminProducts(
     .from('products')
     .select(
       `id, slug, sku, ean, name_lt, color_number, color_hex, price_cents,
-       cost_price_cents, stock_quantity, is_active,
+       sale_price_cents, cost_price_cents, stock_quantity, is_active,
        category:categories(id, slug, name_lt)`
     )
     .limit(500) // MVP'ui užtenka — realiai ~50 dažų + keli šampūnai/oksidantai
@@ -326,6 +327,7 @@ export async function getAdminProducts(
       colorNumber: row.color_number,
       colorHex: row.color_hex,
       priceCents: row.price_cents,
+      salePriceCents: row.sale_price_cents ?? null,
       costPriceCents: row.cost_price_cents ?? null,
       stockQuantity: row.stock_quantity ?? 0,
       isActive: row.is_active ?? true,

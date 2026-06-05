@@ -1,0 +1,18 @@
+{
+  "recommendations": [
+    "anthropic.claude-code",
+    "bradlc.vscode-tailwindcss",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "eamodio.gitlens",
+    "usernamehw.errorlens",
+    "ms-playwright.playwright",
+    "yoavbls.pretty-ts-errors",
+    "lokalise.i18n-ally",
+    "naumovs.color-highlight",
+    "stivo.tailwind-fold",
+    "formulahendry.auto-rename-tag",
+    "streetsidesoftware.code-spell-checker",
+    "mikestead.dotenv"
+  ]
+}

@@ -19,6 +19,8 @@ import {
   getProductDescription,
   getCategoryName,
   localizedField,
+  isOnSale,
+  getEffectivePriceCents,
 } from '@/lib/types'
 import { formatPrice, langPrefix } from '@/lib/utils'
 import { Container } from '@/components/ui/Container'
@@ -116,10 +118,15 @@ export default async function ProductPage({
   const ingredients = localizedField(product, 'ingredients', lang)
   const usage = localizedField(product, 'usage', lang)
 
-  const price = product.price_cents / 100
-  const comparePrice = product.compare_price_cents
-    ? product.compare_price_cents / 100
-    : null
+  const onSale = isOnSale(product)
+  const effectiveCents = getEffectivePriceCents(product)
+  const price = effectiveCents / 100
+  // Akcijos metu perbraukiama įprasta kaina; kitu atveju — tiekėjo „compare" kaina.
+  const comparePrice = onSale
+    ? product.price_cents / 100
+    : product.compare_price_cents
+      ? product.compare_price_cents / 100
+      : null
   const savings = comparePrice ? comparePrice - price : null
   const pricePerMl = product.volume_ml
     ? (price / product.volume_ml).toFixed(3)
@@ -148,7 +155,7 @@ export default async function ProductPage({
     categorySlug,
     sku: product.sku,
     name,
-    priceCents: product.price_cents,
+    priceCents: effectiveCents,
     volumeMl: product.volume_ml,
     imageUrl: images[0] ?? null,
     colorHex: product.color_hex,
