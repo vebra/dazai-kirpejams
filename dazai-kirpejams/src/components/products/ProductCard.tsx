@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { getProductName, type Product } from '@/lib/types'
+import { getProductName, getColorName, type Product } from '@/lib/types'
 import { formatPrice, langPrefix } from '@/lib/utils'
 import type { Locale } from '@/i18n/config'
 import { useVerification } from '@/components/auth/VerificationProvider'
@@ -106,7 +106,7 @@ export function ProductCard({
         </Link>
         {product.color_name && (
           <div className="text-[0.82rem] text-brand-gray-500 mb-2 line-clamp-1">
-            {product.color_name}
+            {getColorName(product, lang)}
           </div>
         )}
         {!product.color_name && product.volume_ml && (
