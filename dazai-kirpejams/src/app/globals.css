@@ -124,9 +124,9 @@ body {
 }
 
 /* Pelę sekantis spalvų „pliūpsnio" švytėjimas (CursorGlow.tsx).
-   mix-blend: multiply — baltas fonas nudažomas spalva, baltos purslų dalys
-   dingsta (white*x=x), todėl matosi tik spalvotas branduolys; tekstas lieka
-   įskaitomas. Tik desktop; reduced-motion / lietimas — paslepiama. */
+   Du sluoksniai: multiply matosi ant šviesaus fono (baltos purslų dalys dingsta),
+   screen matosi ant tamsaus fono. Kartu — matomas visur, tekstas įskaitomas.
+   Tik desktop; reduced-motion / lietimas — paslepiama. */
 .dk-cursor-glow {
   position: fixed;
   top: 0;
@@ -141,12 +141,20 @@ body {
   background-position: center;
   filter: blur(6px) saturate(1.05);
   opacity: 0;
-  mix-blend-mode: multiply;
   transition: opacity 0.45s ease;
   will-change: transform;
 }
-.dk-cursor-glow[data-on="1"] {
-  opacity: 0.42;
+.dk-glow-multiply {
+  mix-blend-mode: multiply;
+}
+.dk-glow-screen {
+  mix-blend-mode: screen;
+}
+.dk-glow-multiply[data-on="1"] {
+  opacity: 0.45;
+}
+.dk-glow-screen[data-on="1"] {
+  opacity: 0.32;
 }
 @media (pointer: coarse) {
   .dk-cursor-glow {
