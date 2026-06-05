@@ -335,17 +335,19 @@ export async function quickUpdateStockAction(formData: FormData): Promise<void> 
     redirect('/admin/sandelis?error=invalid-stock')
   }
 
-  const { error } = await supabase
-    .from('products')
-    .update({
-      stock_quantity: stock,
-      is_in_stock: stock > 0,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', id)
+  // Per RPC — atominis likučio nustatymas + įrašas į judėjimo žurnalą (korekcija)
+  const { data, error } = await supabase.rpc('set_product_stock', {
+    p_product_id: id,
+    p_new_stock: stock,
+    p_source: 'admin',
+    p_note: 'Rankinė korekcija (sąrašas)',
+  })
 
-  if (error) {
-    console.error('[admin/sandelis/actions] quickUpdateStock:', error.message)
+  if (error || (data && (data as { ok?: boolean }).ok === false)) {
+    console.error(
+      '[admin/sandelis/actions] quickUpdateStock:',
+      error?.message ?? JSON.stringify(data)
+    )
     redirect('/admin/sandelis?error=update-failed')
   }
 
