@@ -156,6 +156,15 @@ body {
 .dk-glow-screen[data-on="1"] {
   opacity: 0.32;
 }
+/* Paslepia slinkties juostą (mobilios braukiamos karuselės). */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* „Brand žodžių" juosta (BrandMarquee.tsx) — outline (contour) tekstas
    brand spalvomis, dvi eilutės priešingomis kryptimis. */
 .dk-brand-marquee {

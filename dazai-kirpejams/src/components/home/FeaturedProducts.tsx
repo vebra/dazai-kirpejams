@@ -48,7 +48,7 @@ export async function FeaturedProducts({ lang, dict }: FeaturedProductsProps) {
           </Link>
         </div>
 
-        <StaggerReveal className="grid grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
+        <StaggerReveal className="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-6 px-6 py-2 scroll-pl-6 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible lg:mx-0 lg:px-0 lg:py-0 [&>*]:snap-start [&>*]:shrink-0 [&>*]:w-[62%] sm:[&>*]:w-[42%] lg:[&>*]:w-auto">
           {products.map((product) => {
             const categorySlug = categoryById.get(product.category_id) || 'dazai'
             return (

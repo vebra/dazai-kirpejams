@@ -37,7 +37,7 @@ export function Categories({ lang, dict }: CategoriesProps) {
           </p>
         </div>
 
-        <StaggerReveal className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <StaggerReveal className="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-6 px-6 py-2 scroll-pl-6 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible lg:mx-0 lg:px-0 lg:py-0 [&>*]:snap-start [&>*]:shrink-0 [&>*]:w-[58%] sm:[&>*]:w-[40%] lg:[&>*]:w-auto">
           {items.map((cat) => (
             <TiltCard key={cat.slug}>
             <Link
