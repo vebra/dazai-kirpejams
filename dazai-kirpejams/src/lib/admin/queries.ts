@@ -75,6 +75,7 @@ export type AdminProductListRow = {
   costPriceCents: number | null
   stockQuantity: number
   isActive: boolean
+  imageUrl: string | null
   categorySlug: string | null
   categoryNameLt: string | null
 }
@@ -248,7 +249,7 @@ export async function getAdminProducts(
     .from('products')
     .select(
       `id, slug, sku, ean, name_lt, color_number, color_hex, price_cents,
-       sale_price_cents, cost_price_cents, stock_quantity, is_active,
+       sale_price_cents, cost_price_cents, stock_quantity, is_active, image_urls,
        category:categories(id, slug, name_lt)`
     )
     .limit(500) // MVP'ui užtenka — realiai ~50 dažų + keli šampūnai/oksidantai
@@ -330,6 +331,7 @@ export async function getAdminProducts(
       salePriceCents: row.sale_price_cents ?? null,
       costPriceCents: row.cost_price_cents ?? null,
       stockQuantity: row.stock_quantity ?? 0,
+      imageUrl: Array.isArray(row.image_urls) ? (row.image_urls[0] ?? null) : null,
       isActive: row.is_active ?? true,
       categorySlug: cat?.slug ?? null,
       categoryNameLt: cat?.name_lt ?? null,
