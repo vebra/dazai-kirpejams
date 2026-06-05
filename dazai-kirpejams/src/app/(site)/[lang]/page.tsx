@@ -39,7 +39,7 @@ export default async function HomePage({ params }: PageProps<'/[lang]'>) {
       <Hero lang={lang} dict={dict} />
       <EventCountdownSection lang={lang} />
       <Reveal><TrustBar dict={dict} /></Reveal>
-      <Reveal><Advantages dict={dict} /></Reveal>
+      <Advantages dict={dict} />
       <Reveal><Categories lang={lang} dict={dict} /></Reveal>
       <Reveal><Comparison lang={lang} dict={dict} /></Reveal>
       <Reveal><FeaturedProducts lang={lang} dict={dict} /></Reveal>
