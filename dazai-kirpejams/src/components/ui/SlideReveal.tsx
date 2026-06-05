@@ -49,7 +49,7 @@ export function SlideReveal({
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-out will-change-transform ${
+      className={`transition-all duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform ${
         shown ? 'opacity-100 translate-x-0 md:translate-y-0' : hidden
       } ${className}`}
     >
