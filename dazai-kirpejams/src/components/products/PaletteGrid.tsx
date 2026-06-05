@@ -124,12 +124,16 @@ export function PaletteGrid({ products, lang, labels }: PaletteGridProps) {
           {labels.noResults}
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
-          {filtered.map((product) => (
+        <div
+          key={activeFilter}
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5"
+        >
+          {filtered.map((product, i) => (
             <Link
               key={product.id}
               href={`${langPrefix(lang)}/produktai/dazai/${product.slug}`}
-              className="group bg-brand-gray-50 rounded-xl p-4 text-center border border-transparent hover:border-brand-magenta hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
+              className="dk-fade-up group bg-brand-gray-50 rounded-xl p-4 text-center border border-transparent hover:border-brand-magenta hover:shadow-[0_4px_24px_rgba(0,0,0,0.13)] hover:-translate-y-1 transition-all"
+              style={{ animationDelay: `${Math.min(i, 16) * 35}ms` }}
             >
               <div className="relative w-[108px] h-[180px] mx-auto mb-3 overflow-hidden rounded-md bg-white border border-[#E0E0E0] shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
                 {product.image_urls[0] ? (
@@ -138,11 +142,11 @@ export function PaletteGrid({ products, lang, labels }: PaletteGridProps) {
                     alt={product.color_name || product.name_lt}
                     fill
                     sizes="108px"
-                    className="object-cover"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 ) : (
                   <div
-                    className="w-full h-full"
+                    className="w-full h-full transition-transform duration-300 group-hover:scale-105"
                     style={{ backgroundColor: product.color_hex || '#f5f5f7' }}
                     aria-hidden
                   />

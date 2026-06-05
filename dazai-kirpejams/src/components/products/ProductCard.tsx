@@ -68,7 +68,7 @@ export function ProductCard({
         className="relative block aspect-square bg-white flex items-center justify-center overflow-hidden"
       >
         {product.volume_ml === 180 && (
-          <span className="absolute top-3 left-3 z-10 px-[10px] py-1 bg-brand-magenta text-white text-[0.7rem] font-bold uppercase tracking-[0.5px] rounded-full">
+          <span className="absolute top-3 left-3 z-10 px-[10px] py-1 bg-brand-gradient text-white text-[0.7rem] font-bold uppercase tracking-[0.5px] rounded-full">
             180 ml
           </span>
         )}
