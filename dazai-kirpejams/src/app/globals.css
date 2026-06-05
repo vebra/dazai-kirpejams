@@ -156,6 +156,18 @@ body {
 .dk-glow-screen[data-on="1"] {
   opacity: 0.32;
 }
+/* Mobiliojoje produkto „Į krepšelį" juostoje (StickyBuyBar) WhatsApp mygtukas
+   paslepiamas, kad nesusikirstų su juostos turiniu apačioje. */
+.dk-wa-float {
+  transition: opacity 0.25s ease, transform 0.2s ease;
+}
+@media (max-width: 1023px) {
+  body.dk-buybar-open .dk-wa-float {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
 /* Paslepia slinkties juostą (mobilios braukiamos karuselės). */
 .no-scrollbar {
   scrollbar-width: none;

@@ -24,6 +24,7 @@ import { formatPrice, langPrefix } from '@/lib/utils'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
 import { ProductPriceBlock } from '@/components/products/ProductPriceBlock'
+import { StickyBuyBar } from '@/components/products/StickyBuyBar'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { productSchema, breadcrumbSchema } from '@/lib/schema'
 import { buildCanonicalUrl, buildLanguageAlternates, SITE_URL } from '@/lib/seo'
@@ -141,6 +142,19 @@ export default async function ProductPage({
       ? product.image_urls
       : []
 
+  const cartItem = {
+    productId: product.id,
+    slug: product.slug,
+    categorySlug,
+    sku: product.sku,
+    name,
+    priceCents: product.price_cents,
+    volumeMl: product.volume_ml,
+    imageUrl: images[0] ?? null,
+    colorHex: product.color_hex,
+    colorNumber: product.color_number,
+  }
+
   return (
     <>
       <JsonLd data={productJsonLd} />
@@ -239,18 +253,7 @@ export default async function ProductPage({
                 savings={savings}
                 pricePerMl={pricePerMl}
                 volumeMl={product.volume_ml}
-                cartItem={{
-                  productId: product.id,
-                  slug: product.slug,
-                  categorySlug,
-                  sku: product.sku,
-                  name,
-                  priceCents: product.price_cents,
-                  volumeMl: product.volume_ml,
-                  imageUrl: images[0] ?? null,
-                  colorHex: product.color_hex,
-                  colorNumber: product.color_number,
-                }}
+                cartItem={cartItem}
                 labels={{
                   volumeDouble: t.volumeDouble,
                   pricePerMl: t.pricePerMl,
@@ -273,6 +276,9 @@ export default async function ProductPage({
                   goToAccount: t.goToAccount,
                 }}
               />
+
+              {/* Sticky juostos slenkstis — kai nuslenkama žemiau, parodoma juosta */}
+              <div id="buybar-anchor" aria-hidden className="h-px w-full" />
 
               {/* Description */}
               {description && (
@@ -438,6 +444,19 @@ export default async function ProductPage({
           </div>
         </Container>
       </section>
+
+      <StickyBuyBar
+        lang={lang}
+        langPrefixStr={langPrefix(lang)}
+        price={price}
+        cartItem={cartItem}
+        labels={{
+          addToCart: dict.popular.addToCart,
+          addedToCart: dict.popular.added,
+          login: t.login,
+          priceOnlyPro: t.priceOnlyPro,
+        }}
+      />
     </>
   )
 }
