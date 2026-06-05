@@ -114,12 +114,18 @@ export function MobileMenu({ lang, links, labels }: MobileMenuProps) {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-6 py-8">
           <ul className="space-y-1">
-            {links.map((link) => {
+            {links.map((link, i) => {
               const isActive =
                 pathname === link.href ||
                 (link.href !== (langPrefix(lang) || '/') && pathname.startsWith(link.href))
               return (
-                <li key={link.href}>
+                <li
+                  key={link.href}
+                  className={`transition-all duration-[380ms] ease-out ${
+                    open ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
+                  }`}
+                  style={{ transitionDelay: open ? `${140 + i * 80}ms` : '0ms' }}
+                >
                   <Link
                     href={link.href}
                     className={`block px-4 py-3 rounded-xl text-base font-medium transition-colors ${
