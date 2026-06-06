@@ -890,3 +890,41 @@ export async function quickSetReorderAction(formData: FormData): Promise<void> {
   revalidatePath('/admin/sandelis', 'layout')
   revalidateTag('products', 'max')
 }
+
+// ============================================
+// Rankinis priėmimas pagal prekės ID (be EAN)
+// ============================================
+
+export type ReceiveManualResult =
+  | { ok: true; name: string; sku: string | null; stock: number; added: number }
+  | { ok: false; error: string }
+
+export async function receiveManualItem(
+  productId: string,
+  qty = 1,
+  supplier?: string
+): Promise<ReceiveManualResult> {
+  await requireAdmin()
+  const id = (productId ?? '').trim()
+  if (!id) return { ok: false, error: 'Nepasirinkta prekė.' }
+  const delta = Number.isInteger(qty) && qty > 0 && qty <= 100000 ? qty : 1
+  const source = (supplier ?? '').trim() || 'Rankinis'
+
+  const supabase = await createServerSupabase()
+  const { data, error } = await supabase.rpc('receive_stock_by_product_id', {
+    p_product_id: id,
+    p_delta: delta,
+    p_source: source,
+  })
+  if (error) {
+    console.error('[admin/sandelis/actions] receiveManualItem:', error.message)
+    return { ok: false, error: 'Nepavyko atnaujinti likučio.' }
+  }
+  const r = data as { found?: boolean; name?: string; sku?: string | null; stock?: number }
+  if (!r?.found) return { ok: false, error: 'Prekė nerasta.' }
+
+  revalidatePath('/admin/sandelis', 'layout')
+  revalidatePath('/admin/sandelis/zurnalas')
+  revalidateTag('products', 'max')
+  return { ok: true, name: r.name ?? '—', sku: r.sku ?? null, stock: r.stock ?? 0, added: delta }
+}
