@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
-import { receiveScannedItem } from '../actions'
+import { receiveScannedItem, receiveManualItem } from '../actions'
+import type { AdminProductListRow } from '@/lib/admin/queries'
 
 type LogEntry =
   | { id: number; kind: 'ok'; name: string; sku: string | null; stock: number; added: number }
@@ -30,12 +31,48 @@ function beep(ok: boolean) {
   }
 }
 
-export function ReceivingScanner() {
+export function ReceivingScanner({ products }: { products: AdminProductListRow[] }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [log, setLog] = useState<LogEntry[]>([])
   const [busy, setBusy] = useState(false)
   const [qty, setQty] = useState(1)
+  const [supplier, setSupplier] = useState('')
+  const [manualSearch, setManualSearch] = useState('')
   const idRef = useRef(0)
+
+  const manualResults = useMemo(() => {
+    const q = manualSearch.trim().toLowerCase()
+    if (!q) return []
+    return products
+      .filter(
+        (p) =>
+          p.nameLt.toLowerCase().includes(q) ||
+          (p.colorNumber ?? '').toLowerCase().includes(q) ||
+          (p.sku ?? '').toLowerCase().includes(q)
+      )
+      .slice(0, 8)
+  }, [products, manualSearch])
+
+  async function receiveManual(p: AdminProductListRow) {
+    const id = ++idRef.current
+    setBusy(true)
+    try {
+      const res = await receiveManualItem(p.id, qty, supplier)
+      if (res.ok) {
+        beep(true)
+        setLog((l) => [
+          { id, kind: 'ok', name: res.name, sku: res.sku, stock: res.stock, added: res.added },
+          ...l,
+        ])
+        setManualSearch('')
+      } else {
+        beep(false)
+        setLog((l) => [{ id, kind: 'error', message: res.error }, ...l])
+      }
+    } finally {
+      setBusy(false)
+    }
+  }
   const queueRef = useRef<Array<{ ean: string; qty: number }>>([])
   const processingRef = useRef(false)
 
@@ -174,6 +211,64 @@ export function ReceivingScanner() {
           </p>
         </div>
       </form>
+
+      {/* Rankinis priėmimas (prekėms be barkodo) + tiekėjas */}
+      <div className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-5 space-y-3">
+        <h3 className="text-sm font-bold text-brand-gray-900">
+          Rankinis priėmimas (be barkodo)
+        </h3>
+        <div>
+          <label
+            htmlFor="supplier"
+            className="block text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500 mb-1.5"
+          >
+            Tiekėjas (neprivaloma)
+          </label>
+          <input
+            id="supplier"
+            value={supplier}
+            onChange={(e) => setSupplier(e.target.value)}
+            placeholder="pvz. RosaNera"
+            className="w-full px-3.5 py-2.5 bg-[#F5F5F7] border border-[#ddd] rounded-lg text-sm focus:outline-none focus:border-brand-magenta focus:bg-white"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="manual-search"
+            className="block text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500 mb-1.5"
+          >
+            Rasti prekę (pavadinimas, numeris, SKU) — pridės +{qty}
+          </label>
+          <input
+            id="manual-search"
+            value={manualSearch}
+            onChange={(e) => setManualSearch(e.target.value)}
+            placeholder="pvz. Oksidantas 6% arba OX-6…"
+            className="w-full px-3.5 py-2.5 bg-[#F5F5F7] border border-[#ddd] rounded-lg text-sm focus:outline-none focus:border-brand-magenta focus:bg-white"
+          />
+          {manualResults.length > 0 && (
+            <div className="mt-2 border border-[#eee] rounded-lg divide-y divide-[#f3f3f3] overflow-hidden">
+              {manualResults.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  disabled={busy}
+                  onClick={() => receiveManual(p)}
+                  className="w-full flex items-center justify-between gap-3 px-3 py-2 hover:bg-[#F9F9FB] text-sm text-left disabled:opacity-50"
+                >
+                  <span className="text-brand-gray-900">
+                    {p.colorNumber ? `${p.colorNumber} · ` : ''}
+                    {p.nameLt}
+                  </span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-brand-magenta text-white whitespace-nowrap">
+                    +{qty}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
 
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-brand-gray-900">

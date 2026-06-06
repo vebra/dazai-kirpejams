@@ -802,3 +802,129 @@ export async function receiveScannedItem(
     added: delta,
   }
 }
+
+// ============================================
+// Rankinis nurašymas / išvežimas
+// ============================================
+
+export type WriteOffState = {
+  error?: string
+  success?: boolean
+  message?: string
+}
+
+export async function writeOffStockAction(
+  _prev: WriteOffState,
+  formData: FormData
+): Promise<WriteOffState> {
+  await requireAdmin()
+  const supabase = createServerClient()
+
+  const productId = ((formData.get('product_id') as string) ?? '').trim()
+  const qty = toInt((formData.get('qty') as string) ?? '')
+  const category = ((formData.get('category') as string) ?? 'Kita').trim() || 'Kita'
+  const note = ((formData.get('note') as string) ?? '').trim() || null
+
+  if (!productId) return { error: 'Pasirinkite prekę.' }
+  if (qty === null || qty <= 0) return { error: 'Kiekis turi būti teigiamas skaičius.' }
+
+  const { data, error } = await supabase.rpc('write_off_stock', {
+    p_product_id: productId,
+    p_qty: qty,
+    p_category: category,
+    p_note: note,
+  })
+
+  const res = data as { ok?: boolean; reason?: string; removed?: number; stock?: number } | null
+  if (error || !res?.ok) {
+    const reason = res?.reason
+    const msg =
+      reason === 'no_stock'
+        ? 'Prekės likutis jau 0 — nėra ką nurašyti.'
+        : reason === 'not_found'
+          ? 'Prekė nerasta.'
+          : reason === 'invalid_qty'
+            ? 'Neteisingas kiekis.'
+            : error?.message ?? 'Nepavyko nurašyti.'
+    console.error('[admin/sandelis] writeOff:', error?.message ?? reason)
+    return { error: msg }
+  }
+
+  revalidatePath('/admin/sandelis', 'layout')
+  revalidatePath('/admin/sandelis/zurnalas')
+  revalidateTag('products', 'max')
+  return {
+    success: true,
+    message: `Nurašyta ${res.removed} vnt. Likutis: ${res.stock}.`,
+  }
+}
+
+// ============================================
+// Atsargų perspėjimo riba (reorder_point)
+// ============================================
+
+export async function quickSetReorderAction(formData: FormData): Promise<void> {
+  await requireAdmin()
+  const supabase = createServerClient()
+
+  const id = formData.get('id') as string
+  const raw = ((formData.get('reorder_point') as string) ?? '').trim()
+  // Tuščia = pašalinam ribą (null)
+  const reorder = raw === '' ? null : toInt(raw)
+
+  if (!id || (raw !== '' && (reorder === null || reorder < 0))) {
+    redirect('/admin/sandelis/uzsakyti?error=invalid')
+  }
+
+  const { error } = await supabase
+    .from('products')
+    .update({ reorder_point: reorder, updated_at: new Date().toISOString() })
+    .eq('id', id)
+
+  if (error) {
+    console.error('[admin/sandelis] quickSetReorder:', error.message)
+    redirect('/admin/sandelis/uzsakyti?error=update-failed')
+  }
+
+  revalidatePath('/admin/sandelis/uzsakyti')
+  revalidatePath('/admin/sandelis', 'layout')
+  revalidateTag('products', 'max')
+}
+
+// ============================================
+// Rankinis priėmimas pagal prekės ID (be EAN)
+// ============================================
+
+export type ReceiveManualResult =
+  | { ok: true; name: string; sku: string | null; stock: number; added: number }
+  | { ok: false; error: string }
+
+export async function receiveManualItem(
+  productId: string,
+  qty = 1,
+  supplier?: string
+): Promise<ReceiveManualResult> {
+  await requireAdmin()
+  const id = (productId ?? '').trim()
+  if (!id) return { ok: false, error: 'Nepasirinkta prekė.' }
+  const delta = Number.isInteger(qty) && qty > 0 && qty <= 100000 ? qty : 1
+  const source = (supplier ?? '').trim() || 'Rankinis'
+
+  const supabase = await createServerSupabase()
+  const { data, error } = await supabase.rpc('receive_stock_by_product_id', {
+    p_product_id: id,
+    p_delta: delta,
+    p_source: source,
+  })
+  if (error) {
+    console.error('[admin/sandelis/actions] receiveManualItem:', error.message)
+    return { ok: false, error: 'Nepavyko atnaujinti likučio.' }
+  }
+  const r = data as { found?: boolean; name?: string; sku?: string | null; stock?: number }
+  if (!r?.found) return { ok: false, error: 'Prekė nerasta.' }
+
+  revalidatePath('/admin/sandelis', 'layout')
+  revalidatePath('/admin/sandelis/zurnalas')
+  revalidateTag('products', 'max')
+  return { ok: true, name: r.name ?? '—', sku: r.sku ?? null, stock: r.stock ?? 0, added: delta }
+}
