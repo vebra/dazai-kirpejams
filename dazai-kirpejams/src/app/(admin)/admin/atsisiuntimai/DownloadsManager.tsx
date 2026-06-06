@@ -18,6 +18,33 @@ function fmtSize(bytes: number | null): string {
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`
 }
 
+function CopyLinkButton({ id }: { id: string }) {
+  const [copied, setCopied] = useState(false)
+  async function copy() {
+    const url = `${window.location.origin}/atsisiuntimai/failas/${id}`
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {
+      window.prompt('Nukopijuokite nuorodą:', url)
+    }
+  }
+  return (
+    <button
+      type="button"
+      onClick={copy}
+      className={`px-2.5 py-1 border rounded text-[11px] font-semibold transition-colors ${
+        copied
+          ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+          : 'bg-[#F5F5F7] hover:bg-[#e8e8ec] border-[#ddd] text-brand-gray-900'
+      }`}
+    >
+      {copied ? '✓ Nukopijuota' : '📋 Nuoroda'}
+    </button>
+  )
+}
+
 export function DownloadsManager({ downloads }: { downloads: AdminDownloadRow[] }) {
   const [state, formAction, isPending] = useActionState(
     createDownloadAction,
@@ -166,7 +193,7 @@ export function DownloadsManager({ downloads }: { downloads: AdminDownloadRow[] 
                   <th className="px-4 py-3 text-left">Failas</th>
                   <th className="px-4 py-3 text-center">Matomas</th>
                   <th className="px-4 py-3 text-center">Būsena</th>
-                  <th className="px-4 py-3 text-right w-[150px]"></th>
+                  <th className="px-4 py-3 text-right w-[240px]"></th>
                 </tr>
               </thead>
               <tbody>
@@ -206,6 +233,7 @@ export function DownloadsManager({ downloads }: { downloads: AdminDownloadRow[] 
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="inline-flex gap-1">
+                        <CopyLinkButton id={d.id} />
                         <form action={toggleDownloadAction}>
                           <input type="hidden" name="id" value={d.id} />
                           <input type="hidden" name="next_active" value={(!d.isActive).toString()} />
