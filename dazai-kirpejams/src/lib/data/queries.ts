@@ -457,6 +457,49 @@ export const getActiveBanners = (
   )()
 
 // ============================================
+// ATSISIUNTIMAI (public)
+// ============================================
+
+export type Download = {
+  id: string
+  title: string
+  description: string | null
+  fileName: string | null
+  fileSizeBytes: number | null
+  visibility: 'public' | 'pro'
+}
+
+async function _getDownloads(): Promise<Download[]> {
+  if (!isSupabaseConfigured) return []
+  const supabase = getSupabase()
+  if (!supabase) return []
+  const { data, error } = await supabase
+    .from('downloads')
+    .select('id, title, description, file_name, file_size_bytes, visibility')
+    .eq('is_active', true)
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false })
+  if (error) {
+    console.error('[queries.getDownloads]', error)
+    return []
+  }
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    title: r.title,
+    description: r.description ?? null,
+    fileName: r.file_name ?? null,
+    fileSizeBytes: r.file_size_bytes ?? null,
+    visibility: (r.visibility as 'public' | 'pro') ?? 'public',
+  }))
+}
+
+export const getDownloads = (): Promise<Download[]> =>
+  unstable_cache(_getDownloads, ['downloads'], {
+    revalidate: 120,
+    tags: ['downloads'],
+  })()
+
+// ============================================
 // BLOGAS (public)
 // ============================================
 

@@ -343,6 +343,49 @@ export async function getAdminProducts(
 }
 
 // ============================================
+// Atsisiuntimai (admin)
+// ============================================
+
+export type AdminDownloadRow = {
+  id: string
+  title: string
+  description: string | null
+  fileName: string | null
+  fileSizeBytes: number | null
+  visibility: 'public' | 'pro'
+  sortOrder: number
+  isActive: boolean
+  createdAt: string
+}
+
+export async function getAdminDownloads(): Promise<AdminDownloadRow[]> {
+  const supabase = await createServerSupabase()
+  const { data, error } = await supabase
+    .from('downloads')
+    .select(
+      'id, title, description, file_name, file_size_bytes, visibility, sort_order, is_active, created_at'
+    )
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('[admin/queries] getAdminDownloads:', error.message)
+    return []
+  }
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    title: r.title,
+    description: r.description ?? null,
+    fileName: r.file_name ?? null,
+    fileSizeBytes: r.file_size_bytes ?? null,
+    visibility: (r.visibility as 'public' | 'pro') ?? 'public',
+    sortOrder: r.sort_order ?? 0,
+    isActive: r.is_active ?? true,
+    createdAt: r.created_at,
+  }))
+}
+
+// ============================================
 // Sandelio judėjimo žurnalas
 // ============================================
 

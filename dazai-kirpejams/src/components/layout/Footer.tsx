@@ -40,6 +40,10 @@ export function Footer({ lang, dict }: FooterProps) {
     { href: `${p}/duk`, label: footer.faq },
     { href: `${p}/pristatymas`, label: footer.delivery },
     { href: `${p}/skaiciuokle`, label: footer.calculator },
+    {
+      href: `${p}/atsisiuntimai`,
+      label: lang === 'en' ? 'Downloads' : lang === 'ru' ? 'Скачать' : 'Atsisiuntimai',
+    },
   ]
 
   return (
