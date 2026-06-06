@@ -339,6 +339,70 @@ export async function getAdminProducts(
   })
 }
 
+// ============================================
+// Sandelio judėjimo žurnalas
+// ============================================
+
+export type StockMovementRow = {
+  id: string
+  productId: string
+  productName: string
+  colorNumber: string | null
+  sku: string | null
+  delta: number
+  balanceAfter: number | null
+  reason: string
+  source: string | null
+  note: string | null
+  createdAt: string
+}
+
+export async function getStockMovements(opts?: {
+  productId?: string
+  reason?: string
+  limit?: number
+}): Promise<StockMovementRow[]> {
+  const supabase = await createServerSupabase()
+  let query = supabase
+    .from('stock_movements')
+    .select(
+      `id, product_id, delta, balance_after, reason, source, note, created_at,
+       product:products(name_lt, color_number, sku)`
+    )
+    .order('created_at', { ascending: false })
+    .limit(opts?.limit ?? 200)
+
+  if (opts?.productId) query = query.eq('product_id', opts.productId)
+  if (opts?.reason) query = query.eq('reason', opts.reason)
+
+  const { data, error } = await query
+  if (error) {
+    console.error('[admin/queries] getStockMovements:', error.message)
+    return []
+  }
+
+  return (data ?? []).map((row) => {
+    const rawP = row.product as
+      | { name_lt: string; color_number: string | null; sku: string | null }
+      | { name_lt: string; color_number: string | null; sku: string | null }[]
+      | null
+    const p = Array.isArray(rawP) ? rawP[0] : rawP
+    return {
+      id: row.id,
+      productId: row.product_id,
+      productName: p?.name_lt ?? '—',
+      colorNumber: p?.color_number ?? null,
+      sku: p?.sku ?? null,
+      delta: row.delta,
+      balanceAfter: row.balance_after ?? null,
+      reason: row.reason,
+      source: row.source ?? null,
+      note: row.note ?? null,
+      createdAt: row.created_at,
+    }
+  })
+}
+
 /** Kiek produktų yra aktyvių (is_active=true). Naudojam bulk-deactivate mygtukui. */
 export async function getActiveProductsCount(): Promise<number> {
   const supabase = await createServerSupabase()
