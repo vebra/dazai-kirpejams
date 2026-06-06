@@ -858,3 +858,35 @@ export async function writeOffStockAction(
     message: `Nurašyta ${res.removed} vnt. Likutis: ${res.stock}.`,
   }
 }
+
+// ============================================
+// Atsargų perspėjimo riba (reorder_point)
+// ============================================
+
+export async function quickSetReorderAction(formData: FormData): Promise<void> {
+  await requireAdmin()
+  const supabase = createServerClient()
+
+  const id = formData.get('id') as string
+  const raw = ((formData.get('reorder_point') as string) ?? '').trim()
+  // Tuščia = pašalinam ribą (null)
+  const reorder = raw === '' ? null : toInt(raw)
+
+  if (!id || (raw !== '' && (reorder === null || reorder < 0))) {
+    redirect('/admin/sandelis/uzsakyti?error=invalid')
+  }
+
+  const { error } = await supabase
+    .from('products')
+    .update({ reorder_point: reorder, updated_at: new Date().toISOString() })
+    .eq('id', id)
+
+  if (error) {
+    console.error('[admin/sandelis] quickSetReorder:', error.message)
+    redirect('/admin/sandelis/uzsakyti?error=update-failed')
+  }
+
+  revalidatePath('/admin/sandelis/uzsakyti')
+  revalidatePath('/admin/sandelis', 'layout')
+  revalidateTag('products', 'max')
+}
