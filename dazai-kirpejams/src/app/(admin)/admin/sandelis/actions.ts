@@ -802,3 +802,59 @@ export async function receiveScannedItem(
     added: delta,
   }
 }
+
+// ============================================
+// Rankinis nurašymas / išvežimas
+// ============================================
+
+export type WriteOffState = {
+  error?: string
+  success?: boolean
+  message?: string
+}
+
+export async function writeOffStockAction(
+  _prev: WriteOffState,
+  formData: FormData
+): Promise<WriteOffState> {
+  await requireAdmin()
+  const supabase = createServerClient()
+
+  const productId = ((formData.get('product_id') as string) ?? '').trim()
+  const qty = toInt((formData.get('qty') as string) ?? '')
+  const category = ((formData.get('category') as string) ?? 'Kita').trim() || 'Kita'
+  const note = ((formData.get('note') as string) ?? '').trim() || null
+
+  if (!productId) return { error: 'Pasirinkite prekę.' }
+  if (qty === null || qty <= 0) return { error: 'Kiekis turi būti teigiamas skaičius.' }
+
+  const { data, error } = await supabase.rpc('write_off_stock', {
+    p_product_id: productId,
+    p_qty: qty,
+    p_category: category,
+    p_note: note,
+  })
+
+  const res = data as { ok?: boolean; reason?: string; removed?: number; stock?: number } | null
+  if (error || !res?.ok) {
+    const reason = res?.reason
+    const msg =
+      reason === 'no_stock'
+        ? 'Prekės likutis jau 0 — nėra ką nurašyti.'
+        : reason === 'not_found'
+          ? 'Prekė nerasta.'
+          : reason === 'invalid_qty'
+            ? 'Neteisingas kiekis.'
+            : error?.message ?? 'Nepavyko nurašyti.'
+    console.error('[admin/sandelis] writeOff:', error?.message ?? reason)
+    return { error: msg }
+  }
+
+  revalidatePath('/admin/sandelis', 'layout')
+  revalidatePath('/admin/sandelis/zurnalas')
+  revalidateTag('products', 'max')
+  return {
+    success: true,
+    message: `Nurašyta ${res.removed} vnt. Likutis: ${res.stock}.`,
+  }
+}

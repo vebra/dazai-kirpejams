@@ -128,6 +128,12 @@ export default async function AdminInventoryPage({
         >
           📋 Žurnalas
         </Link>
+        <Link
+          href="/admin/sandelis/nurasymas"
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-[#F5F5F7] transition-colors"
+        >
+          ➖ Nurašyti
+        </Link>
         <a
           href="/admin/sandelis/eksportas"
           download
