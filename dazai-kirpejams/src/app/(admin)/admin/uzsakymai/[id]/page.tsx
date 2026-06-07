@@ -3,11 +3,13 @@ import { notFound } from 'next/navigation'
 import { requireAdmin } from '@/lib/admin/auth'
 import {
   getAdminOrderById,
+  getAdminProducts,
   ORDER_STATUSES,
   ORDER_STATUS_LABELS,
   ORDER_STATUS_COLORS,
   type OrderStatus,
 } from '@/lib/admin/queries'
+import { AddOrderItemForm } from './AddOrderItemForm'
 import {
   updateOrderStatusAction,
   updateOrderNotesAction,
@@ -85,9 +87,10 @@ export default async function AdminOrderDetailPage({
 
   const { id } = await params
   const sp = await searchParams
-  const [order, invoice] = await Promise.all([
+  const [order, invoice, products] = await Promise.all([
     getAdminOrderById(id),
     getInvoiceByOrderId(id),
+    getAdminProducts({ sortBy: 'name' }),
   ])
 
   if (!order) {
@@ -339,6 +342,9 @@ export default async function AdminOrderDetailPage({
           </table>
         </div>
       </section>
+
+      {/* Pridėti prekę prie užsakymo */}
+      <AddOrderItemForm orderId={order.id} products={products} />
 
       {/* Klientas + pristatymas — 2 stulpeliai */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

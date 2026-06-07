@@ -458,3 +458,53 @@ export async function downloadInvoiceAction(formData: FormData): Promise<void> {
   redirect(url)
 }
 
+
+// ============================================
+// Pridėti prekę prie esamo užsakymo
+// ============================================
+
+export type AddOrderItemState = { error?: string; success?: boolean; message?: string }
+
+export async function addOrderItemAction(
+  _prev: AddOrderItemState,
+  formData: FormData
+): Promise<AddOrderItemState> {
+  await requireAdmin()
+  const supabase = createServerClient()
+
+  const orderId = ((formData.get('order_id') as string) ?? '').trim()
+  const productId = ((formData.get('product_id') as string) ?? '').trim()
+  const qtyRaw = ((formData.get('qty') as string) ?? '').trim()
+  const qty = Number(qtyRaw)
+
+  if (!orderId) return { error: 'Trūksta užsakymo.' }
+  if (!productId) return { error: 'Pasirinkite prekę.' }
+  if (!Number.isInteger(qty) || qty <= 0) return { error: 'Kiekis turi būti teigiamas skaičius.' }
+
+  const { data, error } = await supabase.rpc('add_order_item', {
+    p_order_id: orderId,
+    p_product_id: productId,
+    p_qty: qty,
+  })
+
+  const res = data as { ok?: boolean; reason?: string; stock?: number } | null
+  if (error || !res?.ok) {
+    const reason = res?.reason
+    const msg =
+      reason === 'insufficient_stock'
+        ? `Nepakanka likučio (yra ${res?.stock ?? 0}).`
+        : reason === 'product_inactive'
+          ? 'Prekė neaktyvi.'
+          : reason === 'product_not_found'
+            ? 'Prekė nerasta.'
+            : reason === 'order_not_found'
+              ? 'Užsakymas nerastas.'
+              : error?.message ?? 'Nepavyko pridėti prekės.'
+    console.error('[admin/uzsakymai] addOrderItem:', error?.message ?? reason)
+    return { error: msg }
+  }
+
+  revalidatePath(`/admin/uzsakymai/${orderId}`)
+  revalidatePath('/admin/sandelis', 'layout')
+  return { success: true, message: 'Prekė pridėta. Sumos perskaičiuotos.' }
+}
