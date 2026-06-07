@@ -305,7 +305,7 @@ export default async function ProductPage({
       <section className="py-16 bg-brand-gray-50">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0]">
+            <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0] lg:col-span-2">
               <h2 className="text-[1.35rem] font-bold text-brand-gray-900 mb-4 leading-tight">
                 {t.descriptionTitle}
               </h2>
@@ -341,7 +341,7 @@ export default async function ProductPage({
             </div>
 
             {usage && (
-              <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0]">
+              <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0] lg:col-span-2">
                 <h2 className="text-[1.35rem] font-bold text-brand-gray-900 mb-4 leading-tight">
                   {t.usageTitle}
                 </h2>
