@@ -328,6 +328,71 @@ export function ProductEditForm({ product }: Props) {
         </div>
       </section>
 
+      {/* Papildoma informacija (rodoma produkto puslapio lentelėje) */}
+      <section className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6 space-y-5">
+        <h3 className="text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500">
+          Papildoma informacija
+        </h3>
+        <p className="text-[12px] text-brand-gray-500 -mt-3">
+          Rodoma produkto puslapio lentelėje. Palikus tuščią — rodoma numatyta
+          reikšmė.
+        </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div>
+            <label htmlFor="info_type" className="block text-[13px] font-semibold text-brand-gray-900 mb-1.5">
+              Tipas
+            </label>
+            <input
+              type="text"
+              id="info_type"
+              name="info_type"
+              defaultValue={product.infoType ?? ''}
+              placeholder="pvz. Plaukų dažai / Balinamieji milteliai"
+              className="w-full px-4 py-2.5 bg-[#F5F5F7] border border-[#ddd] rounded-lg text-sm focus:outline-none focus:border-brand-magenta focus:bg-white"
+            />
+          </div>
+          <div>
+            <label htmlFor="info_mixing_ratio" className="block text-[13px] font-semibold text-brand-gray-900 mb-1.5">
+              Maišymo santykis
+            </label>
+            <input
+              type="text"
+              id="info_mixing_ratio"
+              name="info_mixing_ratio"
+              defaultValue={product.infoMixingRatio ?? ''}
+              placeholder="pvz. 1+2, 1:2, —"
+              className="w-full px-4 py-2.5 bg-[#F5F5F7] border border-[#ddd] rounded-lg text-sm focus:outline-none focus:border-brand-magenta focus:bg-white"
+            />
+          </div>
+          <div>
+            <label htmlFor="info_shelf_life" className="block text-[13px] font-semibold text-brand-gray-900 mb-1.5">
+              Galiojimas
+            </label>
+            <input
+              type="text"
+              id="info_shelf_life"
+              name="info_shelf_life"
+              defaultValue={product.infoShelfLife ?? ''}
+              placeholder="pvz. 36 mėn."
+              className="w-full px-4 py-2.5 bg-[#F5F5F7] border border-[#ddd] rounded-lg text-sm focus:outline-none focus:border-brand-magenta focus:bg-white"
+            />
+          </div>
+          <div>
+            <label htmlFor="info_country" className="block text-[13px] font-semibold text-brand-gray-900 mb-1.5">
+              Kilmės šalis
+            </label>
+            <input
+              type="text"
+              id="info_country"
+              name="info_country"
+              defaultValue={product.infoCountry ?? ''}
+              placeholder="pvz. Lenkija / ES"
+              className="w-full px-4 py-2.5 bg-[#F5F5F7] border border-[#ddd] rounded-lg text-sm focus:outline-none focus:border-brand-magenta focus:bg-white"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Aprašymai */}
       <section className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6 space-y-5">
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500">

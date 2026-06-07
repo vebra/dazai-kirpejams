@@ -107,6 +107,10 @@ export type AdminProductDetail = {
   colorNumber: string | null
   colorName: string | null
   colorHex: string | null
+  infoType: string | null
+  infoMixingRatio: string | null
+  infoShelfLife: string | null
+  infoCountry: string | null
   stockQuantity: number
   isActive: boolean
   isFeatured: boolean
@@ -777,6 +781,7 @@ export async function getAdminProductById(
        description_lt, description_en, description_ru,
        price_cents, compare_price_cents, b2b_price_cents, cost_price_cents,
        volume_ml, color_number, color_name, color_hex,
+       info_type, info_mixing_ratio, info_shelf_life, info_country,
        stock_quantity, is_active, is_featured, image_urls`
     )
     .eq('id', id)
@@ -808,6 +813,10 @@ export async function getAdminProductById(
     colorNumber: data.color_number,
     colorName: data.color_name,
     colorHex: data.color_hex,
+    infoType: data.info_type ?? null,
+    infoMixingRatio: data.info_mixing_ratio ?? null,
+    infoShelfLife: data.info_shelf_life ?? null,
+    infoCountry: data.info_country ?? null,
     stockQuantity: data.stock_quantity ?? 0,
     isActive: data.is_active ?? true,
     isFeatured: data.is_featured ?? false,

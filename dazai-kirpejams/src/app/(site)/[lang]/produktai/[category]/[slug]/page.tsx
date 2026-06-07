@@ -26,6 +26,7 @@ import { formatPrice, langPrefix } from '@/lib/utils'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
 import { ProductPriceBlock } from '@/components/products/ProductPriceBlock'
+import { ProductDescription } from '@/components/products/ProductDescription'
 import { StickyBuyBar } from '@/components/products/StickyBuyBar'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { productSchema, breadcrumbSchema } from '@/lib/schema'
@@ -287,12 +288,8 @@ export default async function ProductPage({
               {/* Sticky juostos slenkstis — kai nuslenkama žemiau, parodoma juosta */}
               <div id="buybar-anchor" aria-hidden className="h-px w-full" />
 
-              {/* Description */}
-              {description && (
-                <p className="text-[0.95rem] text-brand-gray-500 leading-[1.7] mb-7">
-                  {description}
-                </p>
-              )}
+              {/* Pilnas aprašymas rodomas tik „Aprašymas" bloke žemiau —
+                  čia nedubliuojam. */}
 
               {/* Meta */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-[#E0E0E0]">
@@ -309,14 +306,14 @@ export default async function ProductPage({
       <section className="py-16 bg-brand-gray-50">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0]">
+            <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0] lg:col-span-2">
               <h2 className="text-[1.35rem] font-bold text-brand-gray-900 mb-4 leading-tight">
                 {t.descriptionTitle}
               </h2>
               {description ? (
-                <p className="text-[0.95rem] text-brand-gray-500 leading-[1.7] mb-4">
-                  {description}
-                </p>
+                <div className="mb-4">
+                  <ProductDescription text={description} />
+                </div>
               ) : null}
               {categorySlug === 'dazai' && (
                 <ul className="space-y-2.5 text-[0.92rem] text-brand-gray-500 leading-[1.6]">
@@ -345,7 +342,7 @@ export default async function ProductPage({
             </div>
 
             {usage && (
-              <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0]">
+              <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0] lg:col-span-2">
                 <h2 className="text-[1.35rem] font-bold text-brand-gray-900 mb-4 leading-tight">
                   {t.usageTitle}
                 </h2>
@@ -381,10 +378,10 @@ export default async function ProductPage({
                       t.volume,
                       product.volume_ml ? `${product.volume_ml} ml` : '—',
                     ],
-                    [t.type, t.typeValue],
-                    [t.mixingRatio, '1+2'],
-                    [t.shelfLife, t.shelfLifeValue],
-                    [t.countryOfOrigin, t.countryValue],
+                    [t.type, product.info_type || t.typeValue],
+                    [t.mixingRatio, product.info_mixing_ratio || '1+2'],
+                    [t.shelfLife, product.info_shelf_life || t.shelfLifeValue],
+                    [t.countryOfOrigin, product.info_country || t.countryValue],
                   ].map(([label, value]) => (
                     <tr
                       key={label}
