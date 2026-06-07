@@ -287,12 +287,8 @@ export default async function ProductPage({
               {/* Sticky juostos slenkstis — kai nuslenkama žemiau, parodoma juosta */}
               <div id="buybar-anchor" aria-hidden className="h-px w-full" />
 
-              {/* Description */}
-              {description && (
-                <p className="text-[0.95rem] text-brand-gray-500 leading-[1.7] mb-7">
-                  {description}
-                </p>
-              )}
+              {/* Pilnas aprašymas rodomas tik „Aprašymas" bloke žemiau —
+                  čia nedubliuojam. */}
 
               {/* Meta */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-[#E0E0E0]">
@@ -314,7 +310,7 @@ export default async function ProductPage({
                 {t.descriptionTitle}
               </h2>
               {description ? (
-                <p className="text-[0.95rem] text-brand-gray-500 leading-[1.7] mb-4">
+                <p className="text-[0.95rem] text-brand-gray-500 leading-[1.7] mb-4 whitespace-pre-line">
                   {description}
                 </p>
               ) : null}
