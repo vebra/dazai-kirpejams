@@ -305,8 +305,10 @@ export default async function ProductPage({
       {/* Detailed sections */}
       <section className="py-16 bg-brand-gray-50">
         <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0] lg:col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+            {/* Kairė kolona: aprašymas, naudojimas, sudėtis */}
+            <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0]">
               <h2 className="text-[1.35rem] font-bold text-brand-gray-900 mb-4 leading-tight">
                 {t.descriptionTitle}
               </h2>
@@ -342,7 +344,7 @@ export default async function ProductPage({
             </div>
 
             {usage && (
-              <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0] lg:col-span-2">
+              <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0]">
                 <h2 className="text-[1.35rem] font-bold text-brand-gray-900 mb-4 leading-tight">
                   {t.usageTitle}
                 </h2>
@@ -353,7 +355,7 @@ export default async function ProductPage({
             )}
 
             {ingredients && (
-              <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0] lg:col-span-2">
+              <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0]">
                 <h2 className="text-[1.35rem] font-bold text-brand-gray-900 mb-4 leading-tight">
                   {t.ingredientsTitle}
                 </h2>
@@ -362,8 +364,11 @@ export default async function ProductPage({
                 </p>
               </div>
             )}
+            </div>
 
-            <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0] lg:col-span-2">
+            {/* Dešinė kolona (PC): papildoma informacija */}
+            <aside className="space-y-6">
+            <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0]">
               <h2 className="text-[1.35rem] font-bold text-brand-gray-900 mb-4 leading-tight">
                 {t.additionalInfo}
               </h2>
@@ -398,6 +403,7 @@ export default async function ProductPage({
                 </tbody>
               </table>
             </div>
+            </aside>
           </div>
         </Container>
       </section>
