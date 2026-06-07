@@ -26,7 +26,6 @@ import { formatPrice, langPrefix } from '@/lib/utils'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
 import { ProductPriceBlock } from '@/components/products/ProductPriceBlock'
-import { ProductDescription } from '@/components/products/ProductDescription'
 import { StickyBuyBar } from '@/components/products/StickyBuyBar'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { productSchema, breadcrumbSchema } from '@/lib/schema'
@@ -311,9 +310,9 @@ export default async function ProductPage({
                 {t.descriptionTitle}
               </h2>
               {description ? (
-                <div className="mb-4">
-                  <ProductDescription text={description} />
-                </div>
+                <p className="text-[0.95rem] text-brand-gray-500 leading-[1.7] mb-4 whitespace-pre-line">
+                  {description}
+                </p>
               ) : null}
               {categorySlug === 'dazai' && (
                 <ul className="space-y-2.5 text-[0.92rem] text-brand-gray-500 leading-[1.6]">
