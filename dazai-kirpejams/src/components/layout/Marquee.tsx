@@ -17,7 +17,7 @@ export async function Marquee({ lang }: { lang: Locale }) {
   const half = segment.repeat(6)
 
   return (
-    <div className="overflow-hidden" style={{ background: bg }} aria-label={b.title}>
+    <div className="overflow-hidden mb-4 lg:mb-6" style={{ background: bg }} aria-label={b.title}>
       <div
         className="flex w-max whitespace-nowrap py-2"
         style={{ animation: 'dk-marquee 35s linear infinite' }}
