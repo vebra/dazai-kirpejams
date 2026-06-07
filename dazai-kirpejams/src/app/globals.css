@@ -156,6 +156,29 @@ body {
 .dk-glow-screen[data-on="1"] {
   opacity: 0.32;
 }
+/* Admin zonoje pildymo laukai didesni ir patogesni (didesnis šriftas + aukštis).
+   Specifiškumas (klasė+elementas) nugali Tailwind text-sm/py-* utilities.
+   Neliečia checkbox/radio/file ir labai siaurų inline laukų (≤90px). */
+.dk-admin input:not([type='checkbox']):not([type='radio']):not([type='file']),
+.dk-admin textarea,
+.dk-admin select {
+  font-size: 0.95rem;
+  padding-top: 0.7rem;
+  padding-bottom: 0.7rem;
+}
+.dk-admin textarea {
+  min-height: 130px;
+  line-height: 1.6;
+}
+/* Inline lentelių laukeliai (fiksuotas siauras plotis) — paliekam kompaktiškus */
+.dk-admin input.w-16,
+.dk-admin input.w-20,
+.dk-admin input.w-24 {
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+  font-size: 0.875rem;
+}
+
 /* Mobiliojoje produkto „Į krepšelį" juostoje (StickyBuyBar) WhatsApp mygtukas
    paslepiamas, kad nesusikirstų su juostos turiniu apačioje. */
 .dk-wa-float {
