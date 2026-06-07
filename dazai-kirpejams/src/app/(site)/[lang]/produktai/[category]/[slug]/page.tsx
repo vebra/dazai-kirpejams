@@ -377,10 +377,10 @@ export default async function ProductPage({
                       t.volume,
                       product.volume_ml ? `${product.volume_ml} ml` : '—',
                     ],
-                    [t.type, t.typeValue],
-                    [t.mixingRatio, '1+2'],
-                    [t.shelfLife, t.shelfLifeValue],
-                    [t.countryOfOrigin, t.countryValue],
+                    [t.type, product.info_type || t.typeValue],
+                    [t.mixingRatio, product.info_mixing_ratio || '1+2'],
+                    [t.shelfLife, product.info_shelf_life || t.shelfLifeValue],
+                    [t.countryOfOrigin, product.info_country || t.countryValue],
                   ].map(([label, value]) => (
                     <tr
                       key={label}

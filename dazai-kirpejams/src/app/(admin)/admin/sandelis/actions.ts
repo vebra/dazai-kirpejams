@@ -109,6 +109,11 @@ export async function updateProductAction(
   const sku = ((formData.get('sku') as string) || '').trim() || null
   const ean = ((formData.get('ean') as string) || '').trim() || null
 
+  const infoType = ((formData.get('info_type') as string) || '').trim() || null
+  const infoMixingRatio = ((formData.get('info_mixing_ratio') as string) || '').trim() || null
+  const infoShelfLife = ((formData.get('info_shelf_life') as string) || '').trim() || null
+  const infoCountry = ((formData.get('info_country') as string) || '').trim() || null
+
   const { error } = await supabase
     .from('products')
     .update({
@@ -123,6 +128,10 @@ export async function updateProductAction(
       b2b_price_cents: b2bPriceCents,
       cost_price_cents: costPriceCents,
       volume_ml: volumeMl,
+      info_type: infoType,
+      info_mixing_ratio: infoMixingRatio,
+      info_shelf_life: infoShelfLife,
+      info_country: infoCountry,
       stock_quantity: stockQuantity,
       is_in_stock: stockQuantity > 0,
       is_active: isActive,
@@ -243,6 +252,11 @@ export async function createProductAction(
     slug = `${baseSlug}-${i}`
   }
 
+  const infoType = ((formData.get('info_type') as string) || '').trim() || null
+  const infoMixingRatio = ((formData.get('info_mixing_ratio') as string) || '').trim() || null
+  const infoShelfLife = ((formData.get('info_shelf_life') as string) || '').trim() || null
+  const infoCountry = ((formData.get('info_country') as string) || '').trim() || null
+
   const { data, error } = await supabase
     .from('products')
     .insert({
@@ -264,6 +278,10 @@ export async function createProductAction(
       color_number: colorNumber,
       color_name: colorName,
       color_hex: colorHex,
+      info_type: infoType,
+      info_mixing_ratio: infoMixingRatio,
+      info_shelf_life: infoShelfLife,
+      info_country: infoCountry,
       stock_quantity: stockQuantity,
       is_in_stock: stockQuantity > 0,
       is_active: isActive,

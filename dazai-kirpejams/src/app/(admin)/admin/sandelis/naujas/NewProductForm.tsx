@@ -143,6 +143,29 @@ export function NewProductForm({ categories }: { categories: AdminCategoryOption
         </p>
       </section>
 
+      {/* Papildoma informacija */}
+      <section className={sectionCls}>
+        <h3 className={headCls}>Papildoma informacija (nebūtina)</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div>
+            <label htmlFor="info_type" className={labelCls}>Tipas</label>
+            <input id="info_type" name="info_type" className={inputCls} placeholder="pvz. Plaukų dažai" />
+          </div>
+          <div>
+            <label htmlFor="info_mixing_ratio" className={labelCls}>Maišymo santykis</label>
+            <input id="info_mixing_ratio" name="info_mixing_ratio" className={inputCls} placeholder="pvz. 1+2, 1:2, —" />
+          </div>
+          <div>
+            <label htmlFor="info_shelf_life" className={labelCls}>Galiojimas</label>
+            <input id="info_shelf_life" name="info_shelf_life" className={inputCls} placeholder="pvz. 36 mėn." />
+          </div>
+          <div>
+            <label htmlFor="info_country" className={labelCls}>Kilmės šalis</label>
+            <input id="info_country" name="info_country" className={inputCls} placeholder="pvz. Lenkija / ES" />
+          </div>
+        </div>
+      </section>
+
       {/* Aprašymai */}
       <section className={sectionCls}>
         <h3 className={headCls}>Aprašymas (nebūtina)</h3>
