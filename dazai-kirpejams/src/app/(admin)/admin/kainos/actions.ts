@@ -562,6 +562,7 @@ export async function saleAction(
   prev: SaleActionState,
   formData: FormData
 ): Promise<SaleActionState> {
+  await requireAdmin()
   return formData.get('intent') === 'remove'
     ? removeSaleAction(prev, formData)
     : applySaleAction(prev, formData)
