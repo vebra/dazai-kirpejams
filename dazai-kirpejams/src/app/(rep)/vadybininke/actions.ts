@@ -141,6 +141,16 @@ export async function submitRepOrder(input: {
 
   const result = data as { order_number: string; total_cents: number }
 
+  // Grynais / kortele — apmokėta iškart (vadybininkė surinko vietoje).
+  // Pavedimas lieka „laukia apmokėjimo". (Užsakymas vis tiek laukia admino
+  // patvirtinimo — approval_status nekeičiamas.)
+  if (input.paymentMethod === 'cash' || input.paymentMethod === 'card') {
+    await supabase
+      .from('orders')
+      .update({ payment_status: 'paid' })
+      .eq('order_number', result.order_number)
+  }
+
   // Pranešimas adminui — naujas užsakymas laukia patvirtinimo. Non-blocking:
   // jei laiškas nepavyks, užsakymas vis tiek sėkmingas.
   try {

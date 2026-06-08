@@ -56,6 +56,8 @@ const PAYMENT_LABELS: Record<string, string> = {
   stripe: 'Banko kortelė (Stripe)',
   paysera: 'Paysera',
   bank_transfer: 'Banko pavedimas',
+  cash: 'Grynais',
+  card: 'Kortelė (terminalas)',
 }
 
 const PAYMENT_STATUS_LABELS: Record<string, string> = {
