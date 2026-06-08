@@ -15,6 +15,7 @@ import {
   updateOrderNotesAction,
   updateTrackingAction,
   generateInvoiceAction,
+  regenerateInvoiceAction,
   downloadInvoiceAction,
   deleteOrderAction,
 } from '../actions'
@@ -167,6 +168,11 @@ export default async function AdminOrderDetailPage({
       {invoiceParam === 'exists' && (
         <div className="px-4 py-3 bg-sky-50 border border-sky-200 text-sky-700 rounded-lg text-sm">
           Sąskaita jau buvo išrašyta — rodoma esama.
+        </div>
+      )}
+      {invoiceParam === 'regenerated' && (
+        <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">
+          ✓ Sąskaita pergeneruota pagal dabartinį užsakymą (tas pats numeris).
         </div>
       )}
 
@@ -565,15 +571,27 @@ export default async function AdminOrderDetailPage({
             </div>
             <div className="flex gap-2">
               {invoice.pdfPath ? (
-                <form action={downloadInvoiceAction}>
-                  <input type="hidden" name="id" value={order.id} />
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark transition-colors"
-                  >
-                    ↓ Parsisiųsti PDF
-                  </button>
-                </form>
+                <>
+                  <form action={downloadInvoiceAction}>
+                    <input type="hidden" name="id" value={order.id} />
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark transition-colors"
+                    >
+                      ↓ Parsisiųsti PDF
+                    </button>
+                  </form>
+                  <form action={regenerateInvoiceAction}>
+                    <input type="hidden" name="id" value={order.id} />
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-[#F5F5F7] border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-white transition-colors"
+                      title="Atnaujinti PDF pagal dabartinį užsakymą (po pridėtų prekių ar pataisytų kainų)"
+                    >
+                      ↻ Pergeneruoti
+                    </button>
+                  </form>
+                </>
               ) : (
                 <form action={generateInvoiceAction}>
                   <input type="hidden" name="id" value={order.id} />
