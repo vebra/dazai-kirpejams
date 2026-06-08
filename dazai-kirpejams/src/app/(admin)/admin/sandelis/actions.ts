@@ -962,6 +962,7 @@ export async function issueStockToRepAction(
 
   const productId = ((formData.get('product_id') as string) ?? '').trim()
   const rep = ((formData.get('rep') as string) ?? '').trim()
+  const repId = ((formData.get('rep_id') as string) ?? '').trim() || null
   const qty = toInt((formData.get('qty') as string) ?? '')
 
   if (!rep) return { error: 'Pasirinkite vadybininkę.' }
@@ -972,6 +973,7 @@ export async function issueStockToRepAction(
     p_product_id: productId,
     p_qty: qty,
     p_rep: rep,
+    p_rep_id: repId,
   })
 
   const res = data as { ok?: boolean; reason?: string; stock?: number; removed?: number } | null

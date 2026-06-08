@@ -22,16 +22,22 @@ export function NewOrderFlow({
   deliveryOptions,
   freeShippingThresholdCents,
   vatRate,
+  initialClientId = null,
+  initialCart,
 }: {
   clients: RepClient[]
   products: RepProduct[]
   deliveryOptions: DeliveryOption[]
   freeShippingThresholdCents: number
   vatRate: number
+  initialClientId?: string | null
+  initialCart?: Record<string, number>
 }) {
   const [clients, setClients] = useState<RepClient[]>(initialClients)
-  const [client, setClient] = useState<RepClient | null>(null)
-  const [cart, setCart] = useState<Record<string, number>>({})
+  const [client, setClient] = useState<RepClient | null>(
+    initialClientId ? (initialClients.find((c) => c.id === initialClientId) ?? null) : null
+  )
+  const [cart, setCart] = useState<Record<string, number>>(initialCart ?? {})
   const [deliveryMethod, setDeliveryMethod] = useState(
     deliveryOptions.find((d) => d.value === 'pickup')?.value ?? deliveryOptions[0]?.value ?? 'pickup'
   )

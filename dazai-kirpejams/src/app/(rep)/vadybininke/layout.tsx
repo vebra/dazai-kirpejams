@@ -19,9 +19,11 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic'
 
 const NAV = [
+  { href: '/vadybininke', label: 'Skydelis' },
   { href: '/vadybininke/naujas-uzsakymas', label: 'Naujas užsakymas' },
   { href: '/vadybininke/klientai', label: 'Klientai' },
   { href: '/vadybininke/uzsakymai', label: 'Mano užsakymai' },
+  { href: '/vadybininke/atsargos', label: 'Mano atsargos' },
 ]
 
 export default async function RepRootLayout({

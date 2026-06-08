@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { requireSalesRep } from '@/lib/rep/auth'
 import { getMyRepOrders } from '@/lib/rep/queries'
 import { APPROVAL_LABELS, APPROVAL_BADGE } from '@/lib/rep/types'
@@ -26,9 +27,10 @@ export default async function RepOrdersPage() {
       ) : (
         <div className="space-y-3">
           {orders.map((o) => (
-            <div
+            <Link
               key={o.id}
-              className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-4"
+              href={`/vadybininke/uzsakymai/${o.id}`}
+              className="block bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-4 hover:border-brand-magenta transition-colors"
             >
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div className="min-w-0">
@@ -63,7 +65,7 @@ export default async function RepOrdersPage() {
                   {PRICE.format(o.totalCents / 100)}
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}
