@@ -331,43 +331,54 @@ export const getProductVariants = async (
 async function _getRelatedProducts(
   productId: string,
   categoryId: string,
-  limit: number
+  limit: number,
+  excludeGroup: string | null
 ): Promise<Product[]> {
   const supabase = getSupabase()
 
+  // Neįtraukiam tos pačios variantų grupės (kitų dydžių) — tai tas pats
+  // produktas; ir kitas variantų grupes „sulipdom" į vieną kortelę.
+  const filterAndDedup = (products: Product[]): Product[] =>
+    dedupeVariants(
+      products.filter((p) => !excludeGroup || p.variant_group !== excludeGroup)
+    ).slice(0, limit)
+
   if (!supabase) {
-    return mockProducts
-      .filter(
+    return filterAndDedup(
+      mockProducts.filter(
         (p) =>
           p.is_active &&
           p.id !== productId &&
           p.category_id === categoryId
       )
-      .slice(0, limit)
+    )
   }
 
+  // Imam daugiau nei `limit`, nes po variantų „sulipdymo" ir grupės
+  // pašalinimo eilučių sumažės.
   const { data, error } = await supabase
     .from('products')
     .select('*')
     .eq('is_active', true)
     .eq('category_id', categoryId)
     .neq('id', productId)
-    .limit(limit)
+    .limit(24)
 
   if (error) {
     console.error('[queries.getRelatedProducts]', error)
     return []
   }
-  return (data || []) as Product[]
+  return filterAndDedup((data || []) as Product[])
 }
 
 export const getRelatedProducts = async (
   product: Product,
   limit = 4
 ): Promise<Product[]> => {
+  const group = product.variant_group ?? null
   const related = await unstable_cache(
-    () => _getRelatedProducts(product.id, product.category_id, limit),
-    ['related', product.id, String(limit)],
+    () => _getRelatedProducts(product.id, product.category_id, limit, group),
+    ['related', product.id, String(limit), group ?? ''],
     { revalidate: 60, tags: ['products'] }
   )()
   return gateProducts(related)
