@@ -146,6 +146,14 @@ const nextConfig: NextConfig = {
         pathname: '/storage/v1/object/public/**',
       },
     ],
+    // Vercel image optimization usage mažinimas:
+    // - ilgesnis cache (31 d.) → mažiau pakartotinių transformacijų
+    // - tik webp (be AVIF — kitaip dvigubai transformacijų)
+    // - mažiau dydžių „breakpoint'ų" → mažiau atskirų transformacijų / nuotrauką
+    minimumCacheTTL: 2678400,
+    formats: ['image/webp'],
+    deviceSizes: [640, 828, 1080, 1920],
+    imageSizes: [32, 64, 96, 128, 256],
   },
 }
 
