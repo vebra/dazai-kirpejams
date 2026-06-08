@@ -473,6 +473,110 @@ export async function generateInvoiceForOrder(
 }
 
 /**
+ * Pergeneruoja EGZISTUOJANČIĄ sąskaitą iš DABARTINIO užsakymo: perkuria prekių
+ * sąrašą (items_snapshot) ir sumas iš naujo, perpiešia PDF tuo pačiu numeriu ir
+ * data. Naudojama, kai užsakymas pakeistas (pridėta prekė, pataisytos kainos).
+ * Jei sąskaitos dar nėra — sukuria naują.
+ */
+export async function regenerateInvoiceForOrder(
+  orderId: string
+): Promise<GenerateResult> {
+  const supabase = createServerClient()
+
+  const { data: existing } = await supabase
+    .from('invoices')
+    .select(
+      'id, invoice_number, issued_at, vat_rate, payment_due_date, custom_notes, seller_snapshot, brand_snapshot, pdf_path'
+    )
+    .eq('order_id', orderId)
+    .maybeSingle<{
+      id: string
+      invoice_number: string
+      issued_at: string
+      vat_rate: number
+      payment_due_date: string | null
+      custom_notes: string | null
+      seller_snapshot: InvoiceSellerSnapshot
+      brand_snapshot: InvoiceBrandSnapshot | null
+      pdf_path: string | null
+    }>()
+
+  // Jei sąskaitos dar nėra — paprastas sukūrimas.
+  if (!existing) {
+    return generateInvoiceForOrder(orderId)
+  }
+
+  const order = await loadOrder(supabase, orderId)
+  if (!order) return { ok: false, error: 'Užsakymas nerastas.' }
+  if (!order.order_items || order.order_items.length === 0) {
+    return { ok: false, error: 'Užsakymas neturi prekių — sąskaita negali būti išrašyta.' }
+  }
+
+  const buyer = buildBuyerSnapshot(order)
+  const items = buildItemsSnapshot(order)
+  const brand = existing.brand_snapshot ?? INVOICE_BRAND_DEFAULTS
+
+  const data: InvoiceData = {
+    invoiceNumber: existing.invoice_number,
+    issuedAt: existing.issued_at,
+    orderNumber: order.order_number,
+    seller: existing.seller_snapshot,
+    buyer,
+    items,
+    brand,
+    subtotalCents: order.subtotal_cents,
+    discountCents: order.discount_cents ?? 0,
+    deliveryCostCents: order.delivery_cost_cents ?? 0,
+    vatCents: order.vat_cents,
+    vatRate: existing.vat_rate,
+    totalCents: order.total_cents,
+    paymentMethod: order.payment_method,
+    notes: existing.custom_notes ?? order.notes,
+    paymentDueDate: existing.payment_due_date,
+  }
+
+  const pdfBuffer = await renderPdf(data)
+  const pdfPath = existing.pdf_path ?? buildPdfPath(existing.invoice_number)
+
+  const { error: uploadError } = await supabase.storage
+    .from(INVOICE_BUCKET)
+    .upload(pdfPath, pdfBuffer, {
+      contentType: 'application/pdf',
+      upsert: true,
+      cacheControl: '0',
+    })
+  if (uploadError) {
+    return { ok: false, error: `Nepavyko įkelti PDF: ${uploadError.message}` }
+  }
+
+  const { error: updateError } = await supabase
+    .from('invoices')
+    .update({
+      buyer_snapshot: buyer,
+      items_snapshot: items,
+      subtotal_cents: data.subtotalCents,
+      discount_cents: data.discountCents,
+      delivery_cost_cents: data.deliveryCostCents,
+      vat_cents: data.vatCents,
+      total_cents: data.totalCents,
+      pdf_path: pdfPath,
+      pdf_generated_at: new Date().toISOString(),
+    })
+    .eq('id', existing.id)
+  if (updateError) {
+    return { ok: false, error: `Nepavyko atnaujinti sąskaitos: ${updateError.message}` }
+  }
+
+  return {
+    ok: true,
+    invoiceId: existing.id,
+    invoiceNumber: existing.invoice_number,
+    pdfPath,
+    alreadyExisted: true,
+  }
+}
+
+/**
  * Atskiras scenarijus: invoices eilutė egzistuoja (numeris paimtas), bet
  * PDF upload'as kažkada nepavyko. Regeneruojam PDF tuo pačiu numeriu ir
  * atnaujinam pdf_path. Taip išvengiam numeracijos skylės.

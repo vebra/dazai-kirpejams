@@ -10,7 +10,10 @@ import {
   buildStatusChangeEmail,
   buildInvoicePaidEmail,
 } from '@/lib/email/templates'
-import { generateInvoiceForOrder } from '@/lib/invoices/generate'
+import {
+  generateInvoiceForOrder,
+  regenerateInvoiceForOrder,
+} from '@/lib/invoices/generate'
 import {
   getInvoicePdfBuffer,
   getInvoiceSignedUrl,
@@ -375,6 +378,29 @@ export async function generateInvoiceAction(formData: FormData): Promise<void> {
   redirect(
     `/admin/uzsakymai/${id}?invoice=${result.alreadyExisted ? 'exists' : 'created'}`
   )
+}
+
+/**
+ * Pergeneruoja sąskaitą iš dabartinio užsakymo (po pakeitimų — pridėtos prekės,
+ * pataisytų kainų). Tas pats numeris ir data, atnaujintas prekių sąrašas + sumos.
+ */
+export async function regenerateInvoiceAction(formData: FormData): Promise<void> {
+  await requireAdmin()
+  const id = formData.get('id') as string | null
+  if (!id) redirect('/admin/uzsakymai?error=invalid-id')
+
+  await assertNotAwaitingApproval(createServerClient(), id)
+
+  const result = await regenerateInvoiceForOrder(id)
+  if (!result.ok) {
+    console.error('[admin/uzsakymai/actions] regenerateInvoice:', result.error)
+    redirect(
+      `/admin/uzsakymai/${id}?error=invoice-failed&reason=${encodeURIComponent(result.error)}`
+    )
+  }
+
+  revalidatePath(`/admin/uzsakymai/${id}`)
+  redirect(`/admin/uzsakymai/${id}?invoice=regenerated`)
 }
 
 // ============================================
