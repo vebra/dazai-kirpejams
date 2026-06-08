@@ -205,15 +205,20 @@ export default async function ArticlePage({
                       className="inline-block w-1 h-1 rounded-full bg-[#D0D0D0] mx-3 align-middle"
                       aria-hidden
                     />
+                    {t.by ? `${t.by} ` : ''}
                     {authorUrl ? (
                       <Link
                         href={authorUrl.replace(SITE_URL, '')}
                         className="font-medium hover:text-brand-magenta transition-colors"
                       >
                         {post.author}
+                        {authorJobTitle ? `, ${authorJobTitle}` : ''}
                       </Link>
                     ) : (
-                      <span>{post.author}</span>
+                      <span>
+                        {post.author}
+                        {authorJobTitle ? `, ${authorJobTitle}` : ''}
+                      </span>
                     )}
                   </>
                 )}
