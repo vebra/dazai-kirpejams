@@ -447,20 +447,22 @@ export default async function ProductPage({
               </h2>
               <table className="w-full text-[0.92rem]">
                 <tbody>
-                  {[
+                  {/* Dažams rodom numatytas reikšmes (Tipas/Maišymas/Galiojimas/
+                      Kilmė), kitoms prekėms (pvz. pirštinėms) — tik tuos laukus,
+                      kuriuos admin'as užpildė, kad nesimatytų klaidingų dažų
+                      reikšmių. Tušti laukai praleidžiami. */}
+                  {(
                     [
-                      t.brand,
-                      'Color SHOCK / RosaNera Cosmetics',
-                    ],
-                    [
-                      t.volume,
-                      product.volume_ml ? `${product.volume_ml} ml` : '—',
-                    ],
-                    [t.type, product.info_type || t.typeValue],
-                    [t.mixingRatio, product.info_mixing_ratio || '1+2'],
-                    [t.shelfLife, product.info_shelf_life || t.shelfLifeValue],
-                    [t.countryOfOrigin, product.info_country || t.countryValue],
-                  ].map(([label, value]) => (
+                      [t.brand, 'Color SHOCK / RosaNera Cosmetics'],
+                      [t.volume, product.volume_ml ? `${product.volume_ml} ml` : ''],
+                      [t.type, product.info_type || (categorySlug === 'dazai' ? t.typeValue : '')],
+                      [t.mixingRatio, product.info_mixing_ratio || (categorySlug === 'dazai' ? '1+2' : '')],
+                      [t.shelfLife, product.info_shelf_life || (categorySlug === 'dazai' ? t.shelfLifeValue : '')],
+                      [t.countryOfOrigin, product.info_country || (categorySlug === 'dazai' ? t.countryValue : '')],
+                    ] as [string, string][]
+                  )
+                    .filter(([, value]) => value)
+                    .map(([label, value]) => (
                     <tr
                       key={label}
                       className="border-b border-[#E0E0E0] last:border-b-0"

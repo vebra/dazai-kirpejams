@@ -147,6 +147,50 @@ export async function updateProductAction(
     return { error: `Nepavyko išsaugoti: ${error.message}` }
   }
 
+  // Variantų (dydžių) sinchronizacija — jei prekė priklauso variantų grupei,
+  // BENDRUS laukus (pavadinimas, aprašymas, kainos, talpa, papildoma info)
+  // pritaikom ir kitiems tos grupės dydžiams. Taip redaguojant vieną dydį
+  // automatiškai atsinaujina visi. PER-DYDĮ laukai NEKEIČIAMI: likutis,
+  // SKU, EAN, aktyvumas — kiekvienas dydis juos turi savo.
+  const { data: groupRow } = await supabase
+    .from('products')
+    .select('variant_group')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (groupRow?.variant_group) {
+    const { error: syncError } = await supabase
+      .from('products')
+      .update({
+        name_lt: nameLt,
+        name_en: nameEn,
+        name_ru: nameRu,
+        description_lt: descriptionLt,
+        description_en: descriptionEn,
+        description_ru: descriptionRu,
+        price_cents: priceCents,
+        compare_price_cents: comparePriceCents,
+        b2b_price_cents: b2bPriceCents,
+        cost_price_cents: costPriceCents,
+        volume_ml: volumeMl,
+        info_type: infoType,
+        info_mixing_ratio: infoMixingRatio,
+        info_shelf_life: infoShelfLife,
+        info_country: infoCountry,
+        is_featured: isFeatured,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('variant_group', groupRow.variant_group)
+      .neq('id', id)
+
+    if (syncError) {
+      console.error(
+        '[admin/sandelis/actions] updateProduct variant sync:',
+        syncError.message
+      )
+    }
+  }
+
   revalidatePath('/admin/sandelis', 'layout')
   revalidatePath('/admin')
   revalidateTag('products', 'max')
