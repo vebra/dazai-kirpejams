@@ -84,7 +84,7 @@
     "cards": [
       {
         "icon": "/icons/advantages/tube-180ml.jpg",
-        "title": "180 ml — dvigubai daugiau",
+        "title": "180 ml — iki 3× daugiau",
         "desc": "Standartinė pakuotė rinkoje — 60–100 ml. Mūsų — 180 ml. Tai reiškia mažesnę savikainą kiekvienam dažymui."
       },
       {
@@ -760,7 +760,7 @@
             "q": "Kuo jūsų dažai skiriasi nuo kitų profesionalių dažų?",
             "intro": "Mūsų Color SHOCK dažai išsiskiria keliais esminiais aspektais:",
             "list": [
-              "180 ml pakuotė — dvigubai didesnė nei standartinė rinkoje (60–100 ml), todėl kaina už mililitrą yra žymiai mažesnė.",
+              "180 ml pakuotė — iki 3× didesnė nei standartinė 60 ml (ir ~2× nei 100 ml) rinkoje, todėl kaina už mililitrą yra žymiai mažesnė.",
               "Premium ingredientai — formulėje naudojamas Argano aliejus, Jojobos aliejus ir Erškėtrožių ekstraktas, kurie maitina ir saugo plaukus dažymo metu.",
               "Itališka kokybė — produktai gaminami Italijoje, laikantis aukščiausių kokybės standartų.",
               "Profesionali kaina — didesnė pakuotė leidžia pasiūlyti konkurencingą kainą, neprarandant kokybės."
@@ -1050,7 +1050,7 @@
   },
   "productPage": {
     "reviewCount": "4.9 (27 atsiliepimai)",
-    "volumeDouble": "2× daugiau nei standartinė pakuotė",
+    "volumeDouble": "iki 3× daugiau nei standartinė 60 ml",
     "pricePerMl": "Kaina per ml:",
     "youSave": "Sutaupote",
     "priceOnlyPro": "Kaina — tik profesionalams",
@@ -1083,16 +1083,37 @@
     "shelfLifeValue": "36 mėnesiai (neatidaryta)",
     "countryOfOrigin": "Kilmės šalis",
     "countryValue": "Italija",
-    "feat180ml": "180 ml talpa",
-    "feat180mlDesc": "dvigubai daugiau nei standartinė pakuotė",
-    "featArgan": "Argan & Jojoba aliejus",
-    "featArganDesc": "maitina ir apsaugo plaukus",
-    "featRose": "Erškėtrožių ekstraktas",
-    "featRoseDesc": "turi antioksidacinių savybių",
-    "featGray": "100% pilkų plaukų padengimas",
-    "featGrayDesc": "patikimas rezultatas",
-    "featColor": "Ilgai išliekanti spalva",
-    "featColorDesc": "iki 6–8 savaičių",
+    "dyeIntro": "Color SHOCK – tai profesionalūs ilgalaikiai plaukų dažai, skirti naudoti kirpyklose ir profesionaliam dažymui. Formulė papildyta argano aliejumi, jojobos aliejumi ir rožių ekstraktu, kurie padeda apsaugoti plauką dažymo metu ir suteikia daugiau blizgesio.",
+    "dyeBenefitsTitle": "Kokia nauda?",
+    "dyeBenefits": [
+      "Ilgalaikė ir intensyvi spalva",
+      "Geras žilų plaukų padengimas",
+      "Plaukai išlieka minkštesni ir blizgesni",
+      "Argano aliejus padeda sumažinti plaukų išsausėjimą",
+      "Jojobos aliejus suteikia elastingumo ir glotnumo",
+      "Rožių ekstraktas pasižymi kondicionuojančiomis savybėmis",
+      "Didelė profesionali pakuotė – 180 ml (iki 3× daugiau nei standartinė 60 ml arba ~2× nei 100 ml tūbelė)"
+    ],
+    "dyeMixing": {
+      "title": "Kaip naudoti?",
+      "standardTitle": "Standartinis maišymas",
+      "standardRatio": "1 dalis dažų + 2 dalys oksidacinės emulsijos (1:2)",
+      "examplesTitle": "Pavyzdžiai",
+      "examples": [
+        "30 ml dažų + 60 ml oksidanto",
+        "50 ml dažų + 100 ml oksidanto",
+        "60 ml dažų + 120 ml oksidanto"
+      ],
+      "superliftTitle": "Super šviesinimo serijoms (Superlift)",
+      "superliftRatio": "1 dalis dažų + 3 dalys oksidanto (1:3)",
+      "oxidantTitle": "Oksidanto pasirinkimas",
+      "oxidants": [
+        "1,5–3 % – tonavimui",
+        "6 % (20 vol.) – dažymui tonu į toną, žilų plaukų padengimui",
+        "9 % (30 vol.) – šviesinimui 2–3 tonais",
+        "12 % (40 vol.) – stipresniam šviesinimui ir superlift serijoms"
+      ]
+    },
     "relatedBadge": "Rekomenduojama kartu",
     "relatedTitle": "Tinka prie šio produkto",
     "ctaTitle": "Dirbate salone? Gaukite specialų pasiūlymą",

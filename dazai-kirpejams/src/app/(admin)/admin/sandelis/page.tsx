@@ -34,6 +34,23 @@ function formatCents(cents: number): string {
   return PRICE_FORMATTER.format(cents / 100)
 }
 
+const DATE_FORMATTER = new Intl.DateTimeFormat('lt-LT', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  timeZone: 'Europe/Vilnius',
+})
+
+/** Paskutinio redagavimo data — „2026-06-08 14:30" formatu, Vilniaus laiku. */
+function formatEditedAt(iso: string | null): string {
+  if (!iso) return '—'
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return '—'
+  return DATE_FORMATTER.format(d)
+}
+
 /**
  * Marža % pagal retail su PVM ir savikainą be PVM.
  * LT PVM = 21%. Formulė: (retail/1.21 - cost) / (retail/1.21) × 100
@@ -442,6 +459,9 @@ export default async function AdminInventoryPage({
                           </div>
                           <div className="text-[11px] text-brand-gray-500 font-mono">
                             {p.colorNumber ?? p.sku ?? p.slug}
+                          </div>
+                          <div className="text-[11px] text-brand-gray-400 mt-0.5">
+                            Redaguota: {formatEditedAt(p.updatedAt)}
                           </div>
                         </div>
                       </div>

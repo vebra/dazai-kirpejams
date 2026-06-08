@@ -84,7 +84,7 @@
     "cards": [
       {
         "icon": "/icons/advantages/tube-180ml.jpg",
-        "title": "180 ml — twice as much",
+        "title": "180 ml — up to 3× as much",
         "desc": "The market standard is 60–100 ml. Ours is 180 ml. That means a lower cost per colouring."
       },
       {
@@ -760,7 +760,7 @@
             "q": "How do your dyes differ from other professional dyes?",
             "intro": "Our Color SHOCK dyes stand out in several key ways:",
             "list": [
-              "180 ml package — twice the size of the standard market offering (60–100 ml), making the price per millilitre significantly lower.",
+              "180 ml package — up to 3× the size of a standard 60 ml (and ~2× a 100 ml) market offering, making the price per millilitre significantly lower.",
               "Premium ingredients — the formula contains Argan oil, Jojoba oil and Rosehip extract, which nourish and protect hair during colouring.",
               "Italian quality — products are manufactured in Italy to the highest quality standards.",
               "Professional pricing — the larger package allows us to offer a competitive price without sacrificing quality."
@@ -1050,7 +1050,7 @@
   },
   "productPage": {
     "reviewCount": "4.9 (27 reviews)",
-    "volumeDouble": "2× more than a standard package",
+    "volumeDouble": "up to 3× more than a standard 60 ml",
     "pricePerMl": "Price per ml:",
     "youSave": "You save",
     "priceOnlyPro": "Pricing — professionals only",
@@ -1083,16 +1083,37 @@
     "shelfLifeValue": "36 months (unopened)",
     "countryOfOrigin": "Country of origin",
     "countryValue": "Italy",
-    "feat180ml": "180 ml volume",
-    "feat180mlDesc": "twice the size of a standard package",
-    "featArgan": "Argan & Jojoba oil",
-    "featArganDesc": "nourishes and protects hair",
-    "featRose": "Rosehip extract",
-    "featRoseDesc": "has antioxidant properties",
-    "featGray": "100% grey hair coverage",
-    "featGrayDesc": "reliable results",
-    "featColor": "Long-lasting colour",
-    "featColorDesc": "up to 6–8 weeks",
+    "dyeIntro": "Color SHOCK is a professional long-lasting hair dye, made for use in salons and professional colouring. The formula is enriched with argan oil, jojoba oil and rose extract, which help protect the hair during colouring and add extra shine.",
+    "dyeBenefitsTitle": "What are the benefits?",
+    "dyeBenefits": [
+      "Long-lasting, intense colour",
+      "Good grey hair coverage",
+      "Hair stays softer and shinier",
+      "Argan oil helps reduce hair dryness",
+      "Jojoba oil adds elasticity and smoothness",
+      "Rose extract has conditioning properties",
+      "Large professional package — 180 ml (up to 3× more than a standard 60 ml, or ~2× a 100 ml tube)"
+    ],
+    "dyeMixing": {
+      "title": "How to use",
+      "standardTitle": "Standard mixing",
+      "standardRatio": "1 part dye + 2 parts oxidising emulsion (1:2)",
+      "examplesTitle": "Examples",
+      "examples": [
+        "30 ml dye + 60 ml developer",
+        "50 ml dye + 100 ml developer",
+        "60 ml dye + 120 ml developer"
+      ],
+      "superliftTitle": "For super-lightening series (Superlift)",
+      "superliftRatio": "1 part dye + 3 parts developer (1:3)",
+      "oxidantTitle": "Choosing the developer",
+      "oxidants": [
+        "1.5–3% – for toning",
+        "6% (20 vol.) – for tone-on-tone colouring and grey coverage",
+        "9% (30 vol.) – for lightening by 2–3 tones",
+        "12% (40 vol.) – for stronger lightening and superlift series"
+      ]
+    },
     "relatedBadge": "Recommended together",
     "relatedTitle": "Goes well with this product",
     "ctaTitle": "Work in a salon? Get a special offer",

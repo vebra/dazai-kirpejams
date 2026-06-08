@@ -315,30 +315,68 @@ export default async function ProductPage({
                 </p>
               ) : null}
               {categorySlug === 'dazai' && (
-                <ul className="space-y-2.5 text-[0.92rem] text-brand-gray-500 leading-[1.6]">
-                  <li>
-                    <strong className="text-brand-gray-900">{t.feat180ml}</strong>{' '}
-                    — {t.feat180mlDesc}
-                  </li>
-                  <li>
-                    <strong className="text-brand-gray-900">{t.featArgan}</strong>{' '}
-                    — {t.featArganDesc}
-                  </li>
-                  <li>
-                    <strong className="text-brand-gray-900">{t.featRose}</strong>{' '}
-                    — {t.featRoseDesc}
-                  </li>
-                  <li>
-                    <strong className="text-brand-gray-900">{t.featGray}</strong>{' '}
-                    — {t.featGrayDesc}
-                  </li>
-                  <li>
-                    <strong className="text-brand-gray-900">{t.featColor}</strong>{' '}
-                    — {t.featColorDesc}
-                  </li>
-                </ul>
+                <>
+                  <p className="text-[0.95rem] text-brand-gray-500 leading-[1.7] mb-5 whitespace-pre-line">
+                    {t.dyeIntro}
+                  </p>
+                  <h3 className="text-[1.05rem] font-bold text-brand-gray-900 mb-3">
+                    {t.dyeBenefitsTitle}
+                  </h3>
+                  <ul className="space-y-2.5 text-[0.92rem] text-brand-gray-500 leading-[1.6]">
+                    {t.dyeBenefits.map((benefit) => (
+                      <li key={benefit} className="flex gap-2.5">
+                        <span className="text-brand-magenta mt-0.5" aria-hidden>
+                          ✓
+                        </span>
+                        <span>{benefit}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
               )}
             </div>
+
+            {categorySlug === 'dazai' && (
+              <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0] lg:col-span-2">
+                <h2 className="text-[1.35rem] font-bold text-brand-gray-900 mb-5 leading-tight">
+                  {t.dyeMixing.title}
+                </h2>
+                <div className="space-y-5 text-[0.92rem] text-brand-gray-500 leading-[1.6]">
+                  <div>
+                    <h3 className="font-semibold text-brand-gray-900 mb-1">
+                      {t.dyeMixing.standardTitle}
+                    </h3>
+                    <p>{t.dyeMixing.standardRatio}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-brand-gray-900 mb-1">
+                      {t.dyeMixing.examplesTitle}
+                    </h3>
+                    <ul className="space-y-1 list-disc pl-5">
+                      {t.dyeMixing.examples.map((example) => (
+                        <li key={example}>{example}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-brand-gray-900 mb-1">
+                      {t.dyeMixing.superliftTitle}
+                    </h3>
+                    <p>{t.dyeMixing.superliftRatio}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-brand-gray-900 mb-1">
+                      {t.dyeMixing.oxidantTitle}
+                    </h3>
+                    <ul className="space-y-1 list-disc pl-5">
+                      {t.dyeMixing.oxidants.map((oxidant) => (
+                        <li key={oxidant}>{oxidant}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {usage && (
               <div className="bg-white rounded-2xl p-8 border border-[#E0E0E0] lg:col-span-2">
