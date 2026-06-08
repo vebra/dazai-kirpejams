@@ -109,7 +109,7 @@ export const AUTHORS: Author[] = [
         ],
       },
     },
-    imagePath: null,
+    imagePath: '/team/dziuljeta-vebre.webp',
     sameAs: [],
     publications: [
       { title: 'Nori keist gyvenimą, keisk šukuoseną' },
