@@ -135,7 +135,7 @@ body {
   height: 440px;
   pointer-events: none;
   z-index: 30;
-  background-image: url("/cursor-splash.png");
+  background-image: url("/cursor-splash.webp");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
