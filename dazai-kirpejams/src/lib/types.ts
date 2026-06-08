@@ -58,6 +58,7 @@ export type Product = {
   color_tone: string | null
   color_family: string | null
 
+  info_brand: string | null
   info_type: string | null
   info_mixing_ratio: string | null
   info_shelf_life: string | null

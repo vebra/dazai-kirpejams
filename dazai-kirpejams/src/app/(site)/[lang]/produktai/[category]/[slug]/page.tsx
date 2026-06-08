@@ -453,7 +453,7 @@ export default async function ProductPage({
                       reikšmių. Tušti laukai praleidžiami. */}
                   {(
                     [
-                      [t.brand, 'Color SHOCK / RosaNera Cosmetics'],
+                      [t.brand, product.info_brand || 'Color SHOCK / RosaNera Cosmetics'],
                       [t.volume, product.volume_ml ? `${product.volume_ml} ml` : ''],
                       [t.type, product.info_type || (categorySlug === 'dazai' ? t.typeValue : '')],
                       [t.mixingRatio, product.info_mixing_ratio || (categorySlug === 'dazai' ? '1+2' : '')],

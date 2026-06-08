@@ -104,6 +104,7 @@ function makeProduct(p: Partial<Product>): Product {
     color_hex: null,
     color_tone: null,
     color_family: null,
+    info_brand: null,
     info_type: null,
     info_mixing_ratio: null,
     info_shelf_life: null,

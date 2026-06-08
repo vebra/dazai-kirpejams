@@ -339,6 +339,19 @@ export function ProductEditForm({ product }: Props) {
         </p>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div>
+            <label htmlFor="info_brand" className="block text-[13px] font-semibold text-brand-gray-900 mb-1.5">
+              Prekės ženklas
+            </label>
+            <input
+              type="text"
+              id="info_brand"
+              name="info_brand"
+              defaultValue={product.infoBrand ?? ''}
+              placeholder="pvz. MEDICOV (tuščia — Color SHOCK / RosaNera Cosmetics)"
+              className="w-full px-4 py-2.5 bg-[#F5F5F7] border border-[#ddd] rounded-lg text-sm focus:outline-none focus:border-brand-magenta focus:bg-white"
+            />
+          </div>
+          <div>
             <label htmlFor="info_type" className="block text-[13px] font-semibold text-brand-gray-900 mb-1.5">
               Tipas
             </label>

@@ -109,6 +109,7 @@ export async function updateProductAction(
   const sku = ((formData.get('sku') as string) || '').trim() || null
   const ean = ((formData.get('ean') as string) || '').trim() || null
 
+  const infoBrand = ((formData.get('info_brand') as string) || '').trim() || null
   const infoType = ((formData.get('info_type') as string) || '').trim() || null
   const infoMixingRatio = ((formData.get('info_mixing_ratio') as string) || '').trim() || null
   const infoShelfLife = ((formData.get('info_shelf_life') as string) || '').trim() || null
@@ -128,6 +129,7 @@ export async function updateProductAction(
       b2b_price_cents: b2bPriceCents,
       cost_price_cents: costPriceCents,
       volume_ml: volumeMl,
+      info_brand: infoBrand,
       info_type: infoType,
       info_mixing_ratio: infoMixingRatio,
       info_shelf_life: infoShelfLife,
@@ -173,6 +175,7 @@ export async function updateProductAction(
         b2b_price_cents: b2bPriceCents,
         cost_price_cents: costPriceCents,
         volume_ml: volumeMl,
+        info_brand: infoBrand,
         info_type: infoType,
         info_mixing_ratio: infoMixingRatio,
         info_shelf_life: infoShelfLife,
@@ -296,6 +299,7 @@ export async function createProductAction(
     slug = `${baseSlug}-${i}`
   }
 
+  const infoBrand = ((formData.get('info_brand') as string) || '').trim() || null
   const infoType = ((formData.get('info_type') as string) || '').trim() || null
   const infoMixingRatio = ((formData.get('info_mixing_ratio') as string) || '').trim() || null
   const infoShelfLife = ((formData.get('info_shelf_life') as string) || '').trim() || null
@@ -322,6 +326,7 @@ export async function createProductAction(
       color_number: colorNumber,
       color_name: colorName,
       color_hex: colorHex,
+      info_brand: infoBrand,
       info_type: infoType,
       info_mixing_ratio: infoMixingRatio,
       info_shelf_life: infoShelfLife,

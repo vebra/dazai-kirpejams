@@ -108,6 +108,7 @@ export type AdminProductDetail = {
   colorNumber: string | null
   colorName: string | null
   colorHex: string | null
+  infoBrand: string | null
   infoType: string | null
   infoMixingRatio: string | null
   infoShelfLife: string | null
@@ -778,14 +779,7 @@ export async function getAdminProductById(
   const supabase = await createServerSupabase()
   const { data, error } = await supabase
     .from('products')
-    .select(
-      `id, slug, sku, ean, category_id, name_lt, name_en, name_ru,
-       description_lt, description_en, description_ru,
-       price_cents, compare_price_cents, b2b_price_cents, cost_price_cents,
-       volume_ml, color_number, color_name, color_hex,
-       info_type, info_mixing_ratio, info_shelf_life, info_country,
-       stock_quantity, is_active, is_featured, image_urls`
-    )
+    .select('*')
     .eq('id', id)
     .maybeSingle()
 
@@ -815,6 +809,7 @@ export async function getAdminProductById(
     colorNumber: data.color_number,
     colorName: data.color_name,
     colorHex: data.color_hex,
+    infoBrand: data.info_brand ?? null,
     infoType: data.info_type ?? null,
     infoMixingRatio: data.info_mixing_ratio ?? null,
     infoShelfLife: data.info_shelf_life ?? null,

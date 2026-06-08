@@ -148,6 +148,10 @@ export function NewProductForm({ categories }: { categories: AdminCategoryOption
         <h3 className={headCls}>Papildoma informacija (nebūtina)</h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div>
+            <label htmlFor="info_brand" className={labelCls}>Prekės ženklas</label>
+            <input id="info_brand" name="info_brand" className={inputCls} placeholder="pvz. MEDICOV (tuščia — Color SHOCK / RosaNera Cosmetics)" />
+          </div>
+          <div>
             <label htmlFor="info_type" className={labelCls}>Tipas</label>
             <input id="info_type" name="info_type" className={inputCls} placeholder="pvz. Plaukų dažai" />
           </div>
