@@ -9,6 +9,7 @@ import Image from 'next/image'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import {
   getProductBySlug,
+  getProductVariants,
   getRelatedProducts,
   getCategoryBySlug,
   getProductsForBuild,
@@ -27,6 +28,7 @@ import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
 import { ProductPriceBlock } from '@/components/products/ProductPriceBlock'
 import { StickyBuyBar } from '@/components/products/StickyBuyBar'
+import { VariantPurchase, type VariantVM } from '@/components/products/VariantPurchase'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { productSchema, breadcrumbSchema } from '@/lib/schema'
 import { buildCanonicalUrl, buildLanguageAlternates, SITE_URL } from '@/lib/seo'
@@ -162,6 +164,52 @@ export default async function ProductPage({
     colorNumber: product.color_number,
   }
 
+  // Variantai (dydžiai). Kiekvienas dydis — atskira prekė su savo likučiu;
+  // jei jų yra, vietoj įprasto pirkimo bloko rodom dydžio pasirinkiklį.
+  const variantProducts = product.variant_group
+    ? await getProductVariants(product.variant_group)
+    : []
+  const variants: VariantVM[] = variantProducts.map((vp) => ({
+    id: vp.id,
+    slug: vp.slug,
+    size: vp.variant_size ?? '',
+    priceCents: getEffectivePriceCents(vp),
+    comparePriceCents: isOnSale(vp)
+      ? vp.price_cents
+      : vp.compare_price_cents ?? null,
+    stock: vp.stock_quantity ?? 0,
+    sku: vp.sku,
+    imageUrl: vp.image_urls?.[0] ?? null,
+    colorHex: vp.color_hex,
+    colorNumber: vp.color_number,
+    volumeMl: vp.volume_ml,
+  }))
+  const hasVariants = variants.length > 1
+
+  // Bendri „Į krepšelį" / kainos bloko tekstai — naudojami ir varianto, ir
+  // įprasto pirkimo bloke.
+  const priceLabels = {
+    volumeDouble: t.volumeDouble,
+    pricePerMl: t.pricePerMl,
+    priceOnlyPro: t.priceOnlyPro,
+    loginToSeePrice: t.loginToSeePrice,
+    login: t.login,
+    register: t.register,
+    registerPro: t.registerPro,
+    b2bPrice: t.b2bPrice,
+    addToCart: dict.popular.addToCart,
+    addedToCart: dict.popular.added,
+    youSave: t.youSave,
+    accountPendingTitle: t.accountPendingTitle,
+    accountPendingDesc: t.accountPendingDesc,
+    accountRejectedTitle: t.accountRejectedTitle,
+    accountRejectedDesc: t.accountRejectedDesc,
+    priceLoadingTitle: t.priceLoadingTitle,
+    priceLoadingDesc: t.priceLoadingDesc,
+    refreshPage: t.refreshPage,
+    goToAccount: t.goToAccount,
+  }
+
   return (
     <>
       <JsonLd data={productJsonLd} />
@@ -252,37 +300,30 @@ export default async function ProductPage({
                 {name}
               </h1>
 
-              <ProductPriceBlock
-                lang={lang}
-                langPrefixStr={langPrefix(lang)}
-                price={price}
-                comparePrice={comparePrice}
-                savings={savings}
-                pricePerMl={pricePerMl}
-                volumeMl={product.volume_ml}
-                cartItem={cartItem}
-                labels={{
-                  volumeDouble: t.volumeDouble,
-                  pricePerMl: t.pricePerMl,
-                  priceOnlyPro: t.priceOnlyPro,
-                  loginToSeePrice: t.loginToSeePrice,
-                  login: t.login,
-                  register: t.register,
-                  registerPro: t.registerPro,
-                  b2bPrice: t.b2bPrice,
-                  addToCart: dict.popular.addToCart,
-                  addedToCart: dict.popular.added,
-                  youSave: t.youSave,
-                  accountPendingTitle: t.accountPendingTitle,
-                  accountPendingDesc: t.accountPendingDesc,
-                  accountRejectedTitle: t.accountRejectedTitle,
-                  accountRejectedDesc: t.accountRejectedDesc,
-                  priceLoadingTitle: t.priceLoadingTitle,
-                  priceLoadingDesc: t.priceLoadingDesc,
-                  refreshPage: t.refreshPage,
-                  goToAccount: t.goToAccount,
-                }}
-              />
+              {hasVariants ? (
+                <VariantPurchase
+                  lang={lang}
+                  langPrefixStr={langPrefix(lang)}
+                  categorySlug={categorySlug}
+                  name={name}
+                  variants={variants}
+                  sizeLabel={t.sizeLabel}
+                  outOfStockLabel={t.outOfStock}
+                  labels={priceLabels}
+                />
+              ) : (
+                <ProductPriceBlock
+                  lang={lang}
+                  langPrefixStr={langPrefix(lang)}
+                  price={price}
+                  comparePrice={comparePrice}
+                  savings={savings}
+                  pricePerMl={pricePerMl}
+                  volumeMl={product.volume_ml}
+                  cartItem={cartItem}
+                  labels={priceLabels}
+                />
+              )}
 
               {/* Sticky juostos slenkstis — kai nuslenkama žemiau, parodoma juosta */}
               <div id="buybar-anchor" aria-hidden className="h-px w-full" />
@@ -486,18 +527,22 @@ export default async function ProductPage({
         </Container>
       </section>
 
-      <StickyBuyBar
-        lang={lang}
-        langPrefixStr={langPrefix(lang)}
-        price={price}
-        cartItem={cartItem}
-        labels={{
-          addToCart: dict.popular.addToCart,
-          addedToCart: dict.popular.added,
-          login: t.login,
-          priceOnlyPro: t.priceOnlyPro,
-        }}
-      />
+      {/* Sticky juosta — slepiam variantų prekei, nes joje nėra dydžio
+          pasirinkimo (pirkimas vyksta per dydžio pasirinkiklį viršuje). */}
+      {!hasVariants && (
+        <StickyBuyBar
+          lang={lang}
+          langPrefixStr={langPrefix(lang)}
+          price={price}
+          cartItem={cartItem}
+          labels={{
+            addToCart: dict.popular.addToCart,
+            addedToCart: dict.popular.added,
+            login: t.login,
+            priceOnlyPro: t.priceOnlyPro,
+          }}
+        />
+      )}
     </>
   )
 }

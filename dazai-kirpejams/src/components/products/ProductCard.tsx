@@ -37,6 +37,9 @@ export function ProductCard({
   const primaryImage = product.image_urls?.[0]
   const onSale = isOnSale(product)
   const effectiveCents = getEffectivePriceCents(product)
+  // Variantų prekė (pvz. pirštinių dydžiai) — kortelėje neleidžiam greito
+  // pridėjimo, nes klientas pirma turi pasirinkti dydį produkto puslapyje.
+  const isVariant = Boolean(product.variant_group)
 
   const p = dict.popular
   const loginForPrice = p.loginForPrice
@@ -146,23 +149,32 @@ export function ProductCard({
                 {formatPrice(effectiveCents / 100, lang)}
               </span>
             </div>
-            <AddToCartButton
-              variant="icon"
-              label={p.addToCart}
-              labelAdded={p.added}
-              item={{
-                productId: product.id,
-                slug: product.slug,
-                categorySlug,
-                sku: product.sku,
-                name,
-                priceCents: effectiveCents,
-                volumeMl: product.volume_ml,
-                imageUrl: primaryImage ?? null,
-                colorHex: product.color_hex,
-                colorNumber: product.color_number,
-              }}
-            />
+            {isVariant ? (
+              <Link
+                href={href}
+                className="inline-flex items-center gap-1 px-3 py-2 text-[0.82rem] font-semibold text-brand-magenta border border-brand-magenta/40 rounded-lg hover:bg-brand-magenta hover:text-white transition-colors"
+              >
+                {dict.productPage?.chooseSize ?? 'Pasirinkti dydį'} →
+              </Link>
+            ) : (
+              <AddToCartButton
+                variant="icon"
+                label={p.addToCart}
+                labelAdded={p.added}
+                item={{
+                  productId: product.id,
+                  slug: product.slug,
+                  categorySlug,
+                  sku: product.sku,
+                  name,
+                  priceCents: effectiveCents,
+                  volumeMl: product.volume_ml,
+                  imageUrl: primaryImage ?? null,
+                  colorHex: product.color_hex,
+                  colorNumber: product.color_number,
+                }}
+              />
+            )}
           </div>
         ) : (
           <Link

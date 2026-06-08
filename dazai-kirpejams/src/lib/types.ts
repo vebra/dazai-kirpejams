@@ -70,6 +70,13 @@ export type Product = {
 
   image_urls: string[]
 
+  // Variantai (pvz. pirštinių dydžiai). null = paprasta prekė be variantų.
+  // Visi vieno `variant_group` produktai rodomi viename puslapyje su
+  // dydžio pasirinkimu; kataloge „sulipdomi" į vieną kortelę.
+  variant_group?: string | null
+  variant_size?: string | null
+  variant_sort?: number | null
+
   created_at: string
   updated_at: string
 

@@ -209,7 +209,23 @@ async function _getProducts(
     console.error('[queries.getProducts]', error)
     return []
   }
-  return (data || []) as Product[]
+  return dedupeVariants((data || []) as Product[])
+}
+
+/**
+ * Katalogo sąraše vieną variantų grupę rodome kaip VIENĄ kortelę — paliekame
+ * pirmą grupės produktą esama rikiavimo tvarka, likusius dydžius praleidžiame.
+ * Produktai be `variant_group` lieka nepaliesti. (Sandėlio admin'as nenaudoja
+ * šios funkcijos, todėl ten matomi visi dydžiai atskirai.)
+ */
+function dedupeVariants(products: Product[]): Product[] {
+  const seenGroups = new Set<string>()
+  return products.filter((p) => {
+    if (!p.variant_group) return true
+    if (seenGroups.has(p.variant_group)) return false
+    seenGroups.add(p.variant_group)
+    return true
+  })
 }
 
 /**
@@ -270,6 +286,46 @@ export const getProductBySlug = async (
 ): Promise<Product | null> => {
   const product = await getProductBySlugForBuild(slug)
   return gateProduct(product)
+}
+
+/**
+ * Visi to paties `variant_group` produktai (dydžiai), surikiuoti pagal
+ * `variant_sort`. Naudojama produkto puslapyje dydžio pasirinkimui. Kainos
+ * praeina per tuos pačius vartus — svečiui kainos nukerpamos, bet likučiai
+ * (stock_quantity) lieka, kad galėtume išjungti dydžius „Nėra".
+ */
+async function _getProductVariants(group: string): Promise<Product[]> {
+  const supabase = getSupabase()
+
+  if (!supabase) {
+    return mockProducts
+      .filter((p) => p.is_active && p.variant_group === group)
+      .sort((a, b) => (a.variant_sort ?? 0) - (b.variant_sort ?? 0))
+  }
+
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('is_active', true)
+    .eq('variant_group', group)
+    .order('variant_sort', { ascending: true })
+
+  if (error) {
+    console.error('[queries.getProductVariants]', error)
+    return []
+  }
+  return (data || []) as Product[]
+}
+
+export const getProductVariants = async (
+  group: string
+): Promise<Product[]> => {
+  const variants = await unstable_cache(
+    () => _getProductVariants(group),
+    ['product-variants', group],
+    { revalidate: 60, tags: ['products'] }
+  )()
+  return gateProducts(variants)
 }
 
 async function _getRelatedProducts(
