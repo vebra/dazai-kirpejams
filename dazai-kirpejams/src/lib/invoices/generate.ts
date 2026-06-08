@@ -370,12 +370,13 @@ export async function generateInvoiceForOrder(
     overrides.paymentDueDate
   )
 
-  // Pastabų prioritetas: per-invoice custom > užsakymo > brand default.
+  // Pastabų prioritetas sąskaitai: per-invoice custom > brand default.
+  // Užsakymo `notes` SĄMONINGAI neįtraukiamos — tai VIDINĖS pastabos
+  // (vadybininkės/kliento), jos nerodomos klientui sąskaitoje.
   const resolvedNotes =
     (overrides.customNotes && overrides.customNotes.trim().length > 0
       ? overrides.customNotes
       : null) ??
-    (order.notes && order.notes.trim().length > 0 ? order.notes : null) ??
     (brand.defaultNotes && brand.defaultNotes.trim().length > 0
       ? brand.defaultNotes
       : null)
@@ -531,7 +532,11 @@ export async function regenerateInvoiceForOrder(
     vatRate: existing.vat_rate,
     totalCents: order.total_cents,
     paymentMethod: order.payment_method,
-    notes: existing.custom_notes ?? order.notes,
+    notes:
+      existing.custom_notes ??
+      (brand.defaultNotes && brand.defaultNotes.trim().length > 0
+        ? brand.defaultNotes
+        : null),
     paymentDueDate: existing.payment_due_date,
   }
 
@@ -623,7 +628,9 @@ async function regeneratePdfOnly(
     vatRate: inv.vat_rate,
     totalCents: order.total_cents,
     paymentMethod: order.payment_method,
-    notes: inv.custom_notes ?? order.notes,
+    notes:
+      inv.custom_notes ??
+      ((inv.brand_snapshot ?? INVOICE_BRAND_DEFAULTS).defaultNotes || null),
     paymentDueDate: inv.payment_due_date,
   }
 
