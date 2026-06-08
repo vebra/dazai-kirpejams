@@ -33,6 +33,7 @@ export type RepOrderListItem = {
   totalCents: number
   itemCount: number
   rejectionReason: string | null
+  notes: string | null
 }
 
 export const APPROVAL_LABELS: Record<RepApprovalStatus, string> = {

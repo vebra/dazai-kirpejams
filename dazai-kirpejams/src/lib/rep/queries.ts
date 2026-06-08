@@ -86,7 +86,7 @@ export async function getMyRepOrders(): Promise<RepOrderListItem[]> {
   const { data, error } = await supabase
     .from('orders')
     .select(
-      `id, order_number, created_at, total_cents, approval_status, rejection_reason,
+      `id, order_number, created_at, total_cents, approval_status, rejection_reason, notes,
        clients ( name ),
        order_items ( id )`
     )
@@ -107,6 +107,7 @@ export async function getMyRepOrders(): Promise<RepOrderListItem[]> {
     total_cents: number
     approval_status: 'pending' | 'approved' | 'rejected' | null
     rejection_reason: string | null
+    notes: string | null
     clients: { name: string } | null
     order_items: Array<{ id: string }> | null
   }
@@ -120,5 +121,6 @@ export async function getMyRepOrders(): Promise<RepOrderListItem[]> {
     totalCents: o.total_cents,
     itemCount: o.order_items?.length ?? 0,
     rejectionReason: o.rejection_reason,
+    notes: o.notes,
   }))
 }

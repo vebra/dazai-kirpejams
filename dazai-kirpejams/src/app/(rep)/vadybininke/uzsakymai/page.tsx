@@ -52,6 +52,12 @@ export default async function RepOrdersPage() {
                       Atmesta: {o.rejectionReason}
                     </div>
                   )}
+                  {o.notes && (
+                    <div className="mt-2 px-3 py-2 bg-[#F9F9FB] border border-[#eee] rounded-lg text-[13px] text-brand-gray-600 whitespace-pre-line">
+                      <span className="font-semibold text-brand-gray-900">Pastaba: </span>
+                      {o.notes}
+                    </div>
+                  )}
                 </div>
                 <div className="font-semibold text-brand-gray-900 whitespace-nowrap">
                   {PRICE.format(o.totalCents / 100)}
