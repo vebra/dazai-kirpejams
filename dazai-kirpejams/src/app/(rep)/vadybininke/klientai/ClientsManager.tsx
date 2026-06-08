@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useMemo, useState, useTransition } from 'react'
 import { TIER_LABELS, type RepClient } from '@/lib/rep/types'
 import { createRepClient } from '../actions'
@@ -64,9 +65,17 @@ export function ClientsManager({ clients: initial }: { clients: RepClient[] }) {
                     {[c.phone, c.email].filter(Boolean).join(' · ') || '—'}
                   </div>
                 </div>
-                <span className="inline-flex items-center px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-bold whitespace-nowrap">
-                  {TIER_LABELS[c.pricingTier] ?? c.pricingTier}
-                </span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-bold whitespace-nowrap">
+                    {TIER_LABELS[c.pricingTier] ?? c.pricingTier}
+                  </span>
+                  <Link
+                    href={`/vadybininke/klientai/${c.id}`}
+                    className="text-[12px] font-semibold text-brand-magenta hover:underline whitespace-nowrap"
+                  >
+                    Istorija →
+                  </Link>
+                </div>
               </div>
             ))}
           </div>

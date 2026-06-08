@@ -18,6 +18,8 @@ export function IssueToRepForm({
   const [state, formAction, isPending] = useActionState(issueStockToRepAction, initialState)
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<AdminProductListRow | null>(null)
+  const [repId, setRepId] = useState('')
+  const repName = reps.find((r) => r.id === repId)?.name ?? ''
 
   const results = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -51,19 +53,21 @@ export function IssueToRepForm({
         </label>
         <select
           id="rep"
-          name="rep"
-          defaultValue=""
+          value={repId}
+          onChange={(e) => setRepId(e.target.value)}
           className="w-full md:w-96 px-3.5 py-2.5 bg-white border border-[#ddd] rounded-lg text-sm focus:outline-none focus:border-brand-magenta"
         >
           <option value="" disabled>
             — Pasirinkite —
           </option>
           {reps.map((r) => (
-            <option key={r.id} value={r.name}>
+            <option key={r.id} value={r.id}>
               {r.name}
             </option>
           ))}
         </select>
+        <input type="hidden" name="rep" value={repName} />
+        <input type="hidden" name="rep_id" value={repId} />
       </div>
 
       <div>
@@ -142,7 +146,7 @@ export function IssueToRepForm({
 
       <button
         type="submit"
-        disabled={isPending || !selected}
+        disabled={isPending || !selected || !repId}
         className="px-5 py-2.5 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark disabled:opacity-50 transition-colors"
       >
         {isPending ? 'Išduodama…' : 'Išduoti vadybininkei'}

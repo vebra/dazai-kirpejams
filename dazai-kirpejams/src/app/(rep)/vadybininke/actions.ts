@@ -181,3 +181,37 @@ export async function submitRepOrder(input: {
   revalidatePath('/vadybininke/uzsakymai')
   return { ok: true, orderNumber: result.order_number }
 }
+
+// ============================================
+// Atšaukti SAVO laukiantį (pending) užsakymą
+// ============================================
+
+export async function cancelMyPendingOrder(
+  orderId: string
+): Promise<{ ok: boolean; error?: string }> {
+  await requireSalesRep()
+  if (!orderId) return { ok: false, error: 'Trūksta užsakymo.' }
+
+  const supabase = await createServerSupabase()
+  const { data, error } = await supabase.rpc('cancel_rep_pending_order', {
+    p_order_id: orderId,
+  })
+
+  const res = data as { ok?: boolean; reason?: string } | null
+  if (error || !res?.ok) {
+    const reason = res?.reason
+    const msg =
+      reason === 'not_pending'
+        ? 'Užsakymą galima atšaukti tik kol jis laukia patvirtinimo.'
+        : reason === 'forbidden'
+          ? 'Tai ne jūsų užsakymas.'
+          : reason === 'not_found'
+            ? 'Užsakymas nerastas.'
+            : error?.message ?? 'Nepavyko atšaukti.'
+    console.error('[rep/actions] cancelMyPendingOrder:', error?.message ?? reason)
+    return { ok: false, error: msg }
+  }
+
+  revalidatePath('/vadybininke/uzsakymai')
+  return { ok: true }
+}

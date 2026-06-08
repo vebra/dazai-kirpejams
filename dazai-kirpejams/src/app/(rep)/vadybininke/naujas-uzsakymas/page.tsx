@@ -1,5 +1,9 @@
 import { requireSalesRep } from '@/lib/rep/auth'
-import { getMyClients, getRepOrderProducts } from '@/lib/rep/queries'
+import {
+  getMyClients,
+  getRepOrderProducts,
+  getMyRepOrderDetail,
+} from '@/lib/rep/queries'
 import { getCompanyInfo } from '@/lib/admin/queries'
 import {
   DELIVERY_METHODS,
@@ -17,7 +21,11 @@ const DELIVERY_LABELS: Record<string, string> = {
   pickup: 'Atsiėmimas',
 }
 
-export default async function NewRepOrderPage() {
+export default async function NewRepOrderPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ repeat?: string }>
+}) {
   await requireSalesRep()
 
   const [clients, products, company] = await Promise.all([
@@ -25,6 +33,22 @@ export default async function NewRepOrderPage() {
     getRepOrderProducts(),
     getCompanyInfo().catch(() => null),
   ])
+
+  // Pakartojimas: ?repeat=orderId — užpildom klientą ir prekes iš seno užsakymo.
+  const sp = await searchParams
+  const repeatId = typeof sp.repeat === 'string' ? sp.repeat : null
+  let initialClientId: string | null = null
+  let initialCart: Record<string, number> | undefined
+  if (repeatId) {
+    const det = await getMyRepOrderDetail(repeatId)
+    if (det) {
+      initialClientId = det.clientId
+      initialCart = {}
+      for (const it of det.items) {
+        if (it.productId) initialCart[it.productId] = (initialCart[it.productId] ?? 0) + it.quantity
+      }
+    }
+  }
   // PVM tarifas iš įmonės PVM kodo (tas pats šaltinis kaip viešas checkout).
   // Ne PVM mokėtojas → 0. Peržiūra atitiks serverio apskaičiavimą.
   const vatRate = vatRateFromVatCode(company?.vatCode)
@@ -50,6 +74,8 @@ export default async function NewRepOrderPage() {
         deliveryOptions={deliveryOptions}
         freeShippingThresholdCents={FREE_SHIPPING_THRESHOLD_CENTS}
         vatRate={vatRate}
+        initialClientId={initialClientId}
+        initialCart={initialCart}
       />
     </div>
   )
