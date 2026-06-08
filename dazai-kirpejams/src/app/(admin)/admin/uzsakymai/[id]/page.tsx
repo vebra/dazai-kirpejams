@@ -10,6 +10,7 @@ import {
   type OrderStatus,
 } from '@/lib/admin/queries'
 import { AddOrderItemForm } from './AddOrderItemForm'
+import { RegenerateButton } from './RegenerateButton'
 import {
   updateOrderStatusAction,
   updateOrderNotesAction,
@@ -585,13 +586,7 @@ export default async function AdminOrderDetailPage({
                   </form>
                   <form action={regenerateInvoiceAction}>
                     <input type="hidden" name="id" value={order.id} />
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-[#F5F5F7] border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-white transition-colors"
-                      title="Atnaujinti PDF pagal dabartinį užsakymą (po pridėtų prekių ar pataisytų kainų)"
-                    >
-                      ↻ Pergeneruoti
-                    </button>
+                    <RegenerateButton />
                   </form>
                 </>
               ) : (
