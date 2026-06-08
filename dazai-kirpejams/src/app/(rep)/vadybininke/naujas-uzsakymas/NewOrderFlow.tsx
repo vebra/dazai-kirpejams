@@ -11,9 +11,9 @@ const PRICE = new Intl.NumberFormat('lt-LT', { style: 'currency', currency: 'EUR
 const fmt = (c: number) => PRICE.format(c / 100)
 
 const PAYMENT_OPTIONS = [
-  { value: 'bank_transfer', label: 'Bankinis pavedimas' },
-  { value: 'paysera', label: 'Paysera' },
-  { value: 'stripe', label: 'Kortelė' },
+  { value: 'cash', label: 'Grynais' },
+  { value: 'card', label: 'Kortelė' },
+  { value: 'bank_transfer', label: 'Pavedimas' },
 ]
 
 export function NewOrderFlow({
@@ -38,7 +38,7 @@ export function NewOrderFlow({
   const [address, setAddress] = useState('')
   const [city, setCity] = useState('')
   const [postal, setPostal] = useState('')
-  const [payment, setPayment] = useState('bank_transfer')
+  const [payment, setPayment] = useState('cash')
   const [notes, setNotes] = useState('')
   const [submitting, startSubmit] = useTransition()
   const [submitError, setSubmitError] = useState<string | null>(null)

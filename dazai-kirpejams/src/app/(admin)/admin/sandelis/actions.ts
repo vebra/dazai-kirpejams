@@ -946,3 +946,51 @@ export async function receiveManualItem(
   revalidateTag('products', 'max')
   return { ok: true, name: r.name ?? '—', sku: r.sku ?? null, stock: r.stock ?? 0, added: delta }
 }
+
+// ============================================
+// Prekių išdavimas vadybininkei (išvažiavimas iš sandėlio)
+// ============================================
+
+export type IssueToRepState = { error?: string; success?: boolean; message?: string }
+
+export async function issueStockToRepAction(
+  _prev: IssueToRepState,
+  formData: FormData
+): Promise<IssueToRepState> {
+  await requireAdmin()
+  const supabase = createServerClient()
+
+  const productId = ((formData.get('product_id') as string) ?? '').trim()
+  const rep = ((formData.get('rep') as string) ?? '').trim()
+  const qty = toInt((formData.get('qty') as string) ?? '')
+
+  if (!rep) return { error: 'Pasirinkite vadybininkę.' }
+  if (!productId) return { error: 'Pasirinkite prekę.' }
+  if (qty === null || qty <= 0) return { error: 'Kiekis turi būti teigiamas skaičius.' }
+
+  const { data, error } = await supabase.rpc('issue_stock_to_rep', {
+    p_product_id: productId,
+    p_qty: qty,
+    p_rep: rep,
+  })
+
+  const res = data as { ok?: boolean; reason?: string; stock?: number; removed?: number } | null
+  if (error || !res?.ok) {
+    const reason = res?.reason
+    const msg =
+      reason === 'insufficient_stock'
+        ? `Nepakanka likučio (yra ${res?.stock ?? 0}).`
+        : reason === 'not_found'
+          ? 'Prekė nerasta.'
+          : reason === 'invalid_qty'
+            ? 'Neteisingas kiekis.'
+            : error?.message ?? 'Nepavyko išduoti.'
+    console.error('[admin/sandelis] issueToRep:', error?.message ?? reason)
+    return { error: msg }
+  }
+
+  revalidatePath('/admin/sandelis', 'layout')
+  revalidatePath('/admin/sandelis/zurnalas')
+  revalidateTag('products', 'max')
+  return { success: true, message: `Išduota ${res.removed} vnt. vadybininkei „${rep}". Sandelio likutis: ${res.stock}.` }
+}
