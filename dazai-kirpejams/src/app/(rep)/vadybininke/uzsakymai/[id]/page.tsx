@@ -4,6 +4,7 @@ import { requireSalesRep } from '@/lib/rep/auth'
 import { getMyRepOrderDetail } from '@/lib/rep/queries'
 import { APPROVAL_LABELS, APPROVAL_BADGE } from '@/lib/rep/types'
 import { CancelOrderButton } from './CancelOrderButton'
+import { DeliveryNote } from './DeliveryNote'
 
 export const metadata = { title: 'Užsakymas' }
 export const dynamic = 'force-dynamic'
@@ -29,7 +30,8 @@ export default async function RepOrderDetailPage({
   if (!o) notFound()
 
   return (
-    <div className="max-w-2xl">
+    <>
+    <div className="max-w-2xl print:hidden">
       <Link
         href="/vadybininke/uzsakymai"
         className="text-[13px] text-brand-gray-500 hover:text-brand-magenta"
@@ -110,5 +112,17 @@ export default async function RepOrderDetailPage({
         </div>
       )}
     </div>
+
+    {/* Važtaraštis — už print:hidden ribų, kad spausdintųsi. */}
+    <div className="max-w-2xl mt-5 print:mt-0">
+      <DeliveryNote
+        orderNumber={o.orderNumber}
+        createdAt={o.createdAt}
+        clientName={o.clientName ?? '—'}
+        items={o.items}
+        totalCents={o.totalCents}
+      />
+    </div>
+    </>
   )
 }

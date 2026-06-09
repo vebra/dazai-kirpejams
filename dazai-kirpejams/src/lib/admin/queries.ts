@@ -413,6 +413,8 @@ export type StockMovementRow = {
 export async function getStockMovements(opts?: {
   productId?: string
   reason?: string
+  from?: string // YYYY-MM-DD (imtinai)
+  to?: string // YYYY-MM-DD (imtinai)
   limit?: number
 }): Promise<StockMovementRow[]> {
   const supabase = await createServerSupabase()
@@ -427,6 +429,8 @@ export async function getStockMovements(opts?: {
 
   if (opts?.productId) query = query.eq('product_id', opts.productId)
   if (opts?.reason) query = query.eq('reason', opts.reason)
+  if (opts?.from) query = query.gte('created_at', `${opts.from}T00:00:00`)
+  if (opts?.to) query = query.lte('created_at', `${opts.to}T23:59:59.999`)
 
   const { data, error } = await query
   if (error) {

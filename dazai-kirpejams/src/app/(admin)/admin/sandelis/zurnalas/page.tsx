@@ -50,16 +50,26 @@ const DT = new Intl.DateTimeFormat('lt-LT', {
 export default async function StockJournalPage({
   searchParams,
 }: {
-  searchParams: Promise<{ reason?: string }>
+  searchParams: Promise<{ reason?: string; from?: string; to?: string }>
 }) {
   await requireAdmin()
   const sp = await searchParams
   const reason = typeof sp.reason === 'string' ? sp.reason : ''
+  const from = typeof sp.from === 'string' ? sp.from : ''
+  const to = typeof sp.to === 'string' ? sp.to : ''
 
   const movements = await getStockMovements({
     reason: reason || undefined,
-    limit: 300,
+    from: from || undefined,
+    to: to || undefined,
+    limit: 1000,
   })
+
+  const exportQs = new URLSearchParams()
+  if (reason) exportQs.set('reason', reason)
+  if (from) exportQs.set('from', from)
+  if (to) exportQs.set('to', to)
+  const exportHref = `/admin/sandelis/zurnalas/eksportas${exportQs.toString() ? `?${exportQs}` : ''}`
 
   return (
     <div className="space-y-6 max-w-6xl">
@@ -80,13 +90,15 @@ export default async function StockJournalPage({
         </Link>
       </div>
 
-      {/* Filtrai */}
+      {/* Tipo filtrai (išlaiko datų intervalą) */}
       <div className="flex flex-wrap gap-2">
         {FILTERS.map((f) => {
           const active = reason === f.value
-          const href = f.value
-            ? `/admin/sandelis/zurnalas?reason=${f.value}`
-            : '/admin/sandelis/zurnalas'
+          const qs = new URLSearchParams()
+          if (f.value) qs.set('reason', f.value)
+          if (from) qs.set('from', from)
+          if (to) qs.set('to', to)
+          const href = `/admin/sandelis/zurnalas${qs.toString() ? `?${qs}` : ''}`
           return (
             <Link
               key={f.value || 'all'}
@@ -101,6 +113,56 @@ export default async function StockJournalPage({
             </Link>
           )
         })}
+      </div>
+
+      {/* Datų intervalas + eksportas */}
+      <div className="flex flex-wrap items-end gap-3">
+        <form method="get" className="flex flex-wrap items-end gap-3">
+          {reason && <input type="hidden" name="reason" value={reason} />}
+          <div>
+            <label className="block text-[11px] font-semibold text-brand-gray-500 mb-1">
+              Nuo
+            </label>
+            <input
+              type="date"
+              name="from"
+              defaultValue={from}
+              className="px-3 py-2 bg-white border border-[#ddd] rounded-lg text-sm focus:outline-none focus:border-brand-magenta"
+            />
+          </div>
+          <div>
+            <label className="block text-[11px] font-semibold text-brand-gray-500 mb-1">
+              Iki
+            </label>
+            <input
+              type="date"
+              name="to"
+              defaultValue={to}
+              className="px-3 py-2 bg-white border border-[#ddd] rounded-lg text-sm focus:outline-none focus:border-brand-magenta"
+            />
+          </div>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-brand-gray-900 text-white rounded-lg font-semibold text-sm hover:bg-black transition-colors"
+          >
+            Filtruoti
+          </button>
+        </form>
+        {(from || to) && (
+          <Link
+            href={reason ? `/admin/sandelis/zurnalas?reason=${reason}` : '/admin/sandelis/zurnalas'}
+            className="px-4 py-2 bg-white border border-[#ddd] text-brand-gray-600 rounded-lg font-semibold text-sm hover:bg-[#F5F5F7] transition-colors"
+          >
+            Išvalyti datas
+          </Link>
+        )}
+        <a
+          href={exportHref}
+          download
+          className="px-4 py-2 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-[#F5F5F7] transition-colors ml-auto"
+        >
+          ⬇ Atsisiųsti CSV
+        </a>
       </div>
 
       {/* Lentelė */}
