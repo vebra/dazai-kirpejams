@@ -1578,6 +1578,12 @@ export type UserProfileRow = {
   rejectionReason: string | null
   verifiedAt: string | null
   createdAt: string
+  // Registracijos „pavyko / įstrigo" signalai iš auth.users:
+  //  - emailConfirmed=false → užsiregistravo, bet nepatvirtino el. pašto
+  //    (dažniausiai laiškas pateko į spam) → įstrigęs.
+  //  - lastSignInAt=null → niekada neprisijungė.
+  emailConfirmed: boolean
+  lastSignInAt: string | null
 }
 
 export type GetUserProfilesOptions = {
@@ -1611,7 +1617,12 @@ export async function getUserProfiles(
   // nesaugo email'o (jis yra auth.users.email).
   // Čia MVP supaprastinimas: gaunam visų user'ių email'us vienu kart.
   const userIds = (data ?? []).map((r) => r.id)
-  let emailMap = new Map<string, string>()
+  type AuthInfo = {
+    email: string
+    emailConfirmed: boolean
+    lastSignInAt: string | null
+  }
+  let authMap = new Map<string, AuthInfo>()
 
   if (userIds.length > 0) {
     const { data: usersData } = await supabase.auth.admin.listUsers({
@@ -1619,17 +1630,24 @@ export async function getUserProfiles(
       perPage: 1000,
     })
     if (usersData?.users) {
-      emailMap = new Map(
+      authMap = new Map(
         usersData.users
           .filter((u) => userIds.includes(u.id))
-          .map((u) => [u.id, u.email ?? ''])
+          .map((u) => [
+            u.id,
+            {
+              email: u.email ?? '',
+              emailConfirmed: Boolean(u.email_confirmed_at ?? u.confirmed_at),
+              lastSignInAt: u.last_sign_in_at ?? null,
+            },
+          ])
       )
     }
   }
 
   return (data ?? []).map((r) => ({
     id: r.id,
-    email: emailMap.get(r.id) ?? '',
+    email: authMap.get(r.id)?.email ?? '',
     firstName: r.first_name ?? '',
     lastName: r.last_name ?? '',
     phone: r.phone ?? '',
@@ -1642,6 +1660,8 @@ export async function getUserProfiles(
     rejectionReason: r.rejection_reason,
     verifiedAt: r.verified_at,
     createdAt: r.created_at,
+    emailConfirmed: authMap.get(r.id)?.emailConfirmed ?? false,
+    lastSignInAt: authMap.get(r.id)?.lastSignInAt ?? null,
   }))
 }
 

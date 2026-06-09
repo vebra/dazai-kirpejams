@@ -47,29 +47,44 @@ export function VerificationTable({
   const filtered =
     filter === 'all'
       ? profiles
-      : profiles.filter((p) => p.verificationStatus === filter)
+      : filter === 'stuck'
+        ? profiles.filter((p) => !p.emailConfirmed)
+        : profiles.filter((p) => p.verificationStatus === filter)
 
   return (
     <div className="space-y-4">
       {/* Filtrai */}
       <div className="flex items-center gap-2 flex-wrap">
-        {['pending', 'approved', 'rejected', 'all'].map((s) => (
-          <button
-            key={s}
-            type="button"
-            onClick={() => setFilter(s)}
-            className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-colors ${
-              filter === s
-                ? 'bg-brand-gray-900 text-white'
-                : 'bg-[#F5F5F7] text-brand-gray-500 hover:text-brand-gray-900'
-            }`}
-          >
-            {s === 'all' ? 'Visi' : STATUS_LABELS[s]}
-            {s === 'all'
-              ? ` (${profiles.length})`
-              : ` (${profiles.filter((p) => p.verificationStatus === s).length})`}
-          </button>
-        ))}
+        {['pending', 'approved', 'rejected', 'stuck', 'all'].map((s) => {
+          const count =
+            s === 'all'
+              ? profiles.length
+              : s === 'stuck'
+                ? profiles.filter((p) => !p.emailConfirmed).length
+                : profiles.filter((p) => p.verificationStatus === s).length
+          const label =
+            s === 'all'
+              ? 'Visi'
+              : s === 'stuck'
+                ? 'Įstrigę'
+                : STATUS_LABELS[s]
+          return (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setFilter(s)}
+              className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-colors ${
+                filter === s
+                  ? 'bg-brand-gray-900 text-white'
+                  : s === 'stuck' && count > 0
+                    ? 'bg-orange-50 text-orange-700 hover:bg-orange-100'
+                    : 'bg-[#F5F5F7] text-brand-gray-500 hover:text-brand-gray-900'
+              }`}
+            >
+              {label} ({count})
+            </button>
+          )
+        })}
       </div>
 
       {filtered.length === 0 ? (
@@ -159,6 +174,22 @@ function ProfileRow({
           >
             {p.email}
           </a>
+          {!p.emailConfirmed && (
+            <div className="text-[10px] font-semibold text-orange-700 mt-0.5">
+              ⚠ El. paštas nepatvirtintas
+            </div>
+          )}
+          {p.phone ? (
+            <div className="text-[11px] text-brand-gray-500 mt-0.5">
+              <a href={`tel:${p.phone}`} className="hover:underline">
+                {p.phone}
+              </a>
+            </div>
+          ) : (
+            <div className="text-[11px] text-brand-gray-400 mt-0.5">
+              Be telefono
+            </div>
+          )}
         </td>
         <td className="px-4 py-3 text-center">
           <span
@@ -231,6 +262,24 @@ function ProfileRow({
                 </span>
                 <div className="text-brand-gray-900 mt-0.5">
                   {p.companyCode || '—'}
+                </div>
+              </div>
+              <div>
+                <span className="text-[11px] font-semibold text-brand-gray-500 uppercase tracking-[0.5px]">
+                  El. paštas patvirtintas
+                </span>
+                <div
+                  className={`mt-0.5 font-medium ${p.emailConfirmed ? 'text-emerald-700' : 'text-orange-700'}`}
+                >
+                  {p.emailConfirmed ? 'Taip' : 'Ne — įstrigęs'}
+                </div>
+              </div>
+              <div>
+                <span className="text-[11px] font-semibold text-brand-gray-500 uppercase tracking-[0.5px]">
+                  Paskutinis prisijungimas
+                </span>
+                <div className="text-brand-gray-900 mt-0.5">
+                  {p.lastSignInAt ? formatDate(p.lastSignInAt) : 'Niekada'}
                 </div>
               </div>
               <div>

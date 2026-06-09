@@ -35,6 +35,9 @@ export default async function AdminVerificationPage({
     pending: profiles.filter((p) => p.verificationStatus === 'pending').length,
     approved: profiles.filter((p) => p.verificationStatus === 'approved').length,
     rejected: profiles.filter((p) => p.verificationStatus === 'rejected').length,
+    // Užsiregistravo, bet nepatvirtino el. pašto → įstrigę (dažniausiai
+    // patvirtinimo laiškas pateko į spam). Šiems verta padėti rankomis.
+    stuck: profiles.filter((p) => !p.emailConfirmed).length,
   }
 
   return (
@@ -70,7 +73,7 @@ export default async function AdminVerificationPage({
       )}
 
       {/* KPI */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="px-4 py-3 rounded-xl border bg-amber-50 text-amber-700 border-amber-200">
           <div className="text-2xl font-bold">{statusCounts.pending}</div>
           <div className="text-[12px] font-semibold mt-0.5">Laukia peržiūros</div>
@@ -82,6 +85,12 @@ export default async function AdminVerificationPage({
         <div className="px-4 py-3 rounded-xl border bg-red-50 text-red-600 border-red-200">
           <div className="text-2xl font-bold">{statusCounts.rejected}</div>
           <div className="text-[12px] font-semibold mt-0.5">Atmesti</div>
+        </div>
+        <div className="px-4 py-3 rounded-xl border bg-orange-50 text-orange-700 border-orange-200">
+          <div className="text-2xl font-bold">{statusCounts.stuck}</div>
+          <div className="text-[12px] font-semibold mt-0.5">
+            Nepatvirtino el. pašto
+          </div>
         </div>
       </div>
 
