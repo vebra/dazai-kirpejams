@@ -11,12 +11,8 @@ const initialState: ReturnBatchState = {}
 
 type Rep = { id: string; name: string }
 
-type Line = {
-  id: string
-  name: string
-  colorNumber: string | null
-  sku: string | null
-  held: number
+type Row = RepHeldItem & {
+  checked: boolean
   qty: number
 }
 
@@ -36,68 +32,55 @@ export function ReturnFromRepForm({
     returnStockBatchFromRepAction,
     initialState
   )
-  const [search, setSearch] = useState('')
   const [repId, setRepId] = useState('')
-  const [list, setList] = useState<Line[]>([])
+  const [filter, setFilter] = useState('')
+  const [rows, setRows] = useState<Row[]>([])
   const repName = reps.find((r) => r.id === repId)?.name ?? ''
-
-  const held = useMemo(() => heldByRep[repId] ?? [], [heldByRep, repId])
-
-  const results = useMemo(() => {
-    if (!repId) return []
-    const q = search.trim().toLowerCase()
-    if (!q) return []
-    const inList = new Set(list.map((l) => l.id))
-    return held
-      .filter(
-        (p) =>
-          !inList.has(p.productId) &&
-          (p.name.toLowerCase().includes(q) ||
-            (p.colorNumber ?? '').toLowerCase().includes(q) ||
-            (p.sku ?? '').toLowerCase().includes(q))
-      )
-      .slice(0, 8)
-  }, [held, search, list, repId])
-
-  const itemsJson = JSON.stringify(
-    list.map((l) => ({ product_id: l.id, qty: l.qty }))
-  )
-  const totalUnits = list.reduce((s, l) => s + l.qty, 0)
 
   function changeRep(id: string) {
     setRepId(id)
-    setList([]) // skirtingos vadybininkės — kitos turimos prekės
-    setSearch('')
+    setFilter('')
+    const held = heldByRep[id] ?? []
+    setRows(held.map((h) => ({ ...h, checked: false, qty: h.held })))
   }
 
-  function addProduct(p: RepHeldItem) {
-    setList((prev) =>
-      prev.some((l) => l.id === p.productId)
-        ? prev
-        : [
-            ...prev,
-            {
-              id: p.productId,
-              name: p.name,
-              colorNumber: p.colorNumber,
-              sku: p.sku,
-              held: p.held,
-              qty: 1,
-            },
-          ]
-    )
-    setSearch('')
-  }
-
-  function setQty(id: string, qty: number) {
-    setList((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, qty: Math.max(1, qty) } : l))
+  function toggle(productId: string, checked: boolean) {
+    setRows((prev) =>
+      prev.map((r) => (r.productId === productId ? { ...r, checked } : r))
     )
   }
 
-  function remove(id: string) {
-    setList((prev) => prev.filter((l) => l.id !== id))
+  function setQty(productId: string, qty: number) {
+    setRows((prev) =>
+      prev.map((r) =>
+        r.productId === productId
+          ? { ...r, qty: Math.min(r.held, Math.max(1, qty)), checked: true }
+          : r
+      )
+    )
   }
+
+  function setAll(checked: boolean) {
+    setRows((prev) => prev.map((r) => ({ ...r, checked })))
+  }
+
+  const visible = useMemo(() => {
+    const q = filter.trim().toLowerCase()
+    if (!q) return rows
+    return rows.filter(
+      (r) =>
+        r.name.toLowerCase().includes(q) ||
+        (r.colorNumber ?? '').toLowerCase().includes(q) ||
+        (r.sku ?? '').toLowerCase().includes(q)
+    )
+  }, [rows, filter])
+
+  const selected = rows.filter((r) => r.checked && r.qty > 0)
+  const itemsJson = JSON.stringify(
+    selected.map((r) => ({ product_id: r.productId, qty: r.qty }))
+  )
+  const totalUnits = selected.reduce((s, r) => s + r.qty, 0)
+  const allChecked = rows.length > 0 && rows.every((r) => r.checked)
 
   // ── Po sėkmingo grąžinimo — spausdinamas lapas ──
   if (state.returned) {
@@ -218,146 +201,127 @@ export function ReturnFromRepForm({
         <input type="hidden" name="items" value={itemsJson} />
       </div>
 
-      {repId && held.length === 0 ? (
+      {!repId ? (
+        <div className="px-4 py-8 text-center text-sm text-brand-gray-500 bg-[#F9F9FB] border border-[#eee] rounded-lg">
+          Pasirinkite vadybininkę — bus parodytas visas jos turimų prekių sąrašas.
+        </div>
+      ) : rows.length === 0 ? (
         <div className="px-4 py-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg text-sm">
           Šiai vadybininkei nėra išduotų prekių — nėra ką grąžinti.
         </div>
       ) : (
-        <div>
-          <label className="block text-[12px] font-semibold text-brand-gray-900 mb-1">
-            Pridėti prekę į sąrašą
-          </label>
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={
-              repId
-                ? 'Ieškoti tarp turimų prekių (pavadinimas, numeris, SKU)…'
-                : 'Pirma pasirinkite vadybininkę'
-            }
-            disabled={!repId}
-            className="w-full px-3.5 py-2.5 bg-white border border-[#ddd] rounded-lg text-sm focus:outline-none focus:border-brand-magenta disabled:bg-[#F5F5F7] disabled:text-brand-gray-400"
-          />
-          {results.length > 0 && (
-            <div className="mt-2 max-h-60 overflow-y-auto border border-[#eee] rounded-lg divide-y divide-[#f0f0f0]">
-              {results.map((p) => (
-                <button
-                  key={p.productId}
-                  type="button"
-                  onClick={() => addProduct(p)}
-                  className="w-full flex items-center justify-between gap-3 px-3 py-2 hover:bg-[#F9F9FB] text-sm text-left"
-                >
-                  <span className="text-brand-gray-900">
-                    {p.colorNumber ? `${p.colorNumber} · ` : ''}
-                    {p.name}
-                  </span>
-                  <span className="text-[12px] text-brand-gray-500 whitespace-nowrap">
-                    turi {p.held}
-                  </span>
-                </button>
-              ))}
+        <>
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="text-[12px] font-semibold text-brand-gray-900">
+              Turimos prekės ({rows.length}) — pažymėkite grąžinamas
             </div>
-          )}
-        </div>
-      )}
+            <input
+              type="text"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              placeholder="Filtruoti sąrašą…"
+              className="w-full sm:w-64 px-3 py-2 bg-white border border-[#ddd] rounded-lg text-sm focus:outline-none focus:border-brand-magenta"
+            />
+          </div>
 
-      {/* Sąrašas */}
-      {list.length === 0 ? (
-        <div className="px-4 py-8 text-center text-sm text-brand-gray-500 bg-[#F9F9FB] border border-[#eee] rounded-lg">
-          Sąrašas tuščias. Susiraskite prekes, kurias vadybininkė grąžina.
-        </div>
-      ) : (
-        <div className="border border-[#eee] rounded-lg overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-[#F9F9FB] text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500">
-                <th className="px-3 py-2 text-left">Prekė</th>
-                <th className="px-3 py-2 text-center w-[90px]">Turi</th>
-                <th className="px-3 py-2 text-center w-[120px]">Grąžina</th>
-                <th className="px-3 py-2 w-[40px]"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {list.map((l) => {
-                const over = l.qty > l.held
-                return (
-                  <tr key={l.id} className="border-t border-[#eee]">
-                    <td className="px-3 py-2">
+          <div className="border border-[#eee] rounded-lg overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-[#F9F9FB] text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500">
+                  <th className="px-3 py-2 text-center w-[44px]">
+                    <input
+                      type="checkbox"
+                      checked={allChecked}
+                      onChange={(e) => setAll(e.target.checked)}
+                      title="Pažymėti visas"
+                      className="h-4 w-4 accent-brand-magenta cursor-pointer"
+                    />
+                  </th>
+                  <th className="px-3 py-2 text-left">Prekė</th>
+                  <th className="px-3 py-2 text-center w-[80px]">Turi</th>
+                  <th className="px-3 py-2 text-center w-[120px]">Grąžinti</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visible.map((r) => (
+                  <tr
+                    key={r.productId}
+                    className={`border-t border-[#eee] ${r.checked ? 'bg-brand-magenta/[0.03]' : ''}`}
+                  >
+                    <td className="px-3 py-2 text-center">
+                      <input
+                        type="checkbox"
+                        checked={r.checked}
+                        onChange={(e) => toggle(r.productId, e.target.checked)}
+                        className="h-4 w-4 accent-brand-magenta cursor-pointer"
+                      />
+                    </td>
+                    <td
+                      className="px-3 py-2 cursor-pointer"
+                      onClick={() => toggle(r.productId, !r.checked)}
+                    >
                       <div className="font-medium text-brand-gray-900">
-                        {l.colorNumber ? `${l.colorNumber} · ` : ''}
-                        {l.name}
+                        {r.colorNumber ? `${r.colorNumber} · ` : ''}
+                        {r.name}
                       </div>
-                      {l.sku && (
+                      {r.sku && (
                         <div className="text-[11px] text-brand-gray-500 font-mono">
-                          {l.sku}
+                          {r.sku}
                         </div>
                       )}
                     </td>
                     <td className="px-3 py-2 text-center text-brand-gray-500">
-                      {l.held}
+                      {r.held}
                     </td>
                     <td className="px-3 py-2 text-center">
                       <input
                         type="number"
                         min={1}
-                        max={l.held}
+                        max={r.held}
                         step={1}
-                        value={l.qty}
+                        value={r.qty}
+                        disabled={!r.checked}
                         onChange={(e) =>
-                          setQty(l.id, parseInt(e.target.value, 10) || 1)
+                          setQty(r.productId, parseInt(e.target.value, 10) || 1)
                         }
-                        className={`w-20 px-2 py-1.5 border rounded-md text-sm text-center font-semibold ${
-                          over
-                            ? 'border-red-300 text-red-600 bg-red-50'
-                            : 'border-[#ddd] text-brand-gray-900'
-                        }`}
+                        className="w-20 px-2 py-1.5 border border-[#ddd] rounded-md text-sm text-center font-semibold text-brand-gray-900 disabled:bg-[#F5F5F7] disabled:text-brand-gray-400"
                       />
-                      {over && (
-                        <div className="text-[10px] text-red-600 mt-0.5">
-                          turi tik {l.held}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-3 py-2 text-center">
-                      <button
-                        type="button"
-                        onClick={() => remove(l.id)}
-                        className="text-brand-gray-400 hover:text-red-600 transition-colors"
-                        title="Pašalinti"
-                      >
-                        ✕
-                      </button>
                     </td>
                   </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+                ))}
+                {visible.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="px-3 py-6 text-center text-sm text-brand-gray-500"
+                    >
+                      Pagal filtrą prekių nerasta.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="text-sm text-brand-gray-500">
-          Prekių sąraše: <strong className="text-brand-gray-900">{list.length}</strong>{' '}
-          · Iš viso vienetų:{' '}
+          Pažymėta:{' '}
+          <strong className="text-brand-gray-900">{selected.length}</strong> ·
+          Iš viso vienetų:{' '}
           <strong className="text-brand-gray-900">{totalUnits}</strong>
         </div>
         <button
           type="submit"
-          disabled={
-            isPending ||
-            list.length === 0 ||
-            !repId ||
-            list.some((l) => l.qty > l.held)
-          }
+          disabled={isPending || selected.length === 0 || !repId}
           className="px-5 py-2.5 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark disabled:opacity-50 transition-colors"
         >
           {isPending ? 'Priimama…' : 'Priimti grąžinimą'}
         </button>
       </div>
       <p className="text-[12px] text-brand-gray-500">
-        Pateikus, visos prekės iš karto grąžinamos į sandėlį (viskas arba nieko),
+        Pažymėtos prekės iš karto grąžinamos į sandėlį (viskas arba nieko),
         įrašoma į žurnalą, ir gausite spausdinamą grąžinimo lapą.
       </p>
     </form>
