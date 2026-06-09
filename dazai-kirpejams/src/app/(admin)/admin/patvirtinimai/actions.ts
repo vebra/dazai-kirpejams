@@ -80,9 +80,14 @@ function humanError(raw: string | undefined): string {
   if (/NOT_PENDING/.test(msg))
     return 'Užsakymas jau apdorotas (nebėra „laukiantis"). Atnaujinkite sąrašą.'
   if (/ORDER_NOT_FOUND/.test(msg)) return 'Užsakymas nerastas.'
-  // decrement_stock_for_order trūkstamo sandėlio klaida
-  if (/stock|sandėl|insufficient|quantity/i.test(msg))
-    return 'Sandėlyje per mažai prekių — negalima patvirtinti. Papildykite sandėlį arba atmeskite užsakymą.'
+  if (/NO_REP_ON_ORDER/.test(msg))
+    return 'Užsakymas neturi priskirtos vadybininkės — negalima nurašyti iš atsargų.'
+  // Vadybininkei neužtenka prekių jos atsargose — pirma reikia jai išduoti.
+  const repStock = msg.match(/INSUFFICIENT_REP_STOCK.*?name=(.*?) held=(\d+) need=(\d+)/)
+  if (repStock)
+    return `Vadybininkė turi tik ${repStock[2]} vnt. „${repStock[1].trim()}" (reikia ${repStock[3]}). Pirma išduokite jai trūkstamas prekes arba atmeskite užsakymą.`
+  if (/INSUFFICIENT_REP_STOCK/.test(msg))
+    return 'Vadybininkei neužtenka prekių atsargose. Pirma išduokite jai trūkstamas prekes arba atmeskite užsakymą.'
   return msg
 }
 

@@ -13,6 +13,8 @@ const REASON_LABEL: Record<string, string> = {
   writeoff: 'Nurašymas',
   issue_to_rep: 'Išvežimas vadybininkei',
   return_from_rep: 'Grąžinimas iš vadybininkės',
+  rep_sale: 'Pardavimas (vadybininkė)',
+  rep_sale_cancel: 'Pardavimo atšaukimas (vadybininkė)',
 }
 
 const REASON_CLS: Record<string, string> = {
@@ -23,6 +25,8 @@ const REASON_CLS: Record<string, string> = {
   writeoff: 'bg-red-50 text-red-700 border-red-200',
   issue_to_rep: 'bg-purple-50 text-purple-700 border-purple-200',
   return_from_rep: 'bg-teal-50 text-teal-700 border-teal-200',
+  rep_sale: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+  rep_sale_cancel: 'bg-orange-50 text-orange-700 border-orange-200',
 }
 
 const FILTERS: Array<{ value: string; label: string }> = [
@@ -34,6 +38,8 @@ const FILTERS: Array<{ value: string; label: string }> = [
   { value: 'writeoff', label: 'Nurašymas' },
   { value: 'issue_to_rep', label: 'Išvežimas vadybininkei' },
   { value: 'return_from_rep', label: 'Grąžinimas iš vadybininkės' },
+  { value: 'rep_sale', label: 'Pardavimas (vadybininkė)' },
+  { value: 'rep_sale_cancel', label: 'Pardavimo atšaukimas (vadybininkė)' },
 ]
 
 const DT = new Intl.DateTimeFormat('lt-LT', {

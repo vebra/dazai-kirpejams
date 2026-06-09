@@ -119,7 +119,7 @@ export async function getRepHeldInventory(): Promise<Record<string, RepHeldItem[
   const { data, error } = await sb
     .from('stock_movements')
     .select('rep_id, product_id, delta, reason, products(name_lt, sku, color_number)')
-    .in('reason', ['issue_to_rep', 'return_from_rep'])
+    .in('reason', ['issue_to_rep', 'return_from_rep', 'rep_sale', 'rep_sale_cancel'])
     .not('rep_id', 'is', null)
 
   if (error) {
@@ -131,6 +131,7 @@ export async function getRepHeldInventory(): Promise<Record<string, RepHeldItem[
     rep_id: string
     product_id: string
     delta: number
+    reason: string
     products:
       | { name_lt: string; sku: string | null; color_number: string | null }
       | { name_lt: string; sku: string | null; color_number: string | null }[]
@@ -149,7 +150,10 @@ export async function getRepHeldInventory(): Promise<Record<string, RepHeldItem[
       sku: rawP?.sku ?? null,
       held: 0,
     }
-    cur.held += -r.delta
+    // issue_to_rep / rep_sale_cancel didina atsargas; return_from_rep / rep_sale mažina.
+    const q = Math.abs(r.delta)
+    cur.held +=
+      r.reason === 'issue_to_rep' || r.reason === 'rep_sale_cancel' ? q : -q
     byProduct.set(r.product_id, cur)
     acc.set(r.rep_id, byProduct)
   }
