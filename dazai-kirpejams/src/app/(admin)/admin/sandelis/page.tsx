@@ -169,6 +169,12 @@ export default async function AdminInventoryPage({
         >
           ↩ Grąžinimas iš vadybininkės
         </Link>
+        <Link
+          href="/admin/sandelis/isduota"
+          className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-[#F5F5F7] transition-colors"
+        >
+          📄 Išduotos prekės
+        </Link>
         <a
           href="/admin/sandelis/eksportas"
           download
@@ -222,7 +228,7 @@ export default async function AdminInventoryPage({
                 Turite {inactiveCount} išjungtus produktus
               </h3>
               <p className="mt-1 text-[13px] text-brand-gray-500">
-                Po supplier'io importo produktai yra išjungti ir su 0 likučiu.
+                Po supplier&apos;io importo produktai yra išjungti ir su 0 likučiu.
                 Aktyvuokite juos visus iš karto ir nustatykite pradinį likutį,
                 arba praeikite sąrašą rankomis.
               </p>

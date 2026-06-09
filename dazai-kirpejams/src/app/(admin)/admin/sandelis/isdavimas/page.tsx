@@ -42,12 +42,20 @@ export default async function IssueToRepPage() {
             atsispausdinkite išdavimo lapą.
           </p>
         </div>
-        <Link
-          href="/admin/sandelis"
-          className="px-4 py-2 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-[#F5F5F7] transition-colors whitespace-nowrap"
-        >
-          ← Sandelis
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/admin/sandelis/isduota"
+            className="px-4 py-2 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-[#F5F5F7] transition-colors whitespace-nowrap"
+          >
+            📄 Išduotos prekės
+          </Link>
+          <Link
+            href="/admin/sandelis"
+            className="px-4 py-2 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-[#F5F5F7] transition-colors whitespace-nowrap"
+          >
+            ← Sandelis
+          </Link>
+        </div>
       </div>
 
       {reps.length === 0 ? (
