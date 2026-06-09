@@ -86,7 +86,7 @@ export function IssuedGoodsView({
           {days.map((d) => {
             const dayTotal = d.items.reduce((s, i) => s + i.qty, 0)
             return (
-              <div key={d.date} className="mb-6 break-inside-avoid">
+              <div key={d.date} className="mb-6">
                 <h2 className="text-[13px] font-bold mb-1.5 bg-[#F2F2F4] px-2 py-1 rounded">
                   Išduota: {d.date}
                 </h2>
