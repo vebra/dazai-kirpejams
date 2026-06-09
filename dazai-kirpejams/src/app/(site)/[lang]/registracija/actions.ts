@@ -91,31 +91,39 @@ export async function registerAction(
   }
 
   const serviceClient = createServiceClient()
+  // SVARBU: `upsert`, ne `insert`. Migracija 018 trigger'iu jau sukuria
+  // user_profiles eilutę (id + pending) iškart po signUp, todėl `insert`
+  // su tuo pačiu id meta PK konfliktą ir profesinė info (vardas/telefonas/
+  // veiklos tipas) NIEKAD neįsirašydavo. `upsert(onConflict: id)` atnaujina
+  // tą trigger'io sukurtą eilutę.
   const { error: profileError } = await serviceClient
     .from('user_profiles')
-    .insert({
-      id: signUpData.user.id,
-      first_name: firstName,
-      last_name: lastName,
-      phone,
-      city: city || null,
-      business_type: businessType,
-      salon_name: salonName || null,
-      company_code: companyCode || null,
-      daily_dyes_count: dailyDyesCount || null,
-      verification_notes: verificationNotes || null,
-      // Registracijos kalba įrašoma profilyje, kad admin'as patvirtindamas
-      // ar atmesdamas (dienomis vėliau) galėtų išsiųsti laišką ta pačia
-      // kalba, kuria vartotojas užsiregistravo. Žr. migraciją 033.
-      lang,
-      // Registracija laukia admin'o patvirtinimo per /admin/verifikacija.
-      // Kainos NEatveriamos, kol statusas netaps `approved` — kliento
-      // payload'e jų taip pat nebus (žr. queries.ts kainų vartus).
-      verification_status: 'pending',
-    })
+    .upsert(
+      {
+        id: signUpData.user.id,
+        first_name: firstName,
+        last_name: lastName,
+        phone,
+        city: city || null,
+        business_type: businessType,
+        salon_name: salonName || null,
+        company_code: companyCode || null,
+        daily_dyes_count: dailyDyesCount || null,
+        verification_notes: verificationNotes || null,
+        // Registracijos kalba įrašoma profilyje, kad admin'as patvirtindamas
+        // ar atmesdamas (dienomis vėliau) galėtų išsiųsti laišką ta pačia
+        // kalba, kuria vartotojas užsiregistravo. Žr. migraciją 033.
+        lang,
+        // Registracija laukia admin'o patvirtinimo per /admin/verifikacija.
+        // Kainos NEatveriamos, kol statusas netaps `approved` — kliento
+        // payload'e jų taip pat nebus (žr. queries.ts kainų vartus).
+        verification_status: 'pending',
+      },
+      { onConflict: 'id' }
+    )
 
   if (profileError) {
-    console.error('[register] profile insert error:', profileError.message)
+    console.error('[register] profile upsert error:', profileError.message)
   }
 
   // Email'ai — defensyvūs. Jei Resend nesukonfigūruotas arba lūžta —
