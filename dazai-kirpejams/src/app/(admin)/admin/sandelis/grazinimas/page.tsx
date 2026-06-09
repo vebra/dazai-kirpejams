@@ -1,6 +1,10 @@
 import Link from 'next/link'
 import { requireAdmin } from '@/lib/admin/auth'
-import { getRepManagementData, getRepHeldInventory } from '@/lib/admin/rep-reports'
+import {
+  getRepManagementData,
+  getRepHeldInventory,
+  getRepIssuancesByDate,
+} from '@/lib/admin/rep-reports'
 import { ReturnFromRepForm } from './ReturnFromRepForm'
 
 export const metadata = { title: 'Grąžinimas iš vadybininkės' }
@@ -8,9 +12,10 @@ export const dynamic = 'force-dynamic'
 
 export default async function ReturnFromRepPage() {
   await requireAdmin()
-  const [repData, heldByRep] = await Promise.all([
+  const [repData, heldByRep, issuancesByRep] = await Promise.all([
     getRepManagementData(),
     getRepHeldInventory(),
+    getRepIssuancesByDate(),
   ])
   const reps = repData.reps.map((r) => ({ id: r.id, name: r.name }))
 
@@ -59,7 +64,11 @@ export default async function ReturnFromRepPage() {
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-6">
-          <ReturnFromRepForm reps={reps} heldByRep={heldByRep} />
+          <ReturnFromRepForm
+            reps={reps}
+            heldByRep={heldByRep}
+            issuancesByRep={issuancesByRep}
+          />
         </div>
       )}
     </div>

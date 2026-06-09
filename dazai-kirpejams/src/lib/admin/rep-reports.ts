@@ -167,3 +167,97 @@ export async function getRepHeldInventory(): Promise<Record<string, RepHeldItem[
   }
   return out
 }
+
+// ============================================
+// Vadybininkėms išduotos prekės SUGRUPUOTOS pagal išdavimo dieną.
+// ============================================
+
+export type RepIssuanceItem = {
+  productId: string
+  name: string
+  colorNumber: string | null
+  sku: string | null
+  qty: number
+}
+
+export type RepIssuanceDay = {
+  date: string // lt-LT trumpas formatas, naudojamas ir kaip raktas, ir kaip etiketė
+  items: RepIssuanceItem[]
+}
+
+/**
+ * Žemėlapis rep_id → išdavimai pagal dieną (naujausi viršuje). TIK issue_to_rep
+ * judėjimai (kas tą dieną buvo išduota), be pardavimų/grąžinimų. Service-role.
+ */
+export async function getRepIssuancesByDate(): Promise<
+  Record<string, RepIssuanceDay[]>
+> {
+  const sb = createServerClient()
+  const { data, error } = await sb
+    .from('stock_movements')
+    .select('rep_id, product_id, delta, created_at, products(name_lt, sku, color_number)')
+    .eq('reason', 'issue_to_rep')
+    .not('rep_id', 'is', null)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('[rep-reports] getRepIssuancesByDate:', error.message)
+    return {}
+  }
+
+  const DATE = new Intl.DateTimeFormat('lt-LT', {
+    timeZone: 'Europe/Vilnius',
+    dateStyle: 'short',
+  })
+
+  type Row = {
+    rep_id: string
+    product_id: string
+    delta: number
+    created_at: string
+    products:
+      | { name_lt: string; sku: string | null; color_number: string | null }
+      | { name_lt: string; sku: string | null; color_number: string | null }[]
+      | null
+  }
+
+  // rep_id → date → product_id → kiekis (susumuotas tos dienos to paties produkto)
+  const acc = new Map<string, Map<string, Map<string, RepIssuanceItem>>>()
+  // Datų eiliškumui išlaikyti (jau surūšiuota desc pagal created_at)
+  const dateOrder = new Map<string, string[]>()
+
+  for (const r of (data ?? []) as Row[]) {
+    const rawP = Array.isArray(r.products) ? r.products[0] : r.products
+    const dateKey = DATE.format(new Date(r.created_at))
+    const byDate = acc.get(r.rep_id) ?? new Map<string, Map<string, RepIssuanceItem>>()
+    if (!byDate.has(dateKey)) {
+      byDate.set(dateKey, new Map())
+      const ord = dateOrder.get(r.rep_id) ?? []
+      ord.push(dateKey)
+      dateOrder.set(r.rep_id, ord)
+    }
+    const byProduct = byDate.get(dateKey)!
+    const cur = byProduct.get(r.product_id) ?? {
+      productId: r.product_id,
+      name: rawP?.name_lt ?? '—',
+      colorNumber: rawP?.color_number ?? null,
+      sku: rawP?.sku ?? null,
+      qty: 0,
+    }
+    cur.qty += Math.abs(r.delta)
+    byProduct.set(r.product_id, cur)
+    acc.set(r.rep_id, byDate)
+  }
+
+  const out: Record<string, RepIssuanceDay[]> = {}
+  for (const [repId, byDate] of acc) {
+    const days: RepIssuanceDay[] = (dateOrder.get(repId) ?? []).map((date) => ({
+      date,
+      items: [...byDate.get(date)!.values()]
+        .filter((i) => i.qty > 0)
+        .sort((a, b) => a.name.localeCompare(b.name, 'lt')),
+    }))
+    out[repId] = days.filter((d) => d.items.length > 0)
+  }
+  return out
+}
