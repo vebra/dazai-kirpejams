@@ -3,7 +3,11 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { TIER_LABELS, type PendingRepOrder } from '@/lib/admin/rep-orders-shared'
-import { approveRepOrder, rejectRepOrder } from './actions'
+import {
+  approveRepOrder,
+  approveRepOrderFromWarehouse,
+  rejectRepOrder,
+} from './actions'
 
 const PRICE = new Intl.NumberFormat('lt-LT', { style: 'currency', currency: 'EUR' })
 const DATE = new Intl.DateTimeFormat('lt-LT', { dateStyle: 'short', timeStyle: 'short' })
@@ -82,6 +86,15 @@ function OrderCard({
       const res = await approveRepOrder(o.id)
       if (res.ok) onDone()
       else setError(res.error ?? 'Nepavyko patvirtinti.')
+    })
+  }
+
+  function handleApproveFromWarehouse() {
+    setError(null)
+    startTransition(async () => {
+      const res = await approveRepOrderFromWarehouse(o.id)
+      if (res.ok) onDone()
+      else setError(res.error ?? 'Nepavyko patvirtinti iš sandėlio.')
     })
   }
 
@@ -196,11 +209,21 @@ function OrderCard({
         </button>
         <button
           type="button"
+          onClick={handleApproveFromWarehouse}
+          disabled={pending}
+          title="Nurašyti iš centrinio sandėlio (kai prekės nebuvo išduotos vadybininkei)"
+          className="px-4 py-2 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-[13px] hover:bg-[#F5F5F7] transition-colors disabled:opacity-50"
+        >
+          Iš sandėlio
+        </button>
+        <button
+          type="button"
           onClick={handleApprove}
           disabled={pending}
+          title="Nurašyti iš vadybininkės atsargų"
           className="px-5 py-2 bg-brand-magenta text-white rounded-lg font-semibold text-[13px] hover:bg-brand-magenta-dark transition-colors disabled:opacity-50"
         >
-          {pending ? 'Tvirtinama…' : 'Patvirtinti'}
+          {pending ? 'Tvirtinama…' : 'Patvirtinti (iš atsargų)'}
         </button>
       </div>
     </div>

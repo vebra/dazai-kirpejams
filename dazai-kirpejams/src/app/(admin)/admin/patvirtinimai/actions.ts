@@ -111,6 +111,30 @@ export async function approveRepOrder(orderId: string): Promise<ApprovalResult> 
   return { ok: true }
 }
 
+export async function approveRepOrderFromWarehouse(
+  orderId: string
+): Promise<ApprovalResult> {
+  await requireAdmin()
+  if (!orderId) return { ok: false, error: 'Trūksta užsakymo ID.' }
+
+  const supabase = await createServerSupabase()
+  const { error } = await supabase.rpc('approve_rep_order_from_warehouse', {
+    p_order_id: orderId,
+  })
+
+  if (error) {
+    console.error('[admin/patvirtinimai] approveFromWarehouse:', error.message)
+    return { ok: false, error: humanError(error.message) }
+  }
+
+  await notifyRepDecision(orderId, 'approved')
+
+  revalidatePath('/admin/patvirtinimai')
+  revalidatePath('/admin/uzsakymai', 'layout')
+  revalidatePath('/admin')
+  return { ok: true }
+}
+
 export async function rejectRepOrder(
   orderId: string,
   reason: string
