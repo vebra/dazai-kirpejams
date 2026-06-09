@@ -261,3 +261,133 @@ export async function getRepIssuancesByDate(): Promise<
   }
   return out
 }
+
+// ============================================
+// Atsargų suderinimo ataskaita — išduota / parduota / grąžinta / turi + vertė.
+// ============================================
+
+export type RepReconRow = {
+  productId: string
+  name: string
+  colorNumber: string | null
+  sku: string | null
+  issued: number // iš viso išduota
+  sold: number // parduota (patvirtinti pardavimai)
+  returned: number // grąžinta į sandėlį
+  held: number // turi dabar (issued − sold − returned)
+  valueCents: number // turimų prekių vertė (mažm. kaina)
+}
+
+export type RepRecon = {
+  repId: string
+  repName: string
+  rows: RepReconRow[]
+  totalHeld: number
+  totalValueCents: number
+}
+
+/**
+ * Kiekvienai vadybininkei — atsargų judėjimų suvestinė pagal prekę: kiek išduota,
+ * parduota, grąžinta ir kiek turi dabar (held = issued − sold − returned). Vertė
+ * skaičiuojama mažmenine kaina (products.price_cents). Service-role.
+ */
+export async function getRepReconciliation(): Promise<RepRecon[]> {
+  const sb = createServerClient()
+
+  const [{ data: profs }, { data: moves }] = await Promise.all([
+    sb.from('user_profiles').select('id, first_name, last_name').eq('role', 'sales_rep'),
+    sb
+      .from('stock_movements')
+      .select('rep_id, product_id, delta, reason, products(name_lt, sku, color_number, price_cents)')
+      .in('reason', ['issue_to_rep', 'return_from_rep', 'rep_sale', 'rep_sale_cancel'])
+      .not('rep_id', 'is', null),
+  ])
+
+  // El. paštai vardo fallback'ui
+  const emailMap = new Map<string, string>()
+  for (let page = 1; page <= 5; page++) {
+    const { data } = await sb.auth.admin.listUsers({ page, perPage: 1000 })
+    for (const u of data?.users ?? []) emailMap.set(u.id, u.email ?? '')
+    if (!data || data.users.length < 1000) break
+  }
+  const repName = new Map<string, string>()
+  for (const p of profs ?? []) {
+    const n = `${p.first_name ?? ''} ${p.last_name ?? ''}`.trim()
+    repName.set(p.id, n || emailMap.get(p.id) || '—')
+  }
+
+  type Move = {
+    rep_id: string
+    product_id: string
+    delta: number
+    reason: string
+    products:
+      | { name_lt: string; sku: string | null; color_number: string | null; price_cents: number | null }
+      | { name_lt: string; sku: string | null; color_number: string | null; price_cents: number | null }[]
+      | null
+  }
+
+  // rep_id → product_id → eilutė (+ kaina atskirai vertei)
+  const acc = new Map<string, Map<string, RepReconRow & { price: number }>>()
+  for (const m of (moves ?? []) as Move[]) {
+    const p = Array.isArray(m.products) ? m.products[0] : m.products
+    const byProduct = acc.get(m.rep_id) ?? new Map<string, RepReconRow & { price: number }>()
+    const cur =
+      byProduct.get(m.product_id) ?? {
+        productId: m.product_id,
+        name: p?.name_lt ?? '—',
+        colorNumber: p?.color_number ?? null,
+        sku: p?.sku ?? null,
+        issued: 0,
+        sold: 0,
+        returned: 0,
+        held: 0,
+        valueCents: 0,
+        price: p?.price_cents ?? 0,
+      }
+    const q = Math.abs(m.delta)
+    if (m.reason === 'issue_to_rep') cur.issued += q
+    else if (m.reason === 'rep_sale') cur.sold += q
+    else if (m.reason === 'return_from_rep') cur.returned += q
+    else if (m.reason === 'rep_sale_cancel') cur.sold -= q // pardavimo atšaukimas
+    byProduct.set(m.product_id, cur)
+    acc.set(m.rep_id, byProduct)
+  }
+
+  const result: RepRecon[] = []
+  for (const p of profs ?? []) {
+    const byProduct = acc.get(p.id)
+    const rows: RepReconRow[] = []
+    let totalHeld = 0
+    let totalValueCents = 0
+    for (const r of byProduct?.values() ?? []) {
+      const held = r.issued - r.sold - r.returned
+      const valueCents = Math.max(0, held) * r.price
+      if (r.issued === 0 && held === 0) continue
+      rows.push({
+        productId: r.productId,
+        name: r.name,
+        colorNumber: r.colorNumber,
+        sku: r.sku,
+        issued: r.issued,
+        sold: r.sold,
+        returned: r.returned,
+        held,
+        valueCents,
+      })
+      totalHeld += held
+      totalValueCents += valueCents
+    }
+    rows.sort((a, b) => a.name.localeCompare(b.name, 'lt'))
+    result.push({
+      repId: p.id,
+      repName: repName.get(p.id) ?? '—',
+      rows,
+      totalHeld,
+      totalValueCents,
+    })
+  }
+  // Vadybininkės su atsargomis viršuje
+  result.sort((a, b) => b.totalHeld - a.totalHeld)
+  return result
+}
