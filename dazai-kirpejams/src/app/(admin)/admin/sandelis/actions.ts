@@ -1045,3 +1045,98 @@ export async function issueStockToRepAction(
   revalidateTag('products', 'max')
   return { success: true, message: `Išduota ${res.removed} vnt. vadybininkei „${rep}". Sandelio likutis: ${res.stock}.` }
 }
+
+// ============================================
+// Prekių išdavimas vadybininkei SĄRAŠU (batch) + spausdinimas
+// ============================================
+
+export type IssuedItem = {
+  productId: string
+  name: string
+  qty: number
+  balance: number
+}
+
+export type IssueBatchState = {
+  error?: string
+  issued?: { rep: string; at: string; items: IssuedItem[] }
+}
+
+export async function issueStockBatchToRepAction(
+  _prev: IssueBatchState,
+  formData: FormData
+): Promise<IssueBatchState> {
+  await requireAdmin()
+  const supabase = createServerClient()
+
+  const rep = ((formData.get('rep') as string) ?? '').trim()
+  const repId = ((formData.get('rep_id') as string) ?? '').trim() || null
+  const itemsRaw = (formData.get('items') as string) ?? '[]'
+
+  if (!rep) return { error: 'Pasirinkite vadybininkę.' }
+
+  let items: { product_id: string; qty: number }[]
+  try {
+    const parsed = JSON.parse(itemsRaw)
+    items = Array.isArray(parsed) ? parsed : []
+  } catch {
+    return { error: 'Neteisingas sąrašas.' }
+  }
+
+  // Sanitizuojam — tik validūs įrašai keliauja į RPC.
+  items = items
+    .filter(
+      (i) =>
+        i &&
+        typeof i.product_id === 'string' &&
+        Number.isInteger(i.qty) &&
+        i.qty > 0
+    )
+    .map((i) => ({ product_id: i.product_id, qty: i.qty }))
+
+  if (items.length === 0) {
+    return { error: 'Sąrašas tuščias — pridėkite bent vieną prekę.' }
+  }
+
+  const { data, error } = await supabase.rpc('issue_stock_to_rep_batch', {
+    p_items: items,
+    p_rep: rep,
+    p_rep_id: repId,
+  })
+
+  const res = data as {
+    ok?: boolean
+    reason?: string
+    stock?: number
+    name?: string
+    items?: { product_id: string; name: string; qty: number; balance: number }[]
+  } | null
+
+  if (error || !res?.ok) {
+    const reason = res?.reason
+    const msg =
+      reason === 'insufficient_stock'
+        ? `Nepakanka „${res?.name ?? 'prekės'}" likučio (yra ${res?.stock ?? 0}). Niekas neišduota — pataisykite kiekį.`
+        : reason === 'empty'
+          ? 'Sąrašas tuščias.'
+          : reason === 'not_found'
+            ? 'Viena iš prekių nerasta.'
+            : reason === 'invalid_qty'
+              ? 'Neteisingas kiekis sąraše.'
+              : error?.message ?? 'Nepavyko išduoti.'
+    console.error('[admin/sandelis] issueBatchToRep:', error?.message ?? reason)
+    return { error: msg }
+  }
+
+  revalidatePath('/admin/sandelis', 'layout')
+  revalidatePath('/admin/sandelis/zurnalas')
+  revalidateTag('products', 'max')
+
+  const issuedItems: IssuedItem[] = (res.items ?? []).map((i) => ({
+    productId: i.product_id,
+    name: i.name,
+    qty: i.qty,
+    balance: i.balance,
+  }))
+  return { issued: { rep, at: new Date().toISOString(), items: issuedItems } }
+}

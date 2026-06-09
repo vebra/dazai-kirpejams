@@ -17,14 +17,29 @@ export default async function IssueToRepPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div className="flex items-center justify-between gap-3">
+      {/* Spausdinant rodom TIK išdavimo lapą (.print-area). */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            @media print {
+              body { background: #fff !important; }
+              body * { visibility: hidden !important; }
+              .print-area, .print-area * { visibility: visible !important; }
+              .print-area { position: absolute; left: 0; top: 0; width: 100%; }
+              .print-hide { display: none !important; }
+              @page { margin: 1.4cm; size: A4; }
+            }
+          `,
+        }}
+      />
+      <div className="print-hide flex items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold text-brand-gray-900">
             Prekių išdavimas vadybininkei
           </h2>
           <p className="mt-1 text-sm text-brand-gray-500">
-            Prekės išvežamos iš sandėlio vadybininkei prekiauti — likutis
-            sumažinamas, įrašoma į žurnalą.
+            Sudarykite prekių sąrašą su kiekiais, išduokite visą iš karto ir
+            atsispausdinkite išdavimo lapą.
           </p>
         </div>
         <Link
