@@ -23,6 +23,9 @@ export function analyticsEnabled(): boolean {
   if (typeof window === 'undefined') return false
   const envFlag = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS
   if (envFlag === 'false' || envFlag === '0') return false
+  // Aiškus įjungimas (E2E testai, staging) — apeina hosto patikrą, kad
+  // analytics event'us būtų galima patikrinti ne produkcijos hoste.
+  if (envFlag === 'true' || envFlag === '1') return true
   // Preview/localhost — netriggerintume GA/Meta įvykių, kad nedirbtume
   // Lietuvos rinkos statistikos su JAV cloud'o botų srautu.
   if (!isProductionHost()) return false
