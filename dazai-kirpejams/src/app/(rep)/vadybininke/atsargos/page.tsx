@@ -28,7 +28,7 @@ export default async function RepInventoryPage() {
               <thead>
                 <tr className="bg-[#F9F9FB] text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500">
                   <th className="px-4 py-3 text-left">Prekė</th>
-                  <th className="px-4 py-3 text-right w-[110px]">Išduota</th>
+                  <th className="px-4 py-3 text-right w-[110px]">Turima</th>
                   <th className="px-4 py-3 text-left w-[130px]">Paskutinį kartą</th>
                 </tr>
               </thead>
@@ -55,8 +55,8 @@ export default async function RepInventoryPage() {
         </div>
       )}
       <p className="mt-3 text-[12px] text-brand-gray-500">
-        Rodoma, kiek prekių jums iš viso išduota. Dėl tikslaus likučio susisiekite
-        su administracija.
+        Rodoma, kiek prekių šiuo metu turite (išduota minus grąžinta). Grąžinus
+        prekes administracijai, likutis sumažėja.
       </p>
     </div>
   )

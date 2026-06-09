@@ -95,3 +95,71 @@ export async function getRepManagementData(): Promise<RepManagementData> {
 
   return { reps, clients: clientRows, totalApprovedSalesCents }
 }
+
+// ============================================
+// Vadybininkių turimos atsargos (išduota − grąžinta) grąžinimo priėmimui.
+// ============================================
+
+export type RepHeldItem = {
+  productId: string
+  name: string
+  colorNumber: string | null
+  sku: string | null
+  held: number
+}
+
+/**
+ * Žemėlapis rep_id → prekės, kurias ji šiuo metu turi (neto > 0). Skaičiuojam iš
+ * stock_movements: issue_to_rep (delta neig.) − return_from_rep (delta teig.),
+ * t.y. sum(-delta) per abi priežastis. Service-role, nes stock_movements skaito
+ * tik adminas, o čia reikia visų rep'ų pjūvio grąžinimo formai.
+ */
+export async function getRepHeldInventory(): Promise<Record<string, RepHeldItem[]>> {
+  const sb = createServerClient()
+  const { data, error } = await sb
+    .from('stock_movements')
+    .select('rep_id, product_id, delta, reason, products(name_lt, sku, color_number)')
+    .in('reason', ['issue_to_rep', 'return_from_rep'])
+    .not('rep_id', 'is', null)
+
+  if (error) {
+    console.error('[rep-reports] getRepHeldInventory:', error.message)
+    return {}
+  }
+
+  type Row = {
+    rep_id: string
+    product_id: string
+    delta: number
+    products:
+      | { name_lt: string; sku: string | null; color_number: string | null }
+      | { name_lt: string; sku: string | null; color_number: string | null }[]
+      | null
+  }
+
+  // rep_id → product_id → agregatas
+  const acc = new Map<string, Map<string, RepHeldItem>>()
+  for (const r of (data ?? []) as Row[]) {
+    const rawP = Array.isArray(r.products) ? r.products[0] : r.products
+    const byProduct = acc.get(r.rep_id) ?? new Map<string, RepHeldItem>()
+    const cur = byProduct.get(r.product_id) ?? {
+      productId: r.product_id,
+      name: rawP?.name_lt ?? '—',
+      colorNumber: rawP?.color_number ?? null,
+      sku: rawP?.sku ?? null,
+      held: 0,
+    }
+    cur.held += -r.delta
+    byProduct.set(r.product_id, cur)
+    acc.set(r.rep_id, byProduct)
+  }
+
+  const out: Record<string, RepHeldItem[]> = {}
+  for (const [repId, byProduct] of acc) {
+    const items = [...byProduct.values()]
+      .filter((i) => i.held > 0)
+      .sort((a, b) => a.name.localeCompare(b.name, 'lt'))
+    if (items.length > 0) out[repId] = items
+  }
+  return out
+}
