@@ -424,6 +424,65 @@ export async function quickUpdateStockAction(formData: FormData): Promise<void> 
 }
 
 // ============================================
+// Revizija (inventorizacija) — pritaiko suskaičiuotus likučius
+// ============================================
+export type RevisionResult =
+  | { ok: true; applied: number }
+  | { ok: false; error: string }
+
+/**
+ * Pritaiko revizijos rezultatus: kiekvienai prekei, kurios suskaičiuotas
+ * kiekis skiriasi nuo sistemos, nustato naują likutį per `set_product_stock`
+ * (atominis likutis + įrašas į žurnalą, source='revizija'). Idempotentiška —
+ * nustato absoliučią reikšmę, tad pakartojimas nepakenkia. Frontend siunčia
+ * TIK pasikeitusias prekes (neskaičiuotos NEsiunčiamos → likutis nekeičiamas).
+ */
+export async function applyRevisionAction(
+  items: { productId: string; counted: number }[]
+): Promise<RevisionResult> {
+  await requireAdmin()
+  if (!items || items.length === 0) {
+    return { ok: false, error: 'Nėra pakeitimų taikyti.' }
+  }
+  const supabase = createServerClient()
+  const stamp = new Date().toISOString().slice(0, 10)
+  let applied = 0
+  const failed: string[] = []
+  for (const it of items) {
+    if (!Number.isInteger(it.counted) || it.counted < 0) {
+      failed.push(it.productId)
+      continue
+    }
+    const { data, error } = await supabase.rpc('set_product_stock', {
+      p_product_id: it.productId,
+      p_new_stock: it.counted,
+      p_source: 'revizija',
+      p_note: `Revizija ${stamp}`,
+    })
+    if (error || (data && (data as { ok?: boolean }).ok === false)) {
+      console.error(
+        '[admin/sandelis/actions] applyRevision:',
+        it.productId,
+        error?.message ?? JSON.stringify(data)
+      )
+      failed.push(it.productId)
+    } else {
+      applied++
+    }
+  }
+  revalidatePath('/admin/sandelis')
+  revalidatePath('/admin')
+  revalidateTag('products', 'max')
+  if (failed.length > 0) {
+    return {
+      ok: false,
+      error: `Pritaikyta ${applied}, nepavyko ${failed.length}. Patikrinkite ir bandykite dar kartą (jau pritaikytos nesidubliuos).`,
+    }
+  }
+  return { ok: true, applied }
+}
+
+// ============================================
 // Įjungti/išjungti produktą (soft delete)
 // ============================================
 
