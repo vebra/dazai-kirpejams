@@ -39,9 +39,20 @@ function eur(cents: number): string {
   return (cents / 100).toFixed(2).replace('.', ',') + ' €'
 }
 
-export function NewOrderForm({ products }: { products: AdminProductListRow[] }) {
+export function NewOrderForm({
+  products,
+  vatRate,
+  freeShippingThresholdCents,
+  shippingPriceCents,
+}: {
+  products: AdminProductListRow[]
+  vatRate: number
+  freeShippingThresholdCents: number
+  shippingPriceCents: Record<Delivery, number>
+}) {
   const [pending, startTransition] = useTransition()
   const [result, setResult] = useState<CreateOrderResult | null>(null)
+  const [step, setStep] = useState<'form' | 'review'>('form')
 
   // Klientas
   const [email, setEmail] = useState('')
@@ -154,6 +165,16 @@ export function NewOrderForm({ products }: { products: AdminProductListRow[] }) 
 
   const subtotalCents = list.reduce((s, l) => s + l.priceCents * l.qty, 0)
   const totalUnits = list.reduce((s, l) => s + l.qty, 0)
+  // Pristatymas/PVM/galutinė suma — kaip skaičiuoja serveris (create_order_atomic):
+  // nemokamas pristatymas virš slenksčio; PVM IŠSKIRIAMAS iš sumos (kainos su PVM),
+  // tik jei MŪSŲ įmonė PVM mokėtoja (vatRate > 0).
+  const shippingCents =
+    subtotalCents >= freeShippingThresholdCents
+      ? 0
+      : (shippingPriceCents[delivery] ?? 0)
+  const totalCents = subtotalCents + shippingCents
+  const vatCents =
+    vatRate > 0 ? Math.round(totalCents - totalCents / (1 + vatRate)) : 0
 
   const canSubmit =
     !pending &&
@@ -233,6 +254,134 @@ export function NewOrderForm({ products }: { products: AdminProductListRow[] }) 
             className="px-4 py-2.5 bg-[#F5F5F7] border border-[#ddd] rounded-lg text-[13px] font-semibold text-brand-gray-900 hover:bg-[#e8e8ec]"
           >
             + Dar vienas
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  const DELIVERY_LABEL: Record<Delivery, string> = {
+    courier: 'Kurjeris',
+    parcel_locker: 'Paštomatas',
+    pickup: 'Atsiėmimas',
+  }
+  const LANG_LABEL: Record<Lang, string> = {
+    lt: 'Lietuvių',
+    en: 'English',
+    ru: 'Русский',
+  }
+
+  // ── Peržiūra prieš siunčiant ──
+  if (step === 'review') {
+    return (
+      <div className="space-y-5">
+        <div className="px-4 py-3 bg-amber-50 border border-amber-200 text-amber-900 rounded-lg text-sm font-medium">
+          Patikrinkite užsakymą. Paspaudus mygtuką žemiau, klientui iš karto
+          išsiųsim laišką su rekvizitais — pakeisti nebebus galima.
+        </div>
+
+        {/* Klientas */}
+        <div className="bg-white rounded-xl border border-[#eee] p-5 text-sm space-y-1">
+          <h3 className="text-sm font-bold text-brand-gray-900 mb-2">Klientas</h3>
+          <div>{[firstName, lastName].filter(Boolean).join(' ') || '—'}</div>
+          <div className="text-brand-gray-500">{email} · {phone}</div>
+          {isCompany && (
+            <div className="text-brand-gray-500">
+              Įmonė: {companyName || '—'}
+              {companyCode ? ` · į.k. ${companyCode}` : ''}
+              {vatCode ? ` · PVM ${vatCode}` : ''}
+            </div>
+          )}
+          <div className="text-brand-gray-500">Laiško kalba: {LANG_LABEL[lang]}</div>
+        </div>
+
+        {/* Prekės + suma */}
+        <div className="bg-white rounded-xl border border-[#eee] overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-[#F9F9FB] text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500">
+                <th className="px-3 py-2 text-left">Prekė</th>
+                <th className="px-3 py-2 text-center w-16">Kiekis</th>
+                <th className="px-3 py-2 text-right w-24">Kaina</th>
+                <th className="px-3 py-2 text-right w-24">Suma</th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((l) => (
+                <tr key={l.id} className="border-t border-[#eee]">
+                  <td className="px-3 py-2 text-brand-gray-900">
+                    {l.colorNumber ? `${l.colorNumber} · ` : ''}
+                    {l.name}
+                  </td>
+                  <td className="px-3 py-2 text-center">{l.qty}</td>
+                  <td className="px-3 py-2 text-right text-brand-gray-500">{eur(l.priceCents)}</td>
+                  <td className="px-3 py-2 text-right font-semibold">{eur(l.priceCents * l.qty)}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot className="border-t-2 border-[#eee] text-sm">
+              <tr>
+                <td className="px-3 py-1.5 text-brand-gray-500" colSpan={3}>Tarpinė suma</td>
+                <td className="px-3 py-1.5 text-right">{eur(subtotalCents)}</td>
+              </tr>
+              <tr>
+                <td className="px-3 py-1.5 text-brand-gray-500" colSpan={3}>
+                  Pristatymas — {DELIVERY_LABEL[delivery]}
+                  {shippingCents === 0 && subtotalCents > 0 ? ' (nemokamas)' : ''}
+                </td>
+                <td className="px-3 py-1.5 text-right">{eur(shippingCents)}</td>
+              </tr>
+              <tr className="font-bold text-brand-gray-900">
+                <td className="px-3 py-2" colSpan={3}>Iš viso (su PVM)</td>
+                <td className="px-3 py-2 text-right text-base">{eur(totalCents)}</td>
+              </tr>
+              {vatCents > 0 && (
+                <tr className="text-[12px] text-brand-gray-500">
+                  <td className="px-3 py-1.5" colSpan={3}>iš jų PVM (21%)</td>
+                  <td className="px-3 py-1.5 text-right">{eur(vatCents)}</td>
+                </tr>
+              )}
+            </tfoot>
+          </table>
+        </div>
+
+        {/* Pristatymas */}
+        <div className="bg-white rounded-xl border border-[#eee] p-5 text-sm">
+          <span className="text-brand-gray-500">Pristatymas: </span>
+          {DELIVERY_LABEL[delivery]}
+          {delivery !== 'pickup' && (
+            <span className="text-brand-gray-500">
+              {' '}— {[address, city, postal].filter(Boolean).join(', ')}
+            </span>
+          )}
+          {notes && <div className="text-brand-gray-500 mt-1">Pastaba: {notes}</div>}
+          <div className="text-brand-gray-500 mt-1">
+            Mokėjimas: banko pavedimas (klientas gaus rekvizitus el. paštu)
+          </div>
+        </div>
+
+        {result && !result.ok && (
+          <div className="px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+            {result.error}
+          </div>
+        )}
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            disabled={pending}
+            onClick={submit}
+            className="px-6 py-3 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark disabled:opacity-50"
+          >
+            {pending ? 'Siunčiama…' : 'Patvirtinti ir siųsti klientui'}
+          </button>
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => setStep('form')}
+            className="px-5 py-3 bg-[#F5F5F7] border border-[#ddd] rounded-lg font-semibold text-sm text-brand-gray-900 hover:bg-[#e8e8ec] disabled:opacity-50"
+          >
+            ← Redaguoti
           </button>
         </div>
       </div>
@@ -498,19 +647,27 @@ export function NewOrderForm({ products }: { products: AdminProductListRow[] }) 
       {/* Pateikimas */}
       <div className="bg-white rounded-xl border border-[#eee] p-5 flex items-center justify-between gap-4 flex-wrap">
         <div className="text-sm text-brand-gray-500">
-          Prekių: <strong className="text-brand-gray-900">{totalUnits}</strong> vnt. · Tarpinė suma:{' '}
-          <strong className="text-brand-gray-900">{eur(subtotalCents)}</strong>
+          Prekių: <strong className="text-brand-gray-900">{totalUnits}</strong> vnt. · Tarpinė suma{' '}
+          <strong className="text-brand-gray-900">{eur(subtotalCents)}</strong> · Pristatymas{' '}
+          <strong className="text-brand-gray-900">{eur(shippingCents)}</strong> · Iš viso{' '}
+          <strong className="text-brand-magenta">{eur(totalCents)}</strong>
+          {vatCents > 0 && (
+            <span className="text-[12px]"> (iš jų PVM {eur(vatCents)})</span>
+          )}
           <div className="text-[12px] mt-0.5">
-            Mokėjimas: banko pavedimas — klientas gaus rekvizitus el. paštu. (Pristatymas/PVM priskaičiuojami automatiškai.)
+            Toliau pamatysite pilną peržiūrą ir tik tada laiškas bus išsiųstas klientui.
           </div>
         </div>
         <button
           type="button"
           disabled={!canSubmit}
-          onClick={submit}
+          onClick={() => {
+            setResult(null)
+            setStep('review')
+          }}
           className="px-6 py-3 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark disabled:opacity-50 transition-colors"
         >
-          {pending ? 'Kuriama…' : 'Sukurti ir išsiųsti laišką'}
+          Peržiūrėti užsakymą →
         </button>
       </div>
     </div>

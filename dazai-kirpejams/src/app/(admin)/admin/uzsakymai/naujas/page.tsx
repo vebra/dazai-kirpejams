@@ -1,14 +1,25 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { requireAdmin } from '@/lib/admin/auth'
-import { getAdminProducts } from '@/lib/admin/queries'
+import { getAdminProducts, getCompanyInfo } from '@/lib/admin/queries'
+import {
+  DELIVERY_METHODS,
+  FREE_SHIPPING_THRESHOLD_CENTS,
+  vatRateFromVatCode,
+} from '@/lib/commerce/constants'
 import { NewOrderForm } from './NewOrderForm'
 
 export const metadata: Metadata = { title: 'Naujas užsakymas' }
 
 export default async function NewAdminOrderPage() {
   await requireAdmin()
-  const products = (await getAdminProducts()).filter((p) => p.isActive)
+  const [products, company] = await Promise.all([
+    getAdminProducts(),
+    getCompanyInfo().catch(() => null),
+  ])
+  const activeProducts = products.filter((p) => p.isActive)
+  // PVM tarifas pagal MŪSŲ įmonės PVM kodą (ne kliento). Nėra kodo → 0.
+  const vatRate = vatRateFromVatCode(company?.vatCode)
 
   return (
     <div className="space-y-6">
@@ -30,7 +41,16 @@ export default async function NewAdminOrderPage() {
         </Link>
       </div>
 
-      <NewOrderForm products={products} />
+      <NewOrderForm
+        products={activeProducts}
+        vatRate={vatRate}
+        freeShippingThresholdCents={FREE_SHIPPING_THRESHOLD_CENTS}
+        shippingPriceCents={{
+          courier: DELIVERY_METHODS.courier.priceCents,
+          parcel_locker: DELIVERY_METHODS.parcel_locker.priceCents,
+          pickup: DELIVERY_METHODS.pickup.priceCents,
+        }}
+      />
     </div>
   )
 }
