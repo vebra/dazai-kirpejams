@@ -20,6 +20,25 @@ import {
   getInvoicePdfBuffer,
   getInvoiceSignedUrl,
 } from '@/lib/invoices/queries'
+import {
+  createOrder,
+  type CreateOrderInput,
+  type CreateOrderResult,
+} from '@/lib/commerce/order-actions'
+
+/**
+ * Admino sukurtas užsakymas (telefonu / el. paštu užsisakiusiam klientui).
+ * Panaudoja tą patį `createOrder` (serverio kainos, banko „mokėk čia" laiškas
+ * klientui), tik be Meta CAPI evento (tai ne web konversija). Klientas gauna
+ * patvirtinimo laišką su banko rekvizitais ir suma; toliau, gavus pinigus,
+ * admin pažymi „Apmokėta" (→ sąskaita).
+ */
+export async function createAdminOrder(
+  input: CreateOrderInput
+): Promise<CreateOrderResult> {
+  await requireAdmin()
+  return createOrder(input, { skipAnalytics: true })
+}
 
 /**
  * Užsakymo administravimo Server Action'ai.
