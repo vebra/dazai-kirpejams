@@ -144,7 +144,9 @@ async function _getProducts(
     return filterMockProducts(options)
   }
 
-  let query = supabase.from('products').select('*').eq('is_active', true)
+  // products_public = view be savikainos/B2B stulpelių (migr 066). Pati
+  // products lentelė anon raktui nebepasiekiama. View jau filtruoja is_active.
+  let query = supabase.from('products_public').select('*').eq('is_active', true)
 
   // Kategorijos filtras — per slug reikia pirma gauti kategorijos id
   if (options?.categorySlug) {
@@ -259,7 +261,7 @@ async function _getProductBySlug(slug: string): Promise<Product | null> {
   }
 
   const { data, error } = await supabase
-    .from('products')
+    .from('products_public')
     .select('*')
     .eq('slug', slug)
     .eq('is_active', true)
@@ -304,7 +306,7 @@ async function _getProductVariants(group: string): Promise<Product[]> {
   }
 
   const { data, error } = await supabase
-    .from('products')
+    .from('products_public')
     .select('*')
     .eq('is_active', true)
     .eq('variant_group', group)
@@ -357,7 +359,7 @@ async function _getRelatedProducts(
   // Imam daugiau nei `limit`, nes po variantų „sulipdymo" ir grupės
   // pašalinimo eilučių sumažės.
   const { data, error } = await supabase
-    .from('products')
+    .from('products_public')
     .select('*')
     .eq('is_active', true)
     .eq('category_id', categoryId)
