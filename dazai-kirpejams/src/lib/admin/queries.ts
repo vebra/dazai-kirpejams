@@ -126,6 +126,9 @@ export type AdminProductDetail = {
 
 export async function getOverviewKpis(): Promise<OverviewKpis> {
   const supabase = await createServerSupabase()
+  // Produktų skaitymui — service role (po 067 authenticated riboto stulpelių
+  // lygio; kiti skaičiavimai — orders/b2b/newsletter — veikia per admin RLS).
+  const admin = createServerClient()
   const todayIso = startOfDayVilnius().toISOString()
 
   // Vykdom paraleliai — kiekviena užklausa nepriklauso nuo kitos
@@ -147,7 +150,7 @@ export async function getOverviewKpis(): Promise<OverviewKpis> {
       .gte('created_at', todayIso)
       .in('status', ['paid', 'processing', 'shipped', 'delivered']),
     supabase.from('orders').select('id', { count: 'exact', head: true }),
-    supabase
+    admin
       .from('products')
       .select('id', { count: 'exact', head: true })
       .eq('is_active', true),
@@ -211,7 +214,10 @@ export async function getLowStockProducts(
   threshold = 50,
   limit = 10
 ): Promise<LowStockProduct[]> {
-  const supabase = await createServerSupabase()
+  // Service role — po migr 067 authenticated rolė riboto stulpelių lygio, ir
+  // ši užklausa grąžindavo tuščią (žemo likučio widget'as visada „virš 50").
+  // Admin-only (dashboard), tad service role saugu.
+  const supabase = createServerClient()
   const { data, error } = await supabase
     .from('products')
     .select('id, slug, name_lt, sku, stock_quantity, color_number')
@@ -465,7 +471,7 @@ export async function getStockMovements(opts?: {
 
 /** Kiek produktų yra aktyvių (is_active=true). Naudojam bulk-deactivate mygtukui. */
 export async function getActiveProductsCount(): Promise<number> {
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient() // service role — žr. getLowStockProducts
   const { count, error } = await supabase
     .from('products')
     .select('id', { count: 'exact', head: true })
@@ -480,7 +486,7 @@ export async function getActiveProductsCount(): Promise<number> {
 
 /** Kiek produktų yra išjungtų (is_active=false). Naudojam bulk-activate mygtukui. */
 export async function getInactiveProductsCount(): Promise<number> {
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient() // service role — žr. getLowStockProducts
   const { count, error } = await supabase
     .from('products')
     .select('id', { count: 'exact', head: true })
