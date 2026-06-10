@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { after } from 'next/server'
 import { requireAdmin } from '@/lib/admin/auth'
 import { createServerClient } from '@/lib/supabase/server'
 import { ORDER_STATUSES, type OrderStatus } from '@/lib/admin/queries'
@@ -161,11 +162,13 @@ export async function updateOrderStatusAction(
     process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
     'https://www.dazaikirpejams.lt'
 
-  // Kai užsakymas pažymimas „paid" — auto-generuojam PVM sąskaitą faktūrą ir
-  // išsiunčiam ją klientui email'u kaip PDF priedą.
-  // Idempotentiška: jei sąskaita jau egzistuoja, grąžina esamą be pakeitimų.
-  // Veikia visiems mokėjimo būdams (Paysera callback / Stripe webhook /
-  // rankinis bank_transfer patvirtinimas).
+  // Sąskaita + jos el. laiškas vykdomi FONE (after()) — statusas pažymimas ir
+  // puslapis grįžta IŠKART, o lėtas react-pdf generavimas (Hobby plane šaltas
+  // startas ~2-3s) nebeblokuoja admino. Idempotentiška; veikia visiems mokėjimo
+  // būdams. Jei generavimas nepavyktų — admin'as gali rankiniu būdu spausti
+  // „Išrašyti sąskaitą". (Sąskaita atsiranda po keleto sekundžių — gali tekti
+  // atnaujinti puslapį.)
+  after(async () => {
   if (status === 'paid') {
     const result = await generateInvoiceForOrder(id)
     if (!result.ok) {
@@ -213,6 +216,7 @@ export async function updateOrderStatusAction(
       }
     }
   }
+  })
 
   // Siunčiam status change email'ą klientui (shipped/cancelled/delivered).
   // „Paid" turi savo atskirą email'ą su PDF priedu (žr. aukščiau).
