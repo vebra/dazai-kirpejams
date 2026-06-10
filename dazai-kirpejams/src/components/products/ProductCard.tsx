@@ -12,6 +12,7 @@ import {
 import { formatPrice, langPrefix } from '@/lib/utils'
 import type { Locale } from '@/i18n/config'
 import { useVerification } from '@/components/auth/VerificationProvider'
+import { useProductPrice } from '@/components/products/ProductPricesProvider'
 import { AddToCartButton } from '@/components/commerce/AddToCartButton'
 
 type ProductCardProps = {
@@ -35,8 +36,31 @@ export function ProductCard({
   const name = getProductName(product, lang)
   const href = `${langPrefix(lang)}/produktai/${categorySlug}/${product.slug}`
   const primaryImage = product.image_urls?.[0]
-  const onSale = isOnSale(product)
-  const effectiveCents = getEffectivePriceCents(product)
+
+  // Kaina: statiniame puslapyje (su ProductPricesProvider) ateina iš naršyklės
+  // fetch'o; dinaminiame (be provider'io) — iš serverio prop'o (fallback).
+  const { price: clientPrice, isLoading: priceLoading, hasProvider } =
+    useProductPrice(product.id)
+  const priceData = hasProvider
+    ? clientPrice
+    : {
+        priceCents: product.price_cents,
+        salePriceCents: product.sale_price_cents,
+      }
+  const onSale = priceData
+    ? isOnSale({
+        price_cents: priceData.priceCents,
+        sale_price_cents: priceData.salePriceCents,
+      })
+    : false
+  const effectiveCents = priceData
+    ? getEffectivePriceCents({
+        price_cents: priceData.priceCents,
+        sale_price_cents: priceData.salePriceCents,
+      })
+    : 0
+  // Patvirtintas, bet kaina dar kraunasi (statinis puslapis, fetch vyksta).
+  const priceLoadingNow = isVerified && hasProvider && !priceData && priceLoading
   // Variantų prekė (pvz. pirštinių dydžiai) — kortelėje neleidžiam greito
   // pridėjimo, nes klientas pirma turi pasirinkti dydį produkto puslapyje.
   const isVariant = Boolean(product.variant_group)
@@ -135,12 +159,18 @@ export function ProductCard({
           </div>
         )}
 
-        {isVerified ? (
+        {isVerified && priceLoadingNow ? (
+          /* Kaina kraunasi (statinis puslapis, fetch vyksta) — skeleton */
+          <div className="flex items-center justify-between" aria-hidden>
+            <div className="h-[1.15rem] w-20 rounded bg-brand-gray-100 animate-pulse" />
+            <div className="h-9 w-9 rounded-lg bg-brand-gray-100 animate-pulse" />
+          </div>
+        ) : isVerified && priceData ? (
           <div className="flex items-center justify-between">
             <div className="flex items-baseline gap-2">
               {onSale && (
                 <span className="text-[0.9rem] text-brand-gray-500 line-through">
-                  {formatPrice(product.price_cents / 100, lang)}
+                  {formatPrice(priceData.priceCents / 100, lang)}
                 </span>
               )}
               <span

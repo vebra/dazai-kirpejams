@@ -291,6 +291,18 @@ export const getProductBySlug = async (
 }
 
 /**
+ * Statinis variantas: kainos VISADA nukerpamos (kaip svečiui), be `cookies()`.
+ * Naudoti statiniuose/ISR puslapiuose — kaina į HTML nepatenka; patvirtintas
+ * profesionalas ją pasiima naršyklėje (ProductPricesProvider → get_product_prices).
+ */
+export const getProductStaticBySlug = async (
+  slug: string
+): Promise<Product | null> => {
+  const product = await getProductBySlugForBuild(slug)
+  return product ? stripProductPricing(product) : null
+}
+
+/**
  * Visi to paties `variant_group` produktai (dydžiai), surikiuoti pagal
  * `variant_sort`. Naudojama produkto puslapyje dydžio pasirinkimui. Kainos
  * praeina per tuos pačius vartus — svečiui kainos nukerpamos, bet likučiai
@@ -328,6 +340,18 @@ export const getProductVariants = async (
     { revalidate: 60, tags: ['products'] }
   )()
   return gateProducts(variants)
+}
+
+/** Statinis variantas — kainos nukerptos (žr. getProductStaticBySlug). */
+export const getProductVariantsStatic = async (
+  group: string
+): Promise<Product[]> => {
+  const variants = await unstable_cache(
+    () => _getProductVariants(group),
+    ['product-variants', group],
+    { revalidate: 60, tags: ['products'] }
+  )()
+  return variants.map(stripProductPricing)
 }
 
 async function _getRelatedProducts(
@@ -384,6 +408,20 @@ export const getRelatedProducts = async (
     { revalidate: 60, tags: ['products'] }
   )()
   return gateProducts(related)
+}
+
+/** Statinis variantas — kainos nukerptos (žr. getProductStaticBySlug). */
+export const getRelatedProductsStatic = async (
+  product: Product,
+  limit = 4
+): Promise<Product[]> => {
+  const group = product.variant_group ?? null
+  const related = await unstable_cache(
+    () => _getRelatedProducts(product.id, product.category_id, limit, group),
+    ['related', product.id, String(limit), group ?? ''],
+    { revalidate: 60, tags: ['products'] }
+  )()
+  return related.map(stripProductPricing)
 }
 
 // ============================================

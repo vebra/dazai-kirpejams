@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useVerification } from '@/components/auth/VerificationProvider'
+import { useProductPrice } from '@/components/products/ProductPricesProvider'
 import { AddToCartButton } from '@/components/commerce/AddToCartButton'
 import { formatPrice } from '@/lib/utils'
 import type { CartItem } from '@/lib/commerce/cart-store'
@@ -18,7 +19,7 @@ import type { Locale } from '@/i18n/config'
 export function StickyBuyBar({
   lang,
   langPrefixStr,
-  price,
+  price: price_prop,
   cartItem,
   labels,
 }: {
@@ -33,8 +34,24 @@ export function StickyBuyBar({
     priceOnlyPro: string
   }
 }) {
-  const { isVerified, isLoggedIn } = useVerification()
+  const { isVerified, isLoggedIn, isLoading: verifLoading } = useVerification()
   const [show, setShow] = useState(false)
+
+  // Kaina: statiniame puslapyje iš naršyklės; be provider'io — iš prop'o.
+  const { price: clientPrice, hasProvider } = useProductPrice(cartItem.productId)
+  let price = price_prop
+  let resolvedCartItem = cartItem
+  let priceReady = !hasProvider
+  if (hasProvider && clientPrice) {
+    const onSale =
+      clientPrice.salePriceCents != null &&
+      clientPrice.salePriceCents > 0 &&
+      clientPrice.salePriceCents < clientPrice.priceCents
+    const effCents = onSale ? clientPrice.salePriceCents! : clientPrice.priceCents
+    price = effCents / 100
+    resolvedCartItem = { ...cartItem, priceCents: effCents }
+    priceReady = true
+  }
 
   useEffect(() => {
     const anchor = document.getElementById('buybar-anchor')
@@ -56,8 +73,12 @@ export function StickyBuyBar({
     return () => document.body.classList.remove('dk-buybar-open')
   }, [show])
 
+  // Kol verifikacija kraunasi — juostos nerodom (kad nemirksėtų „prisijungti").
+  if (verifLoading) return null
   // Prisijungęs, bet dar nepatvirtintas — juostos nerodom.
   if (isLoggedIn && !isVerified) return null
+  // Patvirtintas, bet kaina dar fetch'inama — juostos nerodom, kol nebus.
+  if (isVerified && !priceReady) return null
 
   return (
     <div
@@ -81,7 +102,7 @@ export function StickyBuyBar({
               className="ml-auto shrink-0 !px-6 !py-3 !rounded-lg !text-[0.95rem]"
               label={labels.addToCart}
               labelAdded={labels.addedToCart}
-              item={cartItem}
+              item={resolvedCartItem}
             />
           </>
         ) : (

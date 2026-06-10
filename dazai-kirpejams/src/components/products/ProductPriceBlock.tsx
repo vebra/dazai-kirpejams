@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { useVerification } from '@/components/auth/VerificationProvider'
+import { useProductPrice } from '@/components/products/ProductPricesProvider'
 import { AddToCartButton } from '@/components/commerce/AddToCartButton'
 import { formatPrice } from '@/lib/utils'
 import {
@@ -59,15 +60,63 @@ type Props = {
 export function ProductPriceBlock({
   lang,
   langPrefixStr,
-  price,
-  comparePrice,
-  savings,
-  pricePerMl,
+  price: price_prop,
+  comparePrice: comparePrice_prop,
+  savings: savings_prop,
+  pricePerMl: pricePerMl_prop,
   volumeMl,
   cartItem,
   labels,
 }: Props) {
-  const { isVerified, isLoggedIn, status } = useVerification()
+  const { isVerified, isLoggedIn, status, isLoading: verifLoading } =
+    useVerification()
+
+  // Kaina: statiniame puslapyje (su ProductPricesProvider) ateina iš naršyklės;
+  // be provider'io — iš serverio prop'ų (fallback). Iš užkrautos kainos
+  // perskaičiuojam efektyvią kainą, perbraukimą, sutaupymą ir kainą/ml.
+  const {
+    price: clientPrice,
+    isLoading: priceFetchLoading,
+    hasProvider,
+  } = useProductPrice(cartItem.productId)
+
+  let price = price_prop
+  let comparePrice = comparePrice_prop
+  let savings = savings_prop
+  let pricePerMl = pricePerMl_prop
+  let resolvedCartItem = cartItem
+  let priceReady = !hasProvider // be provider'io prop'ai laikomi paruoštais
+
+  if (hasProvider) {
+    if (clientPrice) {
+      const onSale =
+        clientPrice.salePriceCents != null &&
+        clientPrice.salePriceCents > 0 &&
+        clientPrice.salePriceCents < clientPrice.priceCents
+      const effCents = onSale ? clientPrice.salePriceCents! : clientPrice.priceCents
+      price = effCents / 100
+      comparePrice = onSale
+        ? clientPrice.priceCents / 100
+        : clientPrice.comparePriceCents
+          ? clientPrice.comparePriceCents / 100
+          : null
+      savings = comparePrice ? comparePrice - price : null
+      pricePerMl = volumeMl ? (effCents / 100 / volumeMl).toFixed(3) : null
+      resolvedCartItem = { ...cartItem, priceCents: effCents }
+      priceReady = true
+    } else {
+      price = 0
+      comparePrice = null
+      savings = null
+      pricePerMl = null
+      priceReady = false
+    }
+  }
+
+  // Kol verifikacija dar kraunasi ARBA patvirtintam kaina dar fetch'inama —
+  // rodom neutralų skeletoną (kad prisijungusiam pro nemirksėtų „prisijunkite").
+  const showPriceSkeleton =
+    verifLoading || (isVerified && hasProvider && !priceReady && priceFetchLoading)
 
   // ViewContent — visada, nepriklausomai nuo user type. Meta optimizuoja
   // reklamą ant peržiūrų, todėl svarbu siųsti ir guest'ams (be price) ir
@@ -139,7 +188,11 @@ export function ProductPriceBlock({
       )}
 
       {/* Price */}
-      {isVerified ? (
+      {showPriceSkeleton ? (
+        <div className="flex items-baseline gap-3 mb-5" aria-hidden>
+          <div className="h-9 w-40 rounded-lg bg-brand-gray-100 animate-pulse" />
+        </div>
+      ) : isVerified && priceReady ? (
         <div className="flex items-baseline flex-wrap gap-3 mb-5">
           {comparePrice && (
             <span className="text-[1.1rem] text-brand-gray-500 line-through">
@@ -229,14 +282,18 @@ export function ProductPriceBlock({
       )}
 
       {/* CTA */}
-      {isVerified ? (
+      {showPriceSkeleton ? (
+        <div className="flex flex-col sm:flex-row gap-3 mb-8" aria-hidden>
+          <div className="flex-1 h-14 rounded-lg bg-brand-gray-100 animate-pulse" />
+        </div>
+      ) : isVerified && priceReady ? (
         <div className="flex flex-col sm:flex-row gap-3 mb-8">
           <AddToCartButton
             variant="large"
             className="flex-1 !px-10 !py-[18px] !rounded-lg !text-[1.05rem]"
             label={labels.addToCart}
             labelAdded={labels.addedToCart}
-            item={cartItem}
+            item={resolvedCartItem}
           />
           <Link
             href={`${langPrefixStr}/salonams`}
