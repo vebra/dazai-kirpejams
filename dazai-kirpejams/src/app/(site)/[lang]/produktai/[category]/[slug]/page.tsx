@@ -1,6 +1,9 @@
-// Kainos tik patvirtintiems (server-side vartai naudoja cookies()) →
-// per-request render. DB užklausos cache'inamos unstable_cache (60s).
-export const dynamic = 'force-dynamic'
+// STATINIS / ISR (revalidate 60s). Kaina į HTML NEpatenka — puslapis
+// renderinamas kaip svečiui (getProduct*Static → kainos nukirptos), tad
+// nereikia cookies() ir maršrutas nebėra force-dynamic. Patvirtintas
+// profesionalas kainas pasiima naršyklėje (ProductPricesProvider →
+// get_product_prices RPC). Anonimas/Google gauna greitą CDN puslapį be kainų.
+export const revalidate = 60
 
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
@@ -8,13 +11,14 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import {
-  getProductBySlug,
-  getProductVariants,
-  getRelatedProducts,
+  getProductStaticBySlug,
+  getProductVariantsStatic,
+  getRelatedProductsStatic,
   getCategoryBySlug,
   getProductsForBuild,
   getCategories,
 } from '@/lib/data/queries'
+import { ProductPricesProvider } from '@/components/products/ProductPricesProvider'
 import {
   getProductName,
   getProductDescription,
@@ -23,7 +27,7 @@ import {
   isOnSale,
   getEffectivePriceCents,
 } from '@/lib/types'
-import { formatPrice, langPrefix } from '@/lib/utils'
+import { langPrefix } from '@/lib/utils'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
 import { ProductPriceBlock } from '@/components/products/ProductPriceBlock'
@@ -31,7 +35,7 @@ import { StickyBuyBar } from '@/components/products/StickyBuyBar'
 import { VariantPurchase, type VariantVM } from '@/components/products/VariantPurchase'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { productSchema, breadcrumbSchema } from '@/lib/schema'
-import { buildCanonicalUrl, buildLanguageAlternates, SITE_URL } from '@/lib/seo'
+import { buildCanonicalUrl, buildLanguageAlternates } from '@/lib/seo'
 import { locales } from '@/i18n/config'
 
 export async function generateMetadata({
@@ -40,7 +44,7 @@ export async function generateMetadata({
   const { lang, category: categorySlug, slug } = await params
   if (!hasLocale(lang)) return {}
 
-  const product = await getProductBySlug(slug)
+  const product = await getProductStaticBySlug(slug)
   const category = await getCategoryBySlug(categorySlug)
   if (!product || !category) return {}
 
@@ -104,7 +108,7 @@ export default async function ProductPage({
   const { lang, category: categorySlug, slug } = await params
   if (!hasLocale(lang)) notFound()
 
-  const product = await getProductBySlug(slug)
+  const product = await getProductStaticBySlug(slug)
   if (!product) notFound()
 
   const category = await getCategoryBySlug(categorySlug)
@@ -112,7 +116,7 @@ export default async function ProductPage({
 
   const dict = await getDictionary(lang)
   const t = dict.productPage
-  const relatedProducts = await getRelatedProducts(product, 4)
+  const relatedProducts = await getRelatedProductsStatic(product, 4)
   // Verifikacija tikrinama kliento pusėje per VerificationProvider kontekstą
 
   const name = getProductName(product, lang)
@@ -167,7 +171,7 @@ export default async function ProductPage({
   // Variantai (dydžiai). Kiekvienas dydis — atskira prekė su savo likučiu;
   // jei jų yra, vietoj įprasto pirkimo bloko rodom dydžio pasirinkiklį.
   const variantProducts = product.variant_group
-    ? await getProductVariants(product.variant_group)
+    ? await getProductVariantsStatic(product.variant_group)
     : []
   const variants: VariantVM[] = variantProducts.map((vp) => ({
     id: vp.id,
@@ -210,8 +214,18 @@ export default async function ProductPage({
     goToAccount: t.goToAccount,
   }
 
+  // Visų matomų prekių ID — provider'is vienu RPC kvietimu paims jų kainas
+  // patvirtintam profesionalui (pati prekė + dydžiai + susiję produktai).
+  const priceIds = Array.from(
+    new Set([
+      product.id,
+      ...variantProducts.map((v) => v.id),
+      ...relatedProducts.map((p) => p.id),
+    ])
+  )
+
   return (
-    <>
+    <ProductPricesProvider ids={priceIds}>
       <JsonLd data={productJsonLd} />
       <JsonLd data={breadcrumbJsonLd} />
 
@@ -545,7 +559,7 @@ export default async function ProductPage({
           }}
         />
       )}
-    </>
+    </ProductPricesProvider>
   )
 }
 
