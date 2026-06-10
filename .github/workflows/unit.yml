@@ -7,8 +7,8 @@ on:
 
 jobs:
   test:
-    name: Typecheck + Vitest
-    timeout-minutes: 10
+    name: Build (typecheck) + Vitest
+    timeout-minutes: 15
     runs-on: ubuntu-latest
 
     defaults:
@@ -28,8 +28,19 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      - name: Typecheck
-        run: npm run typecheck
+      # `next build` ir sukompiliuoja TS (pagauna tipų klaidas), ir patikrina,
+      # kad app'as apskritai susibuildina. Standalone `tsc` Next 15 projekte
+      # neveiktų — puslapiai naudoja build'o metu generuojamus maršrutų tipus
+      # (PageProps iš .next/types), kurių švarioje CI aplinkoje dar nėra.
+      # Realūs Supabase raktai būtini, nes kai kurie puslapiai prerender'inami
+      # ir kreipiasi į DB (su placeholder env build lūžta ties prerender).
+      - name: Build (includes typecheck)
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
 
       - name: Run unit tests
         run: npm test
