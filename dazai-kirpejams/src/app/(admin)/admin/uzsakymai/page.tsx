@@ -283,6 +283,16 @@ export default async function AdminOrdersPage({
                             B2B
                           </span>
                         )}
+                        {o.source === 'admin' && (
+                          <span className="flex-shrink-0 inline-flex items-center px-1.5 py-0.5 rounded bg-brand-magenta/10 text-brand-magenta border border-brand-magenta/30 text-[10px] font-bold">
+                            Admino
+                          </span>
+                        )}
+                        {o.source === 'rep' && (
+                          <span className="flex-shrink-0 inline-flex items-center px-1.5 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200 text-[10px] font-bold">
+                            Vadybininkė
+                          </span>
+                        )}
                       </div>
                     </td>
                     <td className="px-4 py-3 text-brand-gray-500 text-[13px]">

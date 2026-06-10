@@ -561,6 +561,8 @@ export type AdminOrderListRow = {
   deliveryMethod: string
   isB2b: boolean
   createdAt: string
+  /** Kas suformavo: viešas klientas / admin / vadybininkė (rep). */
+  source: 'public' | 'admin' | 'rep'
 }
 
 export type AdminOrderListOptions = {
@@ -580,6 +582,7 @@ export async function getAdminOrders(
     .select(
       `id, order_number, email, first_name, last_name, company_name,
        total_cents, status, payment_method, delivery_method, created_at,
+       placed_by, approval_status,
        order_items(id)`
     )
     .order('created_at', { ascending: false })
@@ -634,6 +637,13 @@ export async function getAdminOrders(
       deliveryMethod: row.delivery_method,
       isB2b: Boolean(row.company_name),
       createdAt: row.created_at,
+      // placed_by tuščias → viešas; su approval_status → rep (patvirtintas);
+      // su placed_by, bet be approval_status → admino suformuotas.
+      source: !row.placed_by
+        ? 'public'
+        : row.approval_status
+          ? 'rep'
+          : 'admin',
     }
   })
 }

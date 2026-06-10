@@ -36,8 +36,23 @@ import {
 export async function createAdminOrder(
   input: CreateOrderInput
 ): Promise<CreateOrderResult> {
-  await requireAdmin()
-  return createOrder(input, { skipAnalytics: true })
+  const admin = await requireAdmin()
+  const res = await createOrder(input, { skipAnalytics: true })
+  if (res.ok) {
+    // Pažymim, kad užsakymą suformavo admin (placed_by = admino id). Sąraše tai
+    // atskiria nuo viešų klientų užsakymų. approval_status lieka NULL — taip
+    // skiriasi nuo vadybininkės (rep) užsakymų, kurie turi approval ciklą.
+    try {
+      const supabase = createServerClient()
+      await supabase
+        .from('orders')
+        .update({ placed_by: admin.id })
+        .eq('order_number', res.orderNumber)
+    } catch (e) {
+      console.error('[admin/uzsakymai/actions] createAdminOrder mark placed_by:', e)
+    }
+  }
+  return res
 }
 
 /**
