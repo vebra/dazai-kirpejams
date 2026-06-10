@@ -81,7 +81,10 @@ function generateOrderNumber(): string {
  * (kad confirmation puslapis veiktų net be DB) ir redirect'ina į patvirtinimą.
  */
 export async function createOrder(
-  input: CreateOrderInput
+  input: CreateOrderInput,
+  // Admino sukurtam užsakymui (telefonu/el. paštu) NEsiunčiam Meta CAPI
+  // „Purchase" evento — tai ne web konversija, kitaip terštų reklamos duomenis.
+  opts?: { skipAnalytics?: boolean }
 ): Promise<CreateOrderResult> {
   const errs = (await getDictionary(input.locale)).checkout.errors
 
@@ -445,7 +448,7 @@ export async function createOrder(
   // klaidą NEAPGAUBTAS — visa funkcija krenta PO commit'o, klientas mato
   // klaidą, krepšelis neišvalomas, ir pakartotinis bandymas sukuria
   // dublikatą. Todėl, kaip ir el. laiškai, tai non-blocking.
-  try {
+  if (!opts?.skipAnalytics) try {
     await sendMetaCapiEvent({
       eventName: 'Purchase',
       eventId: orderNumber,
