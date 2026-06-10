@@ -259,6 +259,12 @@ export async function updateOrderStatusAction(
       })
     } catch (emailErr) {
       console.error('[admin/uzsakymai/actions] Status email failed:', emailErr)
+      // Klientas liks be būsenos pranešimo (shipped/delivered/cancelled) —
+      // turim apie tai sužinoti (kaip ir kiti laiškai šiame faile).
+      Sentry.captureException(emailErr, {
+        tags: { area: 'order-status-email' },
+        extra: { orderId: id, status },
+      })
     }
   }
 

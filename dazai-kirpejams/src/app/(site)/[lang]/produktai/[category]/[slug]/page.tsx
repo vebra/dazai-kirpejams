@@ -197,6 +197,7 @@ export default async function ProductPage({
     pricePerMl: t.pricePerMl,
     priceOnlyPro: t.priceOnlyPro,
     loginToSeePrice: t.loginToSeePrice,
+    verifyNote: t.verifyNote,
     login: t.login,
     register: t.register,
     registerPro: t.registerPro,
@@ -308,7 +309,10 @@ export default async function ProductPage({
             {/* Details */}
             <div>
               <div className="text-[0.78rem] font-semibold uppercase tracking-[2px] text-brand-magenta mb-3">
-                Color SHOCK • RosaNera Cosmetics
+                {product.info_brand?.trim() ||
+                  (categorySlug === 'dazai'
+                    ? 'Color SHOCK'
+                    : 'RosaNera Cosmetic')}
               </div>
               <h1 className="text-[clamp(1.75rem,3.5vw,2.5rem)] font-bold text-brand-gray-900 mb-4 leading-[1.2]">
                 {name}

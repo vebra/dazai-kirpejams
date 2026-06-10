@@ -39,6 +39,7 @@ type Props = {
     pricePerMl: string
     priceOnlyPro: string
     loginToSeePrice: string
+    verifyNote: string
     login: string
     register: string
     registerPro: string
@@ -259,8 +260,11 @@ export function ProductPriceBlock({
           <p className="text-[0.95rem] text-brand-gray-900 font-semibold mb-1.5">
             {labels.priceOnlyPro}
           </p>
-          <p className="text-[0.88rem] text-brand-gray-500 mb-4 leading-[1.5]">
+          <p className="text-[0.88rem] text-brand-gray-500 mb-2 leading-[1.5]">
             {labels.loginToSeePrice}
+          </p>
+          <p className="text-[0.82rem] text-brand-gray-500 mb-4 flex items-center gap-1.5">
+            <span aria-hidden>⏱</span> {labels.verifyNote}
           </p>
           <div className="flex flex-col sm:flex-row gap-2.5">
             <Link

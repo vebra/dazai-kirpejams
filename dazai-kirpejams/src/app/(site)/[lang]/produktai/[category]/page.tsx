@@ -99,9 +99,12 @@ export default async function CategoryPage({
   const categoryName = getCategoryName(category, lang)
   const categoryDescription = getCategoryDescription(category, lang)
 
-  const minPrice = products.length
-    ? Math.min(...products.map((p) => p.price_cents / 100))
-    : 7.9
+  // Svečiui kainos nukirptos (0) — imam tik teigiamas; jei nėra nė vienos
+  // (anon), rodom kanoninę „nuo" kainą 7,90 € vietoj klaidingo „€0.00".
+  const positivePrices = products
+    .map((p) => p.price_cents / 100)
+    .filter((p) => p > 0)
+  const minPrice = positivePrices.length ? Math.min(...positivePrices) : 7.9
 
   return (
     <>

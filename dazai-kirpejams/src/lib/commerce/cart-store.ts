@@ -28,6 +28,8 @@ type CartState = {
   addItem: (item: Omit<CartItem, 'quantity'>, quantity?: number) => void
   removeItem: (productId: string) => void
   updateQuantity: (productId: string, quantity: number) => void
+  /** Atnaujina krepšelio kainas iš serverio (productId → efektyvi kaina centais). */
+  refreshPrices: (priceMap: Record<string, number>) => void
   clear: () => void
   // Computed helper'iai (funkcijos, ne selektoriai, kad nereikėtų re-render'inti)
   getTotalItems: () => number
@@ -71,6 +73,16 @@ export const useCartStore = create<CartState>()(
         set((state) => ({
           items: state.items.map((i) =>
             i.productId === productId ? { ...i, quantity } : i
+          ),
+        }))
+      },
+
+      refreshPrices: (priceMap) => {
+        set((state) => ({
+          items: state.items.map((i) =>
+            priceMap[i.productId] != null
+              ? { ...i, priceCents: priceMap[i.productId] }
+              : i
           ),
         }))
       },

@@ -40,9 +40,11 @@ export default async function ColorPalettePage({
     getProducts({ categorySlug: 'dazai', sortBy: 'number' }),
     getDictionary(lang),
   ])
-  const minPrice = products.length
-    ? Math.min(...products.map((p) => p.price_cents / 100))
-    : 7.9
+  // Svečiui kainos nukirptos (0) — tik teigiamos; anon rodom kanoninę 7,90 €.
+  const positivePrices = products
+    .map((p) => p.price_cents / 100)
+    .filter((p) => p > 0)
+  const minPrice = positivePrices.length ? Math.min(...positivePrices) : 7.9
 
   return (
     <>
