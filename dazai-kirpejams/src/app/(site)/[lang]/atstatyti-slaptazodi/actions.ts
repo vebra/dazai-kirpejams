@@ -49,6 +49,7 @@ export async function requestPasswordResetAction(
     action: 'password_reset',
     windowSeconds: 3600,
     max: 5,
+    failClosed: true,
   })
   if (!rl.allowed) {
     // Tylus sėkmės atsakas — neleidžia atakuotojui suprasti, kad pasiekė

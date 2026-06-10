@@ -18,7 +18,7 @@ export async function loginAction(
   }
   const { email, password } = parsed.data
 
-  const rl = await checkRateLimit({ action: 'rep-login', windowSeconds: 600, max: 5 })
+  const rl = await checkRateLimit({ action: 'rep-login', windowSeconds: 600, max: 5, failClosed: true })
   if (!rl.allowed) {
     return { error: 'Per daug bandymų. Pabandykite po kelių minučių.' }
   }

@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
+import { ProductPricesProvider } from '@/components/products/ProductPricesProvider'
 import { StaggerReveal } from '@/components/ui/StaggerReveal'
-import { getProducts, getCategories } from '@/lib/data/queries'
+import { getProductsStatic, getCategories } from '@/lib/data/queries'
 import type { Locale } from '@/i18n/config'
 import { langPrefix } from '@/lib/utils'
 
@@ -20,13 +21,14 @@ type FeaturedProductsProps = {
  */
 export async function FeaturedProducts({ lang, dict }: FeaturedProductsProps) {
   const [products, categories] = await Promise.all([
-    getProducts({ featured: true, limit: 4 }),
+    getProductsStatic({ featured: true, limit: 4 }),
     getCategories(),
   ])
 
   if (products.length === 0) return null
 
   const categoryById = new Map(categories.map((c) => [c.id, c.slug]))
+  const priceIds = products.map((p) => p.id)
 
   return (
     <section className="py-16 lg:py-20 bg-white">
@@ -48,20 +50,22 @@ export async function FeaturedProducts({ lang, dict }: FeaturedProductsProps) {
           </Link>
         </div>
 
-        <StaggerReveal className="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-6 px-6 py-2 scroll-pl-6 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible lg:mx-0 lg:px-0 lg:py-0 [&>*]:snap-start [&>*]:shrink-0 [&>*]:w-[62%] sm:[&>*]:w-[42%] lg:[&>*]:w-auto">
-          {products.map((product) => {
-            const categorySlug = categoryById.get(product.category_id) || 'dazai'
-            return (
-              <ProductCard
-                key={product.id}
-                product={product}
-                lang={lang}
-                categorySlug={categorySlug}
-                dict={dict}
-              />
-            )
-          })}
-        </StaggerReveal>
+        <ProductPricesProvider ids={priceIds}>
+          <StaggerReveal className="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar -mx-6 px-6 py-2 scroll-pl-6 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible lg:mx-0 lg:px-0 lg:py-0 [&>*]:snap-start [&>*]:shrink-0 [&>*]:w-[62%] sm:[&>*]:w-[42%] lg:[&>*]:w-auto">
+            {products.map((product) => {
+              const categorySlug = categoryById.get(product.category_id) || 'dazai'
+              return (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  lang={lang}
+                  categorySlug={categorySlug}
+                  dict={dict}
+                />
+              )
+            })}
+          </StaggerReveal>
+        </ProductPricesProvider>
       </Container>
     </section>
   )

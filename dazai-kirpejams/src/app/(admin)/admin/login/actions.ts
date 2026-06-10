@@ -39,6 +39,7 @@ export async function loginAction(
     action: 'admin-login',
     windowSeconds: 600,
     max: 5,
+    failClosed: true,
   })
   if (!rl.allowed) {
     return {

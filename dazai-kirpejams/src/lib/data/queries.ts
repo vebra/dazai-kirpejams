@@ -253,6 +253,18 @@ export const getProducts = async (
   return gateProducts(products)
 }
 
+/**
+ * Statinis variantas listingams (Fazė 2): kainos VISADA nukerptos, be cookies()
+ * → puslapis gali būti statinis/ISR. Patvirtinti profesionalai kainas pasiima
+ * naršyklėje (ProductPricesProvider). Žr. getProductStaticBySlug.
+ */
+export const getProductsStatic = async (
+  options?: GetProductsOptions
+): Promise<Product[]> => {
+  const products = await getProductsForBuild(options)
+  return products.map(stripProductPricing)
+}
+
 async function _getProductBySlug(slug: string): Promise<Product | null> {
   const supabase = getSupabase()
 

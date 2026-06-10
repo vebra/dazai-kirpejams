@@ -42,6 +42,7 @@ export async function loginAction(
     action: 'login',
     windowSeconds: 600,
     max: 5,
+    failClosed: true,
   })
   if (!rl.allowed) {
     return { error: errors.loginGeneric }
