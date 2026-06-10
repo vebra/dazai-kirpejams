@@ -1,5 +1,6 @@
 import 'server-only'
 import { createServerSupabase } from '@/lib/supabase/ssr'
+import { createServerClient } from '@/lib/supabase/server'
 import { DYE_CATEGORIES, type DyeCategoryKey } from '@/lib/data/dye-categories'
 import type { PendingRepOrder } from './rep-orders-shared'
 
@@ -250,7 +251,9 @@ export type AdminProductListOptions = {
 export async function getAdminProducts(
   options: AdminProductListOptions = {}
 ): Promise<AdminProductListRow[]> {
-  const supabase = await createServerSupabase()
+  // Service role — renkasi cost_price_cents; po migr 067 authenticated rolė
+  // jo neturi. Saugu: admin-only (gating per requireAdmin / (admin) layout).
+  const supabase = createServerClient()
 
   let query = supabase
     .from('products')
@@ -780,7 +783,8 @@ export async function getAdminOrderById(
 export async function getAdminProductById(
   id: string
 ): Promise<AdminProductDetail | null> {
-  const supabase = await createServerSupabase()
+  // Service role — select('*') apima cost/b2b, kurių authenticated po 067 neturi.
+  const supabase = createServerClient()
   const { data, error } = await supabase
     .from('products')
     .select('*')
