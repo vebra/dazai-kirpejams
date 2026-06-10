@@ -50,11 +50,12 @@ const PALETTE = {
 function createStyles(accent: string) {
   return StyleSheet.create({
   page: {
-    padding: 40,
+    paddingVertical: 32,
+    paddingHorizontal: 40,
     fontSize: 9,
     fontFamily: 'Inter',
     color: PALETTE.text,
-    lineHeight: 1.4,
+    lineHeight: 1.35,
   },
 
   // Header
@@ -62,8 +63,8 @@ function createStyles(accent: string) {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 30,
-    paddingBottom: 20,
+    marginBottom: 14,
+    paddingBottom: 12,
     borderBottom: `2pt solid ${accent}`,
   },
   logoSection: {
@@ -108,7 +109,7 @@ function createStyles(accent: string) {
   parties: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 30,
+    marginBottom: 14,
     gap: 20,
   },
   party: {
@@ -140,12 +141,12 @@ function createStyles(accent: string) {
 
   // Items table
   tableWrap: {
-    marginBottom: 20,
+    marginBottom: 12,
   },
   tableHeader: {
     flexDirection: 'row',
     backgroundColor: PALETTE.lightBg,
-    paddingVertical: 8,
+    paddingVertical: 6,
     paddingHorizontal: 6,
     borderBottom: `1pt solid ${PALETTE.border}`,
   },
@@ -158,7 +159,7 @@ function createStyles(accent: string) {
   },
   tableRow: {
     flexDirection: 'row',
-    paddingVertical: 8,
+    paddingVertical: 5,
     paddingHorizontal: 6,
     borderBottom: `0.5pt solid ${PALETTE.border}`,
   },
@@ -177,7 +178,7 @@ function createStyles(accent: string) {
   totalsWrap: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginBottom: 30,
+    marginBottom: 12,
   },
   totalsBox: {
     width: 240,
@@ -185,7 +186,7 @@ function createStyles(accent: string) {
   totalsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 4,
+    paddingVertical: 3,
   },
   totalsLabel: {
     fontSize: 9,
@@ -203,7 +204,7 @@ function createStyles(accent: string) {
   grandTotalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 8,
+    paddingVertical: 6,
     backgroundColor: PALETTE.lightBg,
     paddingHorizontal: 10,
     marginTop: 4,
@@ -222,8 +223,8 @@ function createStyles(accent: string) {
   // Payment + notes
   paymentBox: {
     backgroundColor: PALETTE.lightBg,
-    padding: 12,
-    marginBottom: 12,
+    padding: 9,
+    marginBottom: 8,
     borderLeft: `3pt solid ${accent}`,
   },
   paymentTitle: {
@@ -236,15 +237,15 @@ function createStyles(accent: string) {
   },
   paymentLine: {
     fontSize: 9,
-    marginBottom: 3,
+    marginBottom: 2,
   },
   paymentLabel: {
     fontSize: 8,
     color: PALETTE.muted,
   },
   notesBox: {
-    padding: 12,
-    marginBottom: 20,
+    padding: 9,
+    marginBottom: 10,
     border: `0.5pt solid ${PALETTE.border}`,
     borderRadius: 2,
   },
