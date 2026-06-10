@@ -1,5 +1,6 @@
 import 'server-only'
 import { createServerSupabase } from '@/lib/supabase/ssr'
+import { createServerClient } from '@/lib/supabase/server'
 import type { RepClient, RepProduct, RepOrderListItem } from './types'
 
 /**
@@ -36,7 +37,11 @@ export async function getMyClients(): Promise<RepClient[]> {
  * rodomi (UI išjungia „pridėti").
  */
 export async function getRepOrderProducts(): Promise<RepProduct[]> {
-  const supabase = await createServerSupabase()
+  // Service role — po migr 067 authenticated rolei produktų skaitymas
+  // grąžindavo tuščią (vadybininkė nematytų prekių kurdama užsakymą). Prekių
+  // katalogas globalus (ne rep-nuosavybė), tad service role saugu; puslapis
+  // gating'inamas requireSalesRep().
+  const supabase = createServerClient()
   const { data, error } = await supabase
     .from('products')
     .select(
