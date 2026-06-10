@@ -141,15 +141,9 @@ export async function submitRepOrder(input: {
 
   const result = data as { order_number: string; total_cents: number }
 
-  // Grynais / kortele — apmokėta iškart (vadybininkė surinko vietoje).
-  // Pavedimas lieka „laukia apmokėjimo". (Užsakymas vis tiek laukia admino
-  // patvirtinimo — approval_status nekeičiamas.)
-  if (input.paymentMethod === 'cash' || input.paymentMethod === 'card') {
-    await supabase
-      .from('orders')
-      .update({ payment_status: 'paid' })
-      .eq('order_number', result.order_number)
-  }
+  // Grynais / kortele — „apmokėta" žymi pats create_rep_order (migr 065).
+  // Anksčiau čia darytas update per sesijos klientą nieko nepadarydavo:
+  // rep turi tik SELECT policy ant orders, tad RLS tyliai nukirpdavo (0 rows).
 
   // Pranešimas adminui — naujas užsakymas laukia patvirtinimo. Non-blocking:
   // jei laiškas nepavyks, užsakymas vis tiek sėkmingas.

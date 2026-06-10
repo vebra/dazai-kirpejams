@@ -1,5 +1,6 @@
 import 'server-only'
 import { Resend } from 'resend'
+import * as Sentry from '@sentry/nextjs'
 
 /**
  * Resend klientas email notifikacijoms.
@@ -84,6 +85,14 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
 
     if (error || !data) {
       console.error('[email] Resend send error:', error)
+      // Visi laiškai eina per šitą vieną funkciją — vienas capture čia
+      // padengia visus ~30 non-blocking kvietimų, kurių rezultatas dažnai
+      // net netikrinamas. Be šito nepavykęs laiškas prod'e nematomas.
+      Sentry.captureMessage(`Resend send failed: ${error?.message ?? 'no data'}`, {
+        level: 'error',
+        tags: { area: 'email' },
+        extra: { subject: input.subject },
+      })
       return {
         ok: false,
         reason: 'send-failed',
@@ -94,6 +103,10 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
     return { ok: true, id: data.id }
   } catch (err) {
     console.error('[email] Resend exception:', err)
+    Sentry.captureException(err, {
+      tags: { area: 'email' },
+      extra: { subject: input.subject },
+    })
     return {
       ok: false,
       reason: 'send-failed',

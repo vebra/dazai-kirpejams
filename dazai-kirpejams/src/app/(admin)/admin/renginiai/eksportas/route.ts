@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin/auth'
 import { getEventRegistrations } from '@/lib/admin/queries'
 import { getActiveEvent } from '@/lib/events/queries'
+import { csvCell } from '@/lib/csv'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -35,17 +36,6 @@ const ROLE_LABELS_LT: Record<string, string> = {
   kita: 'Kita',
 }
 
-/**
- * Excel-friendly CSV escape — apgaubia dvigubomis kabutėmis ir double'ina vidinius `"`.
- */
-function csvCell(value: string | number | null | undefined): string {
-  if (value === null || value === undefined) return ''
-  const s = String(value)
-  if (/[",\n;]/.test(s)) {
-    return `"${s.replace(/"/g, '""')}"`
-  }
-  return s
-}
 
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return ''
