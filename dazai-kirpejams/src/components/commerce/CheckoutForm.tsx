@@ -16,6 +16,7 @@ import {
   HeadphonesIcon,
 } from 'lucide-react'
 import { useCartStore } from '@/lib/commerce/cart-store'
+import { useRefreshCartPrices } from '@/lib/commerce/useRefreshCartPrices'
 import {
   calculateOrderTotals,
   meetsMinimumOrder,
@@ -70,6 +71,8 @@ export function CheckoutForm({
 
   const items = useCartStore((s) => s.items)
   const clear = useCartStore((s) => s.clear)
+  // Atnaujinam kainas iš serverio prieš pirkimą — žr. useRefreshCartPrices.
+  useRefreshCartPrices()
   const submittedRef = useRef(false)
 
   // Forma — pre-fill iš user_profiles, jei prisijungęs (žr. /apmokejimas/page.tsx).

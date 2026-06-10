@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react'
 import { useCartStore, type CartItem } from '@/lib/commerce/cart-store'
+import { useRefreshCartPrices } from '@/lib/commerce/useRefreshCartPrices'
 import { useVerifiedUser } from '@/lib/auth/useVerifiedUser'
 import {
   FREE_SHIPPING_THRESHOLD_CENTS,
@@ -33,6 +34,10 @@ export function CartView({ lang, dict }: CartViewProps) {
   const updateQuantity = useCartStore((s) => s.updateQuantity)
   const clear = useCartStore((s) => s.clear)
   const { isVerified, isLoading: authLoading, user, status } = useVerifiedUser()
+
+  // Atnaujinam krepšelio kainas iš serverio (kad nebūtų price_mismatch dėl
+  // pasenusios išsaugotos kainos). Tik patvirtintiems.
+  useRefreshCartPrices()
 
   useEffect(() => {
     setMounted(true)
