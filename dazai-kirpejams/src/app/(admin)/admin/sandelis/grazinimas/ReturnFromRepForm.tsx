@@ -1,11 +1,16 @@
 'use client'
 
-import { useState, useMemo, useActionState } from 'react'
+import { useState, useMemo, useRef, useActionState } from 'react'
 import {
   returnStockBatchFromRepAction,
   type ReturnBatchState,
 } from '../actions'
 import type { RepHeldItem, RepIssuanceDay } from '@/lib/admin/rep-reports'
+import {
+  ScanResultBanner,
+  playScanFeedback,
+  type ScanResult,
+} from '@/components/admin/ScanFeedback'
 
 const initialState: ReturnBatchState = {}
 
@@ -18,6 +23,7 @@ type Row = {
   name: string
   colorNumber: string | null
   sku: string | null
+  ean: string | null
   issued: number // kiek tą dieną išduota
   checked: boolean
   qty: number
@@ -44,6 +50,9 @@ export function ReturnFromRepForm({
   const [repId, setRepId] = useState('')
   const [filter, setFilter] = useState('')
   const [rows, setRows] = useState<Row[]>([])
+  const [lastResult, setLastResult] = useState<ScanResult | null>(null)
+  const scanRef = useRef<HTMLInputElement>(null)
+  const scanIdRef = useRef(0)
   const repName = reps.find((r) => r.id === repId)?.name ?? ''
 
   // Kiek vadybininkė šiuo metu turi kiekvienos prekės (po pardavimų/grąžinimų).
@@ -67,6 +76,7 @@ export function ReturnFromRepForm({
           name: it.name,
           colorNumber: it.colorNumber,
           sku: it.sku,
+          ean: it.ean,
           issued: it.qty,
           checked: false,
           qty: it.qty,
@@ -92,6 +102,73 @@ export function ReturnFromRepForm({
 
   function setAll(checked: boolean) {
     setRows((prev) => prev.map((r) => ({ ...r, checked })))
+  }
+
+  // Skenavimas: EAN → +1 prie tos prekės grąžinamo kiekio (neperžengiant to,
+  // ką vadybininkė turi). Kaip priėmime — patogu skaičiuoti fiziškai grąžinamas.
+  function handleScan(e: React.SyntheticEvent) {
+    e.preventDefault()
+    const val = scanRef.current?.value.trim() ?? ''
+    if (scanRef.current) scanRef.current.value = ''
+    scanRef.current?.focus()
+    if (!val) return
+    const id = ++scanIdRef.current
+    const productRows = rows.filter((r) => r.ean && r.ean === val)
+    if (productRows.length === 0) {
+      playScanFeedback('fail')
+      setLastResult({
+        id,
+        outcome: 'fail',
+        title: 'Nerasta',
+        subtitle: `EAN ${val} — šiai vadybininkei neišduota`,
+      })
+      return
+    }
+    const pid = productRows[0].productId
+    const name = productRows[0].name
+    const held = heldMap.get(pid) ?? productRows.reduce((s, r) => s + r.issued, 0)
+    const currentTotal = rows
+      .filter((r) => r.productId === pid && r.checked)
+      .reduce((s, r) => s + r.qty, 0)
+    if (currentTotal >= held) {
+      playScanFeedback('warn')
+      setLastResult({
+        id,
+        outcome: 'warn',
+        title: name,
+        subtitle: `⚠ Jau pažymėta ${currentTotal} — vadybininkė daugiau neturi (${held})`,
+      })
+      return
+    }
+    // Kur pridėti +1: pirma jau pažymėta eilutė su laisvu kiekiu, kitaip nauja.
+    const checkedWithCap = rows.find(
+      (r) => r.productId === pid && r.checked && r.qty < r.issued
+    )
+    const targetKey =
+      checkedWithCap?.key ??
+      rows.find((r) => r.productId === pid && !r.checked)?.key ??
+      null
+    if (!targetKey) {
+      playScanFeedback('warn')
+      setLastResult({ id, outcome: 'warn', title: name, subtitle: 'Nėra kur pridėti daugiau' })
+      return
+    }
+    setRows((prev) =>
+      prev.map((r) =>
+        r.key !== targetKey
+          ? r
+          : r.checked
+            ? { ...r, qty: Math.min(r.issued, r.qty + 1) }
+            : { ...r, checked: true, qty: 1 }
+      )
+    )
+    playScanFeedback('ok')
+    setLastResult({
+      id,
+      outcome: 'ok',
+      title: name,
+      subtitle: `Grąžinama: ${currentTotal + 1} vnt. (vadybininkė turi ${held})`,
+    })
   }
 
   // Susumuojam grąžinamą kiekį pagal prekę (ta pati prekė gali būti keliose dienose).
@@ -270,6 +347,36 @@ export function ReturnFromRepForm({
         </div>
       ) : (
         <>
+          {/* Skenavimas — greitas grąžinamų prekių žymėjimas */}
+          <div className="bg-[#F9F9FB] rounded-lg border border-[#eee] p-3.5 space-y-3">
+            <label
+              htmlFor="return-scan"
+              className="block text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500"
+            >
+              Nuskenuokite grąžinamą prekę — pažymės ir pridės +1
+            </label>
+            <div className="flex gap-2">
+              <input
+                ref={scanRef}
+                id="return-scan"
+                autoComplete="off"
+                placeholder="Nukreipkite skanerį čia…"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleScan(e)
+                }}
+                className="flex-1 px-4 py-3 bg-white border-2 border-brand-magenta rounded-lg text-base focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={handleScan}
+                className="px-5 py-3 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark transition-colors whitespace-nowrap"
+              >
+                Pažymėti
+              </button>
+            </div>
+            <ScanResultBanner result={lastResult} />
+          </div>
+
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <label className="flex items-center gap-2 text-[12px] font-semibold text-brand-gray-900 cursor-pointer">
               <input

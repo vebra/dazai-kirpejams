@@ -177,6 +177,7 @@ export type RepIssuanceItem = {
   name: string
   colorNumber: string | null
   sku: string | null
+  ean: string | null
   qty: number
 }
 
@@ -195,7 +196,7 @@ export async function getRepIssuancesByDate(): Promise<
   const sb = createServerClient()
   const { data, error } = await sb
     .from('stock_movements')
-    .select('rep_id, product_id, delta, created_at, products(name_lt, sku, color_number)')
+    .select('rep_id, product_id, delta, created_at, products(name_lt, sku, color_number, ean)')
     .eq('reason', 'issue_to_rep')
     .not('rep_id', 'is', null)
     .order('created_at', { ascending: false })
@@ -216,8 +217,8 @@ export async function getRepIssuancesByDate(): Promise<
     delta: number
     created_at: string
     products:
-      | { name_lt: string; sku: string | null; color_number: string | null }
-      | { name_lt: string; sku: string | null; color_number: string | null }[]
+      | { name_lt: string; sku: string | null; color_number: string | null; ean: string | null }
+      | { name_lt: string; sku: string | null; color_number: string | null; ean: string | null }[]
       | null
   }
 
@@ -242,6 +243,7 @@ export async function getRepIssuancesByDate(): Promise<
       name: rawP?.name_lt ?? '—',
       colorNumber: rawP?.color_number ?? null,
       sku: rawP?.sku ?? null,
+      ean: rawP?.ean ?? null,
       qty: 0,
     }
     cur.qty += Math.abs(r.delta)

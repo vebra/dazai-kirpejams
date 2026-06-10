@@ -4,32 +4,19 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { receiveScannedItem, receiveManualItem } from '../actions'
 import type { AdminProductListRow } from '@/lib/admin/queries'
+import {
+  ScanResultBanner,
+  playScanFeedback,
+  type ScanResult,
+} from '@/components/admin/ScanFeedback'
 
 type LogEntry =
   | { id: number; kind: 'ok'; name: string; sku: string | null; stock: number; added: number }
   | { id: number; kind: 'notfound'; ean: string }
   | { id: number; kind: 'error'; message: string }
 
-/** Trumpas garso signalas — patogu skanuojant nežiūrint į ekraną. */
-function beep(ok: boolean) {
-  try {
-    const Ctx =
-      window.AudioContext ||
-      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
-    const ctx = new Ctx()
-    const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
-    osc.connect(gain)
-    gain.connect(ctx.destination)
-    osc.frequency.value = ok ? 880 : 240
-    gain.gain.value = 0.05
-    osc.start()
-    osc.stop(ctx.currentTime + (ok ? 0.08 : 0.25))
-    osc.onended = () => ctx.close()
-  } catch {
-    /* garsas nebūtinas */
-  }
-}
+/** Dvigubo skano langas (ms): tas pats EAN per šį laiką → įspėjimas. */
+const DUP_WINDOW_MS = 2500
 
 export function ReceivingScanner({ products }: { products: AdminProductListRow[] }) {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -38,7 +25,10 @@ export function ReceivingScanner({ products }: { products: AdminProductListRow[]
   const [qty, setQty] = useState(1)
   const [supplier, setSupplier] = useState('')
   const [manualSearch, setManualSearch] = useState('')
+  const [lastResult, setLastResult] = useState<ScanResult | null>(null)
   const idRef = useRef(0)
+  // Dvigubo skano aptikimas — paskutinis EAN ir laikas.
+  const lastEanRef = useRef<{ ean: string; at: number } | null>(null)
 
   const manualResults = useMemo(() => {
     const q = manualSearch.trim().toLowerCase()
@@ -59,14 +49,21 @@ export function ReceivingScanner({ products }: { products: AdminProductListRow[]
     try {
       const res = await receiveManualItem(p.id, qty, supplier)
       if (res.ok) {
-        beep(true)
+        playScanFeedback('ok')
+        setLastResult({
+          id,
+          outcome: 'ok',
+          title: `${res.name} · naujas likutis ${res.stock}`,
+          subtitle: `Pridėta +${res.added}${res.sku ? ` · ${res.sku}` : ''}`,
+        })
         setLog((l) => [
           { id, kind: 'ok', name: res.name, sku: res.sku, stock: res.stock, added: res.added },
           ...l,
         ])
         setManualSearch('')
       } else {
-        beep(false)
+        playScanFeedback('fail')
+        setLastResult({ id, outcome: 'fail', title: 'Nepavyko priimti', subtitle: res.error })
         setLog((l) => [{ id, kind: 'error', message: res.error }, ...l])
       }
     } finally {
@@ -95,21 +92,46 @@ export function ReceivingScanner({ products }: { products: AdminProductListRow[]
         try {
           const res = await receiveScannedItem(job.ean, job.qty)
           if (res.ok && res.found) {
-            beep(true)
+            // Dvigubo skano patikra: tas pats EAN per DUP_WINDOW_MS → įspėjam.
+            const now = Date.now()
+            const prev = lastEanRef.current
+            const isDup =
+              prev !== null && prev.ean === job.ean && now - prev.at < DUP_WINDOW_MS
+            lastEanRef.current = { ean: job.ean, at: now }
+            playScanFeedback(isDup ? 'warn' : 'ok')
+            setLastResult({
+              id,
+              outcome: isDup ? 'warn' : 'ok',
+              title: `${res.name} · naujas likutis ${res.stock}`,
+              subtitle: isDup
+                ? `⚠ Tas pats barkodas dar kartą — pridėta +${res.added}. Ar tikrai?`
+                : `Pridėta +${res.added}${res.sku ? ` · ${res.sku}` : ''}`,
+            })
             setLog((l) => [
               { id, kind: 'ok', name: res.name, sku: res.sku, stock: res.stock, added: res.added },
               ...l,
             ])
           } else if (res.ok && !res.found) {
-            beep(false)
+            lastEanRef.current = null
+            playScanFeedback('fail')
+            setLastResult({
+              id,
+              outcome: 'fail',
+              title: 'Prekė nerasta',
+              subtitle: `EAN: ${res.ean} — sukurkite prekę`,
+            })
             setLog((l) => [{ id, kind: 'notfound', ean: res.ean }, ...l])
           } else {
-            beep(false)
+            lastEanRef.current = null
+            playScanFeedback('fail')
+            setLastResult({ id, outcome: 'fail', title: 'Klaida', subtitle: res.error })
             setLog((l) => [{ id, kind: 'error', message: res.error }, ...l])
           }
         } catch (err) {
-          beep(false)
+          lastEanRef.current = null
           const message = err instanceof Error ? err.message : 'Nenumatyta klaida'
+          playScanFeedback('fail')
+          setLastResult({ id, outcome: 'fail', title: 'Klaida', subtitle: message })
           setLog((l) => [{ id, kind: 'error', message }, ...l])
         }
       }
@@ -210,6 +232,9 @@ export function ReceivingScanner({ products }: { products: AdminProductListRow[]
             nustatykite kiekį (pvz. 24) ir nuskenuokite vieną kartą. Singliniams — palikite 1.
           </p>
         </div>
+
+        {/* Didelis paskutinio skano patvirtinimas — iš kart prie lauko */}
+        <ScanResultBanner result={lastResult} />
       </form>
 
       {/* Rankinis priėmimas (prekėms be barkodo) + tiekėjas */}

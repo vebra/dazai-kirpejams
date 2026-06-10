@@ -1,11 +1,16 @@
 'use client'
 
-import { useState, useMemo, useActionState } from 'react'
+import { useState, useMemo, useRef, useActionState } from 'react'
 import {
   issueStockBatchToRepAction,
   type IssueBatchState,
 } from '../actions'
 import type { AdminProductListRow } from '@/lib/admin/queries'
+import {
+  ScanResultBanner,
+  playScanFeedback,
+  type ScanResult,
+} from '@/components/admin/ScanFeedback'
 
 const initialState: IssueBatchState = {}
 
@@ -39,6 +44,9 @@ export function IssueToRepForm({
   const [search, setSearch] = useState('')
   const [repId, setRepId] = useState('')
   const [list, setList] = useState<Line[]>([])
+  const [lastResult, setLastResult] = useState<ScanResult | null>(null)
+  const scanRef = useRef<HTMLInputElement>(null)
+  const scanIdRef = useRef(0)
   const repName = reps.find((r) => r.id === repId)?.name ?? ''
 
   const results = useMemo(() => {
@@ -84,6 +92,49 @@ export function IssueToRepForm({
     setList((prev) =>
       prev.map((l) => (l.id === id ? { ...l, qty: Math.max(1, qty) } : l))
     )
+  }
+
+  // Skenavimas: EAN → prekė įkrenta į sąrašą (arba +1, jei jau yra).
+  function handleScan(e: React.SyntheticEvent) {
+    e.preventDefault()
+    const val = scanRef.current?.value.trim() ?? ''
+    if (scanRef.current) scanRef.current.value = ''
+    scanRef.current?.focus()
+    if (!val) return
+    const id = ++scanIdRef.current
+    const p = products.find((pp) => pp.ean && pp.ean === val)
+    if (!p) {
+      playScanFeedback('fail')
+      setLastResult({ id, outcome: 'fail', title: 'Prekė nerasta', subtitle: `EAN: ${val}` })
+      return
+    }
+    const existing = list.find((l) => l.id === p.id)
+    const newQty = (existing?.qty ?? 0) + 1
+    setList((prev) =>
+      existing
+        ? prev.map((l) => (l.id === p.id ? { ...l, qty: l.qty + 1 } : l))
+        : [
+            ...prev,
+            {
+              id: p.id,
+              name: p.nameLt,
+              colorNumber: p.colorNumber,
+              sku: p.sku,
+              stock: p.stockQuantity ?? 0,
+              qty: 1,
+            },
+          ]
+    )
+    const over = newQty > (p.stockQuantity ?? 0)
+    playScanFeedback(over ? 'warn' : 'ok')
+    setLastResult({
+      id,
+      outcome: over ? 'warn' : 'ok',
+      title: `${p.colorNumber ? `${p.colorNumber} · ` : ''}${p.nameLt}`,
+      subtitle: over
+        ? `⚠ Sąraše ${newQty} vnt., o sandelyje tik ${p.stockQuantity}`
+        : `Sąraše: ${newQty} vnt.${p.stockQuantity != null ? ` · sandelyje ${p.stockQuantity}` : ''}`,
+    })
   }
 
   function remove(id: string) {
@@ -209,9 +260,41 @@ export function IssueToRepForm({
         <input type="hidden" name="items" value={itemsJson} />
       </div>
 
+      {/* Skenavimas — greičiausias kelias pridėti prekę */}
+      {repId && (
+        <div className="bg-[#F9F9FB] rounded-lg border border-[#eee] p-3.5 space-y-3">
+          <label
+            htmlFor="issue-scan"
+            className="block text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500"
+          >
+            Nuskenuokite barkodą — prekė įkris į sąrašą (+1)
+          </label>
+          <div className="flex gap-2">
+            <input
+              ref={scanRef}
+              id="issue-scan"
+              autoComplete="off"
+              placeholder="Nukreipkite skanerį čia…"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleScan(e)
+              }}
+              className="flex-1 px-4 py-3 bg-white border-2 border-brand-magenta rounded-lg text-base focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={handleScan}
+              className="px-5 py-3 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark transition-colors whitespace-nowrap"
+            >
+              Pridėti
+            </button>
+          </div>
+          <ScanResultBanner result={lastResult} />
+        </div>
+      )}
+
       <div>
         <label className="block text-[12px] font-semibold text-brand-gray-900 mb-1">
-          Pridėti prekę į sąrašą
+          Arba pridėkite ranka (paieška)
         </label>
         <input
           type="text"
