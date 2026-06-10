@@ -1,15 +1,9 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin/auth'
 import { getAdminProducts } from '@/lib/admin/queries'
+import { csvCell as esc } from '@/lib/csv'
 
 export const dynamic = 'force-dynamic'
-
-function esc(value: string): string {
-  if (value.includes('"') || value.includes(',') || value.includes('\n')) {
-    return `"${value.replace(/"/g, '""')}"`
-  }
-  return value
-}
 
 function eur(cents: number | null | undefined): string {
   return cents == null ? '' : (cents / 100).toFixed(2)

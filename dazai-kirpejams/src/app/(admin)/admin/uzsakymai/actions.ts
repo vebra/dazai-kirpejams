@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { after } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { requireAdmin } from '@/lib/admin/auth'
 import { createServerClient } from '@/lib/supabase/server'
 import { ORDER_STATUSES, type OrderStatus } from '@/lib/admin/queries'
@@ -155,6 +156,12 @@ export async function updateOrderStatusAction(
         '[admin/uzsakymai/actions] stock restore failed (non-blocking):',
         restoreErr.message
       )
+      // Sandėlis NEatstatytas po atšaukimo — likučiai išsiderina tyliai.
+      Sentry.captureMessage(`Stock restore failed: ${restoreErr.message}`, {
+        level: 'error',
+        tags: { area: 'stock' },
+        extra: { orderId: id },
+      })
     }
   }
 
@@ -178,6 +185,12 @@ export async function updateOrderStatusAction(
       )
       // Nenutraukiam srauto — statusas jau pakeistas. Admin'as galės
       // rankiniu būdu iš naujo spausti „Išrašyti sąskaitą" užsakymo kortelėje.
+      // Bet fone (after) niekas ekrane klaidos nemato — fiksuojam Sentry.
+      Sentry.captureMessage(`Invoice auto-generation failed: ${result.error}`, {
+        level: 'error',
+        tags: { area: 'invoice' },
+        extra: { orderId: id },
+      })
     } else if (orderData) {
       try {
         const pdfBuffer = await getInvoicePdfBuffer(result.pdfPath)
@@ -213,6 +226,10 @@ export async function updateOrderStatusAction(
         }
       } catch (emailErr) {
         console.error('[admin/uzsakymai/actions] Invoice email failed:', emailErr)
+        Sentry.captureException(emailErr, {
+          tags: { area: 'invoice' },
+          extra: { orderId: id },
+        })
       }
     }
   }

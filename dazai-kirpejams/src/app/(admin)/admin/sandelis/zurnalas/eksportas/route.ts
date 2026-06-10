@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { requireAdmin } from '@/lib/admin/auth'
 import { getStockMovements } from '@/lib/admin/queries'
+import { csvCell as esc } from '@/lib/csv'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,13 +15,6 @@ const REASON_LABEL: Record<string, string> = {
   return_from_rep: 'Grąžinimas iš vadybininkės',
   rep_sale: 'Pardavimas (vadybininkė)',
   rep_sale_cancel: 'Pardavimo atšaukimas (vadybininkė)',
-}
-
-function esc(value: string): string {
-  if (value.includes('"') || value.includes(',') || value.includes('\n')) {
-    return `"${value.replace(/"/g, '""')}"`
-  }
-  return value
 }
 
 const DT = new Intl.DateTimeFormat('lt-LT', {

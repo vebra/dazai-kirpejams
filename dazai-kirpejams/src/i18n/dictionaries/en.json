@@ -425,6 +425,8 @@
       "discountSystemUnavailable": "The discount system is currently unavailable.",
       "couponCheckFailed": "Failed to validate coupon. Please try again.",
       "stockShortageGeneric": "Not enough stock. Please try again later.",
+      "priceMismatch": "Product prices have changed. Please refresh the page and review your cart.",
+      "productUnavailable": "Some items in your cart are no longer available. Please update your cart.",
       "orderCreateFailed": "Failed to create the order. Please try again.",
       "itemsSaveFailed": "Failed to save order items. Please try again.",
       "serverError": "Server error. Please try again."

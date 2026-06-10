@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { deleteSubscriberAction, toggleSubscriberAction } from './actions'
 import type { NewsletterSubscriberRow } from '@/lib/admin/queries'
+import { csvCell } from '@/lib/csv'
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('lt-LT', {
   dateStyle: 'short',
@@ -36,7 +37,7 @@ export function SubscribersTable({
 
   const handleExport = () => {
     const rows = filtered.map((s) =>
-      [s.email, s.locale ?? '', s.isActive ? 'active' : 'unsubscribed', s.subscribedAt].join(',')
+      [csvCell(s.email), s.locale ?? '', s.isActive ? 'active' : 'unsubscribed', s.subscribedAt].join(',')
     )
     const csv = ['email,locale,status,subscribed_at', ...rows].join('\n')
     const blob = new Blob([csv], { type: 'text/csv' })

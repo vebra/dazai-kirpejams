@@ -425,6 +425,8 @@
       "discountSystemUnavailable": "Nuolaidų sistema šiuo metu neprieinama.",
       "couponCheckFailed": "Nepavyko patikrinti kupono. Bandykite dar kartą.",
       "stockShortageGeneric": "Nepakanka likučio. Pabandykite vėliau.",
+      "priceMismatch": "Prekių kainos pasikeitė. Atnaujinkite puslapį ir patikrinkite krepšelį.",
+      "productUnavailable": "Dalies krepšelio prekių nebėra parduotuvėje. Atnaujinkite krepšelį.",
       "orderCreateFailed": "Nepavyko sukurti užsakymo. Bandykite dar kartą.",
       "itemsSaveFailed": "Nepavyko išsaugoti prekių. Bandykite dar kartą.",
       "serverError": "Serverio klaida. Bandykite dar kartą."

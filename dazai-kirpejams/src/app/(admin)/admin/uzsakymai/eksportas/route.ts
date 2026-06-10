@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/admin/auth'
 import { getAdminOrders, ORDER_STATUS_LABELS, type OrderStatus } from '@/lib/admin/queries'
+import { csvCell as esc } from '@/lib/csv'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,13 +15,6 @@ const PAYMENT_LT: Record<string, string> = {
   stripe: 'Kortelė',
   paysera: 'Paysera',
   bank_transfer: 'Pavedimas',
-}
-
-function esc(value: string): string {
-  if (value.includes('"') || value.includes(',') || value.includes('\n')) {
-    return `"${value.replace(/"/g, '""')}"`
-  }
-  return value
 }
 
 function formatDate(iso: string): string {

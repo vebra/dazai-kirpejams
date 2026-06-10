@@ -12,6 +12,7 @@ import {
   updateProfileSchema,
   formDataToObject,
 } from '@/lib/validation/auth-schemas'
+import { getEffectivePriceCents } from '@/lib/types'
 
 export type UploadDocState = {
   error?: string
@@ -313,7 +314,7 @@ export async function reorderToCart(
     const { data } = await admin
       .from('products')
       .select(
-        'id, slug, sku, name_lt, name_en, name_ru, price_cents, volume_ml, image_urls, color_hex, color_number, is_active, stock_quantity, category:categories(slug)'
+        'id, slug, sku, name_lt, name_en, name_ru, price_cents, sale_price_cents, volume_ml, image_urls, color_hex, color_number, is_active, stock_quantity, category:categories(slug)'
       )
       .in('id', ids)
     products = (data as Array<Record<string, unknown>>) ?? []
@@ -344,7 +345,12 @@ export async function reorderToCart(
       categorySlug: cat?.slug ?? '',
       sku: (p.sku as string) ?? null,
       name,
-      priceCents: p.price_cents as number,
+      // Akcijos kaina, jei aktyvi — kaip ProductCard/krepšelis, kad
+      // pakartotas užsakymas per akciją nebūtų pilna kaina.
+      priceCents: getEffectivePriceCents({
+        price_cents: p.price_cents as number,
+        sale_price_cents: (p.sale_price_cents as number | null) ?? null,
+      }),
       volumeMl: (p.volume_ml as number) ?? null,
       imageUrl: Array.isArray(imgs) && imgs.length > 0 ? imgs[0] : null,
       colorHex: (p.color_hex as string) ?? null,

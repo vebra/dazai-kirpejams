@@ -47,17 +47,18 @@ export type RateLimitResult =
   | { allowed: false; retryAfterSeconds: number }
 
 /**
- * Ištraukiam kliento IP iš standartinių proxy header'ių. Vercel'e
- * `x-forwarded-for` yra comma-separated sąrašas, pirmas — originalus
- * kliento adresas.
+ * Ištraukiam kliento IP. SVARBU: `x-forwarded-for` PIRMU elementu pasitikėti
+ * negalima — Vercel kliento IP PRIDEDA gale, o piktavalis gali atsiųsti savo
+ * header'į ir taip kiekvienam request'ui gauti „naują" IP (limiterio bypass).
+ * Todėl: `x-real-ip` (jį nustato pati platforma) → PASKUTINIS XFF elementas.
  */
 async function getClientIpHash(): Promise<string> {
   const h = await headers()
   const forwarded = h.get('x-forwarded-for')
   const realIp = h.get('x-real-ip')
   const ip =
-    forwarded?.split(',')[0]?.trim() ||
     realIp?.trim() ||
+    forwarded?.split(',').pop()?.trim() ||
     'unknown'
 
   return createHash('sha256').update(`${IP_SALT}:${ip}`).digest('hex').slice(0, 32)

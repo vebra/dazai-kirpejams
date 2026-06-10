@@ -1,6 +1,7 @@
 'use server'
 
 import { cookies } from 'next/headers'
+import * as Sentry from '@sentry/nextjs'
 import {
   calculateOrderTotals,
   meetsMinimumOrder,
@@ -224,6 +225,14 @@ export async function createOrder(
         if (reason === 'empty_cart') {
           return { ok: false, error: errs.cartEmpty }
         }
+        // RPC (065) kainas ima iš DB: nesutampanti kliento suma arba
+        // nebeaktyvi prekė — krepšelis pasenęs, prašom atsinaujinti.
+        if (reason === 'price_mismatch') {
+          return { ok: false, error: errs.priceMismatch }
+        }
+        if (reason === 'product_unavailable') {
+          return { ok: false, error: errs.productUnavailable }
+        }
         const reasonMap: Record<string, string> = {
           not_found: errs.couponNotFound,
           inactive: errs.couponInactive,
@@ -416,6 +425,12 @@ export async function createOrder(
     ])
   } catch (emailErr) {
     console.error('[order] Email sending failed (non-blocking):', emailErr)
+    // Užsakymas jau įrašytas — klientas liks be patvirtinimo laiško, o
+    // adminas be pranešimo apie naują užsakymą. Turim apie tai sužinoti.
+    Sentry.captureException(emailErr, {
+      tags: { area: 'checkout-email' },
+      extra: { orderNumber },
+    })
   }
 
   // ============================================
