@@ -298,6 +298,10 @@ alter table blog_posts enable row level security;
 create policy "Public read categories" on categories
   for select using (is_active = true);
 
+-- `brands` neturi is_active/visibility stulpelio ir laiko tik viešus duomenis
+-- (pavadinimas, logotipas, aprašymas) — visi prekės ženklai sąmoningai vieši.
+-- Jei kada atsiras nepublikuotų ženklų, pridėti is_active ir gating'ą kaip
+-- categories/products politikose.
 create policy "Public read brands" on brands
   for select using (true);
 

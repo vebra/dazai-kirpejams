@@ -1,6 +1,7 @@
-// Kainos tik patvirtintiems (server-side vartai naudoja cookies()) →
-// per-request render. DB užklausos cache'inamos unstable_cache (60s).
-export const dynamic = 'force-dynamic'
+// STATINIS / ISR (Fazė 2): kaina į HTML NEpatenka (getProductsStatic, be
+// cookies()); filtravimas/rūšiavimas — kliento pusėje. Kainos profesionalams
+// užkraunamos naršyklėje (ProductPricesProvider).
+export const revalidate = 60
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -10,8 +11,9 @@ import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import {
   getCategoryBySlug,
   getCategories,
-  getProducts,
+  getProductsStatic,
 } from '@/lib/data/queries'
+import { ProductPricesProvider } from '@/components/products/ProductPricesProvider'
 import { getCategoryName, getCategoryDescription } from '@/lib/types'
 import { Container } from '@/components/ui/Container'
 import { CategoryProductsView } from '@/components/products/CategoryProductsView'
@@ -89,7 +91,7 @@ export default async function CategoryPage({
   // filtravimas ir rūšiavimas pagal URL parametrus vyksta kliento pusėje
   // (CategoryProductsView), kad puslapis būtų statiškai generuojamas (ISR).
   const defaultSort = isDazai ? 'number' : 'popular'
-  const products = await getProducts({
+  const products = await getProductsStatic({
     categorySlug,
     sortBy: defaultSort as 'popular' | 'number',
   })
@@ -184,13 +186,15 @@ export default async function CategoryPage({
       {/* Filtrai + Produktai — kliento komponentas, kad serveris galėtų
           statiškai sugeneruoti puslapį (ISR) be searchParams priklausomybės */}
       <Suspense>
-        <CategoryProductsView
-          products={products}
-          lang={lang}
-          categorySlug={categorySlug}
-          isDazai={isDazai}
-          dict={dict}
-        />
+        <ProductPricesProvider ids={products.map((p) => p.id)}>
+          <CategoryProductsView
+            products={products}
+            lang={lang}
+            categorySlug={categorySlug}
+            isDazai={isDazai}
+            dict={dict}
+          />
+        </ProductPricesProvider>
       </Suspense>
 
       {/* Advantage bar — tik dažų kategorijai; kitos kategorijos turi skirtingus

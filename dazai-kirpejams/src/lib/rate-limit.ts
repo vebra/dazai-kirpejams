@@ -40,6 +40,16 @@ export type RateLimitOptions = {
   windowSeconds?: number
   /** Max pateikimų per langą. Default: 5. */
   max?: number
+  /**
+   * Jei RPC nepavyksta — blokuoti (true) ar praleisti (false, default).
+   *
+   * Viešoms formoms (kontaktai, naujienlaiškis) fail-open priimtina: geriau
+   * praleisti vieną pateikimą nei trikdyti tikrą vartotoją per Supabase blyksnį.
+   * Bet AUTENTIFIKACIJAI (admin/rep login) naudojam fail-closed — limiteris
+   * yra brute-force barjeras, todėl jo „dingimas" neturi atverti neribotų
+   * bandymų. Esant klaidai grąžinam `allowed:false` su saugiu retry langu.
+   */
+  failClosed?: boolean
 }
 
 export type RateLimitResult =
@@ -71,7 +81,7 @@ export async function checkRateLimit(
     return { allowed: true }
   }
 
-  const { action, windowSeconds = 60, max = 5 } = opts
+  const { action, windowSeconds = 60, max = 5, failClosed = false } = opts
   const ipHash = await getClientIpHash()
   const key = `${action}:ip:${ipHash}`
 
@@ -83,7 +93,13 @@ export async function checkRateLimit(
   })
 
   if (error) {
-    // Jei RPC nepavyko — neblokuojam vartotojo, bet log'inam, kad Sentry pagautų
+    if (failClosed) {
+      // Autentifikacija: klaida = blokuojam, kad limiterio gedimas neatvertų
+      // neriboto brute-force lango. Grąžinam saugų retry langą.
+      console.error('[rate-limit] RPC error, fail-closed:', error.message)
+      return { allowed: false, retryAfterSeconds: windowSeconds }
+    }
+    // Viešos formos: neblokuojam vartotojo, bet log'inam, kad Sentry pagautų
     console.error('[rate-limit] RPC error, fail-open:', error.message)
     return { allowed: true }
   }

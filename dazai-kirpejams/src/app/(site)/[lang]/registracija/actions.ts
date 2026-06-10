@@ -66,6 +66,7 @@ export async function registerAction(
     action: 'register',
     windowSeconds: 3600,
     max: 5,
+    failClosed: true,
   })
   if (!rl.allowed) {
     return { error: errors.registerGeneric }

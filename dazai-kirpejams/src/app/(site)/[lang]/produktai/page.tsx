@@ -1,12 +1,12 @@
-// Kainos tik patvirtintiems (server-side vartai naudoja cookies()) →
-// per-request render. DB užklausos cache'inamos unstable_cache (60s).
-export const dynamic = 'force-dynamic'
+// STATINIS / ISR (Fazė 2): renderinama kaip svečiui (getProductsStatic, be
+// cookies()) → CDN. Kainos profesionalams — naršyklėje (ProductPricesProvider).
+export const revalidate = 60
 
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getDictionary, hasLocale } from '@/i18n/dictionaries'
-import { getCategories, getProducts } from '@/lib/data/queries'
+import { getCategories, getProductsStatic } from '@/lib/data/queries'
 import { getCategoryName } from '@/lib/types'
 import {
   buildCategorySlugMap,
@@ -14,7 +14,8 @@ import {
 } from '@/lib/data/category-map'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
-import { buildPageMetadata, buildCanonicalUrl, SITE_URL } from '@/lib/seo'
+import { ProductPricesProvider } from '@/components/products/ProductPricesProvider'
+import { buildPageMetadata, buildCanonicalUrl } from '@/lib/seo'
 import { langPrefix } from '@/lib/utils'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumbSchema } from '@/lib/schema'
@@ -45,7 +46,7 @@ export default async function ProductsPage({
   const p = langPrefix(lang)
   const [categories, products] = await Promise.all([
     getCategories(),
-    getProducts(),
+    getProductsStatic(),
   ])
   const categorySlugMap = buildCategorySlugMap(categories)
 
@@ -107,21 +108,23 @@ export default async function ProductsPage({
             ))}
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 lg:gap-6">
-            {products.map((product, i) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                lang={lang}
-                categorySlug={getCategorySlugFromMap(
-                  categorySlugMap,
-                  product.category_id
-                )}
-                dict={dict}
-                priority={i < 4}
-              />
-            ))}
-          </div>
+          <ProductPricesProvider ids={products.map((p) => p.id)}>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 lg:gap-6">
+              {products.map((product, i) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  lang={lang}
+                  categorySlug={getCategorySlugFromMap(
+                    categorySlugMap,
+                    product.category_id
+                  )}
+                  dict={dict}
+                  priority={i < 4}
+                />
+              ))}
+            </div>
+          </ProductPricesProvider>
         </Container>
       </section>
 

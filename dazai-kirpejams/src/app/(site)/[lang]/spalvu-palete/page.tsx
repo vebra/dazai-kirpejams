@@ -2,19 +2,19 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { hasLocale, getDictionary } from '@/i18n/dictionaries'
-import { getProducts } from '@/lib/data/queries'
+import { getProductsStatic } from '@/lib/data/queries'
 import { Container } from '@/components/ui/Container'
 import { PaletteGrid } from '@/components/products/PaletteGrid'
 import { CountUp } from '@/components/ui/CountUp'
 import { Newsletter } from '@/components/home/Newsletter'
-import { buildPageMetadata, buildCanonicalUrl, SITE_URL } from '@/lib/seo'
+import { buildPageMetadata, buildCanonicalUrl } from '@/lib/seo'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumbSchema } from '@/lib/schema'
 import { langPrefix } from '@/lib/utils'
 
-// Kainos tik patvirtintiems (server-side vartai naudoja cookies()) →
-// per-request render. DB užklausos cache'inamos unstable_cache (60s).
-export const dynamic = 'force-dynamic'
+// STATINIS / ISR (Fazė 2): paletė rodo tik spalvas+nuorodas (ne kainas), tad
+// renderinama statiškai (getProductsStatic, be cookies()).
+export const revalidate = 60
 
 export async function generateMetadata({
   params,
@@ -37,7 +37,7 @@ export default async function ColorPalettePage({
   if (!hasLocale(lang)) notFound()
 
   const [products, dict] = await Promise.all([
-    getProducts({ categorySlug: 'dazai', sortBy: 'number' }),
+    getProductsStatic({ categorySlug: 'dazai', sortBy: 'number' }),
     getDictionary(lang),
   ])
   // Svečiui kainos nukirptos (0) — tik teigiamos; anon rodom kanoninę 7,90 €.
