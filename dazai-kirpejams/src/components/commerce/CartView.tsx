@@ -8,9 +8,9 @@ import { useCartStore, type CartItem } from '@/lib/commerce/cart-store'
 import { useRefreshCartPrices } from '@/lib/commerce/useRefreshCartPrices'
 import { useVerifiedUser } from '@/lib/auth/useVerifiedUser'
 import {
-  FREE_SHIPPING_THRESHOLD_CENTS,
-  MIN_ORDER_CENTS,
   meetsMinimumOrder,
+  DEFAULT_SHIPPING_SETTINGS,
+  type ShippingSettings,
 } from '@/lib/commerce/constants'
 import { formatPrice, langPrefix } from '@/lib/utils'
 import { trackViewCart, trackBeginCheckout } from '@/lib/analytics'
@@ -21,13 +21,19 @@ type CartViewProps = {
   lang: Locale
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dict: any
+  /** Pristatymo ribos iš shop_settings (paduoda krepšelio puslapis, ISR). */
+  shipping?: ShippingSettings
 }
 
 /**
  * Pagrindinis krepšelio vaizdas. Client component, nes dirba su zustand store.
  * SSR saugus — iki hydration nerodo items, kad nebūtų mismatch'ų.
  */
-export function CartView({ lang, dict }: CartViewProps) {
+export function CartView({
+  lang,
+  dict,
+  shipping = DEFAULT_SHIPPING_SETTINGS,
+}: CartViewProps) {
   const [mounted, setMounted] = useState(false)
   const items = useCartStore((s) => s.items)
   const removeItem = useCartStore((s) => s.removeItem)
@@ -72,17 +78,18 @@ export function CartView({ lang, dict }: CartViewProps) {
     (sum, i) => sum + i.priceCents * i.quantity,
     0
   )
-  const reachedFreeShipping = subtotalCents >= FREE_SHIPPING_THRESHOLD_CENTS
+  const reachedFreeShipping =
+    subtotalCents >= shipping.freeShippingThresholdCents
   const freeShippingRemaining = Math.max(
     0,
-    FREE_SHIPPING_THRESHOLD_CENTS - subtotalCents
+    shipping.freeShippingThresholdCents - subtotalCents
   )
   const progressPct = Math.min(
     100,
-    Math.round((subtotalCents / FREE_SHIPPING_THRESHOLD_CENTS) * 100)
+    Math.round((subtotalCents / shipping.freeShippingThresholdCents) * 100)
   )
-  const meetsMin = meetsMinimumOrder(subtotalCents)
-  const minOrderRemaining = Math.max(0, MIN_ORDER_CENTS - subtotalCents)
+  const meetsMin = meetsMinimumOrder(subtotalCents, shipping.minOrderCents)
+  const minOrderRemaining = Math.max(0, shipping.minOrderCents - subtotalCents)
 
   return (
     <div className="grid lg:grid-cols-[1fr_380px] gap-10">

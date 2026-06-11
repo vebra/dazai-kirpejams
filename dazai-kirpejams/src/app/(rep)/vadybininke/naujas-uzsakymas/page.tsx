@@ -4,11 +4,11 @@ import {
   getRepOrderProducts,
   getMyRepOrderDetail,
 } from '@/lib/rep/queries'
-import { getCompanyInfo } from '@/lib/admin/queries'
+import { getCompanyInfo, getShippingSettings } from '@/lib/admin/queries'
 import {
-  DELIVERY_METHODS,
-  FREE_SHIPPING_THRESHOLD_CENTS,
+  deliveryPriceCents,
   vatRateFromVatCode,
+  type DeliveryMethod,
 } from '@/lib/commerce/constants'
 import { NewOrderFlow } from './NewOrderFlow'
 
@@ -28,10 +28,11 @@ export default async function NewRepOrderPage({
 }) {
   await requireSalesRep()
 
-  const [clients, products, company] = await Promise.all([
+  const [clients, products, company, shipping] = await Promise.all([
     getMyClients(),
     getRepOrderProducts(),
     getCompanyInfo().catch(() => null),
+    getShippingSettings(),
   ])
 
   // Pakartojimas: ?repeat=orderId — užpildom klientą ir prekes iš seno užsakymo.
@@ -54,11 +55,11 @@ export default async function NewRepOrderPage({
   const vatRate = vatRateFromVatCode(company?.vatCode)
 
   const deliveryOptions = (
-    Object.keys(DELIVERY_METHODS) as Array<keyof typeof DELIVERY_METHODS>
+    ['courier', 'parcel_locker', 'pickup'] as DeliveryMethod[]
   ).map((key) => ({
     value: key as string,
     label: DELIVERY_LABELS[key] ?? key,
-    priceCents: DELIVERY_METHODS[key].priceCents,
+    priceCents: deliveryPriceCents(key, shipping),
   }))
 
   return (
@@ -72,7 +73,7 @@ export default async function NewRepOrderPage({
         clients={clients}
         products={products}
         deliveryOptions={deliveryOptions}
-        freeShippingThresholdCents={FREE_SHIPPING_THRESHOLD_CENTS}
+        freeShippingThresholdCents={shipping.freeShippingThresholdCents}
         vatRate={vatRate}
         initialClientId={initialClientId}
         initialCart={initialCart}

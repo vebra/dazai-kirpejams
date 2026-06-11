@@ -358,15 +358,18 @@ export function personSchema({
  * OfferShippingDetails — nurodoma Product Offer'e per @id nuorodą.
  * Google naudoja merchant rich results generavimui.
  */
-export function shippingDetailsSchema(): Record<string, unknown> {
+export function shippingDetailsSchema(
+  // Pigiausia mokama parinktis centais (Omniva paštomatas) — paduodama iš
+  // shop_settings; default'as sutampa su DEFAULT_SHIPPING_SETTINGS.
+  cheapestRateCents: number = 499
+): Record<string, unknown> {
   return {
     '@context': 'https://schema.org',
     '@type': 'OfferShippingDetails',
     '@id': `${SITE_URL}/#shipping`,
-    // Pigiausia mokama parinktis (Omniva paštomatas). Nemokama nuo €50.
     shippingRate: {
       '@type': 'MonetaryAmount',
-      value: '4.99',
+      value: (cheapestRateCents / 100).toFixed(2),
       currency: 'EUR',
     },
     shippingDestination: {

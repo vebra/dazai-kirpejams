@@ -20,9 +20,8 @@ import { useRefreshCartPrices } from '@/lib/commerce/useRefreshCartPrices'
 import {
   calculateOrderTotals,
   meetsMinimumOrder,
-  SHIPPING_COURIER_CENTS,
-  SHIPPING_PARCEL_LOCKER_CENTS,
-  FREE_SHIPPING_THRESHOLD_CENTS,
+  DEFAULT_SHIPPING_SETTINGS,
+  type ShippingSettings,
   type DeliveryMethod,
   type PaymentMethod,
 } from '@/lib/commerce/constants'
@@ -54,6 +53,8 @@ type CheckoutFormProps = {
   dict: any
   /** Efektyvus PVM tarifas (0 = įmonė ne PVM mokėtoja → PVM nerodom). */
   vatRate: number
+  /** Pristatymo kainos/ribos iš shop_settings (žr. /apmokejimas/page.tsx). */
+  shipping?: ShippingSettings
   /** Prisijungusio vartotojo profilio duomenys — pre-fill'ina formą,
    *  kad nuolatinis klientas neturėtų kasdien įvesti tų pačių laukų. */
   prefill?: CheckoutFormPrefill
@@ -63,6 +64,7 @@ export function CheckoutForm({
   lang,
   dict,
   vatRate,
+  shipping = DEFAULT_SHIPPING_SETTINGS,
   prefill,
 }: CheckoutFormProps) {
   const router = useRouter()
@@ -138,7 +140,8 @@ export function CheckoutForm({
     subtotalCents,
     deliveryMethod,
     discountCents,
-    vatRate
+    vatRate,
+    shipping
   )
 
   // Jei subtotal sumažėjo žemiau kupono vertės po prekių pašalinimo — auto-nuimam kuponą.
@@ -195,7 +198,7 @@ export function CheckoutForm({
   }
 
   const canSubmit =
-    meetsMinimumOrder(subtotalCents) &&
+    meetsMinimumOrder(subtotalCents, shipping.minOrderCents) &&
     agreed &&
     firstName.trim() &&
     lastName.trim() &&
@@ -261,21 +264,21 @@ export function CheckoutForm({
       icon: Truck,
       title: dict.checkout.courier,
       desc: dict.checkout.courierDesc,
-      priceCents: SHIPPING_COURIER_CENTS,
+      priceCents: shipping.courierCents,
     },
     {
       value: 'parcel_locker',
       icon: Package,
       title: dict.checkout.parcelLocker,
       desc: dict.checkout.parcelLockerDesc,
-      priceCents: SHIPPING_PARCEL_LOCKER_CENTS,
+      priceCents: shipping.parcelLockerCents,
     },
     {
       value: 'pickup',
       icon: Building2,
       title: dict.checkout.pickup,
       desc: dict.checkout.pickupDesc,
-      priceCents: 0,
+      priceCents: shipping.pickupCents,
     },
   ]
 
@@ -369,7 +372,8 @@ export function CheckoutForm({
             {deliveryOptions.map(({ value, icon: Icon, title, desc, priceCents }) => {
               const selected = deliveryMethod === value
               const free =
-                subtotalCents >= FREE_SHIPPING_THRESHOLD_CENTS && priceCents > 0
+                subtotalCents >= shipping.freeShippingThresholdCents &&
+                priceCents > 0
               return (
                 <label
                   key={value}
