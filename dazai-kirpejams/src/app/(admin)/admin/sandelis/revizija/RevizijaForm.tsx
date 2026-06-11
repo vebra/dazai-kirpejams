@@ -130,7 +130,16 @@ export function RevizijaForm({
   }, [products, counts, missingFilter])
 
   function confirm() {
-    const items = discrepancies.map((r) => ({ productId: r.p.id, counted: r.counted }))
+    const items = discrepancies.map((r) => ({
+      productId: r.p.id,
+      counted: r.counted,
+      name: r.p.nameLt,
+      colorNumber: r.p.colorNumber,
+      sku: r.p.sku,
+      system: r.system,
+      diff: r.diff,
+      valueCents: r.valueCents,
+    }))
     startTransition(async () => {
       const res = await applyRevisionAction(items)
       setResult(res)
