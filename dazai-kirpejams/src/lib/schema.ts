@@ -363,10 +363,10 @@ export function shippingDetailsSchema(): Record<string, unknown> {
     '@context': 'https://schema.org',
     '@type': 'OfferShippingDetails',
     '@id': `${SITE_URL}/#shipping`,
-    // Pigiausia mokama parinktis (LP EXPRESS paštomatas). Nemokama nuo €50.
+    // Pigiausia mokama parinktis (Omniva paštomatas). Nemokama nuo €50.
     shippingRate: {
       '@type': 'MonetaryAmount',
-      value: '3.00',
+      value: '4.99',
       currency: 'EUR',
     },
     shippingDestination: {
