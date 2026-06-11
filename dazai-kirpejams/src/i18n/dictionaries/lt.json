@@ -1057,7 +1057,7 @@
     "youSave": "Sutaupote",
     "priceOnlyPro": "Kaina — tik profesionalams",
     "loginToSeePrice": "Prisijunkite arba užsiregistruokite, kad pamatytumėte kainas ir galėtumėte užsisakyti.",
-    "verifyNote": "Patvirtinimas — per 1 darbo dieną po dokumento pateikimo.",
+    "verifyNote": "Patvirtinimas — per 30 min. įkėlus dokumentą, kitu atveju per 1 darbo dieną.",
     "accountPendingTitle": "Paskyra laukia patvirtinimo",
     "accountPendingDesc": "Jūsų paskyra peržiūrima. Kai administratorius patvirtins dokumentą, matysite kainas ir galėsite pirkti.",
     "accountRejectedTitle": "Dokumentas atmestas",
@@ -1224,10 +1224,10 @@
     "metaDesc": "Prisiregistruokite kaip profesionalus kirpėjas arba salonas ir gaukite prieigą prie produktų kainų.",
     "headerTitle": "Registracija profesionalams",
     "cardTitle": "Sukurkite profesionalo paskyrą",
-    "cardDesc": "Kainos matomos tik patvirtintiems profesionalams. Po registracijos peržiūrėsime Jūsų dokumentą ir suaktyvinsime paskyrą per 1 darbo dieną.",
+    "cardDesc": "Kainos matomos tik patvirtintiems profesionalams. Įkėlus profesiją įrodantį dokumentą patvirtinsime per 30 min., be dokumento — per 1 darbo dieną.",
     "success": {
       "title": "Registracija sėkminga!",
-      "desc": "Jūsų paskyra sukurta. Patvirtinkite el. paštą (patikrinkite inbox'ą ir spam'ą), tada laukite, kol mūsų komanda peržiūrės Jūsų dokumentą ir patvirtins paskyrą. Tai užtrunka iki 1 darbo dienos.",
+      "desc": "Jūsų paskyra sukurta. Patvirtinkite el. paštą (patikrinkite inbox'ą ir spam'ą). Norite greičiau? Paskyroje įkelkite profesiją įrodantį dokumentą — patvirtinsime per 30 min. Be dokumento patvirtinimas užtrunka iki 1 darbo dienos.",
       "loginCta": "Prisijungti"
     },
     "auth": {
@@ -1271,7 +1271,7 @@
       "notes": "Papildoma informacija",
       "notesPlaceholder": "Pvz. dirbu salone „Stilius\", Kaune, 5+ metų patirtis...",
       "noticeStrong": "Svarbu:",
-      "noticeText": "Ši parduotuvė skirta tik profesionalams. Patvirtinę, kad esate kirpėja(-s), koloristė(-as) ar dirbate grožio salone, iškart matysite kainas — dokumentų įkelti nereikia.",
+      "noticeText": "Ši parduotuvė skirta tik profesionalams. Greičiausias patvirtinimas — paskyroje įkėlus profesiją įrodantį dokumentą (kirpėjo sertifikatą ar veiklos dokumentą): patvirtinsime per 30 min. Be dokumento — per 1 darbo dieną.",
       "confirmLabel": "Patvirtinu, kad esu profesionali(-us) kirpėja(-s), koloristė(-as) arba dirbu grožio salone",
       "confirmHint": "Ši informacija tikrinama. Klaidingas patvirtinimas gali užkirsti prieigą prie kainų."
     },
@@ -1450,6 +1450,8 @@
     "passwordTooShort": "Slaptažodis turi būti bent 6 simbolių.",
     "firstNameRequired": "Įveskite vardą.",
     "lastNameRequired": "Įveskite pavardę.",
+    "phoneRequired": "Įveskite telefono numerį.",
+    "cityRequired": "Įveskite miestą.",
     "businessTypeRequired": "Pasirinkite veiklos tipą.",
     "confirmProfessionalRequired": "Pažymėkite, kad esate profesionalė(-as) — ši parduotuvė skirta tik specialistams.",
     "emailAlreadyRegistered": "Šis el. paštas jau užregistruotas. Bandykite prisijungti.",

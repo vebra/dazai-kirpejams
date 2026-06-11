@@ -1057,7 +1057,7 @@
     "youSave": "You save",
     "priceOnlyPro": "Pricing — professionals only",
     "loginToSeePrice": "Log in or register to see prices and place orders.",
-    "verifyNote": "Approval within 1 business day after document submission.",
+    "verifyNote": "Approval within 30 min. after document upload, otherwise within 1 business day.",
     "accountPendingTitle": "Account pending approval",
     "accountPendingDesc": "Your account is under review. Once an administrator approves your document, you'll see prices and be able to order.",
     "accountRejectedTitle": "Document rejected",
@@ -1224,10 +1224,10 @@
     "metaDesc": "Register as a professional hairdresser or salon to access product prices.",
     "headerTitle": "Registration for professionals",
     "cardTitle": "Create a professional account",
-    "cardDesc": "Prices are visible only to approved professionals. After registration we review your document and activate your account within one business day.",
+    "cardDesc": "Prices are visible only to approved professionals. Upload a document proving your profession and we approve within 30 minutes; without a document — within 1 business day.",
     "success": {
       "title": "Registration successful!",
-      "desc": "Your account has been created. Confirm your email (check inbox and spam), then wait while our team reviews your document and approves your account. This takes up to one business day.",
+      "desc": "Your account has been created. Confirm your email (check inbox and spam). Want it faster? Upload a document proving your profession in your account — we approve within 30 minutes. Without a document approval takes up to 1 business day.",
       "loginCta": "Sign in"
     },
     "auth": {
@@ -1271,7 +1271,7 @@
       "notes": "Additional information",
       "notesPlaceholder": "E.g. I work at \"Stilius\" salon in Kaunas, 5+ years of experience...",
       "noticeStrong": "Important:",
-      "noticeText": "This store is for professionals only. Once you confirm you are a hairdresser, colorist or work in a beauty salon, prices are shown immediately — no documents required.",
+      "noticeText": "This store is for professionals only. Fastest approval: upload a document proving your profession (hairdresser certificate or business licence) in your account — we approve within 30 minutes. Without a document — within 1 business day.",
       "confirmLabel": "I confirm that I am a professional hairdresser, colorist or work in a beauty salon",
       "confirmHint": "This is subject to verification. A false confirmation may result in losing access to pricing."
     },
@@ -1450,6 +1450,8 @@
     "passwordTooShort": "Password must be at least 6 characters.",
     "firstNameRequired": "Enter your first name.",
     "lastNameRequired": "Enter your last name.",
+    "phoneRequired": "Enter your phone number.",
+    "cityRequired": "Enter your city.",
     "businessTypeRequired": "Select an activity type.",
     "confirmProfessionalRequired": "Please confirm you are a professional — this store is for specialists only.",
     "emailAlreadyRegistered": "This email is already registered. Try signing in.",

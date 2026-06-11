@@ -186,11 +186,13 @@ export function RegisterForm({
             label={dict.personal.phone}
             name="phone"
             type="tel"
+            required
             placeholder={dict.personal.phonePlaceholder}
           />
           <Field
             label={dict.personal.city}
             name="city"
+            required
             autoComplete="address-level2"
             placeholder={dict.personal.cityPlaceholder}
           />
@@ -203,43 +205,55 @@ export function RegisterForm({
         </legend>
 
         <div>
-          <label
-            htmlFor="business_type"
-            className="block text-xs font-medium text-brand-gray-500 mb-1.5"
-          >
+          <span className="block text-xs font-medium text-brand-gray-500 mb-1.5">
             {dict.business.typeLabel} <span className="text-brand-magenta">*</span>
-          </label>
-          <select
-            id="business_type"
-            name="business_type"
-            required
-            value={businessType}
-            onChange={(e) => setBusinessType(e.target.value)}
-            className="w-full px-4 py-3 border border-brand-gray-50 rounded-xl text-sm focus:outline-none focus:border-brand-magenta transition-colors bg-white"
-          >
-            <option value="hairdresser">{dict.business.options.hairdresser}</option>
-            <option value="colorist">{dict.business.options.colorist}</option>
-            <option value="salon_owner">{dict.business.options.salon_owner}</option>
-            <option value="student">{dict.business.options.student}</option>
-            <option value="other">{dict.business.options.other}</option>
-          </select>
+          </span>
+          {/* Aiškus pasirinkimas-pažymėjimas: KIRPĖJAS / SALONO SAVININKAS / KITA */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {(
+              [
+                { value: 'hairdresser', label: dict.business.options.hairdresser },
+                { value: 'salon_owner', label: dict.business.options.salon_owner },
+                { value: 'other', label: dict.business.options.other },
+              ] as const
+            ).map((opt) => (
+              <label
+                key={opt.value}
+                className={`flex items-center justify-center gap-2 px-3 py-3 border-2 rounded-xl text-sm font-semibold cursor-pointer transition-colors text-center ${
+                  businessType === opt.value
+                    ? 'border-brand-magenta bg-brand-magenta/5 text-brand-magenta'
+                    : 'border-brand-gray-50 text-brand-gray-900 hover:border-brand-magenta/40'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="business_type"
+                  value={opt.value}
+                  required
+                  checked={businessType === opt.value}
+                  onChange={() => setBusinessType(opt.value)}
+                  className="sr-only"
+                />
+                {opt.label}
+              </label>
+            ))}
+          </div>
         </div>
 
-        {(businessType === 'salon_owner' || businessType === 'other') && (
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Field
-              label={dict.business.salonName}
-              name="salon_name"
-              autoComplete="organization"
-              placeholder={dict.business.salonNamePlaceholder}
-            />
-            <Field
-              label={dict.business.companyCode}
-              name="company_code"
-              placeholder={dict.business.companyCodePlaceholder}
-            />
-          </div>
-        )}
+        <div className="grid sm:grid-cols-2 gap-4">
+          <Field
+            label={dict.business.salonName}
+            name="salon_name"
+            required
+            autoComplete="organization"
+            placeholder={dict.business.salonNamePlaceholder}
+          />
+          <Field
+            label={dict.business.companyCode}
+            name="company_code"
+            placeholder={dict.business.companyCodePlaceholder}
+          />
+        </div>
 
         <div>
           <label
