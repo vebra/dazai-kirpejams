@@ -5,6 +5,7 @@ import { getDictionary, hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { CartView } from '@/components/commerce/CartView'
 import { buildPageMetadata } from '@/lib/seo'
+import { getShippingSettings } from '@/lib/admin/queries'
 import { langPrefix } from '@/lib/utils'
 
 export async function generateMetadata({
@@ -30,6 +31,9 @@ export default async function CartPage({
   const { lang } = await params
   if (!hasLocale(lang)) notFound()
   const dict = await getDictionary(lang)
+  // Service-role skaitymas be cookies — puslapis lieka statinis (ISR),
+  // reikšmės atsinaujina per revalidate ciklą.
+  const shipping = await getShippingSettings()
 
   return (
     <>
@@ -55,7 +59,7 @@ export default async function CartPage({
           <h1 className="text-[clamp(1.5rem,3.5vw,2rem)] font-bold text-brand-gray-900 mb-8 leading-tight">
             {dict.cart.title}
           </h1>
-          <CartView lang={lang} dict={dict} />
+          <CartView lang={lang} dict={dict} shipping={shipping} />
         </Container>
       </section>
     </>

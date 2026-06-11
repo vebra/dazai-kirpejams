@@ -1,6 +1,13 @@
 /**
  * Komerciniai konstanta — vienoje vietoje, kad būtų lengva keisti.
  * Visos reikšmės centais (int), kad išvengtume floating-point klaidų.
+ *
+ * SVARBU: nuo shipping-settings refaktoringo tikrasis kainų šaltinis yra
+ * `shop_settings` DB lentelė (admin → Kainos → Parduotuvės nustatymai).
+ * Čia likę skaičiai yra TIK fallback'ai tam atvejui, jei DB nepasiekiama
+ * arba raktas neegzistuoja — jie turi sutapti su realiomis reikšmėmis.
+ * Server'is paima reikšmes per getShopSettings() ir paduoda žemiau esančioms
+ * funkcijoms kaip `ShippingSettings`.
  */
 
 // Minimali užsakymo suma — 30 EUR
@@ -9,10 +16,8 @@ export const MIN_ORDER_CENTS = 3000
 // Nemokamas pristatymas — nuo 50 EUR
 export const FREE_SHIPPING_THRESHOLD_CENTS = 5000
 
-// Pristatymo kainos
-// Paštomatas = tik Omniva — klientas checkout'e renkasi konkretų paštomatą
-// iš oficialaus Omniva sąrašo (žr. /api/omniva-lockers + OmnivaLockerPicker).
-export const SHIPPING_COURIER_CENTS = 599 // 5.99 EUR
+// Pristatymo kainos (fallback — žr. komentarą viršuje)
+export const SHIPPING_COURIER_CENTS = 1000 // 10.00 EUR
 export const SHIPPING_PARCEL_LOCKER_CENTS = 499 // 4.99 EUR (Omniva)
 export const SHIPPING_PICKUP_CENTS = 0
 
@@ -33,16 +38,47 @@ export function vatRateFromVatCode(
 
 export type DeliveryMethod = 'courier' | 'parcel_locker' | 'pickup'
 
-export const DELIVERY_METHODS: Record<
-  DeliveryMethod,
-  { priceCents: number; labelKey: string }
-> = {
-  courier: { priceCents: SHIPPING_COURIER_CENTS, labelKey: 'courier' },
-  parcel_locker: {
-    priceCents: SHIPPING_PARCEL_LOCKER_CENTS,
-    labelKey: 'parcelLocker',
-  },
-  pickup: { priceCents: SHIPPING_PICKUP_CENTS, labelKey: 'pickup' },
+/**
+ * Pristatymo kainų rinkinys — paduodamas iš serverio (shop_settings DB).
+ * Klientiniai komponentai jį gauna per props, server flow'ai — per
+ * getShopSettings() (žr. lib/admin/queries.ts).
+ */
+export type ShippingSettings = {
+  courierCents: number
+  parcelLockerCents: number
+  pickupCents: number
+  freeShippingThresholdCents: number
+  minOrderCents: number
+}
+
+export const DEFAULT_SHIPPING_SETTINGS: ShippingSettings = {
+  courierCents: SHIPPING_COURIER_CENTS,
+  parcelLockerCents: SHIPPING_PARCEL_LOCKER_CENTS,
+  pickupCents: SHIPPING_PICKUP_CENTS,
+  freeShippingThresholdCents: FREE_SHIPPING_THRESHOLD_CENTS,
+  minOrderCents: MIN_ORDER_CENTS,
+}
+
+/** Pristatymo būdo bazinė kaina (be nemokamo pristatymo ribos). */
+export function deliveryPriceCents(
+  method: DeliveryMethod,
+  settings: ShippingSettings = DEFAULT_SHIPPING_SETTINGS
+): number {
+  switch (method) {
+    case 'courier':
+      return settings.courierCents
+    case 'parcel_locker':
+      return settings.parcelLockerCents
+    case 'pickup':
+      return settings.pickupCents
+  }
+}
+
+/** Žodyno raktai pristatymo būdų etiketėms (kainos — per deliveryPriceCents). */
+export const DELIVERY_METHOD_LABEL_KEYS: Record<DeliveryMethod, string> = {
+  courier: 'courier',
+  parcel_locker: 'parcelLocker',
+  pickup: 'pickup',
 }
 
 export type PaymentMethod = 'bank_transfer' | 'paysera'
@@ -53,10 +89,11 @@ export type PaymentMethod = 'bank_transfer' | 'paysera'
  */
 export function calculateShippingCents(
   subtotalCents: number,
-  method: DeliveryMethod
+  method: DeliveryMethod,
+  settings: ShippingSettings = DEFAULT_SHIPPING_SETTINGS
 ): number {
-  if (subtotalCents >= FREE_SHIPPING_THRESHOLD_CENTS) return 0
-  return DELIVERY_METHODS[method].priceCents
+  if (subtotalCents >= settings.freeShippingThresholdCents) return 0
+  return deliveryPriceCents(method, settings)
 }
 
 /**
@@ -75,9 +112,14 @@ export function calculateOrderTotals(
   subtotalCents: number,
   deliveryMethod: DeliveryMethod,
   discountCents: number = 0,
-  vatRate: number = VAT_RATE
+  vatRate: number = VAT_RATE,
+  settings: ShippingSettings = DEFAULT_SHIPPING_SETTINGS
 ) {
-  const shippingCents = calculateShippingCents(subtotalCents, deliveryMethod)
+  const shippingCents = calculateShippingCents(
+    subtotalCents,
+    deliveryMethod,
+    settings
+  )
   // Saugumas: nuolaida niekada negali viršyti subtotal
   const clampedDiscount = Math.max(
     0,
@@ -102,6 +144,9 @@ export function calculateOrderTotals(
 /**
  * Validacija: ar subtotal pasiekia minimalią sumą.
  */
-export function meetsMinimumOrder(subtotalCents: number): boolean {
-  return subtotalCents >= MIN_ORDER_CENTS
+export function meetsMinimumOrder(
+  subtotalCents: number,
+  minOrderCents: number = MIN_ORDER_CENTS
+): boolean {
+  return subtotalCents >= minOrderCents
 }

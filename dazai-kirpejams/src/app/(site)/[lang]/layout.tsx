@@ -23,6 +23,7 @@ import {
   shippingDetailsSchema,
   returnPolicySchema,
 } from '@/lib/schema'
+import { getShippingSettings } from '@/lib/admin/queries'
 import {
   SITE_URL,
   buildCanonicalUrl,
@@ -123,6 +124,12 @@ export default async function RootLayout({
   if (!hasLocale(lang)) notFound()
 
   const dict = await getDictionary(lang)
+  // Service-role skaitymas (be cookies — statinis renderingas išlieka).
+  // Schema.org rodome pigiausią MOKAMĄ pristatymo parinktį.
+  const shipping = await getShippingSettings()
+  const cheapestRateCents = Math.min(
+    ...[shipping.courierCents, shipping.parcelLockerCents].filter((c) => c > 0)
+  )
 
   return (
     <html lang={lang} className={`${inter.variable} h-full`}>
@@ -134,7 +141,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col antialiased overflow-x-hidden">
         <JsonLd data={organizationSchema()} />
         <JsonLd data={websiteSchema(lang)} />
-        <JsonLd data={shippingDetailsSchema()} />
+        <JsonLd data={shippingDetailsSchema(cheapestRateCents)} />
         <JsonLd data={returnPolicySchema()} />
         <ScrollProgress />
         <CursorGlow />

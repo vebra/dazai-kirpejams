@@ -2,6 +2,7 @@ import 'server-only'
 import { createServerSupabase } from '@/lib/supabase/ssr'
 import { createServerClient } from '@/lib/supabase/server'
 import { DYE_CATEGORIES, type DyeCategoryKey } from '@/lib/data/dye-categories'
+import type { ShippingSettings } from '@/lib/commerce/constants'
 import type { PendingRepOrder } from './rep-orders-shared'
 
 /**
@@ -1341,9 +1342,9 @@ export type CompanyInfo = {
  */
 const DEFAULT_SHOP_SETTINGS: ShopSettings = {
   freeShippingThresholdCents: 5000, // €50
-  minOrderCents: 0,
-  deliveryCostCourierCents: 499,
-  deliveryCostParcelLockerCents: 299,
+  minOrderCents: 3000, // €30
+  deliveryCostCourierCents: 1000, // €10.00
+  deliveryCostParcelLockerCents: 499, // €4.99 (Omniva)
   deliveryCostPickupCents: 0,
 }
 
@@ -1386,8 +1387,14 @@ function parseStringSetting(raw: unknown, fallback: string = ''): string {
   return fallback
 }
 
+/**
+ * Pristatymo kainų / ribų TIESOS ŠALTINIS — naudoja checkout, krepšelis,
+ * admin/rep nauji užsakymai, /pristatymas ir schema.org. Skaitom per
+ * service_role klientą (be cookies), kad funkcija būtų saugi ir statiniuose
+ * puslapiuose — cookies() kvietimas čia užkirstų statinį renderingą.
+ */
 export async function getShopSettings(): Promise<ShopSettings> {
-  const supabase = await createServerSupabase()
+  const supabase = createServerClient()
   const { data, error } = await supabase
     .from('shop_settings')
     .select('key, value')
@@ -1423,6 +1430,21 @@ export async function getShopSettings(): Promise<ShopSettings> {
       map.get('delivery_cost_pickup_cents'),
       DEFAULT_SHOP_SETTINGS.deliveryCostPickupCents
     ),
+  }
+}
+
+/**
+ * Tas pats shop_settings turinys commerce sluoksnio forma — paduodamas į
+ * calculateOrderTotals/calculateShippingCents ir client komponentų props.
+ */
+export async function getShippingSettings(): Promise<ShippingSettings> {
+  const s = await getShopSettings()
+  return {
+    courierCents: s.deliveryCostCourierCents,
+    parcelLockerCents: s.deliveryCostParcelLockerCents,
+    pickupCents: s.deliveryCostPickupCents,
+    freeShippingThresholdCents: s.freeShippingThresholdCents,
+    minOrderCents: s.minOrderCents,
   }
 }
 

@@ -4,11 +4,11 @@ import { revalidatePath } from 'next/cache'
 import { requireSalesRep } from '@/lib/rep/auth'
 import { createServerSupabase } from '@/lib/supabase/ssr'
 import {
-  DELIVERY_METHODS,
-  FREE_SHIPPING_THRESHOLD_CENTS,
+  deliveryPriceCents,
   vatRateFromVatCode,
+  type DeliveryMethod,
 } from '@/lib/commerce/constants'
-import { getCompanyInfo } from '@/lib/admin/queries'
+import { getCompanyInfo, getShippingSettings } from '@/lib/admin/queries'
 import { sendEmail, getAdminNotificationEmail } from '@/lib/email/resend'
 import { buildRepOrderAdminEmail } from '@/lib/email/templates'
 import type { RepClient } from '@/lib/rep/types'
@@ -102,8 +102,10 @@ export async function submitRepOrder(input: {
   if (!input.clientId) return { ok: false, error: 'Pasirinkite klientą.' }
   if (!input.items?.length) return { ok: false, error: 'Pridėkite bent vieną prekę.' }
 
-  const dm = DELIVERY_METHODS[input.deliveryMethod as keyof typeof DELIVERY_METHODS]
-  if (!dm) return { ok: false, error: 'Pasirinkite pristatymo būdą.' }
+  const validMethods: DeliveryMethod[] = ['courier', 'parcel_locker', 'pickup']
+  if (!validMethods.includes(input.deliveryMethod as DeliveryMethod)) {
+    return { ok: false, error: 'Pasirinkite pristatymo būdą.' }
+  }
 
   // Pristatymui (ne atsiėmimui) reikia adreso
   if (input.deliveryMethod !== 'pickup') {
@@ -117,6 +119,8 @@ export async function submitRepOrder(input: {
   // (tapus PVM mokėtoju) — automatiškai 21%, ir čia, ir viešam sraute.
   const company = await getCompanyInfo().catch(() => null)
   const vatRate = vatRateFromVatCode(company?.vatCode)
+  // Pristatymo kainos/riba — iš shop_settings (tas pats šaltinis kaip checkout).
+  const shipping = await getShippingSettings()
 
   const supabase = await createServerSupabase()
   const { data, error } = await supabase.rpc('create_rep_order', {
@@ -129,8 +133,11 @@ export async function submitRepOrder(input: {
     p_payment_method: input.paymentMethod,
     p_locale: 'lt',
     p_notes: input.notes?.trim() || null,
-    p_shipping_base_cents: dm.priceCents,
-    p_free_shipping_threshold_cents: FREE_SHIPPING_THRESHOLD_CENTS,
+    p_shipping_base_cents: deliveryPriceCents(
+      input.deliveryMethod as DeliveryMethod,
+      shipping
+    ),
+    p_free_shipping_threshold_cents: shipping.freeShippingThresholdCents,
     p_vat_rate: vatRate,
   })
 

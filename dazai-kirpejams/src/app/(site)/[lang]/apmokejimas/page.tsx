@@ -7,7 +7,7 @@ import { Section } from '@/components/ui/Section'
 import { CheckoutForm } from '@/components/commerce/CheckoutForm'
 import { buildPageMetadata } from '@/lib/seo'
 import { isUserVerified } from '@/lib/auth/verification'
-import { getCompanyInfo } from '@/lib/admin/queries'
+import { getCompanyInfo, getShippingSettings } from '@/lib/admin/queries'
 import { vatRateFromVatCode } from '@/lib/commerce/constants'
 import { langPrefix } from '@/lib/utils'
 import { createServerSupabase } from '@/lib/supabase/ssr'
@@ -45,6 +45,7 @@ export default async function CheckoutPage({
   const dict = await getDictionary(lang)
   const company = await getCompanyInfo().catch(() => null)
   const vatRate = vatRateFromVatCode(company?.vatCode)
+  const shipping = await getShippingSettings()
 
   // Pre-fill iš user_profiles + auth.users — kad nuolatinis klientas
   // neturėtų kasdien įvesti tų pačių laukų. Tylus fallback į tuščia, jei
@@ -120,6 +121,7 @@ export default async function CheckoutPage({
             lang={lang}
             dict={dict}
             vatRate={vatRate}
+            shipping={shipping}
             prefill={prefill}
           />
         </Container>

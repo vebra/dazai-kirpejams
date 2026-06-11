@@ -6,8 +6,7 @@ import {
   calculateOrderTotals,
   meetsMinimumOrder,
   vatRateFromVatCode,
-  DELIVERY_METHODS,
-  FREE_SHIPPING_THRESHOLD_CENTS,
+  deliveryPriceCents,
   type DeliveryMethod,
   type PaymentMethod,
 } from './constants'
@@ -18,7 +17,7 @@ import {
   buildCustomerOrderEmail,
   buildAdminOrderEmail,
 } from '@/lib/email/templates'
-import { getCompanyInfo } from '@/lib/admin/queries'
+import { getCompanyInfo, getShippingSettings } from '@/lib/admin/queries'
 import { getDictionary } from '@/i18n/dictionaries'
 import { sendMetaCapiEvent } from '@/lib/analytics-capi'
 import { createOrderViewToken } from '@/lib/orders/view-token'
@@ -105,13 +104,17 @@ export async function createOrder(
     return { ok: false, error: errs.missingParcelLocker }
   }
 
-  // Skaičiavimai server-side (klientu nepasitikime)
+  // Skaičiavimai server-side (klientu nepasitikime). Kainos/ribos — iš
+  // shop_settings DB (admin → Kainos); klaidos atveju funkcija grąžina
+  // kodo fallback'us, tad checkout'as niekada neužstringa.
+  const shippingSettings = await getShippingSettings()
+
   const subtotalCents = input.items.reduce(
     (sum, i) => sum + i.priceCents * i.quantity,
     0
   )
 
-  if (!meetsMinimumOrder(subtotalCents)) {
+  if (!meetsMinimumOrder(subtotalCents, shippingSettings.minOrderCents)) {
     return { ok: false, error: errs.minOrderNotMet }
   }
 
@@ -147,8 +150,11 @@ export async function createOrder(
   }
   const vatRate = vatRateFromVatCode(companyInfo?.vatCode)
 
-  // Komercinės konstantos perduodamos į RPC — vienas tiesos šaltinis (JS).
-  const shippingBaseCents = DELIVERY_METHODS[input.deliveryMethod].priceCents
+  // Komercinės reikšmės perduodamos į RPC — vienas tiesos šaltinis (shop_settings).
+  const shippingBaseCents = deliveryPriceCents(
+    input.deliveryMethod,
+    shippingSettings
+  )
 
   // ============================================
   // Atominis užsakymo kūrimas — VIENAS RPC, VIENA transakcija.
@@ -194,7 +200,8 @@ export async function createOrder(
         p_notes: input.notes ?? null,
         p_discount_code: normalizedInputCode || null,
         p_shipping_base_cents: shippingBaseCents,
-        p_free_shipping_threshold_cents: FREE_SHIPPING_THRESHOLD_CENTS,
+        p_free_shipping_threshold_cents:
+          shippingSettings.freeShippingThresholdCents,
         p_vat_rate: vatRate,
       })
 
@@ -278,7 +285,8 @@ export async function createOrder(
     subtotalCents,
     input.deliveryMethod,
     discountCents,
-    vatRate
+    vatRate,
+    shippingSettings
   )
 
   // ============================================

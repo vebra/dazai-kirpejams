@@ -52,10 +52,10 @@ describe('calculateOrderTotals — basic math', () => {
     const t = calculateOrderTotals(4000, 'courier')
     expect(t.subtotalCents).toBe(4000)
     expect(t.discountCents).toBe(0)
-    expect(t.shippingCents).toBe(599)
-    expect(t.totalCents).toBe(4599)
+    expect(t.shippingCents).toBe(SHIPPING_COURIER_CENTS)
+    expect(t.totalCents).toBe(4000 + SHIPPING_COURIER_CENTS)
     // VAT is the inclusive portion: total - total / 1.21, rounded
-    expect(t.vatCents).toBe(798)
+    expect(t.vatCents).toBe(868)
   })
 
   it('extracts VAT correctly for a round 100 EUR pickup order', () => {
@@ -69,20 +69,20 @@ describe('calculateOrderTotals — discount clamping', () => {
   it('clamps a discount larger than the subtotal down to the subtotal', () => {
     const t = calculateOrderTotals(4000, 'courier', 5000)
     expect(t.discountCents).toBe(4000)
-    // 4000 - 4000 + 599 shipping
-    expect(t.totalCents).toBe(599)
+    // 4000 - 4000 + shipping
+    expect(t.totalCents).toBe(SHIPPING_COURIER_CENTS)
   })
 
   it('clamps a negative discount up to zero', () => {
     const t = calculateOrderTotals(4000, 'courier', -100)
     expect(t.discountCents).toBe(0)
-    expect(t.totalCents).toBe(4599)
+    expect(t.totalCents).toBe(4000 + SHIPPING_COURIER_CENTS)
   })
 
   it('applies a normal partial discount', () => {
     const t = calculateOrderTotals(4000, 'courier', 1000)
     expect(t.discountCents).toBe(1000)
-    expect(t.totalCents).toBe(3599)
+    expect(t.totalCents).toBe(3000 + SHIPPING_COURIER_CENTS)
   })
 })
 
@@ -120,14 +120,14 @@ describe('calculateOrderTotals — non-VAT payer (vatRate = 0)', () => {
     const t = calculateOrderTotals(4000, 'courier', 0, 0)
     expect(t.vatCents).toBe(0)
     // Totals are otherwise unchanged — VAT is inclusive, not additive
-    expect(t.totalCents).toBe(4599)
+    expect(t.totalCents).toBe(4000 + SHIPPING_COURIER_CENTS)
     expect(t.subtotalCents).toBe(4000)
-    expect(t.shippingCents).toBe(599)
+    expect(t.shippingCents).toBe(SHIPPING_COURIER_CENTS)
   })
 
   it('still extracts VAT when an explicit 21% rate is passed (VAT payer)', () => {
     const t = calculateOrderTotals(4000, 'courier', 0, VAT_RATE)
-    expect(t.vatCents).toBe(798)
+    expect(t.vatCents).toBe(868)
   })
 
   it('defaults to the standard VAT rate when no rate argument is given', () => {
@@ -148,5 +148,34 @@ describe('meetsMinimumOrder', () => {
 
   it('accepts above the minimum', () => {
     expect(meetsMinimumOrder(MIN_ORDER_CENTS + 1)).toBe(true)
+  })
+
+  it('respects a custom minimum from shop settings', () => {
+    expect(meetsMinimumOrder(1000, 0)).toBe(true)
+    expect(meetsMinimumOrder(1000, 1500)).toBe(false)
+  })
+})
+
+describe('shop settings override (shop_settings DB → ShippingSettings)', () => {
+  const custom = {
+    courierCents: 750,
+    parcelLockerCents: 350,
+    pickupCents: 0,
+    freeShippingThresholdCents: 8000,
+    minOrderCents: 2000,
+  }
+
+  it('uses custom prices and threshold instead of defaults', () => {
+    expect(calculateShippingCents(4000, 'courier', custom)).toBe(750)
+    expect(calculateShippingCents(4000, 'parcel_locker', custom)).toBe(350)
+    // Default threshold (5000) would make this free — custom (8000) must not
+    expect(calculateShippingCents(6000, 'courier', custom)).toBe(750)
+    expect(calculateShippingCents(8000, 'courier', custom)).toBe(0)
+  })
+
+  it('flows custom settings through calculateOrderTotals', () => {
+    const t = calculateOrderTotals(4000, 'parcel_locker', 0, VAT_RATE, custom)
+    expect(t.shippingCents).toBe(350)
+    expect(t.totalCents).toBe(4350)
   })
 })
