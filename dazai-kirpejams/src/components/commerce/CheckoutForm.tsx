@@ -28,6 +28,7 @@ import {
 } from '@/lib/commerce/constants'
 import { formatPrice, langPrefix } from '@/lib/utils'
 import { createOrder } from '@/lib/commerce/order-actions'
+import { OmnivaLockerPicker } from '@/components/commerce/OmnivaLockerPicker'
 import { validateDiscountCodeAction } from '@/lib/commerce/discount-actions'
 import type { Locale } from '@/i18n/config'
 
@@ -442,12 +443,10 @@ export function CheckoutForm({
           )}
           {deliveryMethod === 'parcel_locker' && (
             <div className="mt-6">
-              <TextField
-                label={dict.checkout.parcelLockerSelect}
+              <OmnivaLockerPicker
                 value={parcelLocker}
                 onChange={setParcelLocker}
-                placeholder={dict.checkout.parcelLockerPlaceholder}
-                required
+                dict={dict.checkout}
               />
             </div>
           )}
