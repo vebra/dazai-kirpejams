@@ -82,7 +82,8 @@ export function RevizijaForm({
         (p) =>
           p.nameLt.toLowerCase().includes(q) ||
           (p.colorNumber ?? '').toLowerCase().includes(q) ||
-          (p.sku ?? '').toLowerCase().includes(q)
+          (p.sku ?? '').toLowerCase().includes(q) ||
+          (p.ean ?? '').includes(q)
       )
       .slice(0, 8)
   }, [products, search])

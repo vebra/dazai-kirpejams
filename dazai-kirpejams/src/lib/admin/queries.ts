@@ -279,7 +279,8 @@ export async function getAdminProducts(
     const term = `%${options.search}%`
     query = query.or(
       `name_lt.ilike.${term},name_en.ilike.${term},name_ru.ilike.${term},` +
-        `sku.ilike.${term},color_number.ilike.${term},color_name.ilike.${term}`
+        `sku.ilike.${term},color_number.ilike.${term},color_name.ilike.${term},` +
+        `ean.ilike.${term}`
     )
   }
 
