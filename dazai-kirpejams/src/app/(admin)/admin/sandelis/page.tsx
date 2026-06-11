@@ -103,6 +103,7 @@ export default async function AdminInventoryPage({
   )
   const lowOnly = sp.low === '1'
   const inactiveOnly = sp.inactive === '1'
+  const activeOnly = sp.active === '1'
   const errorParam = typeof sp.error === 'string' ? sp.error : undefined
   const activatedCount = typeof sp.activated === 'string' ? Number(sp.activated) : null
   const deactivatedCount = typeof sp.deactivated === 'string' ? Number(sp.deactivated) : null
@@ -115,6 +116,7 @@ export default async function AdminInventoryPage({
       sortBy,
       onlyLowStock: lowOnly,
       onlyInactive: inactiveOnly,
+      onlyActive: activeOnly,
     }),
     getAdminCategories(),
     getActiveProductsCount(),
@@ -414,6 +416,16 @@ export default async function AdminInventoryPage({
               className="w-4 h-4 rounded border-[#ddd]"
             />
             Tik žemo likučio (&lt; 50)
+          </label>
+          <label className="flex items-center gap-2 text-sm text-brand-gray-900 cursor-pointer">
+            <input
+              type="checkbox"
+              name="active"
+              value="1"
+              defaultChecked={activeOnly}
+              className="w-4 h-4 rounded border-[#ddd]"
+            />
+            Tik aktyvūs
           </label>
           <label className="flex items-center gap-2 text-sm text-brand-gray-900 cursor-pointer">
             <input

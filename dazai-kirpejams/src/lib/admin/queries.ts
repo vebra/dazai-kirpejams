@@ -250,6 +250,7 @@ export type AdminProductListOptions = {
   categoryId?: string
   dyeGroup?: DyeCategoryKey
   onlyInactive?: boolean
+  onlyActive?: boolean
   onlyLowStock?: boolean
   sortBy?: 'name' | 'stock-asc' | 'stock-desc' | 'price-asc' | 'price-desc'
 }
@@ -297,6 +298,10 @@ export async function getAdminProducts(
 
   if (options.onlyInactive) {
     query = query.eq('is_active', false)
+  }
+
+  if (options.onlyActive) {
+    query = query.eq('is_active', true)
   }
 
   if (options.onlyLowStock) {
