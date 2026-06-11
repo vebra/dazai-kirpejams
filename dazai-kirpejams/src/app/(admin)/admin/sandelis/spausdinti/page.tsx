@@ -17,11 +17,18 @@ export default async function PrintStockPage({
   const sp = await searchParams
   const activeOnly = sp.active === '1'
   const products = await getAdminProducts({ onlyActive: activeOnly })
-  products.sort(
-    (a, b) =>
+  // Pirštinės — visada sąrašo apačioje (pagalbinė prekė, ne dažai).
+  const isGlove = (p: { nameLt: string }) =>
+    p.nameLt.toLowerCase().includes('pirštin')
+  products.sort((a, b) => {
+    const ga = isGlove(a) ? 1 : 0
+    const gb = isGlove(b) ? 1 : 0
+    if (ga !== gb) return ga - gb
+    return (
       (a.categoryNameLt ?? '').localeCompare(b.categoryNameLt ?? '', 'lt') ||
       a.nameLt.localeCompare(b.nameLt, 'lt')
-  )
+    )
+  })
 
   const totalUnits = products.reduce((s, p) => s + (p.stockQuantity ?? 0), 0)
 
