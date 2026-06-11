@@ -431,7 +431,9 @@ export async function getStockMovements(opts?: {
   to?: string // YYYY-MM-DD (imtinai)
   limit?: number
 }): Promise<StockMovementRow[]> {
-  const supabase = await createServerSupabase()
+  // Service role — embed'as į products; po 067 authenticated rolei products
+  // skaitymas (net per embed) grąžina tuščią → žurnalas atrodė tuščias.
+  const supabase = createServerClient()
   let query = supabase
     .from('stock_movements')
     .select(
