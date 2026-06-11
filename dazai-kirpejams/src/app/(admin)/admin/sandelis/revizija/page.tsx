@@ -25,12 +25,20 @@ export default async function RevizijaPage() {
             prekių likučiai NEKEIČIAMI.
           </p>
         </div>
-        <Link
-          href="/admin/sandelis"
-          className="text-[13px] font-semibold text-brand-gray-500 hover:text-brand-magenta"
-        >
-          ← Atgal į sandėlį
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/admin/sandelis/revizija/istorija"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-[13px] hover:bg-[#F5F5F7] transition-colors"
+          >
+            📜 Istorija
+          </Link>
+          <Link
+            href="/admin/sandelis"
+            className="text-[13px] font-semibold text-brand-gray-500 hover:text-brand-magenta"
+          >
+            ← Atgal į sandėlį
+          </Link>
+        </div>
       </div>
 
       <RevizijaForm products={products} />

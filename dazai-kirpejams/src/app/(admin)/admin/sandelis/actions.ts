@@ -430,15 +430,28 @@ export type RevisionResult =
   | { ok: true; applied: number }
   | { ok: false; error: string }
 
+export type RevisionDetailItem = {
+  productId: string
+  counted: number
+  // Suvestinei (revizijų istorijai) — siunčiama iš admin UI:
+  name: string
+  colorNumber: string | null
+  sku: string | null
+  system: number
+  diff: number
+  valueCents: number
+}
+
 /**
  * Pritaiko revizijos rezultatus: kiekvienai prekei, kurios suskaičiuotas
  * kiekis skiriasi nuo sistemos, nustato naują likutį per `set_product_stock`
  * (atominis likutis + įrašas į žurnalą, source='revizija'). Idempotentiška —
  * nustato absoliučią reikšmę, tad pakartojimas nepakenkia. Frontend siunčia
  * TIK pasikeitusias prekes (neskaičiuotos NEsiunčiamos → likutis nekeičiamas).
+ * Pabaigoje įrašoma suvestinė į stock_revisions (revizijų istorija, migr 071).
  */
 export async function applyRevisionAction(
-  items: { productId: string; counted: number }[]
+  items: RevisionDetailItem[]
 ): Promise<RevisionResult> {
   await requireAdmin()
   if (!items || items.length === 0) {
@@ -447,6 +460,7 @@ export async function applyRevisionAction(
   const supabase = createServerClient()
   const stamp = new Date().toISOString().slice(0, 10)
   let applied = 0
+  const appliedItems: RevisionDetailItem[] = []
   const failed: string[] = []
   for (const it of items) {
     if (!Number.isInteger(it.counted) || it.counted < 0) {
@@ -468,8 +482,32 @@ export async function applyRevisionAction(
       failed.push(it.productId)
     } else {
       applied++
+      appliedItems.push(it)
     }
   }
+
+  // Revizijos suvestinė istorijai — non-blocking (likučiai jau pritaikyti).
+  if (appliedItems.length > 0) {
+    const { error: revErr } = await supabase.from('stock_revisions').insert({
+      applied_count: appliedItems.length,
+      total_delta: appliedItems.reduce((s, i) => s + i.diff, 0),
+      value_change_cents: appliedItems.reduce((s, i) => s + i.valueCents, 0),
+      details: appliedItems.map((i) => ({
+        productId: i.productId,
+        name: i.name,
+        colorNumber: i.colorNumber,
+        sku: i.sku,
+        system: i.system,
+        counted: i.counted,
+        diff: i.diff,
+        valueCents: i.valueCents,
+      })),
+    })
+    if (revErr) {
+      console.error('[admin/sandelis/actions] revision summary:', revErr.message)
+    }
+  }
+
   revalidatePath('/admin/sandelis')
   revalidatePath('/admin')
   revalidateTag('products', 'max')
