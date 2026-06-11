@@ -41,9 +41,19 @@ export default async function PrintStockPage({
               body { background: white !important; }
               aside, [data-admin-sidebar], header[data-admin-topbar],
               .admin-sidebar, .admin-topbar { display: none !important; }
-              .print-page { padding: 0 !important; margin: 0 !important; }
+              .print-page { padding: 0 !important; margin: 0 !important; max-width: none !important; }
               .print-hide { display: none !important; }
-              @page { margin: 1cm; size: A4; }
+              @page { margin: 0.7cm; size: A4; }
+              /* Sutankinta lentelė — telpa į max 2 lapus */
+              .stock-table { font-size: 9.5px !important; line-height: 1.15 !important; }
+              .stock-table th, .stock-table td {
+                padding-top: 1px !important;
+                padding-bottom: 1px !important;
+              }
+              .stock-header h1 { font-size: 15px !important; }
+              .stock-header { padding-bottom: 4px !important; margin-bottom: 6px !important; }
+              .stock-header .meta { margin-top: 2px !important; font-size: 10px !important; }
+              .stock-footer { margin-top: 6px !important; padding-top: 3px !important; font-size: 8px !important; }
             }
           `,
         }}
@@ -84,11 +94,11 @@ export default async function PrintStockPage({
           </div>
         </div>
 
-        <header className="border-b border-black pb-4 mb-6">
+        <header className="stock-header border-b border-black pb-4 mb-6">
           <h1 className="text-2xl font-bold">
             Sandėlio likučiai{activeOnly ? ' (tik aktyvūs)' : ''}
           </h1>
-          <div className="mt-3 flex items-center justify-between text-sm">
+          <div className="meta mt-3 flex items-center justify-between text-sm">
             <div>
               Prekių: <strong>{products.length}</strong> · Iš viso vienetų:{' '}
               <strong>{totalUnits}</strong>
@@ -103,7 +113,7 @@ export default async function PrintStockPage({
         {products.length === 0 ? (
           <div className="text-sm">Produktų nėra.</div>
         ) : (
-          <table className="w-full text-[13px] border-collapse">
+          <table className="stock-table w-full text-[13px] border-collapse">
             <thead>
               <tr className="border-b-2 border-black text-left">
                 <th className="py-2 pr-2 w-[28px]">#</th>
@@ -142,7 +152,7 @@ export default async function PrintStockPage({
           </table>
         )}
 
-        <footer className="mt-8 pt-4 border-t border-gray-400 text-[11px] text-gray-600">
+        <footer className="stock-footer mt-8 pt-4 border-t border-gray-400 text-[11px] text-gray-600">
           Color SHOCK · Dažai Kirpėjams · Sandėlio inventorizacija
         </footer>
       </div>
