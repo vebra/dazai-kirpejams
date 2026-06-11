@@ -13,6 +13,8 @@ import {
   formDataToObject,
 } from '@/lib/validation/auth-schemas'
 import { getEffectivePriceCents } from '@/lib/types'
+import { sendEmail, getAdminNotificationEmail } from '@/lib/email/resend'
+import { buildAdminVerificationDocEmail } from '@/lib/email/auth-templates'
 
 export type UploadDocState = {
   error?: string
@@ -102,13 +104,46 @@ export async function uploadDocumentAction(
     verification_status: 'pending' as const,
   }
 
-  const { error: upsertError } = await supabase
+  // Service klientas: po migr 069 trigeris neleidžia pačiam vartotojui keisti
+  // verification_status — bet čia statusą į 'pending' nustato SISTEMA dėl
+  // naujo dokumento (pvz. po atmetimo įkėlus iš naujo, admin turi peržiūrėti
+  // dar kartą). id = user.id iš autentifikuotos sesijos, tad saugu.
+  const admin = createServerClient()
+  const { error: upsertError } = await admin
     .from('user_profiles')
     .upsert(profilePayload, { onConflict: 'id' })
 
   if (upsertError) {
     console.error('[upload-doc] profile upsert error:', upsertError.message)
     return { error: errors.profileUpdateFailed }
+  }
+
+  // Pranešam adminui — dokumentas įkeltas, verifikacija dabar aktuali.
+  // (Registracijos laiškas ateina anksčiau, dar be dokumento.) Non-blocking.
+  try {
+    const { data: prof } = await admin
+      .from('user_profiles')
+      .select('first_name, last_name')
+      .eq('id', user.id)
+      .maybeSingle()
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
+      'https://www.dazaikirpejams.lt'
+    const mail = buildAdminVerificationDocEmail({
+      fullName: `${prof?.first_name ?? ''} ${prof?.last_name ?? ''}`.trim(),
+      email: user.email ?? '',
+      adminUrl: `${siteUrl}/admin/verifikacija`,
+    })
+    const adminEmail = getAdminNotificationEmail() ?? 'info@dziuljetavebre.lt'
+    await sendEmail({
+      to: adminEmail,
+      subject: mail.subject,
+      html: mail.html,
+      text: mail.text,
+      replyTo: user.email ?? undefined,
+    })
+  } catch (err) {
+    console.error('[upload-doc] admin notify failed (non-blocking):', err)
   }
 
   revalidatePath('/paskyra', 'page')
