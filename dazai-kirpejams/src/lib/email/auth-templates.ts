@@ -591,6 +591,72 @@ export type AdminRegistrationEmailInput = {
   adminUrl: string
 }
 
+// ============================================
+// ADMIN: įkeltas verifikacijos dokumentas — laukia patvirtinimo
+// ============================================
+
+export type AdminVerificationDocEmailInput = {
+  fullName: string
+  email: string
+  adminUrl: string
+}
+
+/**
+ * Siunčiama adminui, kai vartotojas ĮKELIA verifikacijos dokumentą per
+ * paskyrą. Registracijos laiškas ateina anksčiau (be dokumento) — šitas
+ * praneša, kad dabar JAU galima patvirtinti.
+ */
+export function buildAdminVerificationDocEmail(
+  input: AdminVerificationDocEmailInput
+): { subject: string; html: string; text: string } {
+  const who = input.fullName || input.email
+  const subject = `Įkeltas verifikacijos dokumentas — laukia patvirtinimo · ${who}`
+
+  const html = `<!doctype html>
+<html lang="lt">
+<head><meta charset="utf-8"><title>${escapeHtml(subject)}</title></head>
+<body style="margin:0;padding:0;background:${GRAY_50};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:${GRAY_900};">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};padding:32px 16px;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
+      <tr>
+        <td style="padding:24px 32px;background:${BRAND_MAGENTA};">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.85);">
+            Admin · Verifikacijos dokumentas
+          </div>
+          <div style="font-size:22px;font-weight:700;color:#ffffff;margin-top:4px;">
+            ${escapeHtml(who)}
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:24px 32px;">
+          <p style="margin:0 0 8px;font-size:14px;line-height:1.6;">
+            Vartotojas įkėlė verifikacijos dokumentą ir laukia patvirtinimo.
+          </p>
+          <p style="margin:0 0 20px;font-size:14px;color:${GRAY_500};border-top:1px solid ${BORDER};padding-top:12px;">
+            El. paštas: <a href="mailto:${escapeHtml(input.email)}" style="color:${BRAND_MAGENTA};text-decoration:none;">${escapeHtml(input.email)}</a>
+          </p>
+          <a href="${input.adminUrl}" style="display:inline-block;padding:12px 24px;background:${GRAY_900};color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;border-radius:8px;">
+            Peržiūrėti ir patvirtinti →
+          </a>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`
+
+  const text = `Įkeltas verifikacijos dokumentas — laukia patvirtinimo
+${who}
+El. paštas: ${input.email}
+
+Peržiūrėti: ${input.adminUrl}`
+
+  return { subject, html, text }
+}
+
 export function buildAdminRegistrationEmail(
   input: AdminRegistrationEmailInput
 ): { subject: string; html: string; text: string } {
