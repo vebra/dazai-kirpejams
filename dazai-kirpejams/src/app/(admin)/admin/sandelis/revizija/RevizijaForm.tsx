@@ -27,6 +27,7 @@ export function RevizijaForm({
   // productId → suskaičiuotas kiekis (tik paliestos prekės)
   const [counts, setCounts] = useState<Record<string, number>>({})
   const [search, setSearch] = useState('')
+  const [missingFilter, setMissingFilter] = useState('')
   const [lastScan, setLastScan] = useState<ScanResult | null>(null)
   const scanRef = useRef<HTMLInputElement>(null)
   const scanIdRef = useRef(0)
@@ -108,6 +109,25 @@ export function RevizijaForm({
   const totalValueChange = discrepancies.reduce((s, r) => s + r.valueCents, 0)
   const countedProductCount = countedRows.length
   const totalProducts = products.length
+
+  // Nesuskaičiuotos prekės, kurios SISTEMOJE turi likutį — galimi „vaiduokliai"
+  // (fiziškai dingusios prekės nuskenuoti neįmanoma, tad jos liktų su senu
+  // likučiu). Peržiūroje rodom sąrašą su mygtuku „Nėra → 0".
+  const uncountedWithStock = useMemo(() => {
+    const q = missingFilter.trim().toLowerCase()
+    return products
+      .filter(
+        (p) =>
+          counts[p.id] == null &&
+          (p.stockQuantity ?? 0) > 0 &&
+          (!q ||
+            p.nameLt.toLowerCase().includes(q) ||
+            (p.colorNumber ?? '').toLowerCase().includes(q) ||
+            (p.sku ?? '').toLowerCase().includes(q) ||
+            (p.ean ?? '').includes(q))
+      )
+      .sort((a, b) => a.nameLt.localeCompare(b.nameLt, 'lt'))
+  }, [products, counts, missingFilter])
 
   function confirm() {
     const items = discrepancies.map((r) => ({ productId: r.p.id, counted: r.counted }))
@@ -209,6 +229,64 @@ export function RevizijaForm({
                 </tr>
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Nesuskaičiuotos prekės su likučiu — galimi „vaiduokliai" */}
+        {uncountedWithStock.length > 0 || missingFilter ? (
+          <div className="print-hide bg-white rounded-xl border border-[#eee] overflow-hidden">
+            <div className="px-4 py-3 border-b border-[#eee]">
+              <div className="font-bold text-brand-gray-900">
+                Nesuskaičiuotos prekės su likučiu ({uncountedWithStock.length})
+              </div>
+              <p className="mt-1 text-[12px] text-brand-gray-500">
+                Šių prekių nenuskenavote, bet sistemoje jos turi likutį. Jei
+                prekės lentynoje tikrai NĖRA — spauskite „Nėra → 0“ (bus
+                įtraukta į neatitikimus). Jei tiesiog dar nesuskaičiavote —
+                grįžkite į skaičiavimą.
+              </p>
+              <input
+                type="text"
+                value={missingFilter}
+                onChange={(e) => setMissingFilter(e.target.value)}
+                placeholder="Filtruoti…"
+                className="mt-2 w-full sm:w-72 px-3 py-2 bg-[#F5F5F7] border border-[#ddd] rounded-lg text-sm focus:outline-none focus:border-brand-magenta focus:bg-white"
+              />
+            </div>
+            <div className="max-h-72 overflow-y-auto divide-y divide-[#f3f3f3]">
+              {uncountedWithStock.slice(0, 60).map((p) => (
+                <div
+                  key={p.id}
+                  className="px-4 py-2 flex items-center justify-between gap-3"
+                >
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium text-brand-gray-900 truncate">
+                      {p.colorNumber ? `${p.colorNumber} · ` : ''}
+                      {p.nameLt}
+                    </div>
+                    <div className="text-[11px] text-brand-gray-500">
+                      sistemoje: {p.stockQuantity}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setCount(p.id, 0)}
+                    className="shrink-0 px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-md text-[12px] font-semibold hover:bg-red-100"
+                  >
+                    Nėra → 0
+                  </button>
+                </div>
+              ))}
+              {uncountedWithStock.length > 60 && (
+                <div className="px-4 py-2 text-[12px] text-brand-gray-500">
+                  … ir dar {uncountedWithStock.length - 60}. Naudokite filtrą.
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="print-hide px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-sm">
+            Visos prekės su likučiu suskaičiuotos — „vaiduoklių“ nėra. 👍
           </div>
         )}
 
