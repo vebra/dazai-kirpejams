@@ -3,6 +3,7 @@ import { createServerClient } from '@/lib/supabase/server'
 import { sendEmail } from '@/lib/email/resend'
 import { buildEventReminderEmail } from '@/lib/events/emails'
 import { getVisibleUpcomingEvents } from '@/lib/events/queries'
+import { sendLowStockAlertIfNeeded } from '@/lib/admin/low-stock-alert'
 import { SITE_URL } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
@@ -147,9 +148,20 @@ export async function GET(request: Request) {
     })
   }
 
+  // Žemo likučio įspėjimas adminui — prikabintas prie šio kasdienio cron'o
+  // (Hobby plano 2 cron'ų limitas). Non-blocking renginių priminimams.
+  let lowStock: { sent: boolean; count: number } | { error: string }
+  try {
+    lowStock = await sendLowStockAlertIfNeeded()
+  } catch (err) {
+    console.error('[cron/event-reminders] low-stock alert failed:', err)
+    lowStock = { error: err instanceof Error ? err.message : 'unknown' }
+  }
+
   return NextResponse.json({
     ok: true,
     eventsChecked: events.length,
     results,
+    lowStock,
   })
 }

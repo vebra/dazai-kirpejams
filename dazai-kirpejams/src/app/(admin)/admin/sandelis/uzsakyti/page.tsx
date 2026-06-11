@@ -30,15 +30,25 @@ export default async function ReorderPage() {
           <h2 className="text-2xl font-bold text-brand-gray-900">Ką užsakyti</h2>
           <p className="mt-1 text-sm text-brand-gray-500">
             Nustatykite perspėjimo ribą kiekvienai prekei. Kai likutis pasiekia
-            ribą — prekė pažymima „Užsakyti".
+            ribą — prekė pažymima „Užsakyti“.
           </p>
         </div>
-        <Link
-          href="/admin/sandelis"
-          className="px-4 py-2 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-[#F5F5F7] transition-colors whitespace-nowrap"
-        >
-          ← Sandelis
-        </Link>
+        <div className="flex items-center gap-2">
+          {low.length > 0 && (
+            <Link
+              href="/admin/sandelis/uzsakyti/lapas"
+              className="px-4 py-2 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark transition-colors whitespace-nowrap"
+            >
+              🖨 Užsakymo lapas tiekėjui
+            </Link>
+          )}
+          <Link
+            href="/admin/sandelis"
+            className="px-4 py-2 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-[#F5F5F7] transition-colors whitespace-nowrap"
+          >
+            ← Sandelis
+          </Link>
+        </div>
       </div>
 
       <div
