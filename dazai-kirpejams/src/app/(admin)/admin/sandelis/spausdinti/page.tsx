@@ -8,9 +8,15 @@ export const dynamic = 'force-dynamic'
 
 const PRICE = new Intl.NumberFormat('lt-LT', { style: 'currency', currency: 'EUR' })
 
-export default async function PrintStockPage() {
+export default async function PrintStockPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ active?: string }>
+}) {
   await requireAdmin()
-  const products = await getAdminProducts({})
+  const sp = await searchParams
+  const activeOnly = sp.active === '1'
+  const products = await getAdminProducts({ onlyActive: activeOnly })
   products.sort(
     (a, b) =>
       (a.categoryNameLt ?? '').localeCompare(b.categoryNameLt ?? '', 'lt') ||
@@ -45,6 +51,21 @@ export default async function PrintStockPage() {
             ← Atgal
           </Link>
           <div className="flex items-center gap-2">
+            {/* Visi / Tik aktyvūs perjungiklis */}
+            <div className="flex rounded-lg border border-[#ddd] overflow-hidden text-[12px] font-semibold">
+              <Link
+                href="/admin/sandelis/spausdinti"
+                className={`px-3 py-1.5 ${!activeOnly ? 'bg-brand-magenta text-white' : 'bg-white text-brand-gray-900 hover:bg-[#F5F5F7]'}`}
+              >
+                Visi
+              </Link>
+              <Link
+                href="/admin/sandelis/spausdinti?active=1"
+                className={`px-3 py-1.5 border-l border-[#ddd] ${activeOnly ? 'bg-brand-magenta text-white' : 'bg-white text-brand-gray-900 hover:bg-[#F5F5F7]'}`}
+              >
+                Tik aktyvūs
+              </Link>
+            </div>
             <a
               href="/admin/sandelis/eksportas"
               className="px-4 py-2 bg-[#F5F5F7] hover:bg-[#eee] border border-[#ddd] text-brand-gray-900 rounded-lg text-sm font-semibold transition-colors"
@@ -57,7 +78,9 @@ export default async function PrintStockPage() {
         </div>
 
         <header className="border-b border-black pb-4 mb-6">
-          <h1 className="text-2xl font-bold">Sandėlio likučiai</h1>
+          <h1 className="text-2xl font-bold">
+            Sandėlio likučiai{activeOnly ? ' (tik aktyvūs)' : ''}
+          </h1>
           <div className="mt-3 flex items-center justify-between text-sm">
             <div>
               Prekių: <strong>{products.length}</strong> · Iš viso vienetų:{' '}
