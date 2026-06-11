@@ -15,6 +15,7 @@ const REASON_LABEL: Record<string, string> = {
   return_from_rep: 'Grąžinimas iš vadybininkės',
   rep_sale: 'Pardavimas (vadybininkė)',
   rep_sale_cancel: 'Pardavimo atšaukimas (vadybininkė)',
+  own_use: 'Savo naudojimui',
 }
 
 const DT = new Intl.DateTimeFormat('lt-LT', {

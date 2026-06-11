@@ -484,6 +484,84 @@ export async function getActiveProductsCount(): Promise<number> {
   return count ?? 0
 }
 
+// ============================================
+// „Savo naudojimui" ataskaita — savininkės sunaudotos prekės + savikaina
+// ============================================
+export type OwnUseReportRow = {
+  productId: string
+  name: string
+  colorNumber: string | null
+  sku: string | null
+  qty: number
+  costCents: number | null
+  valueCents: number
+}
+export type OwnUseReport = {
+  rows: OwnUseReportRow[]
+  totalQty: number
+  totalValueCents: number
+}
+
+/**
+ * „Savo naudojimui" (reason='own_use') judėjimai per laikotarpį [from, to),
+ * sugrupuoti pagal prekę: kiekis + vertė savikaina. Service role (cost_price).
+ */
+export async function getOwnUseReport(
+  fromIso: string,
+  toIso: string
+): Promise<OwnUseReport> {
+  const supabase = createServerClient()
+  const { data, error } = await supabase
+    .from('stock_movements')
+    .select(
+      'product_id, delta, products(name_lt, color_number, sku, cost_price_cents)'
+    )
+    .eq('reason', 'own_use')
+    .gte('created_at', fromIso)
+    .lt('created_at', toIso)
+
+  if (error) {
+    console.error('[admin/queries] getOwnUseReport:', error.message)
+    return { rows: [], totalQty: 0, totalValueCents: 0 }
+  }
+
+  type Row = {
+    product_id: string
+    delta: number
+    products:
+      | { name_lt: string; color_number: string | null; sku: string | null; cost_price_cents: number | null }
+      | { name_lt: string; color_number: string | null; sku: string | null; cost_price_cents: number | null }[]
+      | null
+  }
+
+  const acc = new Map<string, OwnUseReportRow>()
+  for (const r of (data ?? []) as Row[]) {
+    const p = Array.isArray(r.products) ? r.products[0] : r.products
+    const qty = Math.abs(r.delta)
+    const cost = p?.cost_price_cents ?? null
+    const cur =
+      acc.get(r.product_id) ?? {
+        productId: r.product_id,
+        name: p?.name_lt ?? '—',
+        colorNumber: p?.color_number ?? null,
+        sku: p?.sku ?? null,
+        qty: 0,
+        costCents: cost,
+        valueCents: 0,
+      }
+    cur.qty += qty
+    cur.valueCents += qty * (cost ?? 0)
+    acc.set(r.product_id, cur)
+  }
+
+  const rows = [...acc.values()].sort((a, b) => b.valueCents - a.valueCents)
+  return {
+    rows,
+    totalQty: rows.reduce((s, r) => s + r.qty, 0),
+    totalValueCents: rows.reduce((s, r) => s + r.valueCents, 0),
+  }
+}
+
 /** Kiek produktų yra išjungtų (is_active=false). Naudojam bulk-activate mygtukui. */
 export async function getInactiveProductsCount(): Promise<number> {
   const supabase = createServerClient() // service role — žr. getLowStockProducts

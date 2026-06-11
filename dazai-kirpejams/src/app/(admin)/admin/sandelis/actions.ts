@@ -986,6 +986,50 @@ export async function writeOffStockAction(
 }
 
 // ============================================
+// „Savo naudojimui" — savininkės sunaudotos prekės (salono darbui)
+// ============================================
+export type OwnUseResult =
+  | { ok: true; removed: number; stock: number }
+  | { ok: false; error: string }
+
+export async function consumeOwnUseAction(
+  productId: string,
+  qty: number
+): Promise<OwnUseResult> {
+  await requireAdmin()
+  if (!productId) return { ok: false, error: 'Prekė nenurodyta.' }
+  if (!Number.isInteger(qty) || qty <= 0) {
+    return { ok: false, error: 'Neteisingas kiekis.' }
+  }
+  const supabase = createServerClient()
+  const { data, error } = await supabase.rpc('consume_own_use_stock', {
+    p_product_id: productId,
+    p_qty: qty,
+    p_note: null,
+  })
+  const res = data as
+    | { ok?: boolean; reason?: string; removed?: number; stock?: number }
+    | null
+  if (error || !res?.ok) {
+    const reason = res?.reason
+    const msg =
+      reason === 'no_stock'
+        ? 'Likutis jau 0 — nėra ką sunaudoti.'
+        : reason === 'not_found'
+          ? 'Prekė nerasta.'
+          : reason === 'invalid_qty'
+            ? 'Neteisingas kiekis.'
+            : error?.message ?? 'Nepavyko įrašyti.'
+    console.error('[admin/sandelis] ownUse:', error?.message ?? reason)
+    return { ok: false, error: msg }
+  }
+  revalidatePath('/admin/sandelis', 'layout')
+  revalidatePath('/admin/sandelis/zurnalas')
+  revalidateTag('products', 'max')
+  return { ok: true, removed: res.removed ?? qty, stock: res.stock ?? 0 }
+}
+
+// ============================================
 // Atsargų perspėjimo riba (reorder_point)
 // ============================================
 
