@@ -203,7 +203,7 @@ export default async function AdminInventoryPage({
           ⬇ Atsisiųsti CSV
         </a>
         <Link
-          href="/admin/sandelis/spausdinti"
+          href={activeOnly ? '/admin/sandelis/spausdinti?active=1' : '/admin/sandelis/spausdinti'}
           className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-[#F5F5F7] transition-colors"
         >
           🖨 Spausdinti
