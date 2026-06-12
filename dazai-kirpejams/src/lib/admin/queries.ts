@@ -1,6 +1,9 @@
 import 'server-only'
 import { createServerSupabase } from '@/lib/supabase/ssr'
-import { createServerClient } from '@/lib/supabase/server'
+import {
+  createServerClient,
+  isSupabaseServerConfigured,
+} from '@/lib/supabase/server'
 import { DYE_CATEGORIES, type DyeCategoryKey } from '@/lib/data/dye-categories'
 import type { ShippingSettings } from '@/lib/commerce/constants'
 import type { PendingRepOrder } from './rep-orders-shared'
@@ -1452,9 +1455,16 @@ export async function getShippingSettings(): Promise<ShippingSettings> {
  * Įmonės rekvizitų gavimas iš `shop_settings`. Visi laukai optional —
  * jei migracija dar nepritaikyta arba admin'as jų dar neužpildė, grąžinam
  * tuščius stringus (email šablonas tuomet neparodys banko bloko).
+ *
+ * Service role klientas, ne vartotojo sesija: nuo 064 migracijos
+ * `shop_settings` viešai nebeskaitoma (RLS), o šią funkciją kviečia ir
+ * pirkėjo kontekstai — checkout laiškas, užsakymo patvirtinimo puslapis,
+ * apmokėjimo puslapis, vadybininkės srautas. Saugu: funkcija server-only
+ * ir grąžina tik šį baltąjį raktų sąrašą.
  */
 export async function getCompanyInfo(): Promise<CompanyInfo> {
-  const supabase = await createServerSupabase()
+  if (!isSupabaseServerConfigured) return DEFAULT_COMPANY_INFO
+  const supabase = createServerClient()
   const { data, error } = await supabase
     .from('shop_settings')
     .select('key, value')
