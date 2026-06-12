@@ -186,23 +186,26 @@ export async function getMyRepStats(): Promise<RepStats> {
 }
 
 // ============================================
-// Mano atsargos (kas išduota iš sandėlio)
+// Mano atsargos: suvestinė + judėjimų žurnalas (migr 073)
 // ============================================
 
-export type RepInventoryRow = {
+export type RepStockSummaryRow = {
   productId: string
   name: string
   sku: string | null
   colorNumber: string | null
-  issued: number
+  taken: number
+  returned: number
+  sold: number
+  onHand: number
   lastAt: string
 }
 
-export async function getMyInventory(): Promise<RepInventoryRow[]> {
+export async function getMyStockSummary(): Promise<RepStockSummaryRow[]> {
   const supabase = await createServerSupabase()
-  const { data, error } = await supabase.rpc('get_my_issued_stock')
+  const { data, error } = await supabase.rpc('get_my_stock_summary')
   if (error) {
-    console.error('[rep/queries] getMyInventory:', error.message)
+    console.error('[rep/queries] getMyStockSummary:', error.message)
     return []
   }
   return (
@@ -211,7 +214,10 @@ export async function getMyInventory(): Promise<RepInventoryRow[]> {
       name: string
       sku: string | null
       color_number: string | null
-      issued: number
+      taken: number
+      returned: number
+      sold: number
+      on_hand: number
       last_at: string
     }>
   ).map((r) => ({
@@ -219,8 +225,52 @@ export async function getMyInventory(): Promise<RepInventoryRow[]> {
     name: r.name,
     sku: r.sku,
     colorNumber: r.color_number,
-    issued: r.issued,
+    taken: r.taken,
+    returned: r.returned,
+    sold: r.sold,
+    onHand: r.on_hand,
     lastAt: r.last_at,
+  }))
+}
+
+export type RepStockMovementRow = {
+  createdAt: string
+  reason: 'issue_to_rep' | 'return_from_rep' | 'rep_sale' | 'rep_sale_cancel'
+  qty: number
+  source: string | null
+  productId: string
+  name: string
+  sku: string | null
+  colorNumber: string | null
+}
+
+export async function getMyStockMovements(): Promise<RepStockMovementRow[]> {
+  const supabase = await createServerSupabase()
+  const { data, error } = await supabase.rpc('get_my_stock_movements')
+  if (error) {
+    console.error('[rep/queries] getMyStockMovements:', error.message)
+    return []
+  }
+  return (
+    (data ?? []) as Array<{
+      created_at: string
+      reason: RepStockMovementRow['reason']
+      qty: number
+      source: string | null
+      product_id: string
+      name: string
+      sku: string | null
+      color_number: string | null
+    }>
+  ).map((r) => ({
+    createdAt: r.created_at,
+    reason: r.reason,
+    qty: r.qty,
+    source: r.source,
+    productId: r.product_id,
+    name: r.name,
+    sku: r.sku,
+    colorNumber: r.color_number,
   }))
 }
 
