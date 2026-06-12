@@ -24,7 +24,17 @@ function copyCookies(from: NextResponse, to: NextResponse): NextResponse {
  *
  * Praleidžiam šauksmą anoniminiam srautui — kad botai/crawler'iai nemokamai
  * negrūstų Supabase auth serverio.
+ *
+ * Tinklo kvietimą į Supabase (`getUser()`) darome TIK kai access_token'as
+ * arti galiojimo pabaigos (< 5 min) — kitaip kiekvienas prisijungusio
+ * vartotojo puslapio atidarymas darytų auth round-trip'ą ir funkcija
+ * kabėtų laukdama atsakymo (Vercel Fluid apmokestina tą laiką).
+ * Galiojimą skaitome iš cookie'je saugomos sesijos (`getSession()` —
+ * be tinklo). Tai NĖRA saugumo patikra — admin/vadybininkės keliai turi
+ * savo besąlyginį `getUser()`, o realią autorizaciją daro patys puslapiai.
  */
+const TOKEN_REFRESH_BUFFER_MS = 5 * 60_000
+
 async function refreshSupabaseSession(
   request: NextRequest,
   response: NextResponse
@@ -36,6 +46,14 @@ async function refreshSupabaseSession(
 
   try {
     const supabase = createProxySupabase(request, response)
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+    if (!session) return
+
+    const expiresInMs = (session.expires_at ?? 0) * 1000 - Date.now()
+    if (expiresInMs > TOKEN_REFRESH_BUFFER_MS) return
+
     await supabase.auth.getUser()
   } catch {
     // Ignoruojam — Supabase gali būti nesukonfigūruotas arba sesija negaliojanti.

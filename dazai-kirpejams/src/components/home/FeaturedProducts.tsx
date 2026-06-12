@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
+import { pickCardDict } from '@/components/products/card-dict'
 import { ProductPricesProvider } from '@/components/products/ProductPricesProvider'
 import { StaggerReveal } from '@/components/ui/StaggerReveal'
 import { getProductsStatic, getCategories } from '@/lib/data/queries'
@@ -29,6 +30,7 @@ export async function FeaturedProducts({ lang, dict }: FeaturedProductsProps) {
 
   const categoryById = new Map(categories.map((c) => [c.id, c.slug]))
   const priceIds = products.map((p) => p.id)
+  const cardDict = pickCardDict(dict)
 
   return (
     <section className="py-16 lg:py-20 bg-white">
@@ -60,7 +62,7 @@ export async function FeaturedProducts({ lang, dict }: FeaturedProductsProps) {
                   product={product}
                   lang={lang}
                   categorySlug={categorySlug}
-                  dict={dict}
+                  dict={cardDict}
                 />
               )
             })}

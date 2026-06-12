@@ -254,6 +254,28 @@ export const getProducts = async (
 }
 
 /**
+ * Listingo kortelės nenaudoja aprašymų/sudėties/instrukcijų (×3 kalbos) nei
+ * papildomų nuotraukų — kortelė ir paletė rodo tik pirmą. Šie laukai vis tiek
+ * patekdavo į kiekvieno listingo puslapio payload'ą per client komponentų
+ * props'us. Detalūs tekstai gyvena produkto puslapyje (getProductStaticBySlug).
+ */
+function stripListingPayload(p: Product): Product {
+  return {
+    ...p,
+    description_lt: null,
+    description_en: null,
+    description_ru: null,
+    ingredients_lt: null,
+    ingredients_en: null,
+    ingredients_ru: null,
+    usage_lt: null,
+    usage_en: null,
+    usage_ru: null,
+    image_urls: p.image_urls?.length ? [p.image_urls[0]] : [],
+  }
+}
+
+/**
  * Statinis variantas listingams (Fazė 2): kainos VISADA nukerptos, be cookies()
  * → puslapis gali būti statinis/ISR. Patvirtinti profesionalai kainas pasiima
  * naršyklėje (ProductPricesProvider). Žr. getProductStaticBySlug.
@@ -262,7 +284,7 @@ export const getProductsStatic = async (
   options?: GetProductsOptions
 ): Promise<Product[]> => {
   const products = await getProductsForBuild(options)
-  return products.map(stripProductPricing)
+  return products.map((p) => stripListingPayload(stripProductPricing(p)))
 }
 
 async function _getProductBySlug(slug: string): Promise<Product | null> {
