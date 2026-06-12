@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { toggleBannerActiveAction, deleteBannerAction } from './actions'
-import type { BannerRow } from '@/lib/admin/queries'
+import type { BannerRow, BannerStats } from '@/lib/admin/queries'
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('lt-LT', {
   dateStyle: 'short',
@@ -10,10 +10,59 @@ const DATE_FORMATTER = new Intl.DateTimeFormat('lt-LT', {
 
 const PLACEMENT_LABELS: Record<string, string> = {
   hero: 'Hero (pagrindinis)',
+  announcement: 'Akcijų juosta',
+  marquee: 'Bėganti juosta',
+  brandstrip: 'Brand juosta',
   category: 'Kategorijos',
 }
 
-export function BannersTable({ banners }: { banners: BannerRow[] }) {
+type DisplayStatus = {
+  label: string
+  cls: string
+}
+
+/**
+ * Faktinė rodymo būsena. Kiekviena pozicija rodo tik PIRMĄ aktyvų banerį
+ * (pagal sort_order) — kiti aktyvūs tos pačios pozicijos baneriai laukia
+ * eilėje ir svetainėje nesimato.
+ */
+function displayStatus(
+  banner: BannerRow,
+  banners: BannerRow[],
+  now: number
+): DisplayStatus {
+  if (!banner.isActive) {
+    return { label: 'Išjungtas', cls: 'bg-gray-100 text-gray-500' }
+  }
+  if (banner.startsAt && new Date(banner.startsAt).getTime() > now) {
+    return { label: 'Suplanuotas', cls: 'bg-blue-50 text-blue-700' }
+  }
+  if (banner.endsAt && new Date(banner.endsAt).getTime() < now) {
+    return { label: 'Pasibaigęs', cls: 'bg-gray-100 text-gray-500' }
+  }
+  const shownInPlacement = banners.find(
+    (b) =>
+      b.placement === banner.placement &&
+      b.isActive &&
+      (!b.startsAt || new Date(b.startsAt).getTime() <= now) &&
+      (!b.endsAt || new Date(b.endsAt).getTime() >= now)
+  )
+  if (shownInPlacement && shownInPlacement.id !== banner.id) {
+    return { label: 'Eilėje (nerodomas)', cls: 'bg-amber-50 text-amber-700' }
+  }
+  return { label: 'Rodomas dabar', cls: 'bg-emerald-50 text-emerald-700' }
+}
+
+export function BannersTable({
+  banners,
+  stats,
+  nowIso,
+}: {
+  banners: BannerRow[]
+  stats: Record<string, BannerStats>
+  nowIso: string
+}) {
+  const now = new Date(nowIso).getTime()
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-end">
@@ -39,6 +88,10 @@ export function BannersTable({ banners }: { banners: BannerRow[] }) {
                   <th className="px-6 py-3 text-left">Pozicija</th>
                   <th className="px-6 py-3 text-center">Eiliškumas</th>
                   <th className="px-6 py-3 text-center">Būsena</th>
+                  <th className="px-6 py-3 text-center">Rodymas</th>
+                  <th className="px-6 py-3 text-center">
+                    Parodymai / Pasp.
+                  </th>
                   <th className="px-6 py-3 text-left">Laikotarpis</th>
                   <th className="px-6 py-3 text-right">Veiksmai</th>
                 </tr>
@@ -87,6 +140,24 @@ export function BannersTable({ banners }: { banners: BannerRow[] }) {
                           {banner.isActive ? 'Aktyvus' : 'Neaktyvus'}
                         </button>
                       </form>
+                    </td>
+                    <td className="px-6 py-3 text-center">
+                      {(() => {
+                        const s = displayStatus(banner, banners, now)
+                        return (
+                          <span
+                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold ${s.cls}`}
+                          >
+                            {s.label}
+                          </span>
+                        )
+                      })()}
+                    </td>
+                    <td className="px-6 py-3 text-center text-brand-gray-500 tabular-nums">
+                      {/* Sekama kol kas tik akcijų juosta — kitoms pozicijoms „—" */}
+                      {banner.placement === 'announcement'
+                        ? `${stats[banner.id]?.impressions ?? 0} / ${stats[banner.id]?.clicks ?? 0}`
+                        : '—'}
                     </td>
                     <td className="px-6 py-3 text-[12px] text-brand-gray-500">
                       {banner.startsAt || banner.endsAt ? (

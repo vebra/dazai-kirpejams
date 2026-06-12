@@ -1998,6 +1998,35 @@ export async function getBannerById(id: string): Promise<BannerRow | null> {
   return mapBannerRow(data as Record<string, unknown>)
 }
 
+export type BannerStats = { impressions: number; clicks: number }
+
+/**
+ * Parodymų/paspaudimų suvestinė pagal banner_key (žr. migraciją 072).
+ * Raktas — banners.id arba 'event:<slug>' (automatinis renginio baneris).
+ */
+export async function getBannerEventCounts(): Promise<
+  Record<string, BannerStats>
+> {
+  const supabase = await createServerSupabase()
+  const { data, error } = await supabase
+    .from('banner_event_counts')
+    .select('banner_key, event_type, cnt')
+
+  if (error) {
+    console.error('[admin/queries] getBannerEventCounts:', error.message)
+    return {}
+  }
+
+  const out: Record<string, BannerStats> = {}
+  for (const r of data ?? []) {
+    const key = r.banner_key as string
+    const entry = (out[key] ??= { impressions: 0, clicks: 0 })
+    if (r.event_type === 'impression') entry.impressions = r.cnt as number
+    if (r.event_type === 'click') entry.clicks = r.cnt as number
+  }
+  return out
+}
+
 // ============================================
 // BLOGAS (Blog)
 // ============================================
