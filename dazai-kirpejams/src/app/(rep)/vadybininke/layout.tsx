@@ -16,6 +16,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: { default: 'Vadybininkės sritis | Dažai Kirpėjams', template: '%s | DK Vadyba' },
   robots: { index: false, follow: false },
+  // PWA: „Pridėti į pradžios ekraną" telefone — atsidaro kaip programėlė.
+  manifest: '/vadybininke.webmanifest',
+  appleWebApp: { capable: true, statusBarStyle: 'default', title: 'DK Vadyba' },
 }
 
 // Visa rep zona dinaminė — auth/sesija kiekvienam request'ui, niekada nekešuojama.
@@ -29,16 +32,31 @@ export default async function RepRootLayout({
   const rep = await getRepUser()
 
   let initials = ''
+  let pendingCount = 0
+  let rejectedCount = 0
   if (rep) {
     const supabase = await createServerSupabase()
-    const { data: prof } = await supabase
-      .from('user_profiles')
-      .select('first_name, last_name')
-      .eq('id', rep.user.id)
-      .maybeSingle()
+    const weekAgo = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString()
+    const [{ data: prof }, { data: badgeRows }] = await Promise.all([
+      supabase
+        .from('user_profiles')
+        .select('first_name, last_name')
+        .eq('id', rep.user.id)
+        .maybeSingle(),
+      supabase
+        .from('orders')
+        .select('approval_status, created_at')
+        .eq('placed_by', rep.user.id)
+        .in('approval_status', ['pending', 'rejected']),
+    ])
     initials =
       `${prof?.first_name?.[0] ?? ''}${prof?.last_name?.[0] ?? ''}`.toUpperCase() ||
       (rep.user.email?.[0] ?? '?').toUpperCase()
+    for (const o of badgeRows ?? []) {
+      if (o.approval_status === 'pending') pendingCount++
+      // Atmesti rodomi tik savaitę — seni nebebadina akių amžinai.
+      else if (o.created_at >= weekAgo) rejectedCount++
+    }
   }
 
   return (
@@ -58,7 +76,7 @@ export default async function RepRootLayout({
                       DK <span className="text-brand-magenta">Vadyba</span>
                     </span>
                   </Link>
-                  <RepDesktopNav />
+                  <RepDesktopNav pending={pendingCount} rejected={rejectedCount} />
                 </div>
                 <div className="flex items-center gap-3">
                   <Link
@@ -88,7 +106,7 @@ export default async function RepRootLayout({
             <main className="flex-1 max-w-5xl w-full mx-auto px-4 lg:px-6 py-6 pb-28 sm:pb-8">
               {children}
             </main>
-            <RepMobileTabBar />
+            <RepMobileTabBar pending={pendingCount} rejected={rejectedCount} />
           </div>
         ) : (
           // Neprisijungęs — login puslapis turi savo visaekranio turinį

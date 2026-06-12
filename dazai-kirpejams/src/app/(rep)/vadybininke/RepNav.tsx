@@ -17,12 +17,29 @@ const NAV = [
   { href: '/vadybininke/atsargos', label: 'Atsargos', icon: Package },
 ]
 
+type Badges = { pending?: number; rejected?: number }
+
 function isActive(pathname: string, href: string, exact?: boolean) {
   return exact ? pathname === href : pathname.startsWith(href)
 }
 
+/** Užsakymų ženkliukas: raudonas — atmesti (reikia dėmesio), magenta — laukiantys. */
+function OrdersBadge({ pending = 0, rejected = 0 }: Badges) {
+  const count = rejected > 0 ? rejected : pending
+  if (count === 0) return null
+  return (
+    <span
+      className={`flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold leading-none text-white ${
+        rejected > 0 ? 'bg-red-500' : 'bg-brand-magenta'
+      }`}
+    >
+      {count}
+    </span>
+  )
+}
+
 /** Desktop nav — header'io viduryje, su aktyvia būsena. */
-export function RepDesktopNav() {
+export function RepDesktopNav({ pending, rejected }: Badges) {
   const pathname = usePathname()
   return (
     <nav className="hidden sm:flex items-center gap-0.5">
@@ -40,6 +57,9 @@ export function RepDesktopNav() {
           >
             <n.icon size={15} strokeWidth={active ? 2.4 : 2} />
             {n.label}
+            {n.href === '/vadybininke/uzsakymai' && (
+              <OrdersBadge pending={pending} rejected={rejected} />
+            )}
           </Link>
         )
       })}
@@ -48,7 +68,7 @@ export function RepDesktopNav() {
 }
 
 /** Mobili apatinė navigacija — programėlės stiliaus juosta su centriniu „+". */
-export function RepMobileTabBar() {
+export function RepMobileTabBar({ pending, rejected }: Badges) {
   const pathname = usePathname()
   const left = NAV.slice(0, 2)
   const right = NAV.slice(2)
@@ -56,7 +76,12 @@ export function RepMobileTabBar() {
     <nav className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#eee] pb-[env(safe-area-inset-bottom)]">
       <div className="grid grid-cols-5 items-end h-[60px]">
         {left.map((n) => (
-          <TabItem key={n.href} item={n} active={isActive(pathname, n.href, n.exact)} />
+          <TabItem
+            key={n.href}
+            item={n}
+            active={isActive(pathname, n.href, n.exact)}
+            badges={n.href === '/vadybininke/uzsakymai' ? { pending, rejected } : undefined}
+          />
         ))}
         <div className="relative flex justify-center">
           <Link
@@ -85,9 +110,11 @@ export function RepMobileTabBar() {
 function TabItem({
   item,
   active,
+  badges,
 }: {
   item: (typeof NAV)[number]
   active: boolean
+  badges?: Badges
 }) {
   return (
     <Link
@@ -96,7 +123,14 @@ function TabItem({
         active ? 'text-brand-magenta' : 'text-brand-gray-500'
       }`}
     >
-      <item.icon size={21} strokeWidth={active ? 2.4 : 2} />
+      <span className="relative">
+        <item.icon size={21} strokeWidth={active ? 2.4 : 2} />
+        {badges && (
+          <span className="absolute -top-1.5 -right-2.5">
+            <OrdersBadge {...badges} />
+          </span>
+        )}
+      </span>
       {item.label}
     </Link>
   )

@@ -24,7 +24,7 @@ const DELIVERY_LABELS: Record<string, string> = {
 export default async function NewRepOrderPage({
   searchParams,
 }: {
-  searchParams: Promise<{ repeat?: string }>
+  searchParams: Promise<{ repeat?: string; preke?: string }>
 }) {
   await requireSalesRep()
 
@@ -49,6 +49,11 @@ export default async function NewRepOrderPage({
         if (it.productId) initialCart[it.productId] = (initialCart[it.productId] ?? 0) + it.quantity
       }
     }
+  }
+  // „Parduoti" iš Mano atsargų: ?preke=productId — prekė iškart krepšelyje.
+  const prekeId = typeof sp.preke === 'string' ? sp.preke : null
+  if (prekeId && !initialCart && products.some((p) => p.id === prekeId)) {
+    initialCart = { [prekeId]: 1 }
   }
   // PVM tarifas iš įmonės PVM kodo (tas pats šaltinis kaip viešas checkout).
   // Ne PVM mokėtojas → 0. Peržiūra atitiks serverio apskaičiavimą.

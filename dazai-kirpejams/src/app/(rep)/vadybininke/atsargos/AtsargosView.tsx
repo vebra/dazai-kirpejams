@@ -1,7 +1,8 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Search, Package, ChevronDown } from 'lucide-react'
+import Link from 'next/link'
+import { Search, Package, ChevronDown, ShoppingBag } from 'lucide-react'
 import type { RepStockSummaryRow, RepStockMovementRow } from '@/lib/rep/queries'
 
 const DATE = new Intl.DateTimeFormat('lt-LT', { dateStyle: 'short' })
@@ -208,6 +209,15 @@ export function AtsargosView({
                     </button>
                     {open && (
                       <div className="px-4 pb-3 bg-[#FAFAFC] border-t border-[#f3f3f3]">
+                        {r.onHand > 0 && (
+                          <Link
+                            href={`/vadybininke/naujas-uzsakymas?preke=${r.productId}`}
+                            className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-magenta text-white rounded-lg text-[13px] font-semibold hover:bg-brand-magenta-dark transition-colors"
+                          >
+                            <ShoppingBag size={14} strokeWidth={2.4} />
+                            Parduoti šią prekę
+                          </Link>
+                        )}
                         {productMoves.length === 0 ? (
                           <div className="pt-3 text-[12px] text-brand-gray-500">
                             Judėjimų nėra.
