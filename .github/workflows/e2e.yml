@@ -22,7 +22,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v5
         with:
-          node-version: 24
+          # 24 lūžta: `playwright install` pakimba po Chrome parsisiuntimo
+          # (2× patikrinta 2026-06-12). Birželio 16 deprecation liečia tik
+          # actions runtime (@v5/@v6), ne šią app Node versiją.
+          node-version: 20
           cache: npm
           cache-dependency-path: dazai-kirpejams/package-lock.json
 

@@ -21,7 +21,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v5
         with:
-          node-version: 24
+          # Laikoma sinchronizuota su e2e.yml (ten Node 24 lūžta su Playwright).
+          node-version: 20
           cache: npm
           cache-dependency-path: dazai-kirpejams/package-lock.json
 
