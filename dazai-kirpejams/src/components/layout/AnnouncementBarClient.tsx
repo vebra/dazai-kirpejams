@@ -12,6 +12,25 @@ type Props = {
 }
 
 /**
+ * Statistikos beacon — best-effort, klaidos tylios (statistika nevertingesnė
+ * už veikiantį puslapį). sendBeacon išgyvena puslapio palikimą po paspaudimo.
+ */
+function track(key: string, type: 'impression' | 'click') {
+  const payload = JSON.stringify({ key, type })
+  try {
+    if (!navigator.sendBeacon?.('/api/banner-stats', payload)) {
+      fetch('/api/banner-stats', {
+        method: 'POST',
+        body: payload,
+        keepalive: true,
+      }).catch(() => {})
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
  * Akcijų juosta — plonas pranešimas svetainės viršuje. Uždaroma (× mygtukas),
  * uždarymas įsimenamas per localStorage pagal banerio id, tad NAUJAS pranešimas
  * (kitas id) vėl pasirodys.
@@ -25,9 +44,21 @@ export function AnnouncementBarClient({ id, text, ctaText, href, bg }: Props) {
       if (localStorage.getItem(`dk-announce-${id}`) === '1') {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setHidden(true)
+        return
       }
     } catch {
       /* localStorage nebūtinas */
+    }
+    // Parodymas — kartą per naršyklės sesiją (layout'as nepersikrauna tarp
+    // client-side navigacijų, tad tai ≈ apsilankymas, ne puslapio peržiūra).
+    try {
+      const impKey = `dk-announce-imp-${id}`
+      if (sessionStorage.getItem(impKey) !== '1') {
+        sessionStorage.setItem(impKey, '1')
+        track(id, 'impression')
+      }
+    } catch {
+      /* sessionStorage nebūtinas */
     }
   }, [id])
 
@@ -50,7 +81,11 @@ export function AnnouncementBarClient({ id, text, ctaText, href, bg }: Props) {
       <span>
         {text}
         {href && (
-          <Link href={href} className="underline font-semibold ml-1.5 hover:opacity-90">
+          <Link
+            href={href}
+            onClick={() => track(id, 'click')}
+            className="underline font-semibold ml-1.5 hover:opacity-90"
+          >
             {ctaText || 'Plačiau'}
           </Link>
         )}
