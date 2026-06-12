@@ -45,7 +45,7 @@ export async function AnnouncementBar({ lang }: { lang: Locale }) {
       ? `Free event: ${event.shortTitle} — ${date} (held in Lithuanian).`
       : lang === 'ru'
         ? `Бесплатное мероприятие: ${event.shortTitle} — ${date} (на литовском языке).`
-        : `Nemokamas renginys: ${event.shortTitle} — ${date}. Vietų skaičius ribotas.`
+        : `Nemokamas renginys: ${event.shortTitle} — ${date} · Vietų skaičius ribotas.`
   const ctaText =
     lang === 'en' ? 'Register' : lang === 'ru' ? 'Регистрация' : 'Registruotis'
 
