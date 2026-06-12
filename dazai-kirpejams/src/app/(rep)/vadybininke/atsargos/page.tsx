@@ -70,8 +70,40 @@ export default async function RepInventoryPage() {
         </div>
       ) : (
         <>
-          {/* Suvestinė per prekę */}
-          <div className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
+          {/* Suvestinė per prekę — mobilios kortelės */}
+          <div className="sm:hidden bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
+            <ul className="divide-y divide-[#f3f3f3]">
+              {summary.map((r) => (
+                <li key={r.productId} className="flex items-center justify-between gap-3 px-4 py-3">
+                  <div className="min-w-0">
+                    <div className="font-medium text-brand-gray-900 text-[13px]">{r.name}</div>
+                    <div className="mt-0.5 text-[11px] text-brand-gray-500">
+                      Paimta {r.taken}
+                      {r.returned > 0 && <> · Grąžinta {r.returned}</>}
+                      {r.sold > 0 && <> · Parduota {r.sold}</>}
+                    </div>
+                  </div>
+                  <div
+                    className={`shrink-0 text-right tabular-nums font-bold ${
+                      r.onHand > 0 ? 'text-brand-gray-900' : 'text-brand-gray-400'
+                    }`}
+                  >
+                    {r.onHand}
+                    <span className="ml-0.5 text-[11px] font-semibold text-brand-gray-400">vnt.</span>
+                  </div>
+                </li>
+              ))}
+              <li className="flex items-center justify-between gap-3 px-4 py-3 bg-[#F9F9FB] font-bold text-brand-gray-900 text-[13px]">
+                <span>
+                  Iš viso · paimta {totals.taken} · grąžinta {totals.returned} · parduota {totals.sold}
+                </span>
+                <span className="tabular-nums">{totals.onHand} vnt.</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Suvestinė per prekę — desktop lentelė */}
+          <div className="hidden sm:block bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -133,7 +165,47 @@ export default async function RepInventoryPage() {
             <p className="text-[12px] text-brand-gray-500 mb-3">
               Kiekvienas išdavimas, grąžinimas ir pardavimas (naujausi viršuje).
             </p>
-            <div className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
+            {/* Mobilios kortelės */}
+            <div className="sm:hidden bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
+              <ul className="divide-y divide-[#f3f3f3]">
+                {movements.map((m, i) => {
+                  const r = REASON_LABELS[m.reason]
+                  const isOrder = m.reason === 'rep_sale' || m.reason === 'rep_sale_cancel'
+                  return (
+                    <li key={i} className="px-4 py-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded text-[11px] font-semibold ${r.cls}`}
+                        >
+                          {r.label}
+                        </span>
+                        <span
+                          className={`tabular-nums font-bold ${
+                            r.sign === '+' ? 'text-emerald-700' : 'text-brand-gray-900'
+                          }`}
+                        >
+                          {r.sign}
+                          {m.qty}
+                        </span>
+                      </div>
+                      <div className="mt-1.5 text-[13px] text-brand-gray-900">
+                        {m.colorNumber ? `${m.colorNumber} · ` : ''}
+                        {m.name}
+                      </div>
+                      <div className="mt-0.5 text-[11px] text-brand-gray-500">
+                        {DATE_TIME.format(new Date(m.createdAt))}
+                        {isOrder && m.source && (
+                          <span className="font-mono"> · {m.source}</span>
+                        )}
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+
+            {/* Desktop lentelė */}
+            <div className="hidden sm:block bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
