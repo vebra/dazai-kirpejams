@@ -1,0 +1,13 @@
+import sharp from 'sharp'
+
+const svg = (s) =>
+  Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="${s}" height="${s}">
+  <rect width="32" height="32" rx="6" fill="#E91E8C"/>
+  <text x="16" y="23" font-family="Arial,sans-serif" font-size="20" font-weight="800" fill="#FFFFFF" text-anchor="middle">DK</text>
+</svg>`,
+  )
+
+await sharp(svg(192)).png().toFile('public/icon-192.png')
+await sharp(svg(512)).png().toFile('public/icon-512.png')
+console.log('OK')
