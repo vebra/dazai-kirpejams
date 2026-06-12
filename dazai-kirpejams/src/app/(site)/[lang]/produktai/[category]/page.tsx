@@ -17,6 +17,7 @@ import { ProductPricesProvider } from '@/components/products/ProductPricesProvid
 import { getCategoryName, getCategoryDescription } from '@/lib/types'
 import { Container } from '@/components/ui/Container'
 import { CategoryProductsView } from '@/components/products/CategoryProductsView'
+import { pickCardDict } from '@/components/products/card-dict'
 import { CategorySeoContent } from '@/components/products/CategorySeoContent'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { itemListSchema, breadcrumbSchema } from '@/lib/schema'
@@ -192,7 +193,7 @@ export default async function CategoryPage({
             lang={lang}
             categorySlug={categorySlug}
             isDazai={isDazai}
-            dict={dict}
+            dict={pickCardDict(dict)}
           />
         </ProductPricesProvider>
       </Suspense>

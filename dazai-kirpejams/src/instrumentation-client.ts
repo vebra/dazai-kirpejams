@@ -5,7 +5,9 @@ Sentry.init({
 
   integrations: [Sentry.replayIntegration({ maskAllText: true, blockAllMedia: true })],
 
-  tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1,
+  // 2% pakanka našumo tendencijoms; klientinės transakcijos keliauja per
+  // /monitoring tunelį mūsų domene, t.y. kainuoja Fast Origin Transfer.
+  tracesSampleRate: process.env.NODE_ENV === "production" ? 0.02 : 1,
   replaysSessionSampleRate: 0,
   replaysOnErrorSampleRate: 1.0,
 

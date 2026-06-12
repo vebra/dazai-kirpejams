@@ -14,6 +14,7 @@ import {
 } from '@/lib/data/category-map'
 import { Container } from '@/components/ui/Container'
 import { ProductCard } from '@/components/products/ProductCard'
+import { pickCardDict } from '@/components/products/card-dict'
 import { ProductPricesProvider } from '@/components/products/ProductPricesProvider'
 import { buildPageMetadata, buildCanonicalUrl } from '@/lib/seo'
 import { langPrefix } from '@/lib/utils'
@@ -43,6 +44,7 @@ export default async function ProductsPage({
 
   const dict = await getDictionary(lang)
   const t = dict.productsPage
+  const cardDict = pickCardDict(dict)
   const p = langPrefix(lang)
   const [categories, products] = await Promise.all([
     getCategories(),
@@ -119,7 +121,7 @@ export default async function ProductsPage({
                     categorySlugMap,
                     product.category_id
                   )}
-                  dict={dict}
+                  dict={cardDict}
                   priority={i < 4}
                 />
               ))}
