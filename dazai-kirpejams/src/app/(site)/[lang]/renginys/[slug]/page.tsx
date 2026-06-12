@@ -8,6 +8,10 @@ import { buildCanonicalUrl, SITE_URL } from '@/lib/seo'
 import { formatEventDateLt, isEventPast } from '@/lib/events/config'
 import { getActiveEventBySlug } from '@/lib/events/queries'
 import { EventRegistrationForm } from '@/components/events/EventRegistrationForm'
+import {
+  EventDescription,
+  flattenDescription,
+} from '@/components/events/EventDescription'
 
 // 60 s revalidate — leidžia automatiškai uždaryti registracijos formą
 // per valandą po renginio pabaigos, nereikalaujant manual revalidate.
@@ -23,7 +27,11 @@ export async function generateMetadata({
   if (!EVENT) return {}
 
   const title = `${EVENT.title} ${EVENT.venueCity} | Registracija`
-  const description = `${EVENT.description} Nemokamas įėjimas, būtina registracija. ${EVENT.venueName}, ${EVENT.venueCity}.`
+  // Meta aprašymui — pirma pastraipa be lūžių/sąrašo ženklų (~160 simbolių riba)
+  const firstParagraph = flattenDescription(
+    EVENT.description.split('\n').find((l) => l.trim()) ?? EVENT.description
+  )
+  const description = `${firstParagraph} Nemokamas įėjimas, būtina registracija. ${EVENT.venueName}, ${EVENT.venueCity}.`
   const canonical = buildCanonicalUrl(lang, `/renginys/${slug}`)
 
   return {
@@ -64,7 +72,7 @@ export default async function EventDetailPage({
       <JsonLd
         data={eventSchema({
           name: EVENT.title,
-          description: EVENT.description,
+          description: flattenDescription(EVENT.description),
           startsAtIso: EVENT.startsAtIso,
           endsAtIso: EVENT.endsAtIso,
           venueName: EVENT.venueName,
@@ -109,9 +117,10 @@ export default async function EventDetailPage({
             <h1 className="mt-5 text-4xl sm:text-5xl lg:text-6xl font-bold text-brand-gray-900 leading-[1.1]">
               {EVENT.title}
             </h1>
-            <p className="mt-6 text-lg sm:text-xl text-brand-gray-500 leading-relaxed">
-              {EVENT.description}
-            </p>
+            <EventDescription
+              text={EVENT.description}
+              className="mt-6 text-lg sm:text-xl text-brand-gray-500 leading-relaxed"
+            />
             {(EVENT.presenterName || EVENT.presenterTitle) && (
               <p className="mt-3 text-base text-brand-gray-500">
                 Prezentuoja{' '}

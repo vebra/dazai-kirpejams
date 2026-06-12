@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import { formatEventDateLt } from '@/lib/events/config'
+import { flattenDescription } from '@/components/events/EventDescription'
 import { getEventSpotsTaken } from '@/lib/data/queries'
 import { getVisibleUpcomingEvents } from '@/lib/events/queries'
 
@@ -45,7 +46,12 @@ export async function EventCountdownSection({
               {event.venueName} · {event.venueStreet}, {event.venueCity}
             </p>
             <p className="text-[0.95rem] text-white/65 leading-[1.7] mb-7 max-w-[520px]">
-              {event.description}
+              {/* Teaser — tik pirma aprašymo pastraipa; pilnas tekstas
+                  (su sąrašu ir detalėmis) — renginio puslapyje. */}
+              {flattenDescription(
+                event.description.split('\n').find((l) => l.trim()) ??
+                  event.description
+              )}
             </p>
             <Link
               href={detailHref}
