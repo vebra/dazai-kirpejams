@@ -3,7 +3,7 @@
  * generatorius, JSON-LD schema, admin ir cron priminimas.
  *
  * Datos laikomos su eksplicitine Europe/Vilnius laiko juosta
- * (UTC+02:00 vasarą, UTC+03:00 žiemą). 2026-05-17 — EEST = UTC+03:00.
+ * (UTC+02:00 vasarą, UTC+03:00 žiemą). 2026-08-02 — EEST = UTC+03:00.
  *
  * Pridedant naują renginį: sukurti naują `EventInfo` ir (jei reikia) pridėti
  * route'ą. Dabartinis puslapis rodo `DAZU_PREZENTACIJA_2026` pagal slug.
@@ -38,16 +38,16 @@ export type EventInfo = {
 }
 
 export const DAZU_PREZENTACIJA_2026: EventInfo = {
-  slug: 'dazu-prezentacija-kaune-2026-05-17',
+  slug: 'dazu-prezentacija-kaune-2026-08-02',
   title: 'Color SHOCK dažų prezentacija Kaune',
   shortTitle: 'Dažų prezentacija Kaune',
   description:
     'Gyva profesionalių Color SHOCK plaukų dažų prezentacija Kaune su dažymo technikų demonstracija ant gyvo modelio. Aptarsime oksidantų variantus ir 180 ml pakuotės naudą salonui. Įėjimas nemokamas, būtina registracija.',
-  // 2026-05-17 10:00–15:00 Europe/Vilnius (EEST = UTC+03:00)
-  startsAt: new Date('2026-05-17T10:00:00+03:00'),
-  endsAt: new Date('2026-05-17T15:00:00+03:00'),
-  startsAtIso: '2026-05-17T10:00:00+03:00',
-  endsAtIso: '2026-05-17T15:00:00+03:00',
+  // 2026-08-02 10:00–16:00 Europe/Vilnius (EEST = UTC+03:00)
+  startsAt: new Date('2026-08-02T10:00:00+03:00'),
+  endsAt: new Date('2026-08-02T16:00:00+03:00'),
+  startsAtIso: '2026-08-02T10:00:00+03:00',
+  endsAtIso: '2026-08-02T16:00:00+03:00',
   venueName: 'Įvaizdžio salonas 313 „Rolė"',
   venueStreet: 'Kipro Petrausko g. 44',
   venueCity: 'Kaunas',

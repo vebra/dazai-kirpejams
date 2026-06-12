@@ -17,6 +17,12 @@ import {
 // per valandą po renginio pabaigos, nereikalaujant manual revalidate.
 export const revalidate = 60
 
+// Pervadinti slug'ai — senos nuorodos (pvz. iš jau išsiųstų registracijos
+// laiškų) nukreipiamos į naują URL vietoj 404.
+const RENAMED_SLUGS: Record<string, string> = {
+  'dazu-prezentacija-kaune-2026-05-17': 'dazu-prezentacija-kaune-2026-08-02',
+}
+
 export async function generateMetadata({
   params,
 }: PageProps<'/[lang]/renginys/[slug]'>): Promise<Metadata> {
@@ -52,6 +58,10 @@ export default async function EventDetailPage({
 }: PageProps<'/[lang]/renginys/[slug]'>) {
   const { lang, slug } = await params
   if (!hasLocale(lang)) notFound()
+
+  if (RENAMED_SLUGS[slug]) {
+    redirect(`/renginys/${RENAMED_SLUGS[slug]}`)
+  }
 
   // EN/RU lankytojus nukreipiam į LT canonical URL'ą (renginiai LT kalba).
   if (lang !== 'lt') {
@@ -94,13 +104,17 @@ export default async function EventDetailPage({
         ])}
       />
 
-      <section className="relative w-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-[24/9] overflow-hidden">
+      {/* w-full + h-auto — nuotrauka rodoma visa, natūraliu proporcijų
+          santykiu, be apkarpymo. width/height čia tik pradinis layout'o
+          santykis (CLS) — galutinį diktuoja pats failas. */}
+      <section className="w-full">
         <Image
           src={EVENT.heroImageUrl ?? '/event-hero.jpg'}
           alt={`${EVENT.title} — ${EVENT.presenterName}`}
-          fill
+          width={1916}
+          height={821}
           sizes="100vw"
-          className="object-cover"
+          className="w-full h-auto"
           priority
         />
       </section>
