@@ -41,12 +41,31 @@ export default async function ReorderPage() {
                 background: white !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
+                font-size: 10px !important;
               }
               aside, [data-admin-sidebar], header[data-admin-topbar],
               .admin-sidebar, .admin-topbar { display: none !important; }
               .print-hide { display: none !important; }
-              .reorder-row td { padding-top: 4px !important; padding-bottom: 4px !important; }
-              @page { margin: 1cm; size: A4; }
+              /* Kompaktiškas sąrašas — taupom lapus */
+              .reorder-table { font-size: 10px !important; }
+              .reorder-table th,
+              .reorder-table td {
+                padding-top: 1.5px !important;
+                padding-bottom: 1.5px !important;
+                padding-left: 6px !important;
+                padding-right: 6px !important;
+                line-height: 1.2 !important;
+              }
+              /* Spalvos nr. / SKU — į tą pačią eilutę su pavadinimu */
+              .reorder-name { display: inline !important; }
+              .reorder-meta {
+                display: inline !important;
+                margin-left: 6px !important;
+                font-size: 9px !important;
+              }
+              .reorder-row { page-break-inside: avoid; }
+              thead { display: table-header-group; }
+              @page { margin: 0.8cm; size: A4; }
             }
           `,
         }}
@@ -101,7 +120,7 @@ export default async function ReorderPage() {
 
       <div className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="reorder-table w-full text-sm">
             <thead>
               <tr className="bg-[#F9F9FB] text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500">
                 <th className="px-4 py-3 text-left">Prekė</th>
@@ -129,11 +148,11 @@ export default async function ReorderPage() {
                   >
                     <td className="px-4 py-3">
                       <div
-                        className={`font-medium ${outRow ? 'text-red-700 font-bold' : 'text-brand-gray-900'}`}
+                        className={`reorder-name font-medium ${outRow ? 'text-red-700 font-bold' : 'text-brand-gray-900'}`}
                       >
                         {p.nameLt}
                       </div>
-                      <div className="text-[11px] text-brand-gray-400 font-mono">
+                      <div className="reorder-meta text-[11px] text-brand-gray-400 font-mono">
                         {p.colorNumber ?? p.sku ?? ''}
                       </div>
                     </td>
@@ -189,7 +208,7 @@ export default async function ReorderPage() {
           </table>
         </div>
       </div>
-      <p className="text-[12px] text-brand-gray-500">
+      <p className="print-hide text-[12px] text-brand-gray-500">
         Palikus ribos lauką tuščią ir išsaugojus — perspėjimas išjungiamas tai prekei.
       </p>
     </div>
