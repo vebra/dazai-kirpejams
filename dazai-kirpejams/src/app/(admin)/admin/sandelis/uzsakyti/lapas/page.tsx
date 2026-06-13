@@ -3,13 +3,13 @@ import { requireAdmin } from '@/lib/admin/auth'
 import { getAdminProducts } from '@/lib/admin/queries'
 import { PrintButton } from '@/components/admin/PrintButton'
 
-export const metadata = { title: 'Užsakymo lapas tiekėjui' }
+export const metadata = { title: 'Supplier order sheet' }
 export const dynamic = 'force-dynamic'
 
 /**
- * Spausdinamas užsakymo lapas tiekėjui: prekės, pasiekusios perspėjimo ribą,
- * su siūlomu kiekiu (papildyti iki dvigubos ribos) ir tuščiu stulpeliu
- * rankiniam koregavimui. Atspausdinai / išsisaugojai PDF — išsiuntei tiekėjui.
+ * Spausdinamas užsakymo lapas tiekėjui — ANGLŲ kalba (tiekėjas užsienietis):
+ * prekės, pasiekusios perspėjimo ribą arba baigusios (0), su siūlomu kiekiu
+ * (papildyti iki dvigubos ribos) ir tuščiu stulpeliu rankiniam koregavimui.
  */
 export default async function SupplierOrderSheetPage() {
   await requireAdmin()
@@ -34,7 +34,7 @@ export default async function SupplierOrderSheetPage() {
   const suggested = (p: (typeof low)[number]) =>
     Math.max((p.reorderPoint ?? 0) * 2 - p.stockQuantity, 1)
   const totalSuggested = low.reduce((s, p) => s + suggested(p), 0)
-  const today = new Date().toLocaleDateString('lt-LT')
+  const today = new Date().toLocaleDateString('en-GB')
 
   return (
     <>
@@ -65,34 +65,37 @@ export default async function SupplierOrderSheetPage() {
           >
             ← Atgal
           </Link>
-          <PrintButton className="px-4 py-2 bg-brand-magenta text-white rounded-lg text-sm font-semibold hover:bg-brand-magenta-dark" />
+          <PrintButton
+            label="🖨 Print"
+            className="px-4 py-2 bg-brand-magenta text-white rounded-lg text-sm font-semibold hover:bg-brand-magenta-dark"
+          />
         </div>
 
         <header className="border-b border-black pb-4 mb-6">
-          <h1 className="text-2xl font-bold">Užsakymas tiekėjui</h1>
+          <h1 className="text-2xl font-bold">Purchase order</h1>
           <div className="mt-3 flex items-center justify-between text-sm">
             <div>
-              Pozicijų: <strong>{low.length}</strong> · Siūloma iš viso:{' '}
-              <strong>{totalSuggested} vnt.</strong>
+              Items: <strong>{low.length}</strong> · Suggested total:{' '}
+              <strong>{totalSuggested} pcs</strong>
             </div>
-            <div>Data: {today}</div>
+            <div>Date: {today}</div>
           </div>
         </header>
 
         {low.length === 0 ? (
           <div className="text-sm">
-            Visų prekių likučiai virš ribos — užsakyti nieko nereikia. 👍
+            All stock levels are above threshold — nothing to order. 👍
           </div>
         ) : (
           <table className="w-full text-[13px] border-collapse">
             <thead>
               <tr className="border-b-2 border-black text-left">
                 <th className="py-2 pr-2 w-[28px]">#</th>
-                <th className="py-2 pr-2">Prekė</th>
+                <th className="py-2 pr-2">Product</th>
                 <th className="py-2 pr-2 w-[110px]">SKU / EAN</th>
-                <th className="py-2 pr-2 text-center w-[60px]">Likutis</th>
-                <th className="py-2 pr-2 text-center w-[80px]">Siūloma</th>
-                <th className="py-2 pr-2 text-center w-[90px]">Užsakyta</th>
+                <th className="py-2 pr-2 text-center w-[60px]">Stock</th>
+                <th className="py-2 pr-2 text-center w-[80px]">Suggested</th>
+                <th className="py-2 pr-2 text-center w-[90px]">Ordered</th>
               </tr>
             </thead>
             <tbody>
@@ -106,8 +109,8 @@ export default async function SupplierOrderSheetPage() {
                   <td className="py-1.5 pr-2 tabular-nums">{i + 1}</td>
                   <td className={`py-1.5 pr-2 ${out ? 'text-red-700 font-bold' : ''}`}>
                     {p.colorNumber ? `${p.colorNumber} · ` : ''}
-                    {p.nameLt}
-                    {out ? ' (baigėsi)' : ''}
+                    {p.nameEn || p.nameLt}
+                    {out ? ' (out of stock)' : ''}
                   </td>
                   <td className="py-1.5 pr-2 font-mono text-[11px]">
                     {p.sku ?? p.ean ?? '—'}
@@ -133,8 +136,8 @@ export default async function SupplierOrderSheetPage() {
         )}
 
         <footer className="mt-8 pt-4 border-t border-gray-400 text-[11px] text-gray-600">
-          Dažai Kirpėjams · Užsakymas tiekėjui · Siūlomas kiekis = papildyti iki
-          dvigubos perspėjimo ribos
+          Dažai Kirpėjams · Purchase order · Suggested qty = top up to double the
+          reorder threshold
         </footer>
       </div>
     </>

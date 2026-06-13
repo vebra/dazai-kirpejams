@@ -73,6 +73,7 @@ export type AdminProductListRow = {
   sku: string | null
   ean: string | null
   nameLt: string
+  nameEn: string | null
   colorNumber: string | null
   colorHex: string | null
   priceCents: number
@@ -269,7 +270,7 @@ export async function getAdminProducts(
   let query = supabase
     .from('products')
     .select(
-      `id, slug, sku, ean, name_lt, color_number, color_hex, price_cents,
+      `id, slug, sku, ean, name_lt, name_en, color_number, color_hex, price_cents,
        sale_price_cents, cost_price_cents, stock_quantity, reorder_point,
        is_active, image_urls, updated_at,
        category:categories(id, slug, name_lt)`
@@ -352,6 +353,7 @@ export async function getAdminProducts(
       sku: row.sku,
       ean: row.ean ?? null,
       nameLt: row.name_lt,
+      nameEn: row.name_en ?? null,
       colorNumber: row.color_number,
       colorHex: row.color_hex,
       priceCents: row.price_cents,
