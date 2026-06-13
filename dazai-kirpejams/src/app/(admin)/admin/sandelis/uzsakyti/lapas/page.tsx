@@ -14,13 +14,23 @@ export const dynamic = 'force-dynamic'
 export default async function SupplierOrderSheetPage() {
   await requireAdmin()
   const all = await getAdminProducts({ sortBy: 'name' })
-  const low = all.filter(
-    (p) =>
-      p.isActive &&
-      p.reorderPoint != null &&
-      p.reorderPoint > 0 &&
-      p.stockQuantity <= p.reorderPoint
-  )
+  const isOut = (p: (typeof all)[number]) => p.stockQuantity <= 0
+  const low = all
+    .filter(
+      (p) =>
+        p.isActive &&
+        (isOut(p) ||
+          (p.reorderPoint != null &&
+            p.reorderPoint > 0 &&
+            p.stockQuantity <= p.reorderPoint))
+    )
+    // Baigusios (0) prekės — viršuje
+    .sort((a, b) => {
+      const oa = isOut(a) ? 0 : 1
+      const ob = isOut(b) ? 0 : 1
+      if (oa !== ob) return oa - ob
+      return a.nameLt.localeCompare(b.nameLt, 'lt')
+    })
   const suggested = (p: (typeof low)[number]) =>
     Math.max((p.reorderPoint ?? 0) * 2 - p.stockQuantity, 1)
   const totalSuggested = low.reduce((s, p) => s + suggested(p), 0)
@@ -32,7 +42,11 @@ export default async function SupplierOrderSheetPage() {
         dangerouslySetInnerHTML={{
           __html: `
             @media print {
-              body { background: white !important; }
+              body {
+                background: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+              }
               aside, [data-admin-sidebar], header[data-admin-topbar],
               .admin-sidebar, .admin-topbar { display: none !important; }
               .print-page { padding: 0 !important; margin: 0 !important; max-width: none !important; }
@@ -82,17 +96,25 @@ export default async function SupplierOrderSheetPage() {
               </tr>
             </thead>
             <tbody>
-              {low.map((p, i) => (
-                <tr key={p.id} className="border-b border-gray-300">
+              {low.map((p, i) => {
+                const out = isOut(p)
+                return (
+                <tr
+                  key={p.id}
+                  className={`border-b border-gray-300 ${out ? 'bg-red-100' : ''}`}
+                >
                   <td className="py-1.5 pr-2 tabular-nums">{i + 1}</td>
-                  <td className="py-1.5 pr-2">
+                  <td className={`py-1.5 pr-2 ${out ? 'text-red-700 font-bold' : ''}`}>
                     {p.colorNumber ? `${p.colorNumber} · ` : ''}
                     {p.nameLt}
+                    {out ? ' (baigėsi)' : ''}
                   </td>
                   <td className="py-1.5 pr-2 font-mono text-[11px]">
                     {p.sku ?? p.ean ?? '—'}
                   </td>
-                  <td className="py-1.5 pr-2 text-center tabular-nums">
+                  <td
+                    className={`py-1.5 pr-2 text-center tabular-nums ${out ? 'text-red-700 font-bold' : ''}`}
+                  >
                     {p.stockQuantity}
                   </td>
                   <td className="py-1.5 pr-2 text-center tabular-nums font-bold">
@@ -104,7 +126,8 @@ export default async function SupplierOrderSheetPage() {
                     </span>
                   </td>
                 </tr>
-              ))}
+                )
+              })}
             </tbody>
           </table>
         )}

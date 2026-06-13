@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { requireAdmin } from '@/lib/admin/auth'
 import { getAdminProducts } from '@/lib/admin/queries'
+import { PrintButton } from '@/components/admin/PrintButton'
 import { quickSetReorderAction } from '../actions'
 
 export const metadata = { title: 'Ką užsakyti' }
@@ -11,29 +12,63 @@ export default async function ReorderPage() {
   const all = await getAdminProducts({ sortBy: 'name' })
   const active = all.filter((p) => p.isActive)
 
+  // Prekė baigėsi (0 likutis) — visada raudona ir visada reikia užsakyti
+  const isOut = (p: (typeof active)[number]) => p.stockQuantity <= 0
+  // Žemas likutis pagal perspėjimo ribą
   const isLow = (p: (typeof active)[number]) =>
-    p.reorderPoint != null && p.reorderPoint > 0 && p.stockQuantity <= p.reorderPoint
+    isOut(p) ||
+    (p.reorderPoint != null && p.reorderPoint > 0 && p.stockQuantity <= p.reorderPoint)
 
   const low = active.filter(isLow)
-  // Rikiuojam: pirma reikiantys užsakyti (pagal trūkumą), tada likę
+  const outCount = active.filter(isOut).length
+  // Rikiuojam: pirma baigėsi (0), tada žemas likutis, tada likę
+  const rank = (p: (typeof active)[number]) => (isOut(p) ? 0 : isLow(p) ? 1 : 2)
   const sorted = [...active].sort((a, b) => {
-    const la = isLow(a) ? 0 : 1
-    const lb = isLow(b) ? 0 : 1
-    if (la !== lb) return la - lb
+    const ra = rank(a)
+    const rb = rank(b)
+    if (ra !== rb) return ra - rb
     return a.nameLt.localeCompare(b.nameLt, 'lt')
   })
+  const today = new Date().toLocaleDateString('lt-LT')
 
   return (
     <div className="space-y-6 max-w-5xl">
-      <div className="flex items-center justify-between gap-3">
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            @media print {
+              body {
+                background: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+              }
+              aside, [data-admin-sidebar], header[data-admin-topbar],
+              .admin-sidebar, .admin-topbar { display: none !important; }
+              .print-hide { display: none !important; }
+              .reorder-row td { padding-top: 4px !important; padding-bottom: 4px !important; }
+              @page { margin: 1cm; size: A4; }
+            }
+          `,
+        }}
+      />
+      <div className="hidden print:block mb-2">
+        <h1 className="text-xl font-bold text-black">Ką užsakyti</h1>
+        <div className="text-sm text-black">Data: {today}</div>
+      </div>
+
+      <div className="print-hide flex items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold text-brand-gray-900">Ką užsakyti</h2>
           <p className="mt-1 text-sm text-brand-gray-500">
             Nustatykite perspėjimo ribą kiekvienai prekei. Kai likutis pasiekia
-            ribą — prekė pažymima „Užsakyti“.
+            ribą — prekė pažymima „Užsakyti“. Baigusios (0) prekės žymimos raudonai.
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <PrintButton
+            label="🖨 Spausdinti"
+            className="px-4 py-2 bg-brand-gray-900 text-white rounded-lg font-semibold text-sm hover:bg-black transition-colors whitespace-nowrap"
+          />
           {low.length > 0 && (
             <Link
               href="/admin/sandelis/uzsakyti/lapas"
@@ -59,7 +94,8 @@ export default async function ReorderPage() {
         }`}
       >
         {low.length > 0
-          ? `⚠️ Reikia užsakyti: ${low.length} prek(ės)`
+          ? `⚠️ Reikia užsakyti: ${low.length} prek(ės)` +
+            (outCount > 0 ? ` · iš jų baigėsi (0): ${outCount}` : '')
           : '✓ Visų prekių likučiai virš ribos'}
       </div>
 
@@ -70,20 +106,31 @@ export default async function ReorderPage() {
               <tr className="bg-[#F9F9FB] text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-gray-500">
                 <th className="px-4 py-3 text-left">Prekė</th>
                 <th className="px-4 py-3 text-right w-[90px]">Likutis</th>
-                <th className="px-4 py-3 text-center w-[220px]">Perspėjimo riba</th>
+                <th className="px-4 py-3 text-center w-[220px] print-hide">
+                  Perspėjimo riba
+                </th>
                 <th className="px-4 py-3 text-center w-[120px]">Būsena</th>
               </tr>
             </thead>
             <tbody>
               {sorted.map((p) => {
                 const lowRow = isLow(p)
+                const outRow = isOut(p)
                 return (
                   <tr
                     key={p.id}
-                    className={`border-t border-[#eee] ${lowRow ? 'bg-red-50/40' : 'hover:bg-[#F9F9FB]'} transition-colors`}
+                    className={`reorder-row border-t border-[#eee] ${
+                      outRow
+                        ? 'bg-red-100'
+                        : lowRow
+                          ? 'bg-red-50/40'
+                          : 'hover:bg-[#F9F9FB]'
+                    } transition-colors`}
                   >
                     <td className="px-4 py-3">
-                      <div className="font-medium text-brand-gray-900">
+                      <div
+                        className={`font-medium ${outRow ? 'text-red-700 font-bold' : 'text-brand-gray-900'}`}
+                      >
                         {p.nameLt}
                       </div>
                       <div className="text-[11px] text-brand-gray-400 font-mono">
@@ -91,11 +138,11 @@ export default async function ReorderPage() {
                       </div>
                     </td>
                     <td
-                      className={`px-4 py-3 text-right font-bold ${lowRow ? 'text-red-600' : 'text-brand-gray-900'}`}
+                      className={`px-4 py-3 text-right font-bold ${outRow ? 'text-red-700' : lowRow ? 'text-red-600' : 'text-brand-gray-900'}`}
                     >
                       {p.stockQuantity}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 print-hide">
                       <form
                         action={quickSetReorderAction}
                         className="flex items-center justify-center gap-2"
@@ -119,7 +166,11 @@ export default async function ReorderPage() {
                       </form>
                     </td>
                     <td className="px-4 py-3 text-center">
-                      {lowRow ? (
+                      {outRow ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border bg-red-600 text-white border-red-700">
+                          Baigėsi
+                        </span>
+                      ) : lowRow ? (
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border bg-red-50 text-red-700 border-red-200">
                           Užsakyti
                         </span>
