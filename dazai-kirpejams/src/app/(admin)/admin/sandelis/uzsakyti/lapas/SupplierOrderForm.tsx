@@ -62,6 +62,7 @@ export function SupplierOrderForm({
   const [onlyOrdered, setOnlyOrdered] = useState(false)
   const [pending, startTransition] = useTransition()
   const [result, setResult] = useState<SupplierOrderResult | null>(null)
+  const [downloading, setDownloading] = useState(false)
 
   const isOut = (p: Row) => p.stockQuantity <= 0
   const presetSet = useMemo(() => new Set(presetIds), [presetIds])
@@ -94,6 +95,40 @@ export function SupplierOrderForm({
   }
   function bump(id: string, by: number) {
     setQty((prev) => ({ ...prev, [id]: Math.max(0, (prev[id] ?? 0) + by) }))
+  }
+
+  async function downloadPdf() {
+    if (orderedRows.length === 0) return
+    setDownloading(true)
+    try {
+      const items = orderedRows.map((p) => ({
+        colorNumber: p.colorNumber,
+        name: p.nameLt,
+        nameEn: p.nameEn,
+        sku: p.sku,
+        ean: p.ean,
+        qty: qty[p.id] ?? 0,
+      }))
+      const res = await fetch('/admin/sandelis/uzsakyti/lapas/pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items, note }),
+      })
+      if (!res.ok) throw new Error('PDF generavimas nepavyko')
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `purchase-order-${new Date().toISOString().slice(0, 10)}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+    } catch {
+      setResult({ ok: false, error: 'Nepavyko parsisiųsti PDF. Bandykite dar kartą.' })
+    } finally {
+      setDownloading(false)
+    }
   }
 
   function save() {
@@ -166,6 +201,24 @@ export function SupplierOrderForm({
           >
             Istorija
           </Link>
+          <button
+            type="button"
+            onClick={downloadPdf}
+            disabled={downloading || orderedRows.length === 0}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg text-sm font-semibold hover:bg-[#F5F5F7] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+          >
+            {downloading ? (
+              <>
+                <span
+                  className="w-4 h-4 rounded-full border-2 border-brand-gray-400 border-t-transparent animate-spin"
+                  aria-hidden
+                />
+                Ruošiama…
+              </>
+            ) : (
+              '⬇ Parsisiųsti PDF'
+            )}
+          </button>
           <PrintButton
             label="🖨 Print"
             className="px-4 py-2 bg-brand-gray-900 text-white rounded-lg text-sm font-semibold hover:bg-black"
