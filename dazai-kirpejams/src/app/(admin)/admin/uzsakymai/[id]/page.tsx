@@ -11,6 +11,8 @@ import {
 } from '@/lib/admin/queries'
 import { AddOrderItemForm } from './AddOrderItemForm'
 import { RegenerateButton } from './RegenerateButton'
+import { StatusButton } from './StatusButton'
+import { SubmitButton } from './SubmitButton'
 import {
   updateOrderStatusAction,
   updateOrderNotesAction,
@@ -252,12 +254,10 @@ export default async function AdminOrderDetailPage({
             <form key={s} action={updateOrderStatusAction}>
               <input type="hidden" name="id" value={order.id} />
               <input type="hidden" name="status" value={s} />
-              <button
-                type="submit"
-                className={`px-3 py-2 rounded-lg text-[12px] font-semibold border transition-colors hover:opacity-90 ${ORDER_STATUS_COLORS[s]}`}
-              >
-                → {ORDER_STATUS_LABELS[s]}
-              </button>
+              <StatusButton
+                label={ORDER_STATUS_LABELS[s]}
+                colorClassName={ORDER_STATUS_COLORS[s]}
+              />
             </form>
           ))}
         </div>
@@ -507,12 +507,13 @@ export default async function AdminOrderDetailPage({
                 <option value="other">Kitas</option>
               </select>
             </div>
-            <button
-              type="submit"
-              className="px-4 py-2.5 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark transition-colors"
+            <SubmitButton
+              pendingLabel="Saugoma…"
+              spinnerClassName="border-white border-t-transparent"
+              className="px-4 py-2.5 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark"
             >
               Išsaugoti
-            </button>
+            </SubmitButton>
           </div>
         </form>
       </section>
@@ -577,12 +578,13 @@ export default async function AdminOrderDetailPage({
                 <>
                   <form action={downloadInvoiceAction}>
                     <input type="hidden" name="id" value={order.id} />
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark transition-colors"
+                    <SubmitButton
+                      pendingLabel="Ruošiama…"
+                      spinnerClassName="border-white border-t-transparent"
+                      className="px-4 py-2 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark"
                     >
                       ↓ Parsisiųsti PDF
-                    </button>
+                    </SubmitButton>
                   </form>
                   <form action={regenerateInvoiceAction}>
                     <input type="hidden" name="id" value={order.id} />
@@ -592,12 +594,12 @@ export default async function AdminOrderDetailPage({
               ) : (
                 <form action={generateInvoiceAction}>
                   <input type="hidden" name="id" value={order.id} />
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-[#F5F5F7] border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-white transition-colors"
+                  <SubmitButton
+                    pendingLabel="Generuojama…"
+                    className="px-4 py-2 bg-[#F5F5F7] border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-white"
                   >
                     Sugeneruoti PDF
-                  </button>
+                  </SubmitButton>
                 </form>
               )}
             </div>
@@ -635,12 +637,13 @@ export default async function AdminOrderDetailPage({
             className="w-full px-4 py-2.5 bg-[#F5F5F7] border border-[#ddd] rounded-lg text-sm focus:outline-none focus:border-brand-magenta focus:bg-white"
           />
           <div className="flex justify-end">
-            <button
-              type="submit"
-              className="px-4 py-2 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark transition-colors"
+            <SubmitButton
+              pendingLabel="Saugoma…"
+              spinnerClassName="border-white border-t-transparent"
+              className="px-4 py-2 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark"
             >
               Išsaugoti pastabas
-            </button>
+            </SubmitButton>
           </div>
         </form>
       </section>
