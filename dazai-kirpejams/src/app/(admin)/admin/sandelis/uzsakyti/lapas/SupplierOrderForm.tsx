@@ -10,10 +10,11 @@ import {
 } from '../../actions'
 
 /**
- * Užsakymo lapas tiekėjui — pildomas TIESIAI svetainėje. Kiekvienai prekei
- * (žemas likutis arba baigėsi) galima įvesti užsakomą kiekį (iš anksto
- * užpildyta siūlomu), įtraukti/išmesti prekę, prirašyti pastabą ir IŠSAUGOTI
- * į istoriją (supplier_orders). Užpildytą lapą galima ir atspausdinti.
+ * Užsakymo lapas tiekėjui — pildomas TIESIAI svetainėje. Žemo likučio / baigusios
+ * prekės pridedamos automatiškai, o per paiešką galima įtraukti BET KURIĄ kitą
+ * prekę. Kiekviena eilutė turi užsakomo kiekio lauką, prekes galima pašalinti,
+ * prirašyti pastabą ir IŠSAUGOTI į istoriją (supplier_orders). Lapą galima ir
+ * atspausdinti su jau įrašytais kiekiais.
  */
 
 type Row = AdminProductListRow
@@ -24,51 +25,94 @@ function suggestedQty(p: Row): number {
 
 export function SupplierOrderForm({
   products,
+  presetIds,
   today,
 }: {
+  /** Visos aktyvios prekės — paieškai/pridėjimui. */
   products: Row[]
+  /** Prekės, kurias reikia užsakyti (0 ar žemas likutis) — pridedamos iš karto. */
+  presetIds: string[]
   today: string
 }) {
-  // productId → užsakomas kiekis (pradinis = siūlomas)
-  const [qty, setQty] = useState<Record<string, number>>(() =>
-    Object.fromEntries(products.map((p) => [p.id, suggestedQty(p)]))
+  const pmap = useMemo(() => new Map(products.map((p) => [p.id, p])), [products])
+
+  // Užsakymo eilutės — produktų ID tvarka (pradžioje žemo likučio prekės)
+  const [orderIds, setOrderIds] = useState<string[]>(() =>
+    presetIds.filter((id) => pmap.has(id))
   )
-  // Įtrauktos prekės (pradžioje visos)
-  const [included, setIncluded] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(products.map((p) => [p.id, true]))
+  // productId → užsakomas kiekis
+  const [qty, setQty] = useState<Record<string, number>>(() =>
+    Object.fromEntries(
+      presetIds
+        .map((id) => pmap.get(id))
+        .filter((p): p is Row => !!p)
+        .map((p) => [p.id, suggestedQty(p)])
+    )
   )
   const [note, setNote] = useState('')
+  const [search, setSearch] = useState('')
   const [pending, startTransition] = useTransition()
   const [result, setResult] = useState<SupplierOrderResult | null>(null)
 
   const isOut = (p: Row) => p.stockQuantity <= 0
 
-  const activeRows = useMemo(
-    () => products.filter((p) => included[p.id] && (qty[p.id] ?? 0) > 0),
-    [products, included, qty]
+  const rows = useMemo(
+    () => orderIds.map((id) => pmap.get(id)).filter((p): p is Row => !!p),
+    [orderIds, pmap]
   )
-  const totalQty = activeRows.reduce((s, p) => s + (qty[p.id] ?? 0), 0)
+  const totalQty = rows.reduce((s, p) => s + (qty[p.id] ?? 0), 0)
+
+  const searchResults = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return []
+    const inOrder = new Set(orderIds)
+    return products
+      .filter(
+        (p) =>
+          !inOrder.has(p.id) &&
+          (p.nameLt.toLowerCase().includes(q) ||
+            (p.nameEn ?? '').toLowerCase().includes(q) ||
+            (p.colorNumber ?? '').toLowerCase().includes(q) ||
+            (p.sku ?? '').toLowerCase().includes(q) ||
+            (p.ean ?? '').includes(q))
+      )
+      .slice(0, 8)
+  }, [products, search, orderIds])
+
+  function addProduct(p: Row) {
+    setOrderIds((prev) => (prev.includes(p.id) ? prev : [...prev, p.id]))
+    setQty((prev) => ({ ...prev, [p.id]: prev[p.id] ?? suggestedQty(p) }))
+    setSearch('')
+  }
+
+  function removeProduct(id: string) {
+    setOrderIds((prev) => prev.filter((x) => x !== id))
+  }
 
   function setQtyValue(id: string, v: number) {
     setQty((prev) => ({ ...prev, [id]: Math.max(0, Math.floor(v) || 0) }))
   }
 
   function save() {
-    const items = activeRows.map((p) => ({
-      productId: p.id,
-      name: p.nameLt,
-      nameEn: p.nameEn,
-      colorNumber: p.colorNumber,
-      sku: p.sku,
-      ean: p.ean,
-      stockAtOrder: p.stockQuantity,
-      qty: qty[p.id] ?? 0,
-    }))
+    const items = rows
+      .filter((p) => (qty[p.id] ?? 0) > 0)
+      .map((p) => ({
+        productId: p.id,
+        name: p.nameLt,
+        nameEn: p.nameEn,
+        colorNumber: p.colorNumber,
+        sku: p.sku,
+        ean: p.ean,
+        stockAtOrder: p.stockQuantity,
+        qty: qty[p.id] ?? 0,
+      }))
     startTransition(async () => {
       const res = await createSupplierOrderAction(items, note)
       setResult(res)
     })
   }
+
+  const orderableCount = rows.filter((p) => (qty[p.id] ?? 0) > 0).length
 
   // ── Išsaugota ──
   if (result?.ok) {
@@ -130,7 +174,7 @@ export function SupplierOrderForm({
           <button
             type="button"
             onClick={save}
-            disabled={pending || activeRows.length === 0}
+            disabled={pending || orderableCount === 0}
             className="inline-flex items-center gap-2 px-4 py-2 bg-brand-magenta text-white rounded-lg text-sm font-semibold hover:bg-brand-magenta-dark active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
           >
             {pending ? (
@@ -154,58 +198,77 @@ export function SupplierOrderForm({
         </div>
       )}
 
+      {/* Prekės pridėjimas per paiešką — nespausdinama */}
+      <div className="print-hide mb-6 relative">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="➕ Pridėti prekę — ieškoti pagal pavadinimą, spalvos nr., SKU ar EAN…"
+          className="w-full px-4 py-2.5 bg-[#F5F5F7] border border-[#ddd] rounded-lg text-sm focus:outline-none focus:border-brand-magenta focus:bg-white"
+        />
+        {searchResults.length > 0 && (
+          <div className="absolute z-10 left-0 right-0 mt-1 bg-white border border-[#ddd] rounded-lg shadow-lg overflow-hidden">
+            {searchResults.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => addProduct(p)}
+                className="w-full text-left px-4 py-2.5 hover:bg-[#F5F5F7] flex items-center justify-between gap-3 border-b border-[#f0f0f0] last:border-0"
+              >
+                <span className="text-sm text-brand-gray-900 truncate">
+                  {p.colorNumber ? `${p.colorNumber} · ` : ''}
+                  {p.nameLt}
+                  <span className="ml-2 text-[11px] font-mono text-brand-gray-400">
+                    {p.sku ?? p.ean ?? ''}
+                  </span>
+                </span>
+                <span
+                  className={`text-[12px] flex-shrink-0 ${p.stockQuantity <= 0 ? 'text-red-600 font-bold' : 'text-brand-gray-500'}`}
+                >
+                  likutis: {p.stockQuantity}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       <header className="border-b border-black pb-4 mb-6">
         <h1 className="text-2xl font-bold">Purchase order</h1>
         <div className="mt-3 flex items-center justify-between text-sm">
           <div>
-            Items: <strong>{activeRows.length}</strong> · Total:{' '}
+            Items: <strong>{orderableCount}</strong> · Total:{' '}
             <strong>{totalQty} pcs</strong>
           </div>
           <div>Date: {today}</div>
         </div>
       </header>
 
-      {products.length === 0 ? (
-        <div className="text-sm">
-          All stock levels are above threshold — nothing to order. 👍
+      {rows.length === 0 ? (
+        <div className="text-sm text-brand-gray-500">
+          Sąrašas tuščias. Pridėkite prekių per paiešką viršuje.
         </div>
       ) : (
         <table className="w-full text-[13px] border-collapse">
           <thead>
             <tr className="border-b-2 border-black text-left">
-              <th className="py-2 pr-2 w-[28px] print-hide">✓</th>
               <th className="py-2 pr-2 w-[28px]">#</th>
               <th className="py-2 pr-2">Product</th>
               <th className="py-2 pr-2 w-[110px]">SKU / EAN</th>
               <th className="py-2 pr-2 text-center w-[60px]">Stock</th>
-              <th className="py-2 pr-2 text-center w-[70px] print-hide">
-                Suggested
-              </th>
               <th className="py-2 pr-2 text-center w-[90px]">Ordered</th>
+              <th className="py-2 pr-2 w-[36px] print-hide" />
             </tr>
           </thead>
           <tbody>
-            {products.map((p, i) => {
+            {rows.map((p, i) => {
               const out = isOut(p)
-              const on = included[p.id]
               return (
                 <tr
                   key={p.id}
-                  className={`border-b border-gray-300 ${out ? 'bg-red-100' : ''} ${!on ? 'opacity-40 print:hidden' : ''}`}
+                  className={`border-b border-gray-300 ${out ? 'bg-red-100' : ''}`}
                 >
-                  <td className="py-1.5 pr-2 print-hide">
-                    <input
-                      type="checkbox"
-                      checked={on}
-                      onChange={(e) =>
-                        setIncluded((prev) => ({
-                          ...prev,
-                          [p.id]: e.target.checked,
-                        }))
-                      }
-                      className="w-4 h-4 accent-brand-magenta cursor-pointer"
-                    />
-                  </td>
                   <td className="py-1.5 pr-2 tabular-nums">{i + 1}</td>
                   <td
                     className={`py-1.5 pr-2 ${out ? 'text-red-700 font-bold' : ''}`}
@@ -222,25 +285,29 @@ export function SupplierOrderForm({
                   >
                     {p.stockQuantity}
                   </td>
-                  <td className="py-1.5 pr-2 text-center tabular-nums text-gray-500 print-hide">
-                    {suggestedQty(p)}
-                  </td>
                   <td className="py-1.5 pr-2 text-center">
                     {/* Spausdinant — tik skaičius; ekrane — įvedimo laukas */}
                     <span className="hidden print:inline tabular-nums font-bold">
-                      {on ? (qty[p.id] ?? 0) : ''}
+                      {qty[p.id] ?? 0}
                     </span>
                     <input
                       type="number"
                       min={0}
                       step={1}
                       value={qty[p.id] ?? 0}
-                      disabled={!on}
-                      onChange={(e) =>
-                        setQtyValue(p.id, Number(e.target.value))
-                      }
-                      className="print:hidden w-20 px-2 py-1 border border-[#ddd] rounded-md text-sm text-center tabular-nums focus:outline-none focus:border-brand-magenta disabled:bg-[#f5f5f7] disabled:text-gray-400"
+                      onChange={(e) => setQtyValue(p.id, Number(e.target.value))}
+                      className="print:hidden w-20 px-2 py-1 border border-[#ddd] rounded-md text-sm text-center tabular-nums focus:outline-none focus:border-brand-magenta"
                     />
+                  </td>
+                  <td className="py-1.5 pr-2 text-center print-hide">
+                    <button
+                      type="button"
+                      onClick={() => removeProduct(p.id)}
+                      title="Pašalinti iš užsakymo"
+                      className="w-6 h-6 inline-flex items-center justify-center text-brand-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                    >
+                      ✕
+                    </button>
                   </td>
                 </tr>
               )
@@ -269,8 +336,7 @@ export function SupplierOrderForm({
       </div>
 
       <footer className="mt-8 pt-4 border-t border-gray-400 text-[11px] text-gray-600">
-        Dažai Kirpėjams · Purchase order · Suggested qty = top up to double the
-        reorder threshold
+        Dažai Kirpėjams · Purchase order
       </footer>
     </div>
   )

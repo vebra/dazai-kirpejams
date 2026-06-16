@@ -13,15 +13,16 @@ export const dynamic = 'force-dynamic'
 export default async function SupplierOrderSheetPage() {
   await requireAdmin()
   const all = await getAdminProducts({ sortBy: 'name' })
+  const active = all.filter((p) => p.isActive)
   const isOut = (p: (typeof all)[number]) => p.stockQuantity <= 0
-  const low = all
+  // Žemo likučio / baigusios prekės — pridedamos į lapą iš karto (0 — viršuje).
+  const presetIds = active
     .filter(
       (p) =>
-        p.isActive &&
-        (isOut(p) ||
-          (p.reorderPoint != null &&
-            p.reorderPoint > 0 &&
-            p.stockQuantity <= p.reorderPoint))
+        isOut(p) ||
+        (p.reorderPoint != null &&
+          p.reorderPoint > 0 &&
+          p.stockQuantity <= p.reorderPoint)
     )
     .sort((a, b) => {
       const oa = isOut(a) ? 0 : 1
@@ -29,6 +30,7 @@ export default async function SupplierOrderSheetPage() {
       if (oa !== ob) return oa - ob
       return a.nameLt.localeCompare(b.nameLt, 'lt')
     })
+    .map((p) => p.id)
   const today = new Date().toLocaleDateString('en-GB')
 
   return (
@@ -51,7 +53,11 @@ export default async function SupplierOrderSheetPage() {
           `,
         }}
       />
-      <SupplierOrderForm products={low} today={today} />
+      <SupplierOrderForm
+        products={active}
+        presetIds={presetIds}
+        today={today}
+      />
     </>
   )
 }
