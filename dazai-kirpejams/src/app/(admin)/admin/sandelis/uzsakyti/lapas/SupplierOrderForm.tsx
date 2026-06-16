@@ -256,7 +256,7 @@ export function SupplierOrderForm({
               <th className="py-2 pr-2 w-[28px]">#</th>
               <th className="py-2 pr-2">Product</th>
               <th className="py-2 pr-2 w-[110px]">SKU / EAN</th>
-              <th className="py-2 pr-2 text-center w-[60px]">Stock</th>
+              <th className="py-2 pr-2 text-center w-[60px] print-hide">Stock</th>
               <th className="py-2 pr-2 text-center w-[90px]">Ordered</th>
               <th className="py-2 pr-2 w-[36px] print-hide" />
             </tr>
@@ -267,21 +267,21 @@ export function SupplierOrderForm({
               return (
                 <tr
                   key={p.id}
-                  className={`border-b border-gray-300 ${out ? 'bg-red-100' : ''}`}
+                  className={`border-b border-gray-300 ${out ? 'bg-red-100 print:bg-transparent' : ''}`}
                 >
                   <td className="py-1.5 pr-2 tabular-nums">{i + 1}</td>
                   <td
-                    className={`py-1.5 pr-2 ${out ? 'text-red-700 font-bold' : ''}`}
+                    className={`py-1.5 pr-2 ${out ? 'text-red-700 font-bold print:text-black print:font-normal' : ''}`}
                   >
                     {p.colorNumber ? `${p.colorNumber} · ` : ''}
                     {p.nameEn || p.nameLt}
-                    {out ? ' (out of stock)' : ''}
+                    {out ? <span className="print-hide"> (out of stock)</span> : ''}
                   </td>
                   <td className="py-1.5 pr-2 font-mono text-[11px]">
                     {p.sku ?? p.ean ?? '—'}
                   </td>
                   <td
-                    className={`py-1.5 pr-2 text-center tabular-nums ${out ? 'text-red-700 font-bold' : ''}`}
+                    className={`py-1.5 pr-2 text-center tabular-nums print-hide ${out ? 'text-red-700 font-bold' : ''}`}
                   >
                     {p.stockQuantity}
                   </td>
