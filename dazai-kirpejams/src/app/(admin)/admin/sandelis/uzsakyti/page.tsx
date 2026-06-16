@@ -93,9 +93,15 @@ export default async function ReorderPage() {
               href="/admin/sandelis/uzsakyti/lapas"
               className="px-4 py-2 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark transition-colors whitespace-nowrap"
             >
-              🖨 Užsakymo lapas tiekėjui
+              📝 Užsakymo lapas tiekėjui
             </Link>
           )}
+          <Link
+            href="/admin/sandelis/uzsakyti/istorija"
+            className="px-4 py-2 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-[#F5F5F7] transition-colors whitespace-nowrap"
+          >
+            Užsakymų istorija
+          </Link>
           <Link
             href="/admin/sandelis"
             className="px-4 py-2 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-[#F5F5F7] transition-colors whitespace-nowrap"

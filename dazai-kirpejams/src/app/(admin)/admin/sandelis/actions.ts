@@ -521,6 +521,77 @@ export async function applyRevisionAction(
 }
 
 // ============================================
+// Užsakymas tiekėjui — išsaugojimas istorijai (migr 074)
+// ============================================
+
+export type SupplierOrderItem = {
+  productId: string
+  name: string
+  nameEn: string | null
+  colorNumber: string | null
+  sku: string | null
+  ean: string | null
+  stockAtOrder: number
+  qty: number
+}
+
+export type SupplierOrderResult =
+  | { ok: true; id: string; itemCount: number; totalQty: number }
+  | { ok: false; error: string }
+
+/**
+ * Išsaugo tiekėjui pateiktą užsakymą į supplier_orders (istorija). Frontend
+ * siunčia tik įtrauktas prekes su kiekiu > 0. Snapshot'inam pavadinimus/SKU,
+ * kad istorija liktų tiksli net pakeitus ar ištrynus prekę.
+ */
+export async function createSupplierOrderAction(
+  items: SupplierOrderItem[],
+  note: string | null
+): Promise<SupplierOrderResult> {
+  await requireAdmin()
+  const clean = (items ?? []).filter(
+    (i) => i.productId && Number.isInteger(i.qty) && i.qty > 0
+  )
+  if (clean.length === 0) {
+    return { ok: false, error: 'Pasirinkite bent vieną prekę su kiekiu.' }
+  }
+
+  const supabase = createServerClient()
+  const totalQty = clean.reduce((s, i) => s + i.qty, 0)
+
+  const { data, error } = await supabase
+    .from('supplier_orders')
+    .insert({
+      note: note?.trim() || null,
+      item_count: clean.length,
+      total_qty: totalQty,
+      details: clean.map((i) => ({
+        productId: i.productId,
+        name: i.name,
+        nameEn: i.nameEn,
+        colorNumber: i.colorNumber,
+        sku: i.sku,
+        ean: i.ean,
+        stockAtOrder: i.stockAtOrder,
+        qty: i.qty,
+      })),
+    })
+    .select('id')
+    .single()
+
+  if (error || !data) {
+    console.error(
+      '[admin/sandelis/actions] createSupplierOrder:',
+      error?.message ?? 'no data'
+    )
+    return { ok: false, error: 'Nepavyko išsaugoti užsakymo. Bandykite dar kartą.' }
+  }
+
+  revalidatePath('/admin/sandelis/uzsakyti')
+  return { ok: true, id: data.id, itemCount: clean.length, totalQty }
+}
+
+// ============================================
 // Įjungti/išjungti produktą (soft delete)
 // ============================================
 
