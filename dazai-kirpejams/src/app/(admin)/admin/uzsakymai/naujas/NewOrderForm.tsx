@@ -39,37 +39,53 @@ function eur(cents: number): string {
   return (cents / 100).toFixed(2).replace('.', ',') + ' €'
 }
 
+export type NewOrderPrefill = {
+  email?: string
+  firstName?: string
+  lastName?: string
+  phone?: string | null
+  isCompany?: boolean
+  companyName?: string | null
+  companyCode?: string | null
+  vatCode?: string | null
+  address?: string | null
+  city?: string | null
+  postal?: string | null
+}
+
 export function NewOrderForm({
   products,
   vatRate,
   freeShippingThresholdCents,
   shippingPriceCents,
+  prefill,
 }: {
   products: AdminProductListRow[]
   vatRate: number
   freeShippingThresholdCents: number
   shippingPriceCents: Record<Delivery, number>
+  prefill?: NewOrderPrefill
 }) {
   const [pending, startTransition] = useTransition()
   const [result, setResult] = useState<CreateOrderResult | null>(null)
   const [step, setStep] = useState<'form' | 'review'>('form')
 
-  // Klientas
-  const [email, setEmail] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [phone, setPhone] = useState('')
+  // Klientas (gali būti užpildyta iš esamo kliento)
+  const [email, setEmail] = useState(prefill?.email ?? '')
+  const [firstName, setFirstName] = useState(prefill?.firstName ?? '')
+  const [lastName, setLastName] = useState(prefill?.lastName ?? '')
+  const [phone, setPhone] = useState(prefill?.phone ?? '')
   const [lang, setLang] = useState<Lang>('lt')
-  const [isCompany, setIsCompany] = useState(false)
-  const [companyName, setCompanyName] = useState('')
-  const [companyCode, setCompanyCode] = useState('')
-  const [vatCode, setVatCode] = useState('')
+  const [isCompany, setIsCompany] = useState(prefill?.isCompany ?? false)
+  const [companyName, setCompanyName] = useState(prefill?.companyName ?? '')
+  const [companyCode, setCompanyCode] = useState(prefill?.companyCode ?? '')
+  const [vatCode, setVatCode] = useState(prefill?.vatCode ?? '')
 
   // Pristatymas
   const [delivery, setDelivery] = useState<Delivery>('courier')
-  const [address, setAddress] = useState('')
-  const [city, setCity] = useState('')
-  const [postal, setPostal] = useState('')
+  const [address, setAddress] = useState(prefill?.address ?? '')
+  const [city, setCity] = useState(prefill?.city ?? '')
+  const [postal, setPostal] = useState(prefill?.postal ?? '')
   const [notes, setNotes] = useState('')
 
   // Prekės

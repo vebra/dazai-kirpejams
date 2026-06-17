@@ -143,6 +143,13 @@ export default async function AdminCustomerDetailPage({
               )}
             </div>
           </div>
+
+          <Link
+            href={`/admin/uzsakymai/naujas?klientas=${encodeURIComponent(customer.email)}`}
+            className="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2.5 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark transition-colors whitespace-nowrap"
+          >
+            + Naujas užsakymas šiam klientui
+          </Link>
         </div>
       </div>
 
