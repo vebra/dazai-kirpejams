@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { requireAdmin } from '@/lib/admin/auth'
 import { createServerClient } from '@/lib/supabase/server'
+import { deleteSupplierOrderAction } from '../../actions'
 
 export const metadata = { title: 'Tiekėjo užsakymų istorija' }
 export const dynamic = 'force-dynamic'
@@ -107,6 +108,24 @@ export default async function SupplierOrderHistoryPage() {
                   </span>
                 </div>
               </summary>
+
+              <div className="border-t border-[#eee] px-4 py-3 flex items-center gap-2 flex-wrap bg-[#FbFbFd]">
+                <Link
+                  href={`/admin/sandelis/uzsakyti/lapas?redaguoti=${o.id}`}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-magenta text-white rounded-lg text-[13px] font-semibold hover:bg-brand-magenta-dark transition-colors"
+                >
+                  ✏ Atidaryti (redaguoti · PDF · spausdinti)
+                </Link>
+                <form action={deleteSupplierOrderAction} className="ml-auto">
+                  <input type="hidden" name="id" value={o.id} />
+                  <button
+                    type="submit"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-[#ddd] text-brand-gray-500 rounded-lg text-[13px] font-semibold hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+                  >
+                    🗑 Ištrinti
+                  </button>
+                </form>
+              </div>
 
               <div className="border-t border-[#eee] overflow-x-auto">
                 <table className="w-full text-[13px]">

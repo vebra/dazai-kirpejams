@@ -1,17 +1,44 @@
 import { requireAdmin } from '@/lib/admin/auth'
 import { getAdminProducts } from '@/lib/admin/queries'
+import { createServerClient } from '@/lib/supabase/server'
 import { SupplierOrderForm } from './SupplierOrderForm'
 
 export const metadata = { title: 'Supplier order sheet' }
 export const dynamic = 'force-dynamic'
 
+type SavedDetail = { productId: string; qty: number }
+
 /**
  * Užsakymo lapas tiekėjui — pildomas svetainėje (kiekiai įvedami, lapas
  * išsaugomas į istoriją). Rodom prekes, pasiekusias perspėjimo ribą arba
- * baigusias (0). Baigusios (0) prekės — viršuje, pažymėtos raudonai.
+ * baigusias (0). Su `?redaguoti=<id>` atidaro išsaugotą užsakymą redagavimui.
  */
-export default async function SupplierOrderSheetPage() {
+export default async function SupplierOrderSheetPage({
+  searchParams,
+}: PageProps<'/admin/sandelis/uzsakyti/lapas'>) {
   await requireAdmin()
+  const sp = await searchParams
+  const editId = typeof sp.redaguoti === 'string' ? sp.redaguoti : undefined
+
+  // Redaguojant — įkeliam išsaugotą užsakymą (kiekiai + pastaba).
+  let initialQty: Record<string, number> | undefined
+  let initialNote: string | undefined
+  if (editId) {
+    const supabase = createServerClient()
+    const { data } = await supabase
+      .from('supplier_orders')
+      .select('note, details')
+      .eq('id', editId)
+      .maybeSingle<{ note: string | null; details: SavedDetail[] }>()
+    if (data) {
+      initialQty = {}
+      for (const d of data.details ?? []) {
+        if (d.productId) initialQty[d.productId] = d.qty
+      }
+      initialNote = data.note ?? ''
+    }
+  }
+
   const all = await getAdminProducts({ sortBy: 'name' })
   const active = all.filter((p) => p.isActive)
   const isOut = (p: (typeof all)[number]) => p.stockQuantity <= 0
@@ -57,6 +84,9 @@ export default async function SupplierOrderSheetPage() {
         products={active}
         presetIds={presetIds}
         today={today}
+        editId={editId}
+        initialQty={initialQty}
+        initialNote={initialNote}
       />
     </>
   )

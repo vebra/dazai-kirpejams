@@ -591,6 +591,78 @@ export async function createSupplierOrderAction(
   return { ok: true, id: data.id, itemCount: clean.length, totalQty }
 }
 
+/**
+ * Atnaujina jau išsaugotą tiekėjo užsakymą (redagavimas iš istorijos).
+ * Perrašo prekes, kiekius ir pastabą tame pačiame įraše.
+ */
+export async function updateSupplierOrderAction(
+  id: string,
+  items: SupplierOrderItem[],
+  note: string | null
+): Promise<SupplierOrderResult> {
+  await requireAdmin()
+  if (!id) return { ok: false, error: 'Nenurodytas užsakymas.' }
+  const clean = (items ?? []).filter(
+    (i) => i.productId && Number.isInteger(i.qty) && i.qty > 0
+  )
+  if (clean.length === 0) {
+    return { ok: false, error: 'Pasirinkite bent vieną prekę su kiekiu.' }
+  }
+
+  const supabase = createServerClient()
+  const totalQty = clean.reduce((s, i) => s + i.qty, 0)
+
+  const { error } = await supabase
+    .from('supplier_orders')
+    .update({
+      note: note?.trim() || null,
+      item_count: clean.length,
+      total_qty: totalQty,
+      details: clean.map((i) => ({
+        productId: i.productId,
+        name: i.name,
+        nameEn: i.nameEn,
+        colorNumber: i.colorNumber,
+        sku: i.sku,
+        ean: i.ean,
+        stockAtOrder: i.stockAtOrder,
+        qty: i.qty,
+      })),
+    })
+    .eq('id', id)
+
+  if (error) {
+    console.error('[admin/sandelis/actions] updateSupplierOrder:', error.message)
+    return { ok: false, error: 'Nepavyko atnaujinti užsakymo. Bandykite dar kartą.' }
+  }
+
+  revalidatePath('/admin/sandelis/uzsakyti')
+  revalidatePath('/admin/sandelis/uzsakyti/istorija')
+  return { ok: true, id, itemCount: clean.length, totalQty }
+}
+
+/**
+ * Ištrina išsaugotą tiekėjo užsakymą iš istorijos.
+ */
+export async function deleteSupplierOrderAction(
+  formData: FormData
+): Promise<void> {
+  await requireAdmin()
+  const id = formData.get('id') as string | null
+  if (!id) redirect('/admin/sandelis/uzsakyti/istorija')
+
+  const supabase = createServerClient()
+  const { error } = await supabase
+    .from('supplier_orders')
+    .delete()
+    .eq('id', id)
+  if (error) {
+    console.error('[admin/sandelis/actions] deleteSupplierOrder:', error.message)
+  }
+  revalidatePath('/admin/sandelis/uzsakyti/istorija')
+  redirect('/admin/sandelis/uzsakyti/istorija')
+}
+
 // ============================================
 // Įjungti/išjungti produktą (soft delete)
 // ============================================

@@ -6,6 +6,7 @@ import type { AdminProductListRow } from '@/lib/admin/queries'
 import { PrintButton } from '@/components/admin/PrintButton'
 import {
   createSupplierOrderAction,
+  updateSupplierOrderAction,
   type SupplierOrderResult,
 } from '../../actions'
 
@@ -27,12 +28,21 @@ export function SupplierOrderForm({
   products,
   presetIds,
   today,
+  editId,
+  initialQty,
+  initialNote,
 }: {
   /** Visos aktyvios prekės. */
   products: Row[]
   /** Prekės, kurias reikia užsakyti (0 ar žemas likutis) — su siūlomu kiekiu. */
   presetIds: string[]
   today: string
+  /** Jei redaguojamas esamas užsakymas — jo ID (tada Išsaugoti = atnaujina). */
+  editId?: string
+  /** Redaguojant — iš anksto įvesti kiekiai (productId → qty). */
+  initialQty?: Record<string, number>
+  /** Redaguojant — pastaba. */
+  initialNote?: string
 }) {
   // Prekės: pirma reikalingos užsakyti (0/žemas — preset tvarka), tada likusios pagal pavadinimą
   const ordered = useMemo(() => {
@@ -47,8 +57,10 @@ export function SupplierOrderForm({
     return [...presets, ...rest]
   }, [products, presetIds])
 
-  // productId → užsakomas kiekis (0/žemas — siūlomas, kiti — 0)
+  // productId → užsakomas kiekis. Redaguojant — iš išsaugoto užsakymo;
+  // naujam — 0/žemo likučio prekės su siūlomu kiekiu.
   const [qty, setQty] = useState<Record<string, number>>(() => {
+    if (editId && initialQty) return { ...initialQty }
     const init: Record<string, number> = {}
     const byId = new Map(products.map((p) => [p.id, p]))
     for (const id of presetIds) {
@@ -57,9 +69,10 @@ export function SupplierOrderForm({
     }
     return init
   })
-  const [note, setNote] = useState('')
+  const [note, setNote] = useState(editId ? initialNote ?? '' : '')
   const [filter, setFilter] = useState('')
-  const [onlyOrdered, setOnlyOrdered] = useState(false)
+  // Redaguojant — iškart rodom tik užsakymo prekes.
+  const [onlyOrdered, setOnlyOrdered] = useState(Boolean(editId))
   const [pending, startTransition] = useTransition()
   const [result, setResult] = useState<SupplierOrderResult | null>(null)
   const [downloading, setDownloading] = useState(false)
@@ -159,7 +172,9 @@ export function SupplierOrderForm({
       qty: qty[p.id] ?? 0,
     }))
     startTransition(async () => {
-      const res = await createSupplierOrderAction(items, note)
+      const res = editId
+        ? await updateSupplierOrderAction(editId, items, note)
+        : await createSupplierOrderAction(items, note)
       setResult(res)
     })
   }
@@ -173,7 +188,7 @@ export function SupplierOrderForm({
             <span className="text-3xl">✓</span>
             <div>
               <div className="text-lg font-bold text-brand-gray-900">
-                Užsakymas išsaugotas
+                {editId ? 'Užsakymas atnaujintas' : 'Užsakymas išsaugotas'}
               </div>
               <div className="text-sm text-brand-gray-500">
                 {result.itemCount} prek(ės) · iš viso {result.totalQty} vnt.
@@ -253,6 +268,8 @@ export function SupplierOrderForm({
                 />
                 Saugoma…
               </>
+            ) : editId ? (
+              '💾 Atnaujinti užsakymą'
             ) : (
               '💾 Išsaugoti užsakymą'
             )}
