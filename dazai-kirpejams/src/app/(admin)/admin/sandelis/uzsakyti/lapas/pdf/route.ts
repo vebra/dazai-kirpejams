@@ -9,6 +9,7 @@ import {
 } from '@/lib/supplier-orders/pdf-template'
 
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 /**
  * POST /admin/sandelis/uzsakyti/lapas/pdf — sugeneruoja užsakymo tiekėjui PDF
@@ -49,10 +50,19 @@ export async function POST(req: NextRequest) {
   const note =
     typeof body.note === 'string' && body.note.trim() ? body.note.trim() : null
 
-  const element = createElement(SupplierOrderPdfDocument, {
-    data: { date, items, note },
-  }) as unknown as ReactElement<DocumentProps>
-  const buffer = await renderToBuffer(element)
+  let buffer: Buffer
+  try {
+    const element = createElement(SupplierOrderPdfDocument, {
+      data: { date, items, note },
+    }) as unknown as ReactElement<DocumentProps>
+    buffer = await renderToBuffer(element)
+  } catch (e) {
+    console.error('[uzsakyti/lapas/pdf] renderToBuffer:', e)
+    return NextResponse.json(
+      { error: e instanceof Error ? e.message : 'PDF render failed' },
+      { status: 500 }
+    )
+  }
 
   const stamp = new Date().toISOString().slice(0, 10)
   return new NextResponse(new Uint8Array(buffer), {

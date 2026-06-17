@@ -114,8 +114,18 @@ export function SupplierOrderForm({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ items, note }),
       })
-      if (!res.ok) throw new Error('PDF generavimas nepavyko')
+      if (!res.ok) {
+        const msg = await res.text().catch(() => '')
+        throw new Error(`PDF (${res.status}): ${msg.slice(0, 200)}`)
+      }
       const blob = await res.blob()
+      // Jei serveris vietoj PDF grąžino HTML (pvz. login peradresavimas) —
+      // pranešam aiškiai, o ne siūlom „atsisiųsti" sugadintą failą.
+      if (!blob.type.includes('pdf')) {
+        throw new Error(
+          'Serveris grąžino ne PDF. Greičiausiai pasibaigė sesija — atsijunkite ir prisijunkite iš naujo.'
+        )
+      }
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -124,8 +134,14 @@ export function SupplierOrderForm({
       a.click()
       a.remove()
       URL.revokeObjectURL(url)
-    } catch {
-      setResult({ ok: false, error: 'Nepavyko parsisiųsti PDF. Bandykite dar kartą.' })
+    } catch (e) {
+      setResult({
+        ok: false,
+        error:
+          e instanceof Error
+            ? `Nepavyko parsisiųsti PDF. ${e.message}`
+            : 'Nepavyko parsisiųsti PDF. Bandykite dar kartą.',
+      })
     } finally {
       setDownloading(false)
     }
