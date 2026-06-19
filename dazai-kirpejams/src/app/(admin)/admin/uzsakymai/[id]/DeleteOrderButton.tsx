@@ -1,5 +1,7 @@
 'use client'
 
+import { SubmitButton } from '@/components/ui/SubmitButton'
+
 /**
  * Užsakymo ištrynimo mygtukas su browser'io patvirtinimu — kad admin'as
  * netyčia neištrintų klikundamas. Įveda užsakymo numerį tekstu, kad
@@ -27,12 +29,12 @@ export function DeleteOrderButton({
   return (
     <form action={action} onSubmit={handleSubmit}>
       <input type="hidden" name="id" value={orderId} />
-      <button
-        type="submit"
-        className="px-4 py-2.5 bg-white border-2 border-red-300 text-red-700 rounded-lg font-semibold text-sm hover:bg-red-50 hover:border-red-400 transition-colors"
+      <SubmitButton
+        pendingLabel="Trinama…"
+        className="px-4 py-2.5 bg-white border-2 border-red-300 text-red-700 rounded-lg font-semibold text-sm hover:bg-red-50 hover:border-red-400"
       >
         Ištrinti užsakymą {orderNumber}
-      </button>
+      </SubmitButton>
     </form>
   )
 }

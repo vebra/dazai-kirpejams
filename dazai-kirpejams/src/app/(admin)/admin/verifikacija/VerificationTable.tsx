@@ -5,8 +5,11 @@ import {
   approveUserAction,
   rejectUserAction,
   viewVerificationDocumentAction,
+  sendEmailConfirmReminderAction,
   type RejectUserState,
+  type ConfirmReminderState,
 } from './actions'
+import { SubmitButton } from '@/components/ui/SubmitButton'
 import type { UserProfileRow } from '@/lib/admin/queries'
 
 const STATUS_LABELS: Record<string, string> = {
@@ -130,6 +133,42 @@ export function VerificationTable({
 }
 
 const rejectInitialState: RejectUserState = {}
+const confirmReminderInitialState: ConfirmReminderState = {}
+
+/**
+ * Pakartotinai siunčia el. pašto patvirtinimo priminimą. Rodomas tik
+ * vartotojams su nepatvirtintu el. paštu (po „⚠ nepatvirtintas" žyme).
+ */
+function ConfirmReminderButton({ id }: { id: string }) {
+  const [state, formAction, isPending] = useActionState(
+    sendEmailConfirmReminderAction,
+    confirmReminderInitialState
+  )
+
+  return (
+    <form action={formAction} className="mt-1">
+      <input type="hidden" name="id" value={id} />
+      {state.success ? (
+        <span className="text-[10px] font-semibold text-emerald-700">
+          ✓ {state.message ?? 'Išsiųsta'}
+        </span>
+      ) : (
+        <button
+          type="submit"
+          disabled={isPending}
+          className="text-[10px] font-semibold text-brand-magenta hover:underline disabled:opacity-60 disabled:no-underline"
+        >
+          {isPending ? 'Siunčiama…' : '↻ Siųsti priminimą patvirtinti'}
+        </button>
+      )}
+      {state.error && (
+        <span className="block text-[10px] font-semibold text-red-600 mt-0.5">
+          {state.error}
+        </span>
+      )}
+    </form>
+  )
+}
 
 function ProfileRow({
   profile: p,
@@ -175,8 +214,11 @@ function ProfileRow({
             {p.email}
           </a>
           {!p.emailConfirmed && (
-            <div className="text-[10px] font-semibold text-orange-700 mt-0.5">
-              ⚠ El. paštas nepatvirtintas
+            <div className="mt-0.5">
+              <div className="text-[10px] font-semibold text-orange-700">
+                ⚠ El. paštas nepatvirtintas
+              </div>
+              <ConfirmReminderButton id={p.id} />
             </div>
           )}
           {p.phone ? (
@@ -208,12 +250,13 @@ function ProfileRow({
             <div className="inline-flex gap-1">
               <form action={approveUserAction}>
                 <input type="hidden" name="id" value={p.id} />
-                <button
-                  type="submit"
-                  className="px-3 py-1 bg-emerald-50 border border-emerald-200 rounded text-[11px] font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
+                <SubmitButton
+                  pendingLabel="Tvirtinama…"
+                  spinnerSize="w-3 h-3"
+                  className="px-3 py-1 bg-emerald-50 border border-emerald-200 rounded text-[11px] font-semibold text-emerald-700 hover:bg-emerald-100"
                 >
                   Patvirtinti
-                </button>
+                </SubmitButton>
               </form>
               <button
                 type="button"
@@ -227,12 +270,13 @@ function ProfileRow({
           {p.verificationStatus === 'rejected' && (
             <form action={approveUserAction}>
               <input type="hidden" name="id" value={p.id} />
-              <button
-                type="submit"
-                className="px-3 py-1 bg-emerald-50 border border-emerald-200 rounded text-[11px] font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
+              <SubmitButton
+                pendingLabel="Tvirtinama…"
+                spinnerSize="w-3 h-3"
+                className="px-3 py-1 bg-emerald-50 border border-emerald-200 rounded text-[11px] font-semibold text-emerald-700 hover:bg-emerald-100"
               >
                 Vis tiek patvirtinti
-              </button>
+              </SubmitButton>
             </form>
           )}
           {p.verificationStatus === 'approved' && (
@@ -258,10 +302,26 @@ function ProfileRow({
               </div>
               <div>
                 <span className="text-[11px] font-semibold text-brand-gray-500 uppercase tracking-[0.5px]">
+                  Miestas
+                </span>
+                <div className="text-brand-gray-900 mt-0.5">
+                  {p.city || '—'}
+                </div>
+              </div>
+              <div>
+                <span className="text-[11px] font-semibold text-brand-gray-500 uppercase tracking-[0.5px]">
                   Įmonės kodas
                 </span>
                 <div className="text-brand-gray-900 mt-0.5">
                   {p.companyCode || '—'}
+                </div>
+              </div>
+              <div>
+                <span className="text-[11px] font-semibold text-brand-gray-500 uppercase tracking-[0.5px]">
+                  Dažymai per dieną
+                </span>
+                <div className="text-brand-gray-900 mt-0.5">
+                  {p.dailyDyesCount || '—'}
                 </div>
               </div>
               <div>
@@ -290,12 +350,14 @@ function ProfileRow({
                   {p.verificationDocumentUrl ? (
                     <form action={viewVerificationDocumentAction}>
                       <input type="hidden" name="id" value={p.id} />
-                      <button
-                        type="submit"
+                      <SubmitButton
+                        pendingLabel="Atveriama…"
+                        spinnerSize="w-3 h-3"
+                        spinnerClassName="border-brand-magenta border-t-transparent"
                         className="text-brand-magenta hover:underline font-medium"
                       >
                         Peržiūrėti dokumentą
-                      </button>
+                      </SubmitButton>
                     </form>
                   ) : (
                     <span className="text-brand-gray-500">Nepateiktas</span>

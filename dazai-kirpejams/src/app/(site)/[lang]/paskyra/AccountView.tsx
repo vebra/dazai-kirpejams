@@ -17,6 +17,7 @@ import {
 import { ProfileEditForm } from './ProfileEditForm'
 import { ReorderButton } from './ReorderButton'
 import { LogoutButton } from '@/components/auth/LogoutButton'
+import { SubmitButton } from '@/components/ui/SubmitButton'
 
 const LOCALE_MAP: Record<string, string> = { lt: 'lt-LT', en: 'en-GB', ru: 'ru-RU' }
 
@@ -357,12 +358,12 @@ export function AccountView({
                     <form action={downloadCustomerInvoiceAction}>
                       <input type="hidden" name="invoice_id" value={inv.id} />
                       <input type="hidden" name="lang" value={lang} />
-                      <button
-                        type="submit"
-                        className="px-4 py-2 bg-brand-magenta text-white rounded-lg text-[13px] font-semibold hover:bg-brand-magenta/90 transition-colors"
+                      <SubmitButton
+                        pendingLabel="…"
+                        className="px-4 py-2 bg-brand-magenta text-white rounded-lg text-[13px] font-semibold hover:bg-brand-magenta/90"
                       >
                         {dict.invoices.downloadPdf}
-                      </button>
+                      </SubmitButton>
                     </form>
                   ) : (
                     <span className="text-[12px] text-brand-gray-500 italic">

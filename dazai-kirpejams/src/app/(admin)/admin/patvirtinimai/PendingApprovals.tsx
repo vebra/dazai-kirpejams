@@ -78,23 +78,32 @@ function OrderCard({
   onDone: () => void
 }) {
   const [pending, startTransition] = useTransition()
+  const [busy, setBusy] = useState<'approve' | 'warehouse' | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   function handleApprove() {
     setError(null)
+    setBusy('approve')
     startTransition(async () => {
       const res = await approveRepOrder(o.id)
       if (res.ok) onDone()
-      else setError(res.error ?? 'Nepavyko patvirtinti.')
+      else {
+        setError(res.error ?? 'Nepavyko patvirtinti.')
+        setBusy(null)
+      }
     })
   }
 
   function handleApproveFromWarehouse() {
     setError(null)
+    setBusy('warehouse')
     startTransition(async () => {
       const res = await approveRepOrderFromWarehouse(o.id)
       if (res.ok) onDone()
-      else setError(res.error ?? 'Nepavyko patvirtinti iš sandėlio.')
+      else {
+        setError(res.error ?? 'Nepavyko patvirtinti iš sandėlio.')
+        setBusy(null)
+      }
     })
   }
 
@@ -212,18 +221,30 @@ function OrderCard({
           onClick={handleApproveFromWarehouse}
           disabled={pending}
           title="Nurašyti iš centrinio sandėlio (kai prekės nebuvo išduotos vadybininkei)"
-          className="px-4 py-2 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-[13px] hover:bg-[#F5F5F7] transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-[13px] hover:bg-[#F5F5F7] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-wait"
         >
-          Iš sandėlio
+          {busy === 'warehouse' && (
+            <span
+              className="w-3.5 h-3.5 rounded-full border-2 border-current border-t-transparent animate-spin"
+              aria-hidden
+            />
+          )}
+          {busy === 'warehouse' ? 'Tvirtinama…' : 'Iš sandėlio'}
         </button>
         <button
           type="button"
           onClick={handleApprove}
           disabled={pending}
           title="Nurašyti iš vadybininkės atsargų"
-          className="px-5 py-2 bg-brand-magenta text-white rounded-lg font-semibold text-[13px] hover:bg-brand-magenta-dark transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-5 py-2 bg-brand-magenta text-white rounded-lg font-semibold text-[13px] hover:bg-brand-magenta-dark active:scale-95 transition-all disabled:opacity-50 disabled:cursor-wait"
         >
-          {pending ? 'Tvirtinama…' : 'Patvirtinti (iš atsargų)'}
+          {busy === 'approve' && (
+            <span
+              className="w-3.5 h-3.5 rounded-full border-2 border-current border-t-transparent animate-spin"
+              aria-hidden
+            />
+          )}
+          {busy === 'approve' ? 'Tvirtinama…' : 'Patvirtinti (iš atsargų)'}
         </button>
       </div>
     </div>
