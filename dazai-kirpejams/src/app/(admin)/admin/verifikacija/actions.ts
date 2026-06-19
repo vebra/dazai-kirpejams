@@ -9,6 +9,7 @@ import {
   buildWelcomeEmail,
   buildRejectionEmail,
   buildPasswordResetEmail,
+  buildEmailConfirmReminderEmail,
 } from '@/lib/email/auth-templates'
 import { randomUUID } from 'crypto'
 
@@ -218,6 +219,94 @@ export async function approveUserAction(formData: FormData): Promise<void> {
   // Kliento /paskyra ir produktų puslapiai rodo kainas tik patvirtintiems —
   // būtina išvalyti jų data cache, kad statusas ir kainos atsinaujintų.
   revalidatePath('/', 'layout')
+}
+
+/**
+ * Pakartotinai išsiunčia el. pašto patvirtinimo priminimą vartotojui, kuris
+ * užsiregistravo ir buvo patvirtintas, bet niekada nepaspaudė patvirtinimo
+ * nuorodos (auth.users.email_confirmed_at = null — dažniausiai laiškas pateko
+ * į spam). Sugeneruojama nauja magic-link nuoroda: paspaudus patvirtina el.
+ * paštą IR prijungia prie paskyros.
+ */
+export type ConfirmReminderState = {
+  error?: string
+  success?: boolean
+  message?: string
+}
+
+export async function sendEmailConfirmReminderAction(
+  _prev: ConfirmReminderState,
+  formData: FormData
+): Promise<ConfirmReminderState> {
+  await requireAdmin()
+  const supabase = createServerClient()
+
+  const userId = (formData.get('id') as string) ?? ''
+  if (!userId) return { error: 'Trūksta vartotojo ID.' }
+
+  const { data: authUser, error: authErr } =
+    await supabase.auth.admin.getUserById(userId)
+  const email = authUser?.user?.email
+  if (authErr || !email) {
+    console.error(
+      '[admin/verifikacija] confirm reminder: no auth user',
+      authErr?.message
+    )
+    return { error: 'Nepavyko rasti vartotojo el. pašto.' }
+  }
+
+  if (authUser.user?.email_confirmed_at) {
+    return { success: true, message: 'El. paštas jau patvirtintas.' }
+  }
+
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('first_name, lang')
+    .eq('id', userId)
+    .maybeSingle<{ first_name: string | null; lang: string | null }>()
+
+  const lang = resolveProfileLang(profile?.lang)
+
+  // Magic-link — paspaudus patvirtina el. paštą ir prijungia prie paskyros.
+  // redirectTo eina per /auth/callback (exchangeCodeForSession → /produktai).
+  const { data: linkData, error: linkErr } =
+    await supabase.auth.admin.generateLink({
+      type: 'magiclink',
+      email,
+      options: { redirectTo: `${SITE_URL}/auth/callback?lang=${lang}` },
+    })
+
+  const confirmUrl = linkData?.properties?.action_link
+  if (linkErr || !confirmUrl) {
+    console.error(
+      '[admin/verifikacija] confirm reminder: generateLink failed',
+      linkErr?.message
+    )
+    return { error: 'Nepavyko sugeneruoti patvirtinimo nuorodos.' }
+  }
+
+  const mail = buildEmailConfirmReminderEmail({
+    firstName: profile?.first_name ?? '',
+    confirmUrl,
+    lang,
+  })
+  const result = await sendEmail({
+    to: email,
+    subject: mail.subject,
+    html: mail.html,
+    text: mail.text,
+  })
+
+  if (!result.ok) {
+    return {
+      error:
+        result.reason === 'not-configured'
+          ? 'El. pašto siuntimas nesukonfigūruotas.'
+          : 'Nepavyko išsiųsti laiško. Bandykite dar kartą.',
+    }
+  }
+
+  return { success: true, message: `Priminimas išsiųstas: ${email}` }
 }
 
 /**

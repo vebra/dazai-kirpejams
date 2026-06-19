@@ -7,6 +7,7 @@ import {
   deleteDiscountCodeAction,
   type CreateDiscountCodeState,
 } from './actions'
+import { SubmitButton } from '@/components/ui/SubmitButton'
 import type { AdminDiscountCode, AdminProductListRow } from '@/lib/admin/queries'
 
 type CategoryOption = {
@@ -519,21 +520,28 @@ export function DiscountCodesSection({
                               name="next_active"
                               value={(!c.isActive).toString()}
                             />
-                            <button
-                              type="submit"
-                              className="px-2.5 py-1 bg-[#F5F5F7] hover:bg-[#e8e8ec] border border-[#ddd] rounded text-[11px] font-semibold text-brand-gray-900 transition-colors"
+                            <SubmitButton
+                              pendingLabel="Keičiama…"
+                              spinnerSize="w-3 h-3"
+                              className="px-2.5 py-1 bg-[#F5F5F7] hover:bg-[#e8e8ec] border border-[#ddd] rounded text-[11px] font-semibold text-brand-gray-900"
                             >
                               {c.isActive ? 'Išjungti' : 'Įjungti'}
-                            </button>
+                            </SubmitButton>
                           </form>
                           <form action={deleteDiscountCodeAction}>
                             <input type="hidden" name="id" value={c.id} />
-                            <button
-                              type="submit"
-                              className="px-2.5 py-1 bg-white border border-[#ddd] rounded text-[11px] font-semibold text-red-700 hover:bg-red-50 hover:border-red-300 transition-colors"
+                            <SubmitButton
+                              pendingLabel="Trinama…"
+                              spinnerSize="w-3 h-3"
+                              onClick={(e) => {
+                                if (!confirm(`Tikrai trinti kodą „${c.code}"?`)) {
+                                  e.preventDefault()
+                                }
+                              }}
+                              className="px-2.5 py-1 bg-white border border-[#ddd] rounded text-[11px] font-semibold text-red-700 hover:bg-red-50 hover:border-red-300"
                             >
                               Trinti
-                            </button>
+                            </SubmitButton>
                           </form>
                         </div>
                       </td>

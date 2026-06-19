@@ -1713,9 +1713,11 @@ export type UserProfileRow = {
   firstName: string
   lastName: string
   phone: string
+  city: string | null
   businessType: string | null
   salonName: string | null
   companyCode: string | null
+  dailyDyesCount: string | null
   verificationStatus: 'pending' | 'approved' | 'rejected'
   verificationDocumentUrl: string | null
   verificationNotes: string | null
@@ -1795,9 +1797,11 @@ export async function getUserProfiles(
     firstName: r.first_name ?? '',
     lastName: r.last_name ?? '',
     phone: r.phone ?? '',
+    city: r.city,
     businessType: r.business_type,
     salonName: r.salon_name,
     companyCode: r.company_code,
+    dailyDyesCount: r.daily_dyes_count,
     verificationStatus: r.verification_status,
     verificationDocumentUrl: r.verification_document_url,
     verificationNotes: r.verification_notes,

@@ -8,6 +8,8 @@ import {
   bulkUpdateStatusAction,
   resendConfirmationEmailAction,
 } from './actions'
+import { SubmitButton } from '@/components/ui/SubmitButton'
+import { PendingSelect } from '@/components/ui/PendingSelect'
 import type { EventRegistrationRow } from '@/lib/admin/queries'
 
 const STATUS_LABELS: Record<string, string> = {
@@ -246,12 +248,13 @@ function BulkActionBar({
           <option value="cancelled">Pažymėti „Atšaukta“</option>
           <option value="confirmed">Pažymėti „Patvirtinta“</option>
         </select>
-        <button
-          type="submit"
-          className="px-3 py-1 bg-brand-magenta hover:bg-brand-magenta-dark text-white rounded text-[12px] font-semibold transition-colors"
+        <SubmitButton
+          pendingLabel="Taikoma…"
+          spinnerSize="w-3.5 h-3.5"
+          className="px-3 py-1 bg-brand-magenta hover:bg-brand-magenta-dark text-white rounded text-[12px] font-semibold"
         >
           Taikyti
-        </button>
+        </SubmitButton>
       </form>
       <button
         type="button"
@@ -347,34 +350,32 @@ function RegistrationRow({
           <div className="inline-flex gap-1">
             <form action={updateEventRegistrationStatusAction}>
               <input type="hidden" name="id" value={reg.id} />
-              <select
+              <PendingSelect
                 name="status"
                 defaultValue={reg.status}
-                onChange={(e) => {
-                  const form = e.target.closest('form')
-                  if (form) form.requestSubmit()
-                }}
+                ariaLabel="Keisti būseną"
                 className="px-2 py-1 bg-[#F5F5F7] border border-[#ddd] rounded text-[11px] font-semibold text-brand-gray-900 focus:outline-none focus:border-brand-magenta"
               >
                 <option value="confirmed">Patvirtinta</option>
                 <option value="attended">Dalyvavo</option>
                 <option value="no_show">Neatvyko</option>
                 <option value="cancelled">Atšaukta</option>
-              </select>
+              </PendingSelect>
             </form>
             <form action={deleteEventRegistrationAction}>
               <input type="hidden" name="id" value={reg.id} />
-              <button
-                type="submit"
+              <SubmitButton
+                pendingLabel="Trinama…"
+                spinnerSize="w-3 h-3"
                 onClick={(e) => {
                   if (!confirm(`Ar tikrai trinti registraciją: ${fullName}?`)) {
                     e.preventDefault()
                   }
                 }}
-                className="px-2.5 py-1 bg-white border border-[#ddd] rounded text-[11px] font-semibold text-red-700 hover:bg-red-50 hover:border-red-300 transition-colors"
+                className="px-2.5 py-1 bg-white border border-[#ddd] rounded text-[11px] font-semibold text-red-700 hover:bg-red-50 hover:border-red-300"
               >
                 Trinti
-              </button>
+              </SubmitButton>
             </form>
           </div>
         </td>

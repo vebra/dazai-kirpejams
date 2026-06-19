@@ -5,6 +5,8 @@ import {
   updateB2bInquiryStatusAction,
   deleteB2bInquiryAction,
 } from './actions'
+import { SubmitButton } from '@/components/ui/SubmitButton'
+import { PendingSelect } from '@/components/ui/PendingSelect'
 import type { B2bInquiryRow } from '@/lib/admin/queries'
 
 const STATUS_LABELS: Record<string, string> = {
@@ -164,25 +166,23 @@ function InquiryRow({
           <div className="inline-flex gap-1">
             <form action={updateB2bInquiryStatusAction}>
               <input type="hidden" name="id" value={inq.id} />
-              <select
+              <PendingSelect
                 name="status"
                 defaultValue={inq.status}
-                onChange={(e) => {
-                  const form = e.target.closest('form')
-                  if (form) form.requestSubmit()
-                }}
+                ariaLabel="Keisti būseną"
                 className="px-2 py-1 bg-[#F5F5F7] border border-[#ddd] rounded text-[11px] font-semibold text-brand-gray-900 focus:outline-none focus:border-brand-magenta"
               >
                 <option value="new">Nauja</option>
                 <option value="contacted">Susisiekta</option>
                 <option value="converted">Konvertuota</option>
                 <option value="closed">Uždaryta</option>
-              </select>
+              </PendingSelect>
             </form>
             <form action={deleteB2bInquiryAction}>
               <input type="hidden" name="id" value={inq.id} />
-              <button
-                type="submit"
+              <SubmitButton
+                pendingLabel="Trinama…"
+                spinnerSize="w-3 h-3"
                 onClick={(e) => {
                   if (
                     !confirm(`Ar tikrai trinti užklausą nuo ${inq.salonName}?`)
@@ -190,10 +190,10 @@ function InquiryRow({
                     e.preventDefault()
                   }
                 }}
-                className="px-2.5 py-1 bg-white border border-[#ddd] rounded text-[11px] font-semibold text-red-700 hover:bg-red-50 hover:border-red-300 transition-colors"
+                className="px-2.5 py-1 bg-white border border-[#ddd] rounded text-[11px] font-semibold text-red-700 hover:bg-red-50 hover:border-red-300"
               >
                 Trinti
-              </button>
+              </SubmitButton>
             </form>
           </div>
         </td>
