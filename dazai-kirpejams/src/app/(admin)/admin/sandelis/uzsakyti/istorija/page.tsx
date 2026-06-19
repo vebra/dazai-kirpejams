@@ -15,6 +15,7 @@ type DetailItem = {
   ean: string | null
   stockAtOrder: number
   qty: number
+  received?: number
 }
 
 type SupplierOrderRow = {
@@ -31,6 +32,21 @@ const DT = new Intl.DateTimeFormat('lt-LT', {
   dateStyle: 'medium',
   timeStyle: 'short',
 })
+
+type RecvStatus = 'ordered' | 'partial' | 'received'
+
+const STATUS_BADGE: Record<RecvStatus, { label: string; cls: string }> = {
+  ordered: { label: 'Laukiama', cls: 'bg-[#F5F5F7] text-brand-gray-600 border-[#ddd]' },
+  partial: { label: 'Gauta dalinai', cls: 'bg-amber-50 text-amber-800 border-amber-200' },
+  received: { label: 'Gauta pilnai', cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+}
+
+/** Būsena pagal `received` žymas details masyve (atsparu seniems įrašams). */
+function receiveStatus(details: DetailItem[]): RecvStatus {
+  const total = details.reduce((s, d) => s + (d.received ?? 0), 0)
+  if (total === 0) return 'ordered'
+  return details.every((d) => (d.received ?? 0) >= d.qty) ? 'received' : 'partial'
+}
 
 export default async function SupplierOrderHistoryPage() {
   await requireAdmin()
@@ -78,7 +94,14 @@ export default async function SupplierOrderHistoryPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {orders.map((o) => (
+          {orders.map((o) => {
+            const st = receiveStatus(o.details)
+            const badge = STATUS_BADGE[st]
+            const totalReceived = o.details.reduce(
+              (s, d) => s + (d.received ?? 0),
+              0
+            )
+            return (
             <details
               key={o.id}
               className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden group"
@@ -99,22 +122,35 @@ export default async function SupplierOrderHistoryPage() {
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-4 flex-shrink-0 text-sm">
-                  <span className="text-brand-gray-500">
+                <div className="flex items-center gap-3 flex-shrink-0 text-sm">
+                  <span
+                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold border ${badge.cls}`}
+                  >
+                    {badge.label}
+                  </span>
+                  <span className="text-brand-gray-500 hidden sm:inline">
                     {o.item_count} prek.
                   </span>
                   <span className="font-bold text-brand-gray-900 tabular-nums">
-                    {o.total_qty} vnt.
+                    {st === 'ordered'
+                      ? `${o.total_qty} vnt.`
+                      : `${totalReceived}/${o.total_qty} vnt.`}
                   </span>
                 </div>
               </summary>
 
               <div className="border-t border-[#eee] px-4 py-3 flex items-center gap-2 flex-wrap bg-[#FbFbFd]">
                 <Link
-                  href={`/admin/sandelis/uzsakyti/lapas?redaguoti=${o.id}`}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-magenta text-white rounded-lg text-[13px] font-semibold hover:bg-brand-magenta-dark transition-colors"
+                  href={`/admin/sandelis/uzsakyti/istorija/${o.id}`}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 text-white rounded-lg text-[13px] font-semibold hover:bg-emerald-700 transition-colors"
                 >
-                  ✏ Atidaryti (redaguoti · PDF · spausdinti)
+                  📥 Priimti / sutikrinti
+                </Link>
+                <Link
+                  href={`/admin/sandelis/uzsakyti/lapas?redaguoti=${o.id}`}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg text-[13px] font-semibold hover:bg-[#F5F5F7] transition-colors"
+                >
+                  ✏ Redaguoti · PDF · spausdinti
                 </Link>
                 <form action={deleteSupplierOrderAction} className="ml-auto">
                   <input type="hidden" name="id" value={o.id} />
@@ -137,10 +173,14 @@ export default async function SupplierOrderHistoryPage() {
                         Likutis tada
                       </th>
                       <th className="px-4 py-2 text-center w-[80px]">Užsakyta</th>
+                      <th className="px-4 py-2 text-center w-[80px]">Gauta</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {o.details.map((d, idx) => (
+                    {o.details.map((d, idx) => {
+                      const recv = d.received ?? 0
+                      const full = recv >= d.qty
+                      return (
                       <tr key={idx} className="border-t border-[#eee]">
                         <td className="px-4 py-2 text-brand-gray-900">
                           {d.colorNumber ? `${d.colorNumber} · ` : ''}
@@ -155,13 +195,26 @@ export default async function SupplierOrderHistoryPage() {
                         <td className="px-4 py-2 text-center tabular-nums font-bold text-brand-gray-900">
                           {d.qty}
                         </td>
+                        <td
+                          className={`px-4 py-2 text-center tabular-nums font-bold ${
+                            full
+                              ? 'text-emerald-700'
+                              : recv > 0
+                                ? 'text-amber-700'
+                                : 'text-brand-gray-300'
+                          }`}
+                        >
+                          {full ? '✓' : recv}
+                        </td>
                       </tr>
-                    ))}
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>
             </details>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>
