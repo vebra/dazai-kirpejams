@@ -76,6 +76,12 @@ export function SupplierOrderForm({
   const [pending, startTransition] = useTransition()
   const [result, setResult] = useState<SupplierOrderResult | null>(null)
   const [downloading, setDownloading] = useState(false)
+  // Išsaugoto užsakymo ID — kad PDF/spausdinimas/Išsaugoti nekurtų dublikatų,
+  // o atnaujintų tą patį įrašą. Redaguojant — pradinis editId.
+  const [savedId, setSavedId] = useState<string | undefined>(editId)
+  // Tylus auto-išsaugojimas (parsisiunčiant/spausdinant) — rodo juostelę
+  // neperjungiant viso ekrano į „išsaugota".
+  const [autoSaved, setAutoSaved] = useState(false)
 
   const isOut = (p: Row) => p.stockQuantity <= 0
   const presetSet = useMemo(() => new Set(presetIds), [presetIds])
@@ -147,6 +153,8 @@ export function SupplierOrderForm({
       a.click()
       a.remove()
       URL.revokeObjectURL(url)
+      // Atsisiuntus — automatiškai išsaugom į istoriją (kad nereikėtų atskirai).
+      await persist(true)
     } catch (e) {
       setResult({
         ok: false,
@@ -160,7 +168,13 @@ export function SupplierOrderForm({
     }
   }
 
-  function save() {
+  /**
+   * Išsaugo užsakymą: jei dar neišsaugotas — sukuria (ir įsimena ID), kitaip
+   * atnaujina tą patį įrašą (jokių dublikatų). `silent=true` — tylus išsaugojimas
+   * (PDF/spausdinimas): lieka formoje, parodo juostelę; `silent=false` —
+   * mygtukas „Išsaugoti": parodo pilną „išsaugota" ekraną.
+   */
+  async function persist(silent: boolean): Promise<boolean> {
     const items = orderedRows.map((p) => ({
       productId: p.id,
       name: p.nameLt,
@@ -171,11 +185,23 @@ export function SupplierOrderForm({
       stockAtOrder: p.stockQuantity,
       qty: qty[p.id] ?? 0,
     }))
-    startTransition(async () => {
-      const res = editId
-        ? await updateSupplierOrderAction(editId, items, note)
-        : await createSupplierOrderAction(items, note)
+    if (items.length === 0) return false
+    const res = savedId
+      ? await updateSupplierOrderAction(savedId, items, note)
+      : await createSupplierOrderAction(items, note)
+    if (res.ok && !savedId) setSavedId(res.id)
+    if (silent) {
+      if (res.ok) setAutoSaved(true)
+      else setResult(res) // klaidą parodom inline ir tyliu režimu
+    } else {
       setResult(res)
+    }
+    return res.ok
+  }
+
+  function save() {
+    startTransition(() => {
+      void persist(false)
     })
   }
 
@@ -253,6 +279,9 @@ export function SupplierOrderForm({
           <PrintButton
             label="🖨 Print"
             className="px-4 py-2 bg-brand-gray-900 text-white rounded-lg text-sm font-semibold hover:bg-black"
+            onBeforePrint={async () => {
+              await persist(true)
+            }}
           />
           <button
             type="button"
@@ -280,6 +309,28 @@ export function SupplierOrderForm({
       {result && !result.ok && (
         <div className="print-hide mb-4 px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
           {result.error}
+        </div>
+      )}
+
+      {autoSaved && savedId && (
+        <div className="print-hide mb-4 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-lg text-sm flex items-center justify-between gap-3 flex-wrap">
+          <span className="text-emerald-800 font-semibold">
+            ✓ Užsakymas išsaugotas į istoriją.
+          </span>
+          <span className="flex items-center gap-2">
+            <Link
+              href={`/admin/sandelis/uzsakyti/istorija/${savedId}`}
+              className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-[13px] font-semibold hover:bg-emerald-700"
+            >
+              📥 Priimti / sutikrinti
+            </Link>
+            <Link
+              href="/admin/sandelis/uzsakyti/istorija"
+              className="px-3 py-1.5 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg text-[13px] font-semibold hover:bg-[#F5F5F7]"
+            >
+              Istorija
+            </Link>
+          </span>
         </div>
       )}
 
