@@ -37,5 +37,6 @@ export async function saveEventWidgetPrefs(
     httpOnly: false,
     sameSite: 'lax',
     path: '/',
+    secure: process.env.NODE_ENV === 'production',
   })
 }

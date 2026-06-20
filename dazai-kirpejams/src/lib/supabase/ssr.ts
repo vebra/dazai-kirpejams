@@ -17,6 +17,23 @@ import {
 import { cookies } from 'next/headers'
 import type { NextRequest, NextResponse } from 'next/server'
 
+/**
+ * Bendros cookie saugumo žymės visiems Supabase auth (`sb-*`) slapukams.
+ * Supabase numatytai prideda tik `sameSite: lax` ir `path` — BE `Secure`,
+ * todėl HTTPS aplinkoje sesijos slapukai keliautų ir neapsaugotu kanalu.
+ *
+ * - `secure: true` produkcijoje (localhost http'e išjungiam, kitaip naršyklė
+ *   atmestų slapuką ir dev prisijungimas neveiktų).
+ * - `httpOnly` NEnustatomas (lieka false): naršyklės klientas privalo skaityti
+ *   sesiją per `getSession()` (kainų rodymas, useVerifiedUser). HttpOnly jį
+ *   nulaužtų.
+ */
+const cookieOptions = {
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax' as const,
+  path: '/',
+}
+
 function getEnv() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -36,7 +53,7 @@ function getEnv() {
 /** Client-side (browser) klientas — naudoti 'use client' komponentuose */
 export function createBrowserSupabase() {
   const { url, anonKey } = getEnv()
-  return createBrowserClient(url, anonKey)
+  return createBrowserClient(url, anonKey, { cookieOptions })
 }
 
 /**
@@ -49,6 +66,7 @@ export async function createServerSupabase() {
   const cookieStore = await cookies()
 
   return createServerClient(url, anonKey, {
+    cookieOptions,
     cookies: {
       getAll() {
         return cookieStore.getAll()
@@ -78,6 +96,7 @@ export function createProxySupabase(
   const { url, anonKey } = getEnv()
 
   return createServerClient(url, anonKey, {
+    cookieOptions,
     cookies: {
       getAll() {
         return request.cookies.getAll()
