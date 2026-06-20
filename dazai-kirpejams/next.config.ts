@@ -57,6 +57,9 @@ const securityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
+  // Pašalinam `X-Powered-By: Next.js` antraštę — ji atskleidžia framework'ą
+  // (ir netiesiogiai versiją), todėl užpuolikui lengviau ieškoti žinomų CVE.
+  poweredByHeader: false,
   experimental: {
     // Default Server Action body limit = 1MB. Produktų nuotraukos gali
     // siekti iki 10MB (taip nustatyta 'products' storage bucket'e).
