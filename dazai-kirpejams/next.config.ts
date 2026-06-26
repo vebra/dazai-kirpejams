@@ -174,11 +174,11 @@ export default withSentryConfig(nextConfig, {
  // Upload a larger set of source maps for prettier stack traces (increases build time)
  widenClientFileUpload: true,
 
- // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
- // This can increase your server load as well as your hosting bill.
- // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
- // side errors will fail.
- tunnelRoute: "/monitoring",
+ // Tunnelis IŠJUNGTAS sąmoningai: jis nukreipdavo VISĄ naršyklės Sentry srautą
+ // (traces + session replay) per mūsų domeno funkciją, t.y. degino Fast Origin
+ // Transfer ir Fluid Active CPU (Vercel Hobby ribos). Be jo naršyklė rašo tiesiai
+ // į Sentry — ad-blockeriai užblokuoja dalį pranešimų, bet kaštai krenta į nulį.
+ // tunnelRoute: "/monitoring",
 
  webpack: {
    // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)

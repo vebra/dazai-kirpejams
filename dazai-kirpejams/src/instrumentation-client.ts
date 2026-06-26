@@ -5,11 +5,12 @@ Sentry.init({
 
   integrations: [Sentry.replayIntegration({ maskAllText: true, blockAllMedia: true })],
 
-  // 2% pakanka našumo tendencijoms; klientinės transakcijos keliauja per
-  // /monitoring tunelį mūsų domene, t.y. kainuoja Fast Origin Transfer.
-  tracesSampleRate: process.env.NODE_ENV === "production" ? 0.02 : 1,
+  // Performance tracing prode IŠJUNGTAS (0) — Vercel Hobby resursų taupymas.
+  // Klaidos vis tiek pranešamos; tik našumo transakcijų nerenkam.
+  tracesSampleRate: process.env.NODE_ENV === "production" ? 0 : 1,
   replaysSessionSampleRate: 0,
-  replaysOnErrorSampleRate: 1.0,
+  // Session replay tik 10% klaidų — pilnas DOM įrašas yra sunkus payload'as.
+  replaysOnErrorSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
 
   sendDefaultPii: false,
 
