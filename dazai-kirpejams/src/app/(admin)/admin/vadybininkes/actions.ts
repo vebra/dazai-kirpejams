@@ -37,7 +37,16 @@ export async function createRepAccount(input: {
     email_confirm: true,
   })
   if (cErr || !created.user) {
-    if ((cErr?.message ?? '').toLowerCase().includes('already')) {
+    // Dublikato el. pašto atpažinimas pagal HTTP statusą / kodą (atsparu žinutės
+    // formuluotės pokyčiams ir lokalizacijai), su teksto fallback'u.
+    const status = (cErr as { status?: number } | null)?.status
+    const code = (cErr as { code?: string } | null)?.code ?? ''
+    const m = (cErr?.message ?? '').toLowerCase()
+    const isDuplicate =
+      status === 422 ||
+      code === 'email_exists' ||
+      /already|registered|exist/.test(m)
+    if (isDuplicate) {
       return { ok: false, error: 'Vartotojas su tokiu el. paštu jau egzistuoja.' }
     }
     return { ok: false, error: 'Nepavyko sukurti paskyros.' }
@@ -53,7 +62,13 @@ export async function createRepAccount(input: {
     if (!error) roleSet = true
     else await new Promise((r) => setTimeout(r, 300))
   }
-  if (!roleSet) return { ok: false, error: 'Paskyra sukurta, bet nepavyko nustatyti rolės.' }
+  if (!roleSet) {
+    // Rolė nenustatyta → paskyra be teisių ir su užimtu el. paštu (pakartoti
+    // nebepavyktų). Pašalinam ką tik sukurtą vartotoją, kad admin galėtų bandyti
+    // iš naujo švariai.
+    await sb.auth.admin.deleteUser(uid).catch(() => {})
+    return { ok: false, error: 'Nepavyko nustatyti rolės. Bandykite dar kartą.' }
+  }
 
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
