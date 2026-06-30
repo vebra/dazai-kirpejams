@@ -45,15 +45,15 @@ export function IssueRequestFlow({
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
-    if (!q) return []
-    return products
-      .filter(
-        (p) =>
-          p.nameLt.toLowerCase().includes(q) ||
-          (p.sku ?? '').toLowerCase().includes(q) ||
-          (p.colorNumber ?? '').toLowerCase().includes(q)
-      )
-      .slice(0, 10)
+    const base = q
+      ? products.filter(
+          (p) =>
+            p.nameLt.toLowerCase().includes(q) ||
+            (p.sku ?? '').toLowerCase().includes(q) ||
+            (p.colorNumber ?? '').toLowerCase().includes(q)
+        )
+      : products
+    return base.slice(0, 50)
   }, [products, search])
 
   function setQty(pid: string, q: number) {
