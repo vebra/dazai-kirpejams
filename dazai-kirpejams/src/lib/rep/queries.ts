@@ -46,6 +46,7 @@ export async function getRepOrderProducts(): Promise<RepProduct[]> {
     .from('products')
     .select(
       `id, name_lt, sku, color_number, stock_quantity, is_active,
+       categories ( slug ),
        product_prices ( tier, price_cents )`
     )
     .eq('is_active', true)
@@ -63,10 +64,42 @@ export async function getRepOrderProducts(): Promise<RepProduct[]> {
     sku: string | null
     color_number: string | null
     stock_quantity: number | null
+    categories: { slug: string | null } | { slug: string | null }[] | null
     product_prices: Array<{ tier: string; price_cents: number }> | null
   }
 
-  return (data as unknown as Row[]).map((p) => {
+  const rows = data as unknown as Row[]
+
+  const slugOf = (r: Row) => {
+    const c = Array.isArray(r.categories) ? r.categories[0] : r.categories
+    return c?.slug ?? null
+  }
+  // Dažų numerio raktas: bazė (prieš tašką) skaitine tvarka, tonai (po taško)
+  // simboliais (kad 7.444 eitų prieš 7.66 ir 9.1 prieš 9.12). Be numerio → gale.
+  const dyeKey = (cn: string | null): [number, string] => {
+    if (!cn) return [Number.MAX_SAFE_INTEGER, '']
+    const m = cn.match(/(\d+)(?:[.,](\d+))?/)
+    if (!m) return [Number.MAX_SAFE_INTEGER, cn]
+    return [parseInt(m[1], 10), m[2] ?? '']
+  }
+
+  // Rūšiavimas: pirma DAŽAI (pagal numerį didėjančia), paskui visos kitos
+  // (pagalbinės) prekės pagal pavadinimą.
+  const sorted = [...rows].sort((a, b) => {
+    const aDye = slugOf(a) === 'dazai'
+    const bDye = slugOf(b) === 'dazai'
+    if (aDye !== bDye) return aDye ? -1 : 1
+    if (aDye && bDye) {
+      const ka = dyeKey(a.color_number)
+      const kb = dyeKey(b.color_number)
+      if (ka[0] !== kb[0]) return ka[0] - kb[0]
+      if (ka[1] !== kb[1]) return ka[1] < kb[1] ? -1 : 1
+      return a.name_lt.localeCompare(b.name_lt, 'lt')
+    }
+    return a.name_lt.localeCompare(b.name_lt, 'lt')
+  })
+
+  return sorted.map((p) => {
     const prices: Record<string, number> = {}
     for (const pp of p.product_prices ?? []) prices[pp.tier] = pp.price_cents
     return {

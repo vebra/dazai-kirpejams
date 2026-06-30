@@ -12,7 +12,22 @@ export default async function IssueRequestsPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
+      {/* Spausdinant rodom TIK išvežimo lapą (.print-area). */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            @media print {
+              body { background: #fff !important; }
+              body * { visibility: hidden !important; }
+              .print-area, .print-area * { visibility: visible !important; }
+              .print-area { position: absolute; left: 0; top: 0; width: 100%; }
+              .print-hide { display: none !important; }
+              @page { margin: 1.4cm; size: A4; }
+            }
+          `,
+        }}
+      />
+      <div className="print-hide flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h2 className="text-2xl font-bold text-brand-gray-900">
             Išvežimo prašymai
