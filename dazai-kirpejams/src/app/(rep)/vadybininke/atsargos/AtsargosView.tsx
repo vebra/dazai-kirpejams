@@ -37,7 +37,26 @@ const REASON_LABELS: Record<
   },
 }
 
-type Tab = 'turimos' | 'visos' | 'istorija'
+type Tab = 'turimos' | 'istorija'
+
+// Rūšiavimas: pirma dažai pagal numerį (bazė skaitine, tonai simboliais — 7.444
+// prieš 7.66, 9.1 prieš 9.12), paskui prekės be numerio pagal pavadinimą.
+function colorKey(cn: string | null): { has: boolean; base: number; tones: string } {
+  if (!cn) return { has: false, base: 0, tones: '' }
+  const m = cn.match(/(\d+)(?:[.,](\d+))?/)
+  if (!m) return { has: false, base: 0, tones: '' }
+  return { has: true, base: parseInt(m[1], 10), tones: m[2] ?? '' }
+}
+function byDyeNumber(a: RepStockSummaryRow, b: RepStockSummaryRow): number {
+  const ka = colorKey(a.colorNumber)
+  const kb = colorKey(b.colorNumber)
+  if (ka.has !== kb.has) return ka.has ? -1 : 1
+  if (ka.has && kb.has) {
+    if (ka.base !== kb.base) return ka.base - kb.base
+    if (ka.tones !== kb.tones) return ka.tones < kb.tones ? -1 : 1
+  }
+  return a.name.localeCompare(b.name, 'lt')
+}
 
 export function AtsargosView({
   summary,
@@ -74,7 +93,13 @@ export function AtsargosView({
     return map
   }, [movements])
 
-  const onHandRows = useMemo(() => summary.filter((r) => r.onHand > 0), [summary])
+  // Turimos = tik tai, ką šiuo metu turi (išduota); Istorija = visos prekės, kurias
+  // kada nors turėjo (su parduotomis/grąžintomis) — abu surūšiuota pagal dažų numerį.
+  const onHandRows = useMemo(
+    () => summary.filter((r) => r.onHand > 0).slice().sort(byDyeNumber),
+    [summary]
+  )
+  const allRows = useMemo(() => summary.slice().sort(byDyeNumber), [summary])
 
   const q = query.trim().toLowerCase()
   const filterRows = (rows: RepStockSummaryRow[]) =>
@@ -87,22 +112,12 @@ export function AtsargosView({
         )
       : rows
 
-  const filteredMovements = q
-    ? movements.filter(
-        (m) =>
-          m.name.toLowerCase().includes(q) ||
-          (m.colorNumber ?? '').toLowerCase().includes(q) ||
-          (m.source ?? '').toLowerCase().includes(q)
-      )
-    : movements
-
   const TABS: Array<{ key: Tab; label: string }> = [
     { key: 'turimos', label: `Turimos (${onHandRows.length})` },
-    { key: 'visos', label: `Visos (${summary.length})` },
-    { key: 'istorija', label: 'Istorija' },
+    { key: 'istorija', label: `Istorija (${allRows.length})` },
   ]
 
-  const visibleRows = filterRows(tab === 'turimos' ? onHandRows : summary)
+  const visibleRows = filterRows(tab === 'turimos' ? onHandRows : allRows)
 
   return (
     <div className="space-y-5">
@@ -147,18 +162,17 @@ export function AtsargosView({
       </div>
 
       {/* Turinys */}
-      {tab !== 'istorija' ? (
-        visibleRows.length === 0 ? (
-          <EmptyState
-            text={
-              q
-                ? 'Pagal paiešką nieko nerasta.'
-                : tab === 'turimos'
-                  ? 'Šiuo metu prekių neturite. Visa istorija — skirtuke „Visos".'
-                  : 'Jums dar nieko neišduota iš sandėlio.'
-            }
-          />
-        ) : (
+      {visibleRows.length === 0 ? (
+        <EmptyState
+          text={
+            q
+              ? 'Pagal paiešką nieko nerasta.'
+              : tab === 'turimos'
+                ? 'Šiuo metu prekių neturite. Žr. skiltį „Istorija".'
+                : 'Jums dar nieko neišduota iš sandėlio.'
+          }
+        />
+      ) : (
           <div className="bg-white rounded-2xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
             <ul className="divide-y divide-[#f3f3f3]">
               {visibleRows.map((r) => {
@@ -269,45 +283,7 @@ export function AtsargosView({
             </ul>
           </div>
         )
-      ) : filteredMovements.length === 0 ? (
-        <EmptyState text={q ? 'Pagal paiešką nieko nerasta.' : 'Judėjimų dar nėra.'} />
-      ) : (
-        <div className="bg-white rounded-2xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
-          <ul className="divide-y divide-[#f3f3f3]">
-            {filteredMovements.map((m, i) => {
-              const rl = REASON_LABELS[m.reason]
-              const isOrder = m.reason === 'rep_sale' || m.reason === 'rep_sale_cancel'
-              return (
-                <li key={i} className="px-4 py-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <span
-                      className={`inline-block px-2 py-0.5 rounded text-[11px] font-semibold ${rl.cls}`}
-                    >
-                      {rl.label}
-                    </span>
-                    <span
-                      className={`tabular-nums font-bold ${
-                        rl.sign === '+' ? 'text-emerald-700' : 'text-brand-gray-900'
-                      }`}
-                    >
-                      {rl.sign}
-                      {m.qty}
-                    </span>
-                  </div>
-                  <div className="mt-1 text-[13px] text-brand-gray-900">
-                    {m.colorNumber ? `${m.colorNumber} · ` : ''}
-                    {m.name.replace(/^[\d.]+ /, '')}
-                  </div>
-                  <div className="mt-0.5 text-[11px] text-brand-gray-500">
-                    {DATE_TIME.format(new Date(m.createdAt))}
-                    {isOrder && m.source && <span className="font-mono"> · {m.source}</span>}
-                  </div>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
-      )}
+      }
     </div>
   )
 }
