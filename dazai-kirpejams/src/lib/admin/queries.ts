@@ -1628,7 +1628,9 @@ export async function getAdminUsers(): Promise<AdminUserRow[]> {
 export async function getProductsCountByCategory(): Promise<
   Array<{ categoryId: string; categoryNameLt: string; count: number }>
 > {
-  const supabase = await createServerSupabase()
+  // Service role — po migr 067 authenticated rolei products skaitymas atimtas,
+  // per sesiją grąžintų tuščią (žr. getProductsWithWholesalePrices).
+  const supabase = createServerClient()
   const { data, error } = await supabase
     .from('products')
     .select('category_id, category:categories(id, name_lt)')
@@ -2461,7 +2463,11 @@ export type AdminWholesaleRow = {
  * pagal tier. Admin nustato product_prices reikšmes per /admin/didmenos-kainos.
  */
 export async function getProductsWithWholesalePrices(): Promise<AdminWholesaleRow[]> {
-  const supabase = await createServerSupabase()
+  // Service role — po migr 067 authenticated rolei tiesioginis produktų skaitymas
+  // atimtas, tad per sesijos klientą ši užklausa grąžindavo tuščią (puslapis
+  // rodydavo „Prekių nerasta"). Katalogas globalus, puslapis gating'inamas
+  // requireAdmin() — service role saugu. Tas pats kaip getRepOrderProducts.
+  const supabase = createServerClient()
   const { data, error } = await supabase
     .from('products')
     .select(
