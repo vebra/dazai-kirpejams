@@ -2507,3 +2507,71 @@ export async function getProductsWithWholesalePrices(): Promise<AdminWholesaleRo
     }
   })
 }
+
+// ============================================
+// Vadybininkių „Išvežimas prekybai" prašymai (migr 075) — admino peržiūra
+// ============================================
+
+export type AdminIssueRequest = {
+  id: string
+  repId: string
+  repName: string
+  status: 'pending' | 'approved' | 'rejected'
+  items: Array<{ productId: string; qty: number; name: string }>
+  note: string | null
+  createdAt: string
+}
+
+export async function getPendingIssueRequests(): Promise<AdminIssueRequest[]> {
+  const sb = createServerClient()
+  const { data, error } = await sb
+    .from('rep_issue_requests')
+    .select('id, rep_id, status, items, note, created_at')
+    .eq('status', 'pending')
+    .order('created_at', { ascending: true })
+
+  if (error) {
+    console.error('[admin/queries] getPendingIssueRequests:', error.message)
+    return []
+  }
+
+  const rows = (data ?? []) as Array<{
+    id: string
+    rep_id: string
+    status: AdminIssueRequest['status']
+    items: Array<{ product_id: string; qty: number; name: string }> | null
+    note: string | null
+    created_at: string
+  }>
+
+  const repIds = Array.from(new Set(rows.map((r) => r.rep_id)))
+  const repNames = new Map<string, string>()
+  if (repIds.length > 0) {
+    const { data: profs } = await sb
+      .from('user_profiles')
+      .select('id, first_name, last_name')
+      .in('id', repIds)
+    for (const p of (profs ?? []) as Array<{
+      id: string
+      first_name: string | null
+      last_name: string | null
+    }>) {
+      const n = `${p.first_name ?? ''} ${p.last_name ?? ''}`.trim()
+      if (n) repNames.set(p.id, n)
+    }
+  }
+
+  return rows.map((r) => ({
+    id: r.id,
+    repId: r.rep_id,
+    repName: repNames.get(r.rep_id) ?? '—',
+    status: r.status,
+    items: (Array.isArray(r.items) ? r.items : []).map((i) => ({
+      productId: i.product_id,
+      qty: i.qty,
+      name: i.name,
+    })),
+    note: r.note,
+    createdAt: r.created_at,
+  }))
+}

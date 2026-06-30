@@ -8,6 +8,7 @@ import {
   ClipboardList,
   ArrowRight,
   Plus,
+  Truck,
 } from 'lucide-react'
 import { requireSalesRep } from '@/lib/rep/auth'
 import {
@@ -220,28 +221,52 @@ export default async function RepDashboard() {
         </section>
       </div>
 
-      {/* Greitas veiksmas */}
-      <Link
-        href="/vadybininke/naujas-uzsakymas"
-        className="dk-fade-up group flex items-center justify-between gap-4 p-5 rounded-2xl bg-brand-magenta text-white shadow-[0_4px_14px_rgba(233,30,140,0.3)] hover:bg-brand-magenta-dark transition-colors"
-        style={{ animationDelay: '360ms' }}
-      >
-        <div className="flex items-center gap-3">
-          <span className="flex items-center justify-center w-10 h-10 rounded-full bg-white/15">
-            <Plus size={20} strokeWidth={2.6} />
-          </span>
-          <div>
-            <div className="font-bold">Naujas užsakymas</div>
-            <div className="text-[12px] text-white/75">
-              Klientas → prekės → pateikti patvirtinimui
+      {/* Greiti veiksmai */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <Link
+          href="/vadybininke/naujas-uzsakymas"
+          className="dk-fade-up group flex items-center justify-between gap-4 p-5 rounded-2xl bg-brand-magenta text-white shadow-[0_4px_14px_rgba(233,30,140,0.3)] hover:bg-brand-magenta-dark transition-colors"
+          style={{ animationDelay: '360ms' }}
+        >
+          <div className="flex items-center gap-3">
+            <span className="flex items-center justify-center w-10 h-10 rounded-full bg-white/15">
+              <Plus size={20} strokeWidth={2.6} />
+            </span>
+            <div>
+              <div className="font-bold">Naujas užsakymas</div>
+              <div className="text-[12px] text-white/75">
+                Pardavimas klientui → patvirtinimui
+              </div>
             </div>
           </div>
-        </div>
-        <ArrowRight
-          size={20}
-          className="shrink-0 transition-transform group-hover:translate-x-1"
-        />
-      </Link>
+          <ArrowRight
+            size={20}
+            className="shrink-0 transition-transform group-hover:translate-x-1"
+          />
+        </Link>
+
+        <Link
+          href="/vadybininke/isvezimas"
+          className="dk-fade-up group flex items-center justify-between gap-4 p-5 rounded-2xl bg-brand-blue text-white shadow-[0_4px_14px_rgba(43,53,175,0.3)] hover:opacity-95 transition-opacity"
+          style={{ animationDelay: '420ms' }}
+        >
+          <div className="flex items-center gap-3">
+            <span className="flex items-center justify-center w-10 h-10 rounded-full bg-white/15">
+              <Truck size={20} strokeWidth={2.4} />
+            </span>
+            <div>
+              <div className="font-bold">Išvežimas prekybai</div>
+              <div className="text-[12px] text-white/75">
+                Pasiimti prekių → admin patvirtina
+              </div>
+            </div>
+          </div>
+          <ArrowRight
+            size={20}
+            className="shrink-0 transition-transform group-hover:translate-x-1"
+          />
+        </Link>
+      </div>
     </div>
   )
 }
