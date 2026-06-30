@@ -92,6 +92,34 @@ export default async function RepOrderDetailPage({
           </tbody>
           <tfoot className="bg-[#F9F9FB]">
             <tr className="border-t border-[#eee]">
+              <td colSpan={3} className="px-4 py-2 text-right text-[13px] text-brand-gray-600">
+                Tarpinė suma
+              </td>
+              <td className="px-4 py-2 text-right text-[13px] text-brand-gray-900">
+                {PRICE.format(o.subtotalCents / 100)}
+              </td>
+            </tr>
+            {o.deliveryCostCents > 0 && (
+              <tr>
+                <td colSpan={3} className="px-4 py-2 text-right text-[13px] text-brand-gray-600">
+                  Pristatymas
+                </td>
+                <td className="px-4 py-2 text-right text-[13px] text-brand-gray-900">
+                  {PRICE.format(o.deliveryCostCents / 100)}
+                </td>
+              </tr>
+            )}
+            {o.vatCents > 0 && (
+              <tr>
+                <td colSpan={3} className="px-4 py-2 text-right text-[13px] text-brand-gray-600">
+                  PVM
+                </td>
+                <td className="px-4 py-2 text-right text-[13px] text-brand-gray-900">
+                  {PRICE.format(o.vatCents / 100)}
+                </td>
+              </tr>
+            )}
+            <tr className="border-t border-[#eee]">
               <td colSpan={3} className="px-4 py-3 text-right font-bold text-brand-gray-900">
                 Iš viso
               </td>
@@ -120,6 +148,9 @@ export default async function RepOrderDetailPage({
         createdAt={o.createdAt}
         clientName={o.clientName ?? '—'}
         items={o.items}
+        subtotalCents={o.subtotalCents}
+        deliveryCostCents={o.deliveryCostCents}
+        vatCents={o.vatCents}
         totalCents={o.totalCents}
       />
     </div>

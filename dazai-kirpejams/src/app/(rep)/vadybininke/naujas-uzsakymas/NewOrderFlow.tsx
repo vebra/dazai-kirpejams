@@ -59,11 +59,18 @@ export function NewOrderFlow({
       .filter(([, q]) => q > 0)
       .map(([pid, q]) => {
         const p = products.find((x) => x.id === pid)!
-        const unit = p?.prices[tier] ?? 0
-        return { product: p, qty: q, unit, total: unit * q }
+        const price = p?.prices[tier]
+        const hasPrice = typeof price === 'number'
+        const unit = hasPrice ? price : 0
+        return { product: p, qty: q, unit, total: unit * q, hasPrice }
       })
       .filter((l) => l.product)
   }, [cart, products, tier])
+
+  // Prekės, kurioms pasirinkto kliento grupei nėra kainos — užsakymo pateikti
+  // negalima (serveris atmestų su NO_PRICE_FOR_TIER). Atsiranda pakeitus klientą
+  // į kitos grupės, kai krepšelyje jau yra prekė be tos grupės kainos.
+  const unpricedLines = lines.filter((l) => !l.hasPrice)
 
   const subtotal = lines.reduce((s, l) => s + l.total, 0)
   const shipping = subtotal >= freeShippingThresholdCents ? 0 : delivery?.priceCents ?? 0
@@ -79,6 +86,12 @@ export function NewOrderFlow({
     if (!client) return setSubmitError('Pasirinkite klientą.')
     const items = lines.map((l) => ({ product_id: l.product.id, quantity: l.qty }))
     if (!items.length) return setSubmitError('Pridėkite bent vieną prekę.')
+    if (unpricedLines.length > 0) {
+      const names = unpricedLines.map((l) => l.product.nameLt).join(', ')
+      return setSubmitError(
+        `Šioms prekėms nėra kainos kliento grupei „${TIER_LABELS[tier] ?? tier}": ${names}. Pašalinkite jas iš krepšelio.`
+      )
+    }
     startSubmit(async () => {
       const res = await submitRepOrder({
         clientId: client.id,
@@ -161,7 +174,20 @@ export function NewOrderFlow({
                     <span className="text-brand-gray-900 min-w-0 truncate">
                       {l.product.nameLt} <span className="text-brand-gray-400">× {l.qty}</span>
                     </span>
-                    <span className="font-medium whitespace-nowrap">{fmt(l.total)}</span>
+                    {l.hasPrice ? (
+                      <span className="font-medium whitespace-nowrap">{fmt(l.total)}</span>
+                    ) : (
+                      <span className="flex items-center gap-2 whitespace-nowrap">
+                        <span className="text-[12px] font-medium text-red-600">Nėra kainos</span>
+                        <button
+                          type="button"
+                          onClick={() => setQty(l.product.id, 0)}
+                          className="text-[12px] font-semibold text-brand-magenta hover:underline"
+                        >
+                          Pašalinti
+                        </button>
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -252,7 +278,7 @@ export function NewOrderFlow({
 
               <button
                 onClick={handleSubmit}
-                disabled={submitting}
+                disabled={submitting || unpricedLines.length > 0}
                 className="w-full px-5 py-3 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark transition-colors disabled:opacity-50"
               >
                 {submitting ? 'Pateikiama…' : 'Pateikti užsakymą'}
