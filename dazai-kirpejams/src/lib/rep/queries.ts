@@ -399,3 +399,57 @@ export async function getClientWithOrders(
     orders,
   }
 }
+
+// ============================================
+// Išvežimo prekybai prašymai (migr 075) — rep prašo, admin patvirtina
+// ============================================
+
+export type RepIssueRequestItem = { productId: string; qty: number; name: string }
+export type RepIssueRequest = {
+  id: string
+  status: 'pending' | 'approved' | 'rejected'
+  items: RepIssueRequestItem[]
+  note: string | null
+  rejectReason: string | null
+  createdAt: string
+  decidedAt: string | null
+}
+
+/** Vadybininkės pateikti išvežimo prašymai (RLS → tik savo). Naujausi viršuje. */
+export async function getMyIssueRequests(): Promise<RepIssueRequest[]> {
+  const supabase = await createServerSupabase()
+  const { data, error } = await supabase
+    .from('rep_issue_requests')
+    .select('id, status, items, note, reject_reason, created_at, decided_at')
+    .order('created_at', { ascending: false })
+    .limit(100)
+
+  if (error) {
+    console.error('[rep/queries] getMyIssueRequests:', error.message)
+    return []
+  }
+
+  return (
+    (data ?? []) as Array<{
+      id: string
+      status: RepIssueRequest['status']
+      items: Array<{ product_id: string; qty: number; name: string }> | null
+      note: string | null
+      reject_reason: string | null
+      created_at: string
+      decided_at: string | null
+    }>
+  ).map((r) => ({
+    id: r.id,
+    status: r.status,
+    items: (Array.isArray(r.items) ? r.items : []).map((i) => ({
+      productId: i.product_id,
+      qty: i.qty,
+      name: i.name,
+    })),
+    note: r.note,
+    rejectReason: r.reject_reason,
+    createdAt: r.created_at,
+    decidedAt: r.decided_at,
+  }))
+}

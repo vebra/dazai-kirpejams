@@ -7,6 +7,7 @@ import {
   approveRepOrder,
   approveRepOrderFromWarehouse,
   rejectRepOrder,
+  removeRepOrderLine,
 } from './actions'
 
 const PRICE = new Intl.NumberFormat('lt-LT', { style: 'currency', currency: 'EUR' })
@@ -107,6 +108,17 @@ function OrderCard({
     })
   }
 
+  function handleRemoveLine(productId: string | null, name: string) {
+    if (!productId) return
+    if (!confirm(`Pašalinti „${name}" iš užsakymo?`)) return
+    setError(null)
+    startTransition(async () => {
+      const res = await removeRepOrderLine(o.id, productId)
+      if (res.ok) onDone()
+      else setError(res.error ?? 'Nepavyko pašalinti prekės.')
+    })
+  }
+
   return (
     <div className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
       {/* Antraštė */}
@@ -151,6 +163,7 @@ function OrderCard({
               <th className="pb-2 text-center w-[60px]">Kiekis</th>
               <th className="pb-2 text-right w-[110px]">Vnt. kaina</th>
               <th className="pb-2 text-right w-[110px]">Suma</th>
+              <th className="pb-2 w-[36px]"></th>
             </tr>
           </thead>
           <tbody>
@@ -165,6 +178,17 @@ function OrderCard({
                 <td className="py-2 text-center text-brand-gray-600">{it.quantity}</td>
                 <td className="py-2 text-right text-brand-gray-600">{fmt(it.unitPriceCents)}</td>
                 <td className="py-2 text-right font-medium text-brand-gray-900">{fmt(it.totalCents)}</td>
+                <td className="py-2 text-right">
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveLine(it.productId, it.productName)}
+                    disabled={pending}
+                    title="Pašalinti šią prekę iš užsakymo"
+                    className="text-brand-gray-300 hover:text-red-600 transition-colors disabled:opacity-40"
+                  >
+                    ✕
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

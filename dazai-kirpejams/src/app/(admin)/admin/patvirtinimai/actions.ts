@@ -135,6 +135,86 @@ export async function approveRepOrderFromWarehouse(
   return { ok: true }
 }
 
+/**
+ * Pašalina vieną eilutę iš LAUKIANČIO vadybininkės užsakymo ir perskaičiuoja
+ * sumas — kad adminas galėtų patvirtinti likusį užsakymą, kai vienos prekės
+ * trūksta (vietoj viso atmetimo). Service-role: order_items keitimas + sumų
+ * perskaičiavimas. Paskutinės eilutės pašalinti neleidžiam (tuščias užsakymas
+ * neturi prasmės — verčiau atmesti).
+ */
+export async function removeRepOrderLine(
+  orderId: string,
+  productId: string
+): Promise<ApprovalResult> {
+  await requireAdmin()
+  if (!orderId || !productId) return { ok: false, error: 'Trūksta duomenų.' }
+
+  const sb = createServerClient()
+  const { data: o, error: oErr } = await sb
+    .from('orders')
+    .select('id, approval_status, subtotal_cents, delivery_cost_cents, vat_cents')
+    .eq('id', orderId)
+    .maybeSingle<{
+      id: string
+      approval_status: string | null
+      subtotal_cents: number
+      delivery_cost_cents: number | null
+      vat_cents: number | null
+    }>()
+  if (oErr || !o) return { ok: false, error: 'Užsakymas nerastas.' }
+  if (o.approval_status !== 'pending')
+    return { ok: false, error: 'Keisti galima tik laukiantį užsakymą.' }
+
+  const { count } = await sb
+    .from('order_items')
+    .select('id', { count: 'exact', head: true })
+    .eq('order_id', orderId)
+  if ((count ?? 0) <= 1)
+    return {
+      ok: false,
+      error: 'Tai paskutinė prekė — vietoj šalinimo atmeskite visą užsakymą.',
+    }
+
+  const { error: dErr } = await sb
+    .from('order_items')
+    .delete()
+    .eq('order_id', orderId)
+    .eq('product_id', productId)
+  if (dErr) {
+    console.error('[admin/patvirtinimai] removeLine:', dErr.message)
+    return { ok: false, error: 'Nepavyko pašalinti prekės.' }
+  }
+
+  // Perskaičiuojam iš likusių eilučių (PVM proporcingai, pristatymas nekinta).
+  const { data: rest } = await sb
+    .from('order_items')
+    .select('total_cents')
+    .eq('order_id', orderId)
+  const newSubtotal = (rest ?? []).reduce((s, r) => s + (r.total_cents ?? 0), 0)
+  const shipping = o.delivery_cost_cents ?? 0
+  const oldBase = (o.subtotal_cents ?? 0) + shipping
+  const rate = oldBase > 0 ? (o.vat_cents ?? 0) / oldBase : 0
+  const newVat = Math.round((newSubtotal + shipping) * rate)
+  const newTotal = newSubtotal + shipping + newVat
+
+  const { error: uErr } = await sb
+    .from('orders')
+    .update({
+      subtotal_cents: newSubtotal,
+      vat_cents: newVat,
+      total_cents: newTotal,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', orderId)
+  if (uErr) {
+    console.error('[admin/patvirtinimai] removeLine update:', uErr.message)
+    return { ok: false, error: 'Prekė pašalinta, bet nepavyko atnaujinti sumos.' }
+  }
+
+  revalidatePath('/admin/patvirtinimai')
+  return { ok: true }
+}
+
 export async function rejectRepOrder(
   orderId: string,
   reason: string

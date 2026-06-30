@@ -22,6 +22,7 @@ export function NewOrderFlow({
   deliveryOptions,
   freeShippingThresholdCents,
   vatRate,
+  heldByProduct = {},
   initialClientId = null,
   initialCart,
 }: {
@@ -30,6 +31,7 @@ export function NewOrderFlow({
   deliveryOptions: DeliveryOption[]
   freeShippingThresholdCents: number
   vatRate: number
+  heldByProduct?: Record<string, number>
   initialClientId?: string | null
   initialCart?: Record<string, number>
 }) {
@@ -53,6 +55,11 @@ export function NewOrderFlow({
   const tier = client?.pricingTier ?? 'wholesale_1'
   const delivery = deliveryOptions.find((d) => d.value === deliveryMethod)
 
+  // „Galima" prekės kiekis = max(sandėlio likutis, vadybininkės atsargos), nes
+  // užsakymą galima įvykdyti arba iš sandėlio, arba iš jos atsargų.
+  const availableOf = (p: RepProduct) =>
+    Math.max(p.stockQuantity ?? 0, heldByProduct[p.id] ?? 0)
+
   // Krepšelio eilutės + sumos (kliento pusės peržiūra; serveris perskaičiuoja autoritetingai)
   const lines = useMemo(() => {
     return Object.entries(cart)
@@ -62,15 +69,19 @@ export function NewOrderFlow({
         const price = p?.prices[tier]
         const hasPrice = typeof price === 'number'
         const unit = hasPrice ? price : 0
-        return { product: p, qty: q, unit, total: unit * q, hasPrice }
+        const available = p ? Math.max(p.stockQuantity ?? 0, heldByProduct[p.id] ?? 0) : 0
+        return { product: p, qty: q, unit, total: unit * q, hasPrice, available, overStock: q > available }
       })
       .filter((l) => l.product)
-  }, [cart, products, tier])
+  }, [cart, products, tier, heldByProduct])
 
   // Prekės, kurioms pasirinkto kliento grupei nėra kainos — užsakymo pateikti
   // negalima (serveris atmestų su NO_PRICE_FOR_TIER). Atsiranda pakeitus klientą
   // į kitos grupės, kai krepšelyje jau yra prekė be tos grupės kainos.
   const unpricedLines = lines.filter((l) => !l.hasPrice)
+  // Prekės, kurių užsakyta daugiau nei galima (nei sandėlyje, nei atsargose) —
+  // toks užsakymas įstrigtų patvirtinime, todėl blokuojam jau čia.
+  const overStockLines = lines.filter((l) => l.overStock)
 
   const subtotal = lines.reduce((s, l) => s + l.total, 0)
   const shipping = subtotal >= freeShippingThresholdCents ? 0 : delivery?.priceCents ?? 0
@@ -90,6 +101,14 @@ export function NewOrderFlow({
       const names = unpricedLines.map((l) => l.product.nameLt).join(', ')
       return setSubmitError(
         `Šioms prekėms nėra kainos kliento grupei „${TIER_LABELS[tier] ?? tier}": ${names}. Pašalinkite jas iš krepšelio.`
+      )
+    }
+    if (overStockLines.length > 0) {
+      const names = overStockLines
+        .map((l) => `${l.product.nameLt} (galima ${l.available})`)
+        .join(', ')
+      return setSubmitError(
+        `Nepakanka likučio: ${names}. Sumažinkite kiekį arba pašalinkite iš krepšelio.`
       )
     }
     startSubmit(async () => {
@@ -163,7 +182,13 @@ export function NewOrderFlow({
       {/* 2. Prekės + krepšelis (tik pasirinkus klientą) */}
       {client && (
         <>
-          <ProductStep products={products} tier={tier} cart={cart} onQty={setQty} />
+          <ProductStep
+            products={products}
+            tier={tier}
+            cart={cart}
+            onQty={setQty}
+            availableOf={availableOf}
+          />
 
           {lines.length > 0 && (
             <div className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-5 space-y-4">
@@ -173,9 +198,24 @@ export function NewOrderFlow({
                   <div key={l.product.id} className="flex items-center justify-between py-2 text-sm gap-3">
                     <span className="text-brand-gray-900 min-w-0 truncate">
                       {l.product.nameLt} <span className="text-brand-gray-400">× {l.qty}</span>
+                      {l.hasPrice && l.overStock && (
+                        <span className="block text-[11px] font-medium text-red-600">
+                          Galima tik {l.available} vnt.
+                        </span>
+                      )}
                     </span>
                     {l.hasPrice ? (
-                      <span className="font-medium whitespace-nowrap">{fmt(l.total)}</span>
+                      l.overStock ? (
+                        <button
+                          type="button"
+                          onClick={() => setQty(l.product.id, l.available)}
+                          className="text-[12px] font-semibold text-brand-magenta hover:underline whitespace-nowrap"
+                        >
+                          Sumažinti iki {l.available}
+                        </button>
+                      ) : (
+                        <span className="font-medium whitespace-nowrap">{fmt(l.total)}</span>
+                      )
                     ) : (
                       <span className="flex items-center gap-2 whitespace-nowrap">
                         <span className="text-[12px] font-medium text-red-600">Nėra kainos</span>
@@ -278,7 +318,7 @@ export function NewOrderFlow({
 
               <button
                 onClick={handleSubmit}
-                disabled={submitting || unpricedLines.length > 0}
+                disabled={submitting || unpricedLines.length > 0 || overStockLines.length > 0}
                 className="w-full px-5 py-3 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark transition-colors disabled:opacity-50"
               >
                 {submitting ? 'Pateikiama…' : 'Pateikti užsakymą'}
@@ -496,11 +536,13 @@ function ProductStep({
   tier,
   cart,
   onQty,
+  availableOf,
 }: {
   products: RepProduct[]
   tier: string
   cart: Record<string, number>
   onQty: (pid: string, q: number) => void
+  availableOf: (p: RepProduct) => number
 }) {
   const [search, setSearch] = useState('')
   const filtered = useMemo(() => {
@@ -532,6 +574,9 @@ function ProductStep({
           const price = p.prices[tier]
           const qty = cart[p.id] ?? 0
           const hasPrice = typeof price === 'number'
+          const available = availableOf(p)
+          const soldOut = available <= 0
+          const atMax = qty >= available
           return (
             <div key={p.id} className="flex items-center justify-between gap-3 px-3 py-2.5">
               <div className="min-w-0">
@@ -539,9 +584,15 @@ function ProductStep({
                 <div className="text-[11px] text-brand-gray-400">
                   {p.sku ?? ''}
                   {hasPrice ? ` · ${fmt(price)}` : ' · kaina nenustatyta'}
+                  {hasPrice && (
+                    <span className={soldOut ? 'text-red-500' : ''}>
+                      {' · '}
+                      {soldOut ? 'nėra likučio' : `galima ${available}`}
+                    </span>
+                  )}
                 </div>
               </div>
-              {hasPrice ? (
+              {hasPrice && !soldOut ? (
                 <div className="flex items-center gap-1.5 flex-shrink-0">
                   <button
                     onClick={() => onQty(p.id, qty - 1)}
@@ -551,13 +602,17 @@ function ProductStep({
                   <input
                     type="number"
                     min={0}
+                    max={available}
                     value={qty}
-                    onChange={(e) => onQty(p.id, parseInt(e.target.value || '0', 10))}
+                    onChange={(e) =>
+                      onQty(p.id, Math.min(available, parseInt(e.target.value || '0', 10)))
+                    }
                     className="w-12 text-center px-1 py-1 bg-[#F5F5F7] border border-[#ddd] rounded-md text-sm"
                   />
                   <button
-                    onClick={() => onQty(p.id, qty + 1)}
-                    className="w-7 h-7 rounded-md border border-[#ddd] text-brand-gray-600 hover:bg-[#F5F5F7]"
+                    onClick={() => onQty(p.id, Math.min(available, qty + 1))}
+                    disabled={atMax}
+                    className="w-7 h-7 rounded-md border border-[#ddd] text-brand-gray-600 hover:bg-[#F5F5F7] disabled:opacity-40"
                   >+</button>
                 </div>
               ) : (

@@ -216,3 +216,60 @@ export async function cancelMyPendingOrder(
   revalidatePath('/vadybininke/uzsakymai')
   return { ok: true }
 }
+
+// ============================================
+// Išvežimo prekybai prašymas (migr 075) — rep prašo, admin patvirtina
+// ============================================
+
+export type IssueRequestResult = { ok: true } | { ok: false; error: string }
+
+export async function submitIssueRequest(input: {
+  items: Array<{ product_id: string; qty: number; name: string }>
+  note?: string
+}): Promise<IssueRequestResult> {
+  const { user } = await requireSalesRep()
+
+  const items = (input.items ?? []).filter(
+    (i) => i && typeof i.product_id === 'string' && Number.isInteger(i.qty) && i.qty > 0
+  )
+  if (!items.length) return { ok: false, error: 'Pridėkite bent vieną prekę.' }
+
+  const supabase = await createServerSupabase()
+  const { error } = await supabase.from('rep_issue_requests').insert({
+    rep_id: user.id,
+    items,
+    note: input.note?.trim() || null,
+  })
+  if (error) {
+    console.error('[rep/actions] submitIssueRequest:', error.message)
+    return { ok: false, error: 'Nepavyko pateikti prašymo. Bandykite dar kartą.' }
+  }
+
+  // Pranešimas adminui (non-blocking)
+  try {
+    const adminTo = getAdminNotificationEmail()
+    if (adminTo) {
+      const { data: prof } = await supabase
+        .from('user_profiles')
+        .select('first_name, last_name')
+        .eq('id', user.id)
+        .maybeSingle()
+      const repName =
+        `${prof?.first_name ?? ''} ${prof?.last_name ?? ''}`.trim() || user.email || 'Vadybininkė'
+      const totalUnits = items.reduce((s, i) => s + i.qty, 0)
+      const lines = items.map((i) => `• ${i.name} × ${i.qty}`).join('\n')
+      const url = `${siteUrl()}/admin/isvezimo-prasymai`
+      await sendEmail({
+        to: adminTo,
+        subject: `Naujas išvežimo prašymas — ${repName}`,
+        html: `<p>${repName} pateikė išvežimo prekybai prašymą (${totalUnits} vnt.).</p><pre style="font-family:inherit">${lines}</pre><p><a href="${url}">Peržiūrėti ir patvirtinti</a></p>`,
+        text: `${repName}: ${totalUnits} vnt.\n${lines}\n${url}`,
+      })
+    }
+  } catch (e) {
+    console.error('[rep/actions] issue request notify failed (non-blocking):', e)
+  }
+
+  revalidatePath('/vadybininke/isvezimas')
+  return { ok: true }
+}

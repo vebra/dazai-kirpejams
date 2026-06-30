@@ -8,6 +8,7 @@ import {
   Users,
   Package,
   Plus,
+  Truck,
 } from 'lucide-react'
 
 const NAV = [
@@ -15,6 +16,13 @@ const NAV = [
   { href: '/vadybininke/uzsakymai', label: 'Užsakymai', icon: ClipboardList },
   { href: '/vadybininke/klientai', label: 'Klientai', icon: Users },
   { href: '/vadybininke/atsargos', label: 'Atsargos', icon: Package },
+]
+
+// Desktop meniu turi ir „Išvežimą"; mobilioje apatinėje juostoje vietos mažai,
+// todėl ten jis pasiekiamas per skydelio greitą veiksmą.
+const DESKTOP_NAV = [
+  ...NAV,
+  { href: '/vadybininke/isvezimas', label: 'Išvežimas', icon: Truck },
 ]
 
 type Badges = { pending?: number; rejected?: number }
@@ -46,7 +54,7 @@ export function RepDesktopNav({ pending, rejected }: Badges) {
   const pathname = usePathname()
   return (
     <nav className="hidden sm:flex items-center gap-0.5">
-      {NAV.map((n) => {
+      {DESKTOP_NAV.map((n) => {
         const active = isActive(pathname, n.href, n.exact)
         return (
           <Link
