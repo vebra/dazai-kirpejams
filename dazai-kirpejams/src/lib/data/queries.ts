@@ -97,7 +97,7 @@ async function _getCategories(): Promise<Category[]> {
 }
 
 export const getCategories = unstable_cache(_getCategories, ['categories'], {
-  revalidate: 120,
+  revalidate: 3600,
   tags: ['categories'],
 })
 
@@ -128,7 +128,7 @@ export const getCategoryBySlug = (slug: string) =>
   unstable_cache(
     () => _getCategoryBySlug(slug),
     ['category', slug],
-    { revalidate: 120, tags: ['categories'] }
+    { revalidate: 3600, tags: ['categories'] }
   )()
 
 // ============================================
@@ -241,7 +241,7 @@ export const getProductsForBuild = (
 ): Promise<Product[]> => {
   const key = JSON.stringify(options ?? {})
   return unstable_cache(() => _getProducts(options), ['products', key], {
-    revalidate: 60,
+    revalidate: 3600,
     tags: ['products'],
   })()
 }
@@ -313,7 +313,7 @@ export const getProductBySlugForBuild = (
   slug: string
 ): Promise<Product | null> =>
   unstable_cache(() => _getProductBySlug(slug), ['product', slug], {
-    revalidate: 60,
+    revalidate: 3600,
     tags: ['products'],
   })()
 
@@ -371,7 +371,7 @@ export const getProductVariants = async (
   const variants = await unstable_cache(
     () => _getProductVariants(group),
     ['product-variants', group],
-    { revalidate: 60, tags: ['products'] }
+    { revalidate: 3600, tags: ['products'] }
   )()
   return gateProducts(variants)
 }
@@ -383,7 +383,7 @@ export const getProductVariantsStatic = async (
   const variants = await unstable_cache(
     () => _getProductVariants(group),
     ['product-variants', group],
-    { revalidate: 60, tags: ['products'] }
+    { revalidate: 3600, tags: ['products'] }
   )()
   return variants.map(stripProductPricing)
 }
@@ -439,7 +439,7 @@ export const getRelatedProducts = async (
   const related = await unstable_cache(
     () => _getRelatedProducts(product.id, product.category_id, limit, group),
     ['related', product.id, String(limit), group ?? ''],
-    { revalidate: 60, tags: ['products'] }
+    { revalidate: 3600, tags: ['products'] }
   )()
   return gateProducts(related)
 }
@@ -453,7 +453,7 @@ export const getRelatedProductsStatic = async (
   const related = await unstable_cache(
     () => _getRelatedProducts(product.id, product.category_id, limit, group),
     ['related', product.id, String(limit), group ?? ''],
-    { revalidate: 60, tags: ['products'] }
+    { revalidate: 3600, tags: ['products'] }
   )()
   return related.map(stripProductPricing)
 }
@@ -594,7 +594,7 @@ export const getActiveBanners = (
   unstable_cache(
     () => _getActiveBanners(placement, lang),
     ['banners', placement, lang],
-    { revalidate: 120, tags: ['banners'] }
+    { revalidate: 3600, tags: ['banners'] }
   )()
 
 // ============================================
@@ -717,7 +717,7 @@ export const getBlogPosts = (lang: Locale = 'lt') =>
   unstable_cache(
     () => _getBlogPosts(lang),
     ['blog-posts', lang],
-    { revalidate: 60, tags: ['blog'] }
+    { revalidate: 3600, tags: ['blog'] }
   )()
 
 async function _getBlogPostBySlug(
@@ -755,7 +755,7 @@ export const getBlogPostBySlug = (slug: string, lang: Locale = 'lt') =>
   unstable_cache(
     () => _getBlogPostBySlug(slug, lang),
     ['blog-post', slug, lang],
-    { revalidate: 60, tags: ['blog'] }
+    { revalidate: 3600, tags: ['blog'] }
   )()
 
 // ============================================

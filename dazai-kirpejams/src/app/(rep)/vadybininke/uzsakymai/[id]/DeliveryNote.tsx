@@ -16,12 +16,18 @@ export function DeliveryNote({
   createdAt,
   clientName,
   items,
+  subtotalCents,
+  deliveryCostCents,
+  vatCents,
   totalCents,
 }: {
   orderNumber: string
   createdAt: string
   clientName: string
   items: Item[]
+  subtotalCents: number
+  deliveryCostCents: number
+  vatCents: number
   totalCents: number
 }) {
   const totalQty = items.reduce((s, i) => s + i.quantity, 0)
@@ -88,13 +94,38 @@ export function DeliveryNote({
                 </td>
               </tr>
             ))}
-            <tr className="border-t-2 border-black font-bold">
-              <td className="py-2 pr-2" colSpan={2}>
-                Iš viso
+            <tr className="border-t-2 border-black">
+              <td className="py-2 pr-2 font-semibold" colSpan={2}>
+                Iš viso, vnt.
               </td>
-              <td className="py-2 pr-2 text-right tabular-nums">{totalQty}</td>
-              <td />
+              <td className="py-2 pr-2 text-right tabular-nums font-semibold">{totalQty}</td>
+              <td className="py-2 pr-2 text-right text-gray-600">Tarpinė suma</td>
               <td className="py-2 pr-2 text-right tabular-nums">
+                {PRICE.format(subtotalCents / 100)}
+              </td>
+            </tr>
+            {deliveryCostCents > 0 && (
+              <tr>
+                <td colSpan={3} />
+                <td className="py-1 pr-2 text-right text-gray-600">Pristatymas</td>
+                <td className="py-1 pr-2 text-right tabular-nums">
+                  {PRICE.format(deliveryCostCents / 100)}
+                </td>
+              </tr>
+            )}
+            {vatCents > 0 && (
+              <tr>
+                <td colSpan={3} />
+                <td className="py-1 pr-2 text-right text-gray-600">PVM</td>
+                <td className="py-1 pr-2 text-right tabular-nums">
+                  {PRICE.format(vatCents / 100)}
+                </td>
+              </tr>
+            )}
+            <tr className="font-bold">
+              <td colSpan={3} />
+              <td className="py-2 pr-2 text-right">Iš viso</td>
+              <td className="py-2 pr-2 text-right tabular-nums border-t border-black">
                 {PRICE.format(totalCents / 100)}
               </td>
             </tr>

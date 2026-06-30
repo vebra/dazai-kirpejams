@@ -23,9 +23,12 @@ function isActive(pathname: string, href: string, exact?: boolean) {
   return exact ? pathname === href : pathname.startsWith(href)
 }
 
-/** Užsakymų ženkliukas: raudonas — atmesti (reikia dėmesio), magenta — laukiantys. */
+/**
+ * Užsakymų ženkliukas: rodo VISŲ laukiančių + atmestų sumą (nieko neslepia).
+ * Raudonas, kai yra atmestų (reikia dėmesio), kitu atveju magenta — laukiantys.
+ */
 function OrdersBadge({ pending = 0, rejected = 0 }: Badges) {
-  const count = rejected > 0 ? rejected : pending
+  const count = pending + rejected
   if (count === 0) return null
   return (
     <span

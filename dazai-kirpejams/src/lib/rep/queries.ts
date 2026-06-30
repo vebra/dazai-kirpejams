@@ -288,6 +288,9 @@ export type RepOrderDetail = {
   clientId: string | null
   clientName: string | null
   paymentMethod: string
+  subtotalCents: number
+  deliveryCostCents: number
+  vatCents: number
   totalCents: number
   items: Array<{
     productId: string | null
@@ -309,7 +312,7 @@ export async function getMyRepOrderDetail(orderId: string): Promise<RepOrderDeta
   const { data, error } = await supabase
     .from('orders')
     .select(
-      `id, order_number, created_at, total_cents, approval_status, rejection_reason, notes, payment_method, client_id,
+      `id, order_number, created_at, subtotal_cents, delivery_cost_cents, vat_cents, total_cents, approval_status, rejection_reason, notes, payment_method, client_id,
        clients ( name ),
        order_items ( product_id, product_name, product_sku, quantity, unit_price_cents, total_cents )`
     )
@@ -330,6 +333,9 @@ export async function getMyRepOrderDetail(orderId: string): Promise<RepOrderDeta
     clientId: d.client_id ?? null,
     clientName: d.clients?.name ?? null,
     paymentMethod: d.payment_method,
+    subtotalCents: d.subtotal_cents ?? 0,
+    deliveryCostCents: d.delivery_cost_cents ?? 0,
+    vatCents: d.vat_cents ?? 0,
     totalCents: d.total_cents,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     items: (d.order_items ?? []).map((it: any) => ({
