@@ -41,15 +41,96 @@ function RequestCard({
   const [error, setError] = useState<string | null>(null)
   const [rejecting, setRejecting] = useState(false)
   const [reason, setReason] = useState('')
+  const [sheet, setSheet] = useState<{
+    rep: string
+    at: string
+    items: { name: string; qty: number; balance: number }[]
+  } | null>(null)
   const units = req.items.reduce((s, i) => s + i.qty, 0)
 
   function approve() {
     setError(null)
     start(async () => {
       const res = await approveIssueRequest(req.id)
-      if (res.ok) onDone()
-      else setError(res.error ?? 'Nepavyko patvirtinti.')
+      if (res.ok) {
+        if (res.issued) setSheet(res.issued)
+        else onDone()
+      } else setError(res.error ?? 'Nepavyko patvirtinti.')
     })
+  }
+
+  // Po patvirtinimo — spausdinamas išvežimo lapas.
+  if (sheet) {
+    const total = sheet.items.reduce((s, i) => s + i.qty, 0)
+    return (
+      <div>
+        <div className="print-hide mb-3 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="px-5 py-2.5 bg-brand-magenta text-white rounded-lg font-semibold text-sm hover:bg-brand-magenta-dark transition-colors"
+          >
+            🖨 Spausdinti
+          </button>
+          <button
+            type="button"
+            onClick={onDone}
+            className="px-5 py-2.5 bg-white border border-[#ddd] text-brand-gray-900 rounded-lg font-semibold text-sm hover:bg-[#F5F5F7] transition-colors"
+          >
+            Uždaryti
+          </button>
+        </div>
+
+        <div className="print-area max-w-3xl bg-white">
+          <header className="border-b border-black pb-4 mb-6">
+            <h1 className="text-2xl font-bold">Prekių išvežimo lapas</h1>
+            <div className="mt-3 flex items-center justify-between text-sm flex-wrap gap-2">
+              <div>
+                Vadybininkė: <strong>{sheet.rep}</strong>
+              </div>
+              <div>Data: {DATE.format(new Date(sheet.at))}</div>
+            </div>
+          </header>
+
+          <table className="w-full text-[13px] border-collapse">
+            <thead>
+              <tr className="border-b-2 border-black text-left">
+                <th className="py-2 pr-2 w-[28px]">#</th>
+                <th className="py-2 pr-2">Prekė</th>
+                <th className="py-2 pr-2 text-right w-[90px]">Išduota</th>
+                <th className="py-2 pr-2 text-right w-[120px]">Liko sandėlyje</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sheet.items.map((i, idx) => (
+                <tr key={idx} className="border-b border-gray-300">
+                  <td className="py-1.5 pr-2 tabular-nums">{idx + 1}</td>
+                  <td className="py-1.5 pr-2">{i.name}</td>
+                  <td className="py-1.5 pr-2 text-right tabular-nums font-semibold">{i.qty}</td>
+                  <td className="py-1.5 pr-2 text-right tabular-nums">{i.balance}</td>
+                </tr>
+              ))}
+              <tr className="border-t-2 border-black font-bold">
+                <td className="py-2 pr-2" colSpan={2}>
+                  Iš viso
+                </td>
+                <td className="py-2 pr-2 text-right tabular-nums">{total}</td>
+                <td />
+              </tr>
+            </tbody>
+          </table>
+
+          <div className="mt-12 grid grid-cols-2 gap-8 text-[12px]">
+            <div className="border-t border-gray-400 pt-1.5">Išdavė (parašas)</div>
+            <div className="border-t border-gray-400 pt-1.5">Priėmė (parašas)</div>
+          </div>
+
+          <footer className="mt-8 pt-4 border-t border-gray-400 text-[11px] text-gray-600">
+            Color SHOCK · Dažai Kirpėjams · Prekių išvežimas vadybininkei
+          </footer>
+        </div>
+      </div>
+    )
   }
 
   function reject() {

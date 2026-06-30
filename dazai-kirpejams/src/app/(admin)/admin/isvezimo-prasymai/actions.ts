@@ -10,7 +10,12 @@ import { createServerClient } from '@/lib/supabase/server'
  * jos atsargos +). Service-role: RPC granted tik service_role, o sprendimo
  * įrašymas bypass'ina RLS (puslapis ir veiksmai gating'inami requireAdmin()).
  */
-export type IssueReqResult = { ok: boolean; error?: string }
+export type IssuedSheetItem = { name: string; qty: number; balance: number }
+export type IssueReqResult = {
+  ok: boolean
+  error?: string
+  issued?: { rep: string; at: string; items: IssuedSheetItem[] }
+}
 
 export async function approveIssueRequest(id: string): Promise<IssueReqResult> {
   await requireAdmin()
@@ -49,7 +54,13 @@ export async function approveIssueRequest(id: string): Promise<IssueReqResult> {
     p_rep: repName,
     p_rep_id: req.rep_id,
   })
-  const r = res as { ok?: boolean; reason?: string; stock?: number; name?: string } | null
+  const r = res as {
+    ok?: boolean
+    reason?: string
+    stock?: number
+    name?: string
+    items?: Array<{ name: string; qty: number; balance: number }>
+  } | null
   if (rErr || !r?.ok) {
     const msg =
       r?.reason === 'insufficient_stock'
@@ -67,7 +78,14 @@ export async function approveIssueRequest(id: string): Promise<IssueReqResult> {
   revalidatePath('/admin/isvezimo-prasymai')
   revalidatePath('/admin/sandelis', 'layout')
   revalidatePath('/admin')
-  return { ok: true }
+  return {
+    ok: true,
+    issued: {
+      rep: repName,
+      at: new Date().toISOString(),
+      items: (r.items ?? []).map((i) => ({ name: i.name, qty: i.qty, balance: i.balance })),
+    },
+  }
 }
 
 export async function rejectIssueRequest(
