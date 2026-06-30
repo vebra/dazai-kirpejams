@@ -3,6 +3,7 @@ import {
   getMyClients,
   getRepOrderProducts,
   getMyRepOrderDetail,
+  getMyStockSummary,
 } from '@/lib/rep/queries'
 import { getCompanyInfo, getShippingSettings } from '@/lib/admin/queries'
 import {
@@ -28,12 +29,18 @@ export default async function NewRepOrderPage({
 }) {
   await requireSalesRep()
 
-  const [clients, products, company, shipping] = await Promise.all([
+  const [clients, products, company, shipping, stockSummary] = await Promise.all([
     getMyClients(),
     getRepOrderProducts(),
     getCompanyInfo().catch(() => null),
     getShippingSettings(),
+    getMyStockSummary(),
   ])
+
+  // Kiek vadybininkė pati turi atsargose (held) — leidžiam užsakyti iki
+  // max(sandėlis, atsargos), kad nepristigtų nei sandėlio, nei jos pačios prekių.
+  const heldByProduct: Record<string, number> = {}
+  for (const r of stockSummary) if (r.onHand > 0) heldByProduct[r.productId] = r.onHand
 
   // Pakartojimas: ?repeat=orderId — užpildom klientą ir prekes iš seno užsakymo.
   const sp = await searchParams
@@ -80,6 +87,7 @@ export default async function NewRepOrderPage({
         deliveryOptions={deliveryOptions}
         freeShippingThresholdCents={shipping.freeShippingThresholdCents}
         vatRate={vatRate}
+        heldByProduct={heldByProduct}
         initialClientId={initialClientId}
         initialCart={initialCart}
       />

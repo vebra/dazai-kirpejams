@@ -2362,7 +2362,7 @@ export async function getPendingRepOrders(): Promise<PendingRepOrder[]> {
        delivery_city, delivery_address, delivery_postal_code,
        placed_by,
        clients ( name, pricing_tier ),
-       order_items ( product_name, product_sku, quantity, unit_price_cents, total_cents )`
+       order_items ( product_id, product_name, product_sku, quantity, unit_price_cents, total_cents )`
     )
     .eq('approval_status', 'pending')
     .order('created_at', { ascending: false })
@@ -2389,6 +2389,7 @@ export async function getPendingRepOrders(): Promise<PendingRepOrder[]> {
     placed_by: string | null
     clients: { name: string; pricing_tier: string } | null
     order_items: Array<{
+      product_id: string | null
       product_name: string
       product_sku: string | null
       quantity: number
@@ -2435,6 +2436,7 @@ export async function getPendingRepOrders(): Promise<PendingRepOrder[]> {
     clientTier: r.clients?.pricing_tier ?? null,
     repName: r.placed_by ? repNames.get(r.placed_by) ?? null : null,
     items: (r.order_items ?? []).map((i) => ({
+      productId: i.product_id,
       productName: i.product_name,
       productSku: i.product_sku,
       quantity: i.quantity,

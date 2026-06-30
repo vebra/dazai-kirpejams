@@ -14,6 +14,7 @@ export const TIER_LABELS: Record<string, string> = {
 }
 
 export type PendingRepOrderItem = {
+  productId: string | null
   productName: string
   productSku: string | null
   quantity: number
