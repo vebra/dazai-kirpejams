@@ -57,6 +57,10 @@ export type CampaignEmailInput = {
   /** Email atidarymo tracking pixel URL — per recipient_id įterpia 1×1 PNG.
    * Jei null/undefined — pixel'is nepridedamas (pvz. testiniam siuntimui). */
   trackingPixelUrl?: string | null
+  /** Atsisakymo nuoroda (HMAC, be prisijungimo). GDPR/ePrivacy reikalauja jos
+   * kiekviename marketingo laiške. Jei null (pvz. testinis siuntimas adminui) —
+   * footer'yje nerodoma. */
+  unsubscribeUrl?: string | null
 }
 
 export function buildCampaignEmail(input: CampaignEmailInput): {
@@ -115,6 +119,13 @@ export function buildCampaignEmail(input: CampaignEmailInput): {
             <strong style="color:${GRAY_900};">Dažai Kirpėjams</strong> ·
             <a href="${input.siteUrl}" style="color:${BRAND_MAGENTA};text-decoration:none;">${input.siteUrl.replace(/^https?:\/\//, '')}</a>
           </p>
+          ${
+            input.unsubscribeUrl
+              ? `<p style="margin:12px 0 0;font-size:11px;color:${GRAY_500};line-height:1.6;">
+            Nebenorite gauti pasiūlymų? <a href="${input.unsubscribeUrl}" style="color:${GRAY_500};text-decoration:underline;">Atsisakyti naujienlaiškių</a>
+          </p>`
+              : ''
+          }
         </td>
       </tr>
     </table>
@@ -137,7 +148,13 @@ ${input.body}
 Jei turite klausimų — tiesiog atsakykite į šį laišką.
 
 Dažai Kirpėjams
-${input.siteUrl}`
+${input.siteUrl}${
+    input.unsubscribeUrl
+      ? `
+
+Atsisakyti naujienlaiškių: ${input.unsubscribeUrl}`
+      : ''
+  }`
 
   return { subject: input.subject, html, text }
 }

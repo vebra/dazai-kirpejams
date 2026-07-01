@@ -101,15 +101,16 @@ export function ReminderStatus({
   const startsAt = new Date(startsAtIso).getTime()
   const hoursUntil = Math.round((startsAt - Date.now()) / (60 * 60 * 1000))
 
+  // Langas turi sutapti su /api/cron/event-reminders (12–36h prieš startą).
   let cronInfo: string
   if (hoursUntil <= 0) {
     cronInfo = 'Cron nebesiųs (renginys jau įvyko / vyksta)'
-  } else if (hoursUntil >= 20 && hoursUntil <= 28) {
+  } else if (hoursUntil >= 12 && hoursUntil <= 36) {
     cronInfo = 'Cron šiuo metu yra siuntimo lange'
-  } else if (hoursUntil < 20) {
+  } else if (hoursUntil < 12) {
     cronInfo = `Cron praėjo siuntimo langą (liko ${hoursUntil}h)`
   } else {
-    cronInfo = `Cron įsijungs likus ~24h (dabar ~${hoursUntil}h)`
+    cronInfo = `Cron įsijungs likus ~parai (dabar ~${hoursUntil}h)`
   }
 
   return (
