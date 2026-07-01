@@ -2225,14 +2225,19 @@ export async function getReportsData(
     ordersQuery = ordersQuery.gte('created_at', since)
   }
 
+  // Eksplicitinis limit — be jo PostgREST default'as (1000 eilučių) tyliai
+  // apkirptų ataskaitas augant užsakymų kiekiui (pajamos/top prekės būtų
+  // skaičiuojamos tik iš dalies duomenų, be jokio signalo).
+  const MAX_REPORT_ROWS = 20000
   const [ordersRes, allOrderIdsRes] = await Promise.all([
-    ordersQuery.order('created_at', { ascending: true }),
+    ordersQuery.order('created_at', { ascending: true }).limit(MAX_REPORT_ROWS),
     since
       ? supabase
           .from('orders')
           .select('id')
           .gte('created_at', since)
-      : supabase.from('orders').select('id'),
+          .limit(MAX_REPORT_ROWS)
+      : supabase.from('orders').select('id').limit(MAX_REPORT_ROWS),
   ])
 
   const orders = ordersRes.data ?? []
@@ -2245,7 +2250,9 @@ export async function getReportsData(
     const batchSize = 200
     for (let i = 0; i < orderIds.length; i += batchSize) {
       const batch = orderIds.slice(i, i + batchSize)
-      const { data } = await itemsQuery.in('order_id', batch)
+      // limit > batchSize × max prekių užsakyme — kad PostgREST 1000 eilučių
+      // default'as neapkirptų batch'o su daug pozicijų.
+      const { data } = await itemsQuery.in('order_id', batch).limit(MAX_REPORT_ROWS)
       if (data) items = items.concat(data)
       // Reset query for next batch
       itemsQuery = supabase

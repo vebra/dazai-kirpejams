@@ -63,7 +63,7 @@ export async function markOrderReceivedAction(
   const { data: order, error: loadErr } = await admin
     .from('orders')
     .select(
-      'id, order_number, email, first_name, status, total_cents, vat_cents, tracking_number, tracking_carrier'
+      'id, order_number, email, first_name, status, total_cents, vat_cents, tracking_number, tracking_carrier, locale'
     )
     .eq('order_number', orderNumber)
     .maybeSingle()
@@ -117,6 +117,10 @@ export async function markOrderReceivedAction(
     const siteUrl =
       process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
       'https://www.dazaikirpejams.lt'
+    // Laiško kalba — kokia kalba klientas pirko (orders.locale), ne route'o
+    // lang (klientas galėjo atsidaryti nuorodą kita kalba).
+    const emailLang: 'lt' | 'en' | 'ru' =
+      order.locale === 'en' || order.locale === 'ru' ? order.locale : 'lt'
     const payload = buildStatusChangeEmail({
       orderNumber: order.order_number,
       firstName: order.first_name,
@@ -124,6 +128,7 @@ export async function markOrderReceivedAction(
       trackingNumber: order.tracking_number ?? null,
       trackingCarrier: order.tracking_carrier ?? null,
       siteUrl,
+      lang: emailLang,
     })
     await sendEmail({
       to: order.email,

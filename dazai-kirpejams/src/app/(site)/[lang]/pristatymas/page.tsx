@@ -9,11 +9,11 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumbSchema } from '@/lib/schema'
 import { CONTACT, phoneHref } from '@/lib/site'
 import { getShippingSettings } from '@/lib/admin/queries'
-import { langPrefix } from '@/lib/utils'
+import { langPrefix, formatEurByLang } from '@/lib/utils'
 
-/** €1000 (centai) → „€10,00" — lentelės formatas. */
-function priceLabel(cents: number): string {
-  return `€${(cents / 100).toFixed(2).replace('.', ',')}`
+/** €1000 (centai) → „€10,00" (LT/RU) arba „€10.00" (EN) — lentelės formatas. */
+function priceLabel(cents: number, lang: string): string {
+  return formatEurByLang(cents / 100, lang)
 }
 
 export const revalidate = 300
@@ -156,8 +156,8 @@ export default async function DeliveryPage({
                 </thead>
                 <tbody>
                   {[
-                    { method: `🚚 ${t.courierTitle}`, term: t.courierTime, price: priceLabel(shipping.courierCents), free: true },
-                    { method: '📦 Omniva', term: t.parcelTime, price: priceLabel(shipping.parcelLockerCents), free: true },
+                    { method: `🚚 ${t.courierTitle}`, term: t.courierTime, price: priceLabel(shipping.courierCents, lang), free: true },
+                    { method: '📦 Omniva', term: t.parcelTime, price: priceLabel(shipping.parcelLockerCents, lang), free: true },
                     { method: `🏢 ${t.pickupTitle}`, term: t.pickupTime, price: t.free, free: true, priceIsFree: true },
                   ].map((row) => (
                     <tr

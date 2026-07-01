@@ -37,7 +37,10 @@ export function organizationSchema(): Record<string, unknown> {
     description:
       'Profesionalūs plaukų dažai kirpėjams ir koloristams. Didesnė 180 ml talpa — daugiau vertės darbui salone.',
     legalName: COMPANY.legalName,
-    taxID: COMPANY.code,
+    // taxID TYČIA nededamas (savininkės sprendimas 2026-07-02): IV veiklos
+    // kodas yra asmens kodo formato — pirkimo sąlygose kaip privalomas
+    // rekvizitas lieka, bet masiškai botų nuskaitomame sitewide JSON-LD jo
+    // skelbti nereikia.
     address: {
       '@type': 'PostalAddress',
       streetAddress: CONTACT.street,

@@ -23,7 +23,7 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { itemListSchema, breadcrumbSchema } from '@/lib/schema'
 import { buildCanonicalUrl, buildLanguageAlternates } from '@/lib/seo'
 import { locales } from '@/i18n/config'
-import { langPrefix } from '@/lib/utils'
+import { langPrefix, formatEurByLang } from '@/lib/utils'
 import { DYE_PALETTE_TARGET_COUNT } from '@/lib/data/dye-categories'
 
 export async function generateMetadata({
@@ -177,7 +177,7 @@ export default async function CategoryPage({
             )}
             <div className="inline-flex items-center gap-1.5 text-[0.85rem] lg:text-[0.95rem] text-brand-gray-500 px-3.5 lg:px-5 py-1.5 lg:py-2 bg-brand-gray-50 rounded-full">
               <strong className="text-brand-magenta font-bold">
-                Nuo €{minPrice.toFixed(2)}
+                {dict.categoryPage.fromPrice} {formatEurByLang(minPrice, lang)}
               </strong>
             </div>
           </div>
@@ -222,7 +222,7 @@ export default async function CategoryPage({
               </div>
               <div>
                 <strong className="block text-brand-magenta text-[1.2rem] font-extrabold mb-1">
-                  Nuo €{minPrice.toFixed(2)}
+                  {dict.categoryPage.fromPrice} {formatEurByLang(minPrice, lang)}
                 </strong>
                 <span className="text-[0.85rem] text-white/60">
                   {dict.categoryPage.advPerUnit}
