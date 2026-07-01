@@ -125,15 +125,20 @@ export async function getApprovedUsersWithNotes(): Promise<ApprovedUserRow[]> {
     return []
   }
 
-  // Email gaunam iš auth.users per admin API (kaip ir verifikacijos UI)
-  const { data: usersData } = await supabase.auth.admin.listUsers({
-    page: 1,
-    perPage: 1000,
-  })
-
+  // Email gaunam iš auth.users per admin API (kaip ir verifikacijos UI).
+  // Puslapiuojama iki 5000 vartotojų — vien pirmo puslapio neužtenka augant
+  // bazei (auditas B14).
   const emailMap = new Map<string, string>()
-  for (const u of usersData?.users ?? []) {
-    if (u.email) emailMap.set(u.id, u.email)
+  for (let page = 1; page <= 5; page++) {
+    const { data: usersData } = await supabase.auth.admin.listUsers({
+      page,
+      perPage: 1000,
+    })
+    const users = usersData?.users ?? []
+    for (const u of users) {
+      if (u.email) emailMap.set(u.id, u.email)
+    }
+    if (users.length < 1000) break
   }
 
   return profiles

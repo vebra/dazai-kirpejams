@@ -705,25 +705,8 @@ export async function deleteSupplierOrderAction(
 // Likučio MAŽINIMAS čia negalimas — perteklių taisyti per Reviziją.
 
 export type SupplierOrderStatus = 'ordered' | 'partial' | 'received'
-
-type StoredSupplierDetail = {
-  productId: string
-  name: string
-  nameEn: string | null
-  colorNumber: string | null
-  sku: string | null
-  ean: string | null
-  stockAtOrder: number
-  qty: number
-  received?: number
-}
-
-function computeOrderStatus(details: StoredSupplierDetail[]): SupplierOrderStatus {
-  const totalReceived = details.reduce((s, i) => s + (i.received ?? 0), 0)
-  if (totalReceived === 0) return 'ordered'
-  const allFull = details.every((i) => (i.received ?? 0) >= i.qty)
-  return allFull ? 'received' : 'partial'
-}
+// Statusas ir `received` žymos nuo 078 skaičiuojami DB pusėje
+// (supplier_order_status + receive_supplier_order_* RPC su FOR UPDATE).
 
 export type ReceiveOrderItemResult =
   | {
@@ -738,10 +721,11 @@ export type ReceiveOrderItemResult =
   | { ok: false; error: string }
 
 /**
- * Priima vieną užsakymo prekę: +delta prie likučio (RPC, source „Tiekėjo
- * užsakymas") IR +delta prie užsakymo `received` žymos. Likutį didinam per
- * sesijos klientą (RPC tikrina is_admin() pagal auth.uid), o užsakymą rašom
- * per service_role (supplier_orders neturi UPDATE RLS).
+ * Priima vieną užsakymo prekę per ATOMINĮ receive_supplier_order_item RPC
+ * (078): likutis + žurnalas + `received` žyma + statusas vienoje
+ * transakcijoje su FOR UPDATE. Anksčiau žingsniai buvo du atskiri app'e —
+ * žymos klaida būdavo nuryjama, o du įrenginiai skenuodami lygiagrečiai
+ * perrašydavo vienas kito žymas (auditas B5/B6).
  */
 export async function receiveOrderItemAction(
   orderId: string,
@@ -752,41 +736,36 @@ export async function receiveOrderItemAction(
   if (!orderId || !productId) return { ok: false, error: 'Trūksta duomenų.' }
   const d = Number.isInteger(delta) && delta > 0 && delta <= 100000 ? delta : 1
 
-  const admin = createServerClient()
-  const { data: order, error: fErr } = await admin
-    .from('supplier_orders')
-    .select('details')
-    .eq('id', orderId)
-    .single()
-  if (fErr || !order) return { ok: false, error: 'Užsakymas nerastas.' }
-
-  const details = ((order.details ?? []) as StoredSupplierDetail[]).map((i) => ({ ...i }))
-  const idx = details.findIndex((i) => i.productId === productId)
-  if (idx === -1) return { ok: false, error: 'Šios prekės nėra šiame užsakyme.' }
-
-  // 1) Didinam tikrą likutį
+  // Sesijos klientas — RPC viduje tikrina is_admin() pagal auth.uid
   const session = await createServerSupabase()
-  const { data: rpcData, error: rpcErr } = await session.rpc(
-    'receive_stock_by_product_id',
-    { p_product_id: productId, p_delta: d, p_source: 'Tiekėjo užsakymas' }
-  )
-  if (rpcErr) {
-    console.error('[admin/sandelis/actions] receiveOrderItem rpc:', rpcErr.message)
-    return { ok: false, error: 'Nepavyko atnaujinti likučio.' }
-  }
-  const r = rpcData as { found?: boolean; name?: string; stock?: number }
-  if (!r?.found) return { ok: false, error: 'Prekė nerasta (galbūt ištrinta).' }
-
-  // 2) Didinam užsakymo žymą + statusą
-  details[idx].received = (details[idx].received ?? 0) + d
-  const status = computeOrderStatus(details)
-  const { error: uErr } = await admin
-    .from('supplier_orders')
-    .update({ details, status })
-    .eq('id', orderId)
-  if (uErr) {
-    console.error('[admin/sandelis/actions] receiveOrderItem update:', uErr.message)
-    // Likutis jau pridėtas — grąžinam ok, kad UI rodytų realią būseną.
+  const { data, error } = await session.rpc('receive_supplier_order_item', {
+    p_order_id: orderId,
+    p_product_id: productId,
+    p_delta: d,
+  })
+  const r = data as {
+    ok?: boolean
+    reason?: string
+    name?: string
+    stock?: number
+    received?: number
+    qty?: number
+    status?: SupplierOrderStatus
+  } | null
+  if (error || !r?.ok) {
+    console.error(
+      '[admin/sandelis/actions] receiveOrderItem:',
+      error?.message ?? r?.reason
+    )
+    const msg =
+      r?.reason === 'order_not_found'
+        ? 'Užsakymas nerastas.'
+        : r?.reason === 'item_not_found'
+          ? 'Šios prekės nėra šiame užsakyme.'
+          : r?.reason === 'product_not_found'
+            ? 'Prekė nerasta (galbūt ištrinta).'
+            : 'Nepavyko priimti prekės.'
+    return { ok: false, error: msg }
   }
 
   revalidatePath('/admin/sandelis', 'layout')
@@ -795,11 +774,11 @@ export async function receiveOrderItemAction(
   return {
     ok: true,
     productId,
-    name: r.name ?? details[idx].name,
+    name: r.name ?? '',
     stock: r.stock ?? 0,
-    received: details[idx].received,
-    qty: details[idx].qty,
-    status,
+    received: r.received ?? 0,
+    qty: r.qty ?? 0,
+    status: r.status ?? 'partial',
   }
 }
 
@@ -808,8 +787,10 @@ export type ReceiveAllResult =
   | { ok: false; error: string }
 
 /**
- * Priima VISAS likusias užsakymo prekes (kiekvienai prideda trūkstamą kiekį iki
- * užsakyto). Praleidžia jau pilnai gautas ir ištrintas prekes.
+ * Priima VISAS likusias užsakymo prekes per ATOMINĮ receive_supplier_order_all
+ * RPC (078) — trūkstami kiekiai skaičiuojami DB pusėje su FOR UPDATE, tad
+ * pasenusi `received` žyma nebegali sukelti dvigubo likučio pridėjimo.
+ * Praleidžia jau pilnai gautas ir ištrintas prekes.
  */
 export async function receiveAllRemainingAction(
   orderId: string
@@ -817,53 +798,40 @@ export async function receiveAllRemainingAction(
   await requireAdmin()
   if (!orderId) return { ok: false, error: 'Trūksta užsakymo.' }
 
-  const admin = createServerClient()
-  const { data: order, error: fErr } = await admin
-    .from('supplier_orders')
-    .select('details')
-    .eq('id', orderId)
-    .single()
-  if (fErr || !order) return { ok: false, error: 'Užsakymas nerastas.' }
-
-  const details = ((order.details ?? []) as StoredSupplierDetail[]).map((i) => ({ ...i }))
   const session = await createServerSupabase()
-  let units = 0
-  let touched = 0
-  for (const it of details) {
-    const remaining = it.qty - (it.received ?? 0)
-    if (remaining <= 0) continue
-    const { data, error } = await session.rpc('receive_stock_by_product_id', {
-      p_product_id: it.productId,
-      p_delta: remaining,
-      p_source: 'Tiekėjo užsakymas',
-    })
-    const rr = data as { found?: boolean } | null
-    if (error || !rr?.found) {
-      console.error(
-        '[admin/sandelis/actions] receiveAll item:',
-        it.productId,
-        error?.message ?? 'not found'
-      )
-      continue
+  const { data, error } = await session.rpc('receive_supplier_order_all', {
+    p_order_id: orderId,
+  })
+  const r = data as {
+    ok?: boolean
+    reason?: string
+    received_units?: number
+    items_touched?: number
+    status?: SupplierOrderStatus
+  } | null
+  if (error || !r?.ok) {
+    console.error(
+      '[admin/sandelis/actions] receiveAll:',
+      error?.message ?? r?.reason
+    )
+    return {
+      ok: false,
+      error:
+        r?.reason === 'order_not_found'
+          ? 'Užsakymas nerastas.'
+          : 'Nepavyko priimti prekių.',
     }
-    it.received = it.qty
-    units += remaining
-    touched++
-  }
-
-  const status = computeOrderStatus(details)
-  const { error: uErr } = await admin
-    .from('supplier_orders')
-    .update({ details, status })
-    .eq('id', orderId)
-  if (uErr) {
-    console.error('[admin/sandelis/actions] receiveAll update:', uErr.message)
   }
 
   revalidatePath('/admin/sandelis', 'layout')
   revalidatePath('/admin/sandelis/uzsakyti/istorija')
   revalidateTag('products', 'max')
-  return { ok: true, receivedUnits: units, itemsTouched: touched, status }
+  return {
+    ok: true,
+    receivedUnits: r.received_units ?? 0,
+    itemsTouched: r.items_touched ?? 0,
+    status: r.status ?? 'received',
+  }
 }
 
 export type SetReceivedResult =
@@ -885,31 +853,38 @@ export async function setOrderItemReceivedAction(
     return { ok: false, error: 'Neteisingas kiekis.' }
   }
 
-  const admin = createServerClient()
-  const { data: order, error: fErr } = await admin
-    .from('supplier_orders')
-    .select('details')
-    .eq('id', orderId)
-    .single()
-  if (fErr || !order) return { ok: false, error: 'Užsakymas nerastas.' }
-
-  const details = ((order.details ?? []) as StoredSupplierDetail[]).map((i) => ({ ...i }))
-  const idx = details.findIndex((i) => i.productId === productId)
-  if (idx === -1) return { ok: false, error: 'Šios prekės nėra šiame užsakyme.' }
-
-  details[idx].received = received
-  const status = computeOrderStatus(details)
-  const { error: uErr } = await admin
-    .from('supplier_orders')
-    .update({ details, status })
-    .eq('id', orderId)
-  if (uErr) {
-    console.error('[admin/sandelis/actions] setOrderItemReceived:', uErr.message)
-    return { ok: false, error: 'Nepavyko išsaugoti.' }
+  // Atominis RPC (078) su FOR UPDATE — lygiagretus skenavimas iš kito
+  // įrenginio nebeperrašo žymos (lost update, auditas B6).
+  const session = await createServerSupabase()
+  const { data, error } = await session.rpc('set_supplier_order_received', {
+    p_order_id: orderId,
+    p_product_id: productId,
+    p_received: received,
+  })
+  const r = data as {
+    ok?: boolean
+    reason?: string
+    received?: number
+    status?: SupplierOrderStatus
+  } | null
+  if (error || !r?.ok) {
+    console.error(
+      '[admin/sandelis/actions] setOrderItemReceived:',
+      error?.message ?? r?.reason
+    )
+    return {
+      ok: false,
+      error:
+        r?.reason === 'order_not_found'
+          ? 'Užsakymas nerastas.'
+          : r?.reason === 'item_not_found'
+            ? 'Šios prekės nėra šiame užsakyme.'
+            : 'Nepavyko išsaugoti.',
+    }
   }
 
   revalidatePath('/admin/sandelis/uzsakyti/istorija')
-  return { ok: true, received, status }
+  return { ok: true, received: r.received ?? received, status: r.status ?? 'partial' }
 }
 
 // ============================================

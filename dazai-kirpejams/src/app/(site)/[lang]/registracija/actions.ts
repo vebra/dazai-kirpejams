@@ -118,6 +118,16 @@ export async function registerAction(
     return { error: errors.createAccountFailed, values: echoValues(formData) }
   }
 
+  // Dublikato patikra su įjungtu email confirmation: Supabase dėl enumeration
+  // protection egzistuojančiam el. paštui grąžina NE klaidą, o obfuskuotą
+  // user objektą su TUŠČIU identities masyvu (naujas UUID, kurio auth.users
+  // realiai nėra). Be šios patikros dublikato registracija atrodydavo
+  // sėkminga: profilio upsert lūždavo ant FK, o vartotojas laukdavo
+  // patvirtinimo laiško, kuris niekada neateis (auditas B19).
+  if (signUpData.user.identities && signUpData.user.identities.length === 0) {
+    return { error: errors.emailAlreadyRegistered, values: echoValues(formData) }
+  }
+
   const serviceClient = createServiceClient()
   // SVARBU: `upsert`, ne `insert`. Migracija 018 trigger'iu jau sukuria
   // user_profiles eilutę (id + pending) iškart po signUp, todėl `insert`

@@ -341,11 +341,19 @@ export async function sendCampaignAction(formData: FormData): Promise<void> {
     redirect(`/admin/kampanijos/${id}?error=already-sent`)
   }
 
-  // 1) Pažymim sending iškart, kad UI neleistų antrą kartą spustelėti
-  await supabase
+  // 1) Atominis compare-and-swap į 'sending': update sąlygotas .eq('status',
+  // 'draft') — du lygiagretūs paspaudimai (dvi kortelės/dvigubas klikas)
+  // nebepraeis abu: antrasis nepakeis nė vienos eilutės ir bus atmestas
+  // (auditas B15 — anksčiau patikra ir update buvo neatominiai TOCTOU).
+  const { data: claimed } = await supabase
     .from('marketing_campaigns')
     .update({ status: 'sending', updated_at: new Date().toISOString() })
     .eq('id', id)
+    .eq('status', 'draft')
+    .select('id')
+  if (!claimed || claimed.length === 0) {
+    redirect(`/admin/kampanijos/${id}?error=already-sent`)
+  }
 
   // 2) Surenkam patvirtintus vartotojus (arba pasirinktą poaibį) + email.
   // marketing_opt_out=true (atsisakę per unsubscribe nuorodą) praleidžiami
@@ -366,20 +374,26 @@ export async function sendCampaignAction(formData: FormData): Promise<void> {
     profileById.set(p.id, { firstName: p.first_name })
   }
 
-  const { data: usersResp } = await supabase.auth.admin.listUsers({
-    page: 1,
-    perPage: 1000,
-  })
+  // listUsers puslapiuojamas (iki 5000 vartotojų) — anksčiau imtas tik
+  // pirmas 1000 puslapis ir gavėjai už ribos tyliai iškrisdavo (auditas B14).
   const recipients: { userId: string; email: string; firstName: string | null }[] = []
-  for (const u of usersResp?.users ?? []) {
-    if (!u.email) continue
-    const profile = profileById.get(u.id)
-    if (!profile) continue // tik approved (+ pasirinkti, jei selectedRecipientIds.length > 0)
-    recipients.push({
-      userId: u.id,
-      email: u.email,
-      firstName: profile.firstName,
+  for (let page = 1; page <= 5; page++) {
+    const { data: usersResp } = await supabase.auth.admin.listUsers({
+      page,
+      perPage: 1000,
     })
+    const users = usersResp?.users ?? []
+    for (const u of users) {
+      if (!u.email) continue
+      const profile = profileById.get(u.id)
+      if (!profile) continue // tik approved (+ pasirinkti, jei selectedRecipientIds.length > 0)
+      recipients.push({
+        userId: u.id,
+        email: u.email,
+        firstName: profile.firstName,
+      })
+    }
+    if (users.length < 1000) break
   }
 
   if (recipients.length === 0) {
