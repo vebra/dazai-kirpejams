@@ -79,10 +79,10 @@ export default async function SendsLogPage() {
       <SendsLogTable rows={rows} />
 
       <p className="text-[11px] text-brand-gray-500 leading-relaxed">
-        Pastaba apie „atidaryta": Gmail/Outlook proxy paveikslus iškart gavus
+        Pastaba apie „atidaryta&quot;: Gmail/Outlook proxy paveikslus iškart gavus
         laišką, todėl jų vartotojams reikšmė dažniausiai reiškia „pristatyta
-        į inbox", ne tikrą atidarymą. Apple Mail ir kai kurie kiti rodo
-        realius open'us.
+        į inbox&quot;, ne tikrą atidarymą. Apple Mail ir kai kurie kiti rodo
+        realius open&apos;us.
       </p>
     </div>
   )

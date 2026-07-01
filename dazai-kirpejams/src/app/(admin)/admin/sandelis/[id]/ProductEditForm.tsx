@@ -504,7 +504,7 @@ export function ProductEditForm({ product }: Props) {
               Rekomenduojamas
             </div>
             <div className="text-[12px] text-brand-gray-500">
-              Rodomas „Populiariausi produktai" bloke pagrindiniame puslapyje.
+              Rodomas „Populiariausi produktai&quot; bloke pagrindiniame puslapyje.
             </div>
           </div>
         </label>

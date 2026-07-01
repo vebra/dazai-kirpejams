@@ -72,6 +72,7 @@ export function useVerifiedUser(
     if (
       /(?:^|;\s*)sb-[^=;]*-auth-token[^=;]*=/.test(document.cookie)
     ) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- tyčinis anti-flash pattern'as (žr. komentarą aukščiau): sesijos cookie tikrinamas tik kliente po hydration, todėl isLoading nustatomas efekte
       setState((s) =>
         s.isLoading || s.user ? s : { ...s, isLoading: true }
       )

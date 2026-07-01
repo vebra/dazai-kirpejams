@@ -11,7 +11,7 @@ async function setupPixelSpy(page: Page) {
       .fbq
     const spy = function (...args: unknown[]) {
       calls.push(args)
-      if (typeof original === 'function') original.apply(null, args)
+      if (typeof original === 'function') original(...args)
     }
     Object.defineProperty(window, 'fbq', {
       configurable: true,

@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
 import type { ReportsData, ReportPeriod } from '@/lib/admin/queries'
 
 const PRICE_FORMATTER = new Intl.NumberFormat('lt-LT', {
@@ -61,8 +60,6 @@ type Props = {
 }
 
 export function ReportsDashboard({ data, currentPeriod }: Props) {
-  const searchParams = useSearchParams()
-
   const maxDailyRevenue = Math.max(
     ...data.dailyRevenue.map((d) => d.revenueCents),
     1

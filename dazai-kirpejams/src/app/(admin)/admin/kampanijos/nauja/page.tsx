@@ -54,7 +54,7 @@ export default async function NewCampaignPage({
             className="w-full px-4 py-2.5 border border-[#eee] rounded-lg text-sm focus:outline-none focus:border-brand-magenta"
           />
           <p className="mt-1 text-[11px] text-brand-gray-500">
-            Matomas tik jums admin'o sąraše. Klientai šio nemato.
+            Matomas tik jums admin&apos;o sąraše. Klientai šio nemato.
           </p>
         </div>
 
@@ -93,7 +93,7 @@ Kviečiame susipažinti su mūsų katalogu...`}
           />
           <p className="mt-1 text-[11px] text-brand-gray-500">
             Paprastas tekstas. Atskiri paragrafai — dvi naujos eilutės (Enter du
-            kartus). Nuorodos su https:// automatiškai taps spaudžiamais link'ais.
+            kartus). Nuorodos su https:// automatiškai taps spaudžiamais link&apos;ais.
           </p>
         </div>
 

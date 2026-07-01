@@ -613,7 +613,7 @@ export default async function AdminOrderDetailPage({
         ) : (
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <p className="text-sm text-brand-gray-500 max-w-md">
-              Sąskaita dar neišrašyta. Statusui pasikeitus į „Apmokėtas" ji bus
+              Sąskaita dar neišrašyta. Statusui pasikeitus į „Apmokėtas&quot; ji bus
               sugeneruota automatiškai, arba galite ją išrašyti rankiniu būdu
               (pvz. B2B pasiūlymui prieš apmokėjimą). Prieš išrašymą galite
               pakoreguoti apmokėjimo terminą ir pastabas.
@@ -663,7 +663,7 @@ export default async function AdminOrderDetailPage({
           Ištrinant užsakymą prekės automatiškai grąžinamos į sandėlį (jei dar
           nebuvo grąžintos). Užsakymo eilutės ištrinamos visam laikui — šis
           veiksmas neatšaukiamas. Sąskaita-faktūra (jei buvo išrašyta) lieka
-          Storage'e dėl apskaitos.
+          Storage&apos;e dėl apskaitos.
         </p>
         <DeleteOrderButton
           action={deleteOrderAction}

@@ -6,6 +6,7 @@ import type { Product } from '@/lib/types'
 import { getProductName } from '@/lib/types'
 import type { Locale } from '@/i18n/config'
 import { ProductCard } from '@/components/products/ProductCard'
+import type { pickCardDict } from '@/components/products/card-dict'
 import { CategoryFiltersBar } from '@/components/products/CategoryFiltersBar'
 import { ShowMoreGrid } from '@/components/products/ShowMoreGrid'
 import { Container } from '@/components/ui/Container'
@@ -21,7 +22,8 @@ type Props = {
   lang: Locale
   categorySlug: string
   isDazai: boolean
-  dict: Record<string, any>
+  // Visi kvietėjai paduoda pickCardDict(dict) rezultatą — tipas iš ten
+  dict: ReturnType<typeof pickCardDict>
 }
 
 function sortProducts(products: Product[], sortBy: string, lang: Locale): Product[] {

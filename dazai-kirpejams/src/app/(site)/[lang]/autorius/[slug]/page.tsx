@@ -202,7 +202,7 @@ export default async function AuthorPage({
                         key={idx}
                         className="text-[0.95rem] text-brand-gray-700 italic"
                       >
-                        „{pub.title}"
+                        „{pub.title}&quot;
                       </li>
                     ))}
                   </ul>

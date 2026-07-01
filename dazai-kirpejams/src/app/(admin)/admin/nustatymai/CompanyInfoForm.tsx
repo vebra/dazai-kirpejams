@@ -93,7 +93,7 @@ export function CompanyInfoForm({ info }: { info: CompanyInfo }) {
         </h4>
         <p className="text-[12px] text-brand-gray-500 mb-3">
           Šie duomenys rodomi pavedimo instrukcijose klientams, pasirinkusiems
-          „Banko pavedimas" kaip apmokėjimo būdą.
+          „Banko pavedimas&quot; kaip apmokėjimo būdą.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field

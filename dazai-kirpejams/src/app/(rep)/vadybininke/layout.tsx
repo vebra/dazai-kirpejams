@@ -36,6 +36,7 @@ export default async function RepRootLayout({
   let rejectedCount = 0
   if (rep) {
     const supabase = await createServerSupabase()
+    // eslint-disable-next-line react-hooks/purity -- server komponentas su force-dynamic: reikšmė tyčia skaičiuojama kiekvieno request'o metu
     const weekAgo = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString()
     const [{ data: prof }, { data: badgeRows }] = await Promise.all([
       supabase

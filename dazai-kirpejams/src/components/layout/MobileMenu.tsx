@@ -32,11 +32,13 @@ export function MobileMenu({ lang, links, labels }: MobileMenuProps) {
   const pathname = usePathname()
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- SSR hydration pattern'as: mounted vėliavėlė tyčia nustatoma efekte, kad serverio ir pirmo kliento renderio output'as sutaptų
     setMounted(true)
   }, [])
 
   // Uždarom meniu kai pakeičiamas route'as
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- tyčinė sinchronizacija su router'iu (išorine sistema): meniu uždaromas pasikeitus pathname
     setOpen(false)
   }, [pathname])
 

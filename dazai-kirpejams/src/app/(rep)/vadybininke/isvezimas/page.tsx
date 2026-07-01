@@ -17,7 +17,7 @@ export default async function RepIssueRequestPage() {
       <h1 className="text-2xl font-bold text-brand-gray-900 mb-1">Išvežimas prekybai</h1>
       <p className="text-sm text-brand-gray-500 mb-6">
         Sudarykite prekių sąrašą, kurį norite pasiimti prekybai. Pateikus, prašymą
-        patvirtins administratorius — tada prekės atsiras jūsų skiltyje „Mano atsargos".
+        patvirtins administratorius — tada prekės atsiras jūsų skiltyje „Mano atsargos&quot;.
         Neparduotas vėliau grąžinsite.
       </p>
       <IssueRequestFlow

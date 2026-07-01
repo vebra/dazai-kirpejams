@@ -81,7 +81,7 @@ export function IssueRequestFlow({
     <div className="space-y-6">
       {done && (
         <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-sm">
-          ✅ Prašymas pateiktas. Administratoriui patvirtinus, prekės atsiras „Mano atsargos".
+          ✅ Prašymas pateiktas. Administratoriui patvirtinus, prekės atsiras „Mano atsargos&quot;.
         </div>
       )}
 

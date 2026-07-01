@@ -16,6 +16,7 @@ export function Countdown({
   const [now, setNow] = useState<number | null>(null)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- SSR hydration pattern'as: serveris renderina be Date.now(), pirmas setNow tyčia efekte, kad nebūtų hydration mismatch
     setNow(Date.now())
     const id = setInterval(() => setNow(Date.now()), 60_000)
     return () => clearInterval(id)

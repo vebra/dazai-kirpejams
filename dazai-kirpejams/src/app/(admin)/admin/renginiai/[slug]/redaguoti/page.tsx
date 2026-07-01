@@ -94,7 +94,7 @@ export default async function EditEventPage({
           />
           {!event.heroImageUrl && (
             <div className="absolute inset-x-0 bottom-0 bg-black/55 text-white text-[11px] py-1.5 px-3 text-center">
-              Numatytasis (/event-hero.jpg) — admin'as dar neįkėlė savojo
+              Numatytasis (/event-hero.jpg) — admin&apos;as dar neįkėlė savojo
             </div>
           )}
         </div>
