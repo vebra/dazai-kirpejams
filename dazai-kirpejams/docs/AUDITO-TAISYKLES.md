@@ -76,7 +76,52 @@ Prieš teigiant „šis kodas lūžta / netipizuotas / neveikia" — paleisk ati
 
 ---
 
-## 5. „NEKABINTI" — sąmoningi projekto sprendimai
+## 5. Kaip atskirti tyčinį sprendimą nuo bug'o
+
+„Tyčinis sprendimas" ≠ „kodas taip veikia". Prieš dedant ką nors į „NEKABINTI"
+sąrašą (6 skyrius), pritaikyk **3 klausimų testą**:
+
+1. **Ar yra priežastis, kodėl taip padaryta?** (ne „kaip", o „kodėl")
+2. **Ar kompromisas buvo pasirinktas žinant?** (žinota, ką prarandi, ir vis tiek pasirinkta)
+3. **Kas tą priežastį patvirtina?** (turi būti šaltinis, ne prielaida)
+
+- Visi trys TAIP → **tyčinis sprendimas** → į „NEKABINTI".
+- Priežasties nėra, niekas nepasirinko, „tiesiog taip išėjo" → **bug'as** → taisyti.
+
+> **Svarbu:** „neradau priežasties" ≠ „priežasties nėra". Jei šaltinio nėra —
+> tai NĖRA tyčinis sprendimas, kol savininkas jo nepatvirtina.
+
+### Kur ieškoti priežasties (patvirtinimo šaltiniai)
+
+| Šaltinis | Ką reiškia |
+|----------|-----------|
+| Komentaras kode su „tyčia / nes / kad" | Techninis sprendimas užfiksuotas |
+| Testas, tvirtinantis tą elgesį | Elgesys sąmoningai apsaugotas |
+| Memory / dokumentacija | Anksčiau patvirtintas sprendimas |
+| Savininko patvirtinimas | Verslo/dizaino intencija — tik jis gali pasakyti |
+
+### Kas ką sprendžia
+
+- **Techninius** (cache, noindex, buferiai) — patvirtina kodo komentaras/testas
+  arba atsekimas. Gali eiti į „NEKABINTI" be savininko, jei priežastis dokumentuota.
+- **Verslo / dizaino** (kainos svečiui, spalvos, „ar rodyti X") — **tik savininkas**.
+  Auditas atneša klausimą, ne sprendimą. NEDĖTI į „NEKABINTI" be jo patvirtinimo.
+
+### Kaip pateikti abejotiną radinį
+
+Kiekvienam abejotinam radiniui atsakyk 2 klausimus atvirai:
+
+> **Radau:** kaina svečiui nerodoma produkto puslapyje.
+> **Ar tyčia?** Kode komentaras „tyčia, kad GSC nekabintų" + memory patvirtina → tyčinis, į „NEKABINTI".
+> **Reikia savininko?** Ne — techninė priežastis dokumentuota.
+
+> **Radau:** Comparison gradientas magenta→magenta.
+> **Ar tyčia?** Priežasties kode/memory nėra → negaliu spręsti.
+> **Reikia savininko?** Taip — dizaino pasirinkimas. Klausimas: palikti ar keisti?
+
+---
+
+## 6. „NEKABINTI" — sąmoningi projekto sprendimai
 
 Tai NĖRA klaidos. Auditas neturi jų flaginti (o jei flagina — tik su tvirtu
 nauju įrodymu, kodėl ankstesnis sprendimas nebegalioja).
@@ -120,7 +165,7 @@ nauju įrodymu, kodėl ankstesnis sprendimas nebegalioja).
 
 ---
 
-## 6. Dažni klaidingų teiginių šablonai (iš 2026-07 audito)
+## 7. Dažni klaidingų teiginių šablonai (iš 2026-07 audito)
 
 Pavyzdžiai, ką reiškia „nepatikrinta prielaida":
 
