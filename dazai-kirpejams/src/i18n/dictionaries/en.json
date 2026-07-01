@@ -56,7 +56,7 @@
     "title": "Why Choose Us",
     "volume": {
       "title": "180 ml Volume",
-      "desc": "2x more than standard packaging — fewer orders, more work done"
+      "desc": "Up to 3× more than a standard 60 ml pack — fewer orders, more work done"
     },
     "formula": {
       "title": "Professional Formula",
@@ -1134,12 +1134,13 @@
     "dyeTitle": "Hair Dyes — Color SHOCK",
     "dyeDesc": "Professional cream hair dyes with Argan & Jojoba oils and rosehip extract.",
     "dyeDescBold": "180 ml volume",
-    "dyeDescEnd": "— twice the size of a standard package.",
+    "dyeDescEnd": "— up to 3× more than a standard 60 ml pack.",
     "colorsLabel": "colours",
     "productsLabel": "products",
     "volumeLabel": "volume",
     "noProducts": "No products found for the selected filters.",
     "colorsAbbrev": "col.",
+    "otherColors": "Other shades",
     "advPalette": "Professional Palette",
     "advPerPackage": "In Every Package",
     "advPerUnit": "Per Package",

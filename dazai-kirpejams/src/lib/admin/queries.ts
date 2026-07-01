@@ -668,6 +668,9 @@ export type AdminOrderListOptions = {
   status?: OrderStatus
   dateFrom?: string
   dateTo?: string
+  /** Max eilučių. Default 200 (sąrašo UI); CSV eksportas paduoda didesnį,
+   * kad buhalterinis failas nebūtų tyliai apkirptas. */
+  limit?: number
 }
 
 export async function getAdminOrders(
@@ -684,7 +687,7 @@ export async function getAdminOrders(
        order_items(id)`
     )
     .order('created_at', { ascending: false })
-    .limit(200)
+    .limit(options.limit ?? 200)
     // Rep užsakymai, laukiantys patvirtinimo (pending) ar atmesti (rejected),
     // tvarkomi TIK /admin/patvirtinimai ekrane — slepiam iš įprasto sąrašo.
     // Rodom: savitarna (approval_status NULL) + patvirtinti rep (approved).

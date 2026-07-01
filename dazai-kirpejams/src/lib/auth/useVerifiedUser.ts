@@ -62,6 +62,21 @@ export function useVerifiedUser(
     const supabase = createBrowserSupabase()
     const controller = new AbortController()
 
+    // Anti-flash: site layout'as statinis (be cookies — tyčia), tad
+    // initialIsLoggedIn niekada nepaduodamas ir isLoading startuoja false —
+    // prisijungęs pro pirmo užkrovimo metu matydavo svečio „prisijunkite"
+    // bloką, kol baigsis getSession + verifikacijos RPC. Supabase SSR sesija
+    // gyvena `sb-*-auth-token*` cookie — jį matome sinchroniškai iškart po
+    // hydration: jei sesijos cookie yra, rodome skeleton'ą (isLoading=true),
+    // o ne svečio UI. Svečiams (be cookie) niekas nesikeičia.
+    if (
+      /(?:^|;\s*)sb-[^=;]*-auth-token[^=;]*=/.test(document.cookie)
+    ) {
+      setState((s) =>
+        s.isLoading || s.user ? s : { ...s, isLoading: true }
+      )
+    }
+
     async function check() {
       // getSession() skaito sesiją LOKALIAI (iš slapukų), be tinklo užklausos —
       // patikima net silpnu mobiliu ryšiu / in-app naršyklėje. getUser() darydavo

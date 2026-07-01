@@ -4,6 +4,7 @@ import { hasLocale } from '@/i18n/dictionaries'
 import { Container } from '@/components/ui/Container'
 import { getDownloads } from '@/lib/data/queries'
 import { langPrefix } from '@/lib/utils'
+import { buildPageMetadata } from '@/lib/seo'
 import type { Locale } from '@/i18n/config'
 
 export const dynamic = 'force-dynamic'
@@ -54,8 +55,17 @@ export async function generateMetadata({
   params: Promise<{ lang: string }>
 }): Promise<Metadata> {
   const { lang } = await params
-  const t = STR[(hasLocale(lang) ? lang : 'lt') as Locale]
-  return { title: t.title, description: t.subtitle }
+  const locale = (hasLocale(lang) ? lang : 'lt') as Locale
+  const t = STR[locale]
+  // buildPageMetadata (kaip kituose statiniuose puslapiuose) — be jo puslapis
+  // per Next.js shallow-merge paveldėdavo layout'o canonical į home ('/') ir
+  // Google jį laikė homepage duplikatu.
+  return buildPageMetadata({
+    lang: locale,
+    path: '/atsisiuntimai',
+    title: t.title,
+    description: t.subtitle,
+  })
 }
 
 export default async function DownloadsPage({

@@ -119,6 +119,12 @@ export function RegisterForm({
     )
   }
 
+  // React 19 po kiekvieno action'o resetina uncontrolled laukus į defaultValue
+  // — net kai grąžinta klaida. Todėl klaidos atveju action'as grąžina įvestas
+  // reikšmes (be slaptažodžio), o čia jos tampa defaultValue — laukai
+  // nebeišsivalo. Sėkmės atveju forma keičiama į padėkos bloką (žr. aukščiau).
+  const v = state.values ?? {}
+
   return (
     <form action={formAction} className="space-y-6">
       <input type="hidden" name="lang" value={lang} />
@@ -152,6 +158,7 @@ export function RegisterForm({
             type="email"
             required
             placeholder={dict.auth.emailPlaceholder}
+            defaultValue={v.email}
           />
           <Field
             label={dict.auth.password}
@@ -174,6 +181,7 @@ export function RegisterForm({
             required
             autoComplete="given-name"
             placeholder={dict.personal.firstNamePlaceholder}
+            defaultValue={v.first_name}
           />
           <Field
             label={dict.personal.lastName}
@@ -181,6 +189,7 @@ export function RegisterForm({
             required
             autoComplete="family-name"
             placeholder={dict.personal.lastNamePlaceholder}
+            defaultValue={v.last_name}
           />
           <Field
             label={dict.personal.phone}
@@ -188,6 +197,7 @@ export function RegisterForm({
             type="tel"
             required
             placeholder={dict.personal.phonePlaceholder}
+            defaultValue={v.phone}
           />
           <Field
             label={dict.personal.city}
@@ -195,6 +205,7 @@ export function RegisterForm({
             required
             autoComplete="address-level2"
             placeholder={dict.personal.cityPlaceholder}
+            defaultValue={v.city}
           />
         </div>
       </fieldset>
@@ -247,11 +258,13 @@ export function RegisterForm({
             required
             autoComplete="organization"
             placeholder={dict.business.salonNamePlaceholder}
+            defaultValue={v.salon_name}
           />
           <Field
             label={dict.business.companyCode}
             name="company_code"
             placeholder={dict.business.companyCodePlaceholder}
+            defaultValue={v.company_code}
           />
         </div>
 
@@ -265,7 +278,7 @@ export function RegisterForm({
           <select
             id="daily_dyes_count"
             name="daily_dyes_count"
-            defaultValue=""
+            defaultValue={v.daily_dyes_count ?? ''}
             className="w-full px-4 py-3 border border-brand-gray-50 rounded-xl text-sm focus:outline-none focus:border-brand-magenta transition-colors bg-white"
           >
             <option value="">{dict.business.dailyDyesPlaceholder}</option>
@@ -287,6 +300,7 @@ export function RegisterForm({
             id="verification_notes"
             name="verification_notes"
             rows={2}
+            defaultValue={v.verification_notes}
             placeholder={dict.business.notesPlaceholder}
             className="w-full px-4 py-3 border border-brand-gray-50 rounded-xl text-sm focus:outline-none focus:border-brand-magenta transition-colors resize-none"
           />
@@ -301,6 +315,7 @@ export function RegisterForm({
             type="checkbox"
             name="confirm_professional"
             required
+            defaultChecked={v.confirm_professional === 'on'}
             className="mt-0.5 w-4 h-4 accent-brand-magenta shrink-0"
           />
           <span className="text-sm text-brand-gray-900 leading-snug">
@@ -342,6 +357,7 @@ function Field({
   placeholder,
   autoComplete,
   inputMode,
+  defaultValue,
 }: {
   label: string
   name: string
@@ -350,6 +366,7 @@ function Field({
   placeholder?: string
   autoComplete?: string
   inputMode?: 'text' | 'email' | 'tel' | 'numeric' | 'decimal' | 'search' | 'url'
+  defaultValue?: string
 }) {
   const defaultAutoComplete =
     autoComplete ??
@@ -377,6 +394,7 @@ function Field({
         placeholder={placeholder}
         autoComplete={defaultAutoComplete}
         inputMode={defaultInputMode}
+        defaultValue={defaultValue}
         className="w-full px-4 py-3 border border-brand-gray-50 rounded-xl text-sm focus:outline-none focus:border-brand-magenta transition-colors bg-white"
       />
     </label>

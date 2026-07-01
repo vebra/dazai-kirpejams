@@ -56,7 +56,7 @@
     "title": "Kodėl rinktis mus",
     "volume": {
       "title": "180 ml talpa",
-      "desc": "2x daugiau nei standartinė pakuotė — mažiau užsakymų, daugiau darbo"
+      "desc": "Iki 3× daugiau nei standartinė 60 ml pakuotė — mažiau užsakymų, daugiau darbo"
     },
     "formula": {
       "title": "Profesionali formulė",
@@ -1134,12 +1134,13 @@
     "dyeTitle": "Plaukų dažai — Color SHOCK",
     "dyeDesc": "Profesionalūs kreminiai plaukų dažai su Argan & Jojoba aliejumi ir erškėtrožių ekstraktu.",
     "dyeDescBold": "180 ml talpa",
-    "dyeDescEnd": "— dvigubai daugiau nei standartinė pakuotė.",
+    "dyeDescEnd": "— iki 3× daugiau nei standartinė 60 ml pakuotė.",
     "colorsLabel": "spalvų",
     "productsLabel": "produktai",
     "volumeLabel": "talpa",
     "noProducts": "Nerasta produktų pagal pasirinktus filtrus.",
     "colorsAbbrev": "spalv.",
+    "otherColors": "Kiti atspalviai",
     "advPalette": "Profesionali paletė",
     "advPerPackage": "Kiekvienoje pakuotėje",
     "advPerUnit": "Už pakuotę",

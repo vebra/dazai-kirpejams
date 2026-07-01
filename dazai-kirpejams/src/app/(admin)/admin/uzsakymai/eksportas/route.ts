@@ -46,6 +46,9 @@ export async function GET(request: Request) {
     status: status ?? undefined,
     dateFrom: dateFrom ? `${dateFrom}T00:00:00.000Z` : undefined,
     dateTo: dateTo ? `${dateTo}T23:59:59.999Z` : undefined,
+    // Be šito galiotų sąrašo UI default'as (200) ir buhalterinis eksportas
+    // būtų tyliai apkirptas — „eksportuoja visus" turi reikšti visus.
+    limit: 10000,
   })
 
   // BOM + header — BOM padeda Excel'ui teisingai nuskaityti UTF-8

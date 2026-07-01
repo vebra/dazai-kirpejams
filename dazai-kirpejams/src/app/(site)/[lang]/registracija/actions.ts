@@ -15,9 +15,36 @@ import { registerSchema, formDataToObject } from '@/lib/validation/auth-schemas'
 export type RegisterState = {
   error?: string
   success?: boolean
+  /** Įvestos reikšmės klaidos atveju — React 19 po action'o resetina
+   * uncontrolled formą, tad be šito vartotojas po klaidos turėtų pildyti
+   * visus ~10 laukų iš naujo. Slaptažodis NIEKADA negrąžinamas. */
+  values?: Record<string, string>
 }
 
 const FALLBACK_ADMIN_EMAIL = 'info@dziuljetavebre.lt'
+
+// Laukai, kuriuos saugu grąžinti formai po klaidos (be password!)
+const ECHO_FIELDS = [
+  'email',
+  'first_name',
+  'last_name',
+  'phone',
+  'city',
+  'salon_name',
+  'company_code',
+  'daily_dyes_count',
+  'verification_notes',
+  'confirm_professional',
+] as const
+
+function echoValues(formData: FormData): Record<string, string> {
+  const out: Record<string, string> = {}
+  for (const k of ECHO_FIELDS) {
+    const v = formData.get(k)
+    if (typeof v === 'string' && v) out[k] = v
+  }
+  return out
+}
 
 function resolveLang(raw: FormDataEntryValue | null): Locale {
   if (typeof raw === 'string' && (locales as readonly string[]).includes(raw)) {
@@ -44,7 +71,7 @@ export async function registerAction(
   if (!parsed.success) {
     const firstIssue = parsed.error.issues[0]
     const key = firstIssue?.message as keyof typeof errors
-    return { error: errors[key] ?? errors.registerGeneric }
+    return { error: errors[key] ?? errors.registerGeneric, values: echoValues(formData) }
   }
   const {
     email,
@@ -69,7 +96,7 @@ export async function registerAction(
     failClosed: true,
   })
   if (!rl.allowed) {
-    return { error: errors.registerGeneric }
+    return { error: errors.registerGeneric, values: echoValues(formData) }
   }
 
   const supabase = await createServerSupabase()
@@ -82,13 +109,13 @@ export async function registerAction(
   if (signUpError) {
     console.error('[register] signUp error:', signUpError.message)
     if (signUpError.message.includes('already registered')) {
-      return { error: errors.emailAlreadyRegistered }
+      return { error: errors.emailAlreadyRegistered, values: echoValues(formData) }
     }
-    return { error: errors.registerGeneric }
+    return { error: errors.registerGeneric, values: echoValues(formData) }
   }
 
   if (!signUpData.user) {
-    return { error: errors.createAccountFailed }
+    return { error: errors.createAccountFailed, values: echoValues(formData) }
   }
 
   const serviceClient = createServiceClient()
