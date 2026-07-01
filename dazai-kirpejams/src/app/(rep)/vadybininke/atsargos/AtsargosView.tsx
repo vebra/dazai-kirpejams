@@ -6,10 +6,6 @@ import { Search, Package, ChevronDown, ShoppingBag } from 'lucide-react'
 import type { RepStockSummaryRow, RepStockMovementRow } from '@/lib/rep/queries'
 
 const DATE = new Intl.DateTimeFormat('lt-LT', { dateStyle: 'short' })
-const DATE_TIME = new Intl.DateTimeFormat('lt-LT', {
-  dateStyle: 'short',
-  timeStyle: 'short',
-})
 
 const REASON_LABELS: Record<
   RepStockMovementRow['reason'],
@@ -56,6 +52,16 @@ function byDyeNumber(a: RepStockSummaryRow, b: RepStockSummaryRow): number {
     if (ka.tones !== kb.tones) return ka.tones < kb.tones ? -1 : 1
   }
   return a.name.localeCompare(b.name, 'lt')
+}
+
+// Trumpas, švarus pavadinimas: nukerpam pradinį numerį (jis rodomas ženkliuke)
+// ir kartojamą „Color SHOCK —" priešdėlį, kad sąrašas nebūtų perkrautas.
+function cleanName(name: string): string {
+  const out = name
+    .replace(/^[\d.]+\s+/, '')
+    .replace(/^Color\s*SHOCK\s*[—–-]\s*/i, '')
+    .trim()
+  return out || name
 }
 
 export function AtsargosView({
@@ -195,14 +201,16 @@ export function AtsargosView({
                         {r.colorNumber ?? '—'}
                       </span>
                       <span className="flex-1 min-w-0">
-                        <span className="block text-[13px] font-medium text-brand-gray-900 truncate">
-                          {r.name.replace(/^[\d.]+ /, '')}
+                        <span className="block text-sm font-medium text-brand-gray-900 truncate">
+                          {cleanName(r.name)}
                         </span>
-                        <span className="block mt-0.5 text-[11px] text-brand-gray-500">
-                          Paimta {r.taken}
-                          {r.sold > 0 && <> · parduota {r.sold}</>}
-                          {r.returned > 0 && <> · grąžinta {r.returned}</>}
-                        </span>
+                        {tab === 'istorija' && (
+                          <span className="block mt-0.5 text-[11px] text-brand-gray-500">
+                            Paimta {r.taken}
+                            {r.sold > 0 && <> · parduota {r.sold}</>}
+                            {r.returned > 0 && <> · grąžinta {r.returned}</>}
+                          </span>
+                        )}
                       </span>
                       <span
                         className={`shrink-0 tabular-nums font-bold ${
