@@ -106,6 +106,7 @@ export function B2bForm({ lang, labels }: { lang: Locale; labels: B2bLabels }) {
         name="salon_name"
         required
         placeholder={labels.formSalonPlaceholder}
+        defaultValue={state.values?.salon_name}
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -114,6 +115,7 @@ export function B2bForm({ lang, labels }: { lang: Locale; labels: B2bLabels }) {
           name="contact_name"
           required
           placeholder={labels.formContactPlaceholder}
+          defaultValue={state.values?.contact_name}
         />
         <B2BField
           label={labels.formEmail}
@@ -121,6 +123,7 @@ export function B2bForm({ lang, labels }: { lang: Locale; labels: B2bLabels }) {
           type="email"
           required
           placeholder={labels.formEmailPlaceholder}
+          defaultValue={state.values?.email}
         />
       </div>
 
@@ -130,11 +133,13 @@ export function B2bForm({ lang, labels }: { lang: Locale; labels: B2bLabels }) {
           name="phone"
           type="tel"
           placeholder={labels.formPhonePlaceholder}
+          defaultValue={state.values?.phone}
         />
         <B2BField
           label={labels.formAddress}
           name="address"
           placeholder={labels.formAddressPlaceholder}
+          defaultValue={state.values?.address}
         />
       </div>
 
@@ -148,6 +153,7 @@ export function B2bForm({ lang, labels }: { lang: Locale; labels: B2bLabels }) {
         <select
           id="b2b-volume"
           name="monthly_volume"
+          defaultValue={state.values?.monthly_volume ?? ''}
           className="w-full px-4 py-[14px] border border-[#E0E0E0] rounded-lg bg-white text-brand-gray-900 text-[0.95rem] cursor-pointer focus:outline-none focus:border-brand-magenta focus:shadow-[0_0_0_3px_rgba(233,30,140,0.1)] transition-all"
         >
           <option value="">{labels.formVolumePlaceholder}</option>
@@ -169,6 +175,7 @@ export function B2bForm({ lang, labels }: { lang: Locale; labels: B2bLabels }) {
           id="b2b-message"
           name="message"
           rows={4}
+          defaultValue={state.values?.message}
           placeholder={labels.formMessagePlaceholder}
           className="w-full px-4 py-[14px] border border-[#E0E0E0] rounded-lg bg-white text-brand-gray-900 text-[0.95rem] resize-y min-h-[110px] focus:outline-none focus:border-brand-magenta focus:shadow-[0_0_0_3px_rgba(233,30,140,0.1)] transition-all"
         />
@@ -191,12 +198,14 @@ function B2BField({
   type = 'text',
   required = false,
   placeholder,
+  defaultValue,
 }: {
   label: string
   name: string
   type?: string
   required?: boolean
   placeholder?: string
+  defaultValue?: string
 }) {
   const autoComplete =
     name === 'salon_name'
@@ -230,6 +239,7 @@ function B2BField({
         placeholder={placeholder}
         autoComplete={autoComplete}
         inputMode={inputMode}
+        defaultValue={defaultValue}
         className="w-full px-4 py-[14px] border border-[#E0E0E0] rounded-lg bg-white text-brand-gray-900 text-[0.95rem] placeholder:text-[#B0B0B0] focus:outline-none focus:border-brand-magenta focus:shadow-[0_0_0_3px_rgba(233,30,140,0.1)] transition-all"
       />
     </div>

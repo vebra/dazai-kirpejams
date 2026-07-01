@@ -20,9 +20,29 @@ export type B2bFormState = {
    * ID kaip čia iššautas CAPI — Meta dedupe'ina abu signalus.
    */
   eventId?: string
+  /** Įvestos reikšmės klaidos atveju — React 19 po action'o resetina
+   * uncontrolled formą; be šito laukai po klaidos išsivalytų. */
+  values?: Record<string, string>
 }
 
 const FALLBACK_ADMIN_EMAIL = 'info@dziuljetavebre.lt'
+
+function echoValues(formData: FormData): Record<string, string> {
+  const out: Record<string, string> = {}
+  for (const k of [
+    'salon_name',
+    'contact_name',
+    'email',
+    'phone',
+    'address',
+    'monthly_volume',
+    'message',
+  ]) {
+    const v = formData.get(k)
+    if (typeof v === 'string' && v) out[k] = v
+  }
+  return out
+}
 
 function resolveLang(raw: FormDataEntryValue | null): Locale {
   if (typeof raw === 'string' && (locales as readonly string[]).includes(raw)) {
@@ -50,10 +70,14 @@ export async function submitB2bInquiryAction(
   const monthlyVolume = ((formData.get('monthly_volume') as string) ?? '').trim()
   const message = ((formData.get('message') as string) ?? '').trim()
 
-  if (!salonName) return { error: errors.salonNameRequired }
-  if (!contactName) return { error: errors.contactPersonRequired }
+  if (!salonName) {
+    return { error: errors.salonNameRequired, values: echoValues(formData) }
+  }
+  if (!contactName) {
+    return { error: errors.contactPersonRequired, values: echoValues(formData) }
+  }
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { error: errors.emailInvalid }
+    return { error: errors.emailInvalid, values: echoValues(formData) }
   }
 
   // B2B griežčiau — kiekvienas pateikimas siunčia 2 Resend email'us,
@@ -64,7 +88,7 @@ export async function submitB2bInquiryAction(
     max: 3,
   })
   if (!rl.allowed) {
-    return { error: errors.rateLimited }
+    return { error: errors.rateLimited, values: echoValues(formData) }
   }
 
   const supabase = await createServerSupabase()
@@ -83,7 +107,7 @@ export async function submitB2bInquiryAction(
 
   if (error) {
     console.error('[b2b-form] insert error:', error.message)
-    return { error: errors.b2bSendFailed }
+    return { error: errors.b2bSendFailed, values: echoValues(formData) }
   }
 
   // Email notifikacijos — adminui (info@dziuljetavebre.lt) ir patvirtinimas

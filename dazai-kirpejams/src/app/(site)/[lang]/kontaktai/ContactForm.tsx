@@ -90,19 +90,27 @@ export function ContactForm({ lang, labels }: { lang: Locale; labels: ContactLab
         </div>
       )}
 
-      <FormField label={labels.formName} name="name" required placeholder={labels.formNamePlaceholder} />
+      <FormField
+        label={labels.formName}
+        name="name"
+        required
+        placeholder={labels.formNamePlaceholder}
+        defaultValue={state.values?.name}
+      />
       <FormField
         label={labels.formEmail}
         name="email"
         type="email"
         required
         placeholder={labels.formEmailPlaceholder}
+        defaultValue={state.values?.email}
       />
       <FormField
         label={labels.formPhone}
         name="phone"
         type="tel"
         placeholder={labels.formPhonePlaceholder}
+        defaultValue={state.values?.phone}
       />
       <div>
         <label
@@ -114,6 +122,7 @@ export function ContactForm({ lang, labels }: { lang: Locale; labels: ContactLab
         <select
           id="contact-subject"
           name="subject"
+          defaultValue={state.values?.subject}
           className="w-full px-4 py-[14px] border border-[#E0E0E0] rounded-lg bg-white text-brand-gray-900 text-[0.95rem] cursor-pointer focus:outline-none focus:border-brand-magenta focus:shadow-[0_0_0_3px_rgba(233,30,140,0.1)] transition-all"
         >
           <option value={labels.formSubjectGeneral}>{labels.formSubjectGeneral}</option>
@@ -134,6 +143,7 @@ export function ContactForm({ lang, labels }: { lang: Locale; labels: ContactLab
           name="message"
           rows={5}
           required
+          defaultValue={state.values?.message}
           placeholder={labels.formMessagePlaceholder}
           className="w-full px-4 py-[14px] border border-[#E0E0E0] rounded-lg bg-white text-brand-gray-900 text-[0.95rem] resize-y min-h-[120px] focus:outline-none focus:border-brand-magenta focus:shadow-[0_0_0_3px_rgba(233,30,140,0.1)] transition-all"
         />
@@ -155,12 +165,14 @@ function FormField({
   type = 'text',
   required = false,
   placeholder,
+  defaultValue,
 }: {
   label: string
   name: string
   type?: string
   required?: boolean
   placeholder?: string
+  defaultValue?: string
 }) {
   const autoComplete =
     name === 'name'
@@ -190,6 +202,7 @@ function FormField({
         placeholder={placeholder}
         autoComplete={autoComplete}
         inputMode={inputMode}
+        defaultValue={defaultValue}
         className="w-full px-4 py-[14px] border border-[#E0E0E0] rounded-lg bg-white text-brand-gray-900 text-[0.95rem] placeholder:text-[#B0B0B0] focus:outline-none focus:border-brand-magenta focus:shadow-[0_0_0_3px_rgba(233,30,140,0.1)] transition-all"
       />
     </div>

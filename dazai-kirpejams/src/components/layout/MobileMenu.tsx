@@ -52,12 +52,20 @@ export function MobileMenu({ lang, links, labels }: MobileMenuProps) {
     }
   }, [open])
 
-  // Auth state
+  // Auth state — getSession (lokaliai, be tinklo; projekto taisyklė mobiliajam)
+  // + onAuthStateChange, kad po login/logout per client-side navigaciją
+  // meniu nerodytų pasenusios būsenos.
   useEffect(() => {
     const supabase = createBrowserSupabase()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setIsLoggedIn(!!user)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session?.user)
     })
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session?.user)
+    })
+    return () => subscription.unsubscribe()
   }, [])
 
   // ESC klavišas uždarinimui

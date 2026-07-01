@@ -22,8 +22,11 @@ export function HeaderAuth({ lang, myAccountLabel, loginLabel }: HeaderAuthProps
   useEffect(() => {
     const supabase = createBrowserSupabase()
 
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setIsLoggedIn(!!user)
+    // getSession() skaito sesiją LOKALIAI (be tinklo užklausos) — projekto
+    // taisyklė mobiliajam: getUser() tinklo validacija in-app naršyklėse
+    // neretai neįvyksta ir prisijungusiam rodydavo „Prisijungti".
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session?.user)
     })
 
     const {

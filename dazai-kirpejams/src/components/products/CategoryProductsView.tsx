@@ -76,17 +76,25 @@ export function CategoryProductsView({
     [filteredByTone, sortBy, lang]
   )
 
-  const groupedByDyeCategory = useMemo(() => {
-    if (!showColorFilters) return new Map<DyeCategoryKey, Product[]>()
+  // DYE_CATEGORIES yra rankinis slug'ų sąrašas — naujas dažų produktas DB su
+  // sąraše nesančiu slug'u anksčiau TYLIAI dingdavo iš viso listingo (o
+  // skaitiklis jį vis tiek skaičiuodavo). Nepriskirti produktai dabar krenta
+  // į `ungrouped` ir rodomi „Kiti atspalviai" sekcijoje sąrašo gale.
+  const { groupedByDyeCategory, ungrouped } = useMemo(() => {
     const map = new Map<DyeCategoryKey, Product[]>()
+    const rest: Product[] = []
+    if (!showColorFilters) return { groupedByDyeCategory: map, ungrouped: rest }
     for (const p of sortedProducts) {
       const key = getDyeCategoryKeyBySlug(p.slug)
-      if (!key) continue
+      if (!key) {
+        rest.push(p)
+        continue
+      }
       const bucket = map.get(key) ?? []
       bucket.push(p)
       map.set(key, bucket)
     }
-    return map
+    return { groupedByDyeCategory: map, ungrouped: rest }
   }, [sortedProducts, showColorFilters])
 
   const activeGroupKey = showColorFilters
@@ -103,6 +111,10 @@ export function CategoryProductsView({
   const visibleCount = activeGroupKey
     ? (groupedByDyeCategory.get(activeGroupKey)?.length ?? 0)
     : sortedProducts.length
+
+  // group+tone kombinacija gali palikti aktyvią grupę tuščią — tada rodome
+  // „nėra produktų" žinutę, o ne tylų tuščią plotą.
+  const activeGroupEmpty = activeGroupKey !== null && visibleCount === 0
 
   return (
     <>
@@ -137,7 +149,7 @@ export function CategoryProductsView({
       {/* Products */}
       <section className="py-10 lg:py-14 bg-brand-gray-50">
         <Container>
-          {sortedProducts.length === 0 ? (
+          {sortedProducts.length === 0 || activeGroupEmpty ? (
             <div className="text-center py-16">
               <p className="text-brand-gray-500">
                 {dict.categoryPage.noProducts}
@@ -186,6 +198,40 @@ export function CategoryProductsView({
                   </div>
                 )
               })}
+              {/* Produktai, kurių slug'o nėra DYE_CATEGORIES sąraše —
+                  matomi čia, kol bus priskirti grupei dye-categories.ts */}
+              {!activeGroupKey && ungrouped.length > 0 && (
+                <div>
+                  <h2 className="flex items-center gap-3 text-[1.3rem] font-bold text-brand-gray-900 mb-5 pb-3 border-b-2 border-[#E0E0E0]">
+                    <span
+                      className="inline-block w-6 h-6 rounded-full border-2 border-white shadow-[0_1px_4px_rgba(0,0,0,0.15)] bg-linear-to-br from-[#E91E8C] to-[#2B35AF]"
+                      aria-hidden
+                    />
+                    {dict.categoryPage.otherColors}
+                    <span className="text-[0.85rem] font-medium text-brand-gray-500 ml-auto">
+                      {ungrouped.length} {dict.categoryPage.colorsAbbrev}
+                    </span>
+                  </h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 lg:gap-6">
+                    <ShowMoreGrid
+                      total={ungrouped.length}
+                      showMoreLabel={dict.categoryPage.showMore}
+                      showingOfLabel={dict.categoryPage.showingOf}
+                    >
+                      {ungrouped.map((product, i) => (
+                        <ProductCard
+                          key={product.id}
+                          product={product}
+                          lang={lang}
+                          categorySlug={categorySlug}
+                          dict={dict}
+                          priority={i < 4}
+                        />
+                      ))}
+                    </ShowMoreGrid>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 lg:gap-6">

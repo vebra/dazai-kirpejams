@@ -31,6 +31,7 @@ const STATIC_PATHS: Array<{
   { path: '/kontaktai', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/blogas', priority: 0.6, changeFrequency: 'weekly' },
   { path: '/duk', priority: 0.6, changeFrequency: 'monthly' },
+  { path: '/atsisiuntimai', priority: 0.5, changeFrequency: 'monthly' },
   { path: '/pristatymas', priority: 0.5, changeFrequency: 'yearly' },
   { path: '/privatumo-politika', priority: 0.3, changeFrequency: 'yearly' },
   { path: '/pirkimo-salygos', priority: 0.3, changeFrequency: 'yearly' },

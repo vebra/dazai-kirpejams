@@ -12,6 +12,18 @@ export type ContactFormState = {
   success?: boolean
   /** Naudojamas Pixel↔CAPI dedupe (žr. salonams/actions.ts). */
   eventId?: string
+  /** Įvestos reikšmės klaidos atveju — React 19 po action'o resetina
+   * uncontrolled formą; be šito laukai po klaidos išsivalytų. */
+  values?: Record<string, string>
+}
+
+function echoValues(formData: FormData): Record<string, string> {
+  const out: Record<string, string> = {}
+  for (const k of ['name', 'email', 'phone', 'subject', 'message']) {
+    const v = formData.get(k)
+    if (typeof v === 'string' && v) out[k] = v
+  }
+  return out
 }
 
 function resolveLang(raw: FormDataEntryValue | null): Locale {
@@ -38,11 +50,13 @@ export async function submitContactAction(
   const subject = ((formData.get('subject') as string) ?? '').trim()
   const message = ((formData.get('message') as string) ?? '').trim()
 
-  if (!name) return { error: errors.nameRequired }
+  if (!name) return { error: errors.nameRequired, values: echoValues(formData) }
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { error: errors.emailInvalid }
+    return { error: errors.emailInvalid, values: echoValues(formData) }
   }
-  if (!message) return { error: errors.messageRequired }
+  if (!message) {
+    return { error: errors.messageRequired, values: echoValues(formData) }
+  }
 
   const rl = await checkRateLimit({
     action: 'contact',
@@ -50,7 +64,7 @@ export async function submitContactAction(
     max: 5,
   })
   if (!rl.allowed) {
-    return { error: errors.rateLimited }
+    return { error: errors.rateLimited, values: echoValues(formData) }
   }
 
   const supabase = await createServerSupabase()
@@ -66,7 +80,7 @@ export async function submitContactAction(
 
   if (error) {
     console.error('[contact-form] insert error:', error.message)
-    return { error: errors.contactSendFailed }
+    return { error: errors.contactSendFailed, values: echoValues(formData) }
   }
 
   const eventId = randomUUID()
