@@ -227,7 +227,7 @@ export default async function ProductPage({
 
   return (
     <ProductPricesProvider ids={priceIds}>
-      <JsonLd data={productJsonLd} />
+      {productJsonLd && <JsonLd data={productJsonLd} />}
       <JsonLd data={breadcrumbJsonLd} />
 
       {/* Breadcrumb */}

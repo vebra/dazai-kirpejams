@@ -152,7 +152,15 @@ export function productSchema(
   category: Category | null,
   lang: Locale,
   productUrl: string
-): Record<string, unknown> {
+): Record<string, unknown> | null {
+  // Kaina rodoma TIK patvirtintiems profesionalams — svečiui/crawler'iui
+  // `price_cents` jau nukirptas (0). Be kainos Product neturi nei `offers`,
+  // nei `review`/`aggregateRating`, tad Google „Product snippets" jį pažymi
+  // kaip nepilną. Tokiu atveju geriau Product JSON-LD visai neatiduoti —
+  // puslapis vis tiek normaliai indeksuojamas (breadcrumb schema lieka), o
+  // GSC įspėjimas dingsta. Kainą profesionalas pasiima naršyklėje.
+  if (!(product.price_cents > 0)) return null
+
   const name = getProductName(product, lang)
   const rawDescription = getProductDescription(product, lang).trim()
   const description =
@@ -184,10 +192,6 @@ export function productSchema(
         value: `${product.volume_ml} ml`,
       },
     }),
-    // Kaina rodoma TIK patvirtintiems profesionalams. Anonimui/crawler'iui
-    // `price_cents` jau nukirptas (0) duomenų sluoksnyje — tuomet Offer'io
-    // visai nededam, kad JSON-LD nerodytų €0,00.
-    ...(product.price_cents > 0 && {
     offers: {
       '@type': 'Offer',
       url: productUrl,
@@ -236,7 +240,6 @@ export function productSchema(
         returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
       },
     },
-    }),
   }
 }
 
