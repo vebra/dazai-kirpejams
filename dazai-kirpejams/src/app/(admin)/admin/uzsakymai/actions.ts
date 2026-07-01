@@ -117,6 +117,46 @@ export async function updateOrderStatusAction(
   // patvirtinimo ekraną (kitaip apeitume sandėlio nuskaitymą per approve).
   await assertNotAwaitingApproval(supabase, id)
 
+  // Reaktyvavimas: cancelled/refunded → aktyvus statusas galimas TIK jei
+  // sandėlį pavyksta nurašyti iš naujo (grąžinimas per restore jau įvyko).
+  // Kitaip likučiai liktų išpūsti, o antras cancel jų nebegrąžintų
+  // (stock_restored flag'as jau būtų suvartotas).
+  const { data: prevOrder } = await supabase
+    .from('orders')
+    .select('status, stock_restored')
+    .eq('id', id)
+    .maybeSingle<{ status: string; stock_restored: boolean | null }>()
+
+  const reactivating =
+    (prevOrder?.status === 'cancelled' || prevOrder?.status === 'refunded') &&
+    status !== 'cancelled' &&
+    status !== 'refunded'
+
+  if (reactivating) {
+    const { data: redecData, error: redecErr } = await supabase.rpc(
+      'redecrement_stock_by_order_id',
+      { p_order_id: id }
+    )
+    const redec = redecData as {
+      ok?: boolean
+      reason?: string
+      product?: string
+      stock?: number
+      needed?: number
+    } | null
+    if (redecErr || !redec?.ok) {
+      const reason =
+        redec?.reason === 'insufficient_stock'
+          ? `nepakanka likučio („${redec.product}“: yra ${redec.stock}, reikia ${redec.needed})`
+          : redec?.reason === 'rep_order'
+            ? 'vadybininkės užsakymo reaktyvuoti negalima'
+            : (redecErr?.message ?? 'sandėlio nurašymas nepavyko')
+      redirect(
+        `/admin/uzsakymai/${id}?error=reactivate-failed&reason=${encodeURIComponent(reason)}`
+      )
+    }
+  }
+
   // Jei statusas keičiamas į shipped/cancelled/paid/delivered — reikės
   // kliento duomenų email pranešimui. Paimam vieną kartą prieš update'ą.
   const shouldEmail =
@@ -225,7 +265,10 @@ export async function updateOrderStatusAction(
         tags: { area: 'invoice' },
         extra: { orderId: id },
       })
-    } else if (orderData) {
+    } else if (orderData && !result.alreadyExisted) {
+      // Laiškas su PDF siunčiamas tik NAUJAI išrašytai sąskaitai — jei ji jau
+      // egzistavo (pvz. admin'as pakartotinai spusteli „Apmokėtas" ar grąžina
+      // statusą paid→processing→paid), klientas dubliuoto laiško negauna.
       try {
         const pdfBuffer = await getInvoicePdfBuffer(result.pdfPath)
         if (!pdfBuffer) {
@@ -568,6 +611,10 @@ export async function addOrderItemAction(
   if (!productId) return { error: 'Pasirinkite prekę.' }
   if (!Number.isInteger(qty) || qty <= 0) return { error: 'Kiekis turi būti teigiamas skaičius.' }
 
+  // Pending/rejected rep užsakymo pildyti negalima (kaip ir statuso keitimo) —
+  // RPC papildomai blokuoja VISUS rep užsakymus ir atšauktus/grąžintus.
+  await assertNotAwaitingApproval(supabase, orderId)
+
   const { data, error } = await supabase.rpc('add_order_item', {
     p_order_id: orderId,
     p_product_id: productId,
@@ -586,7 +633,11 @@ export async function addOrderItemAction(
             ? 'Prekė nerasta.'
             : reason === 'order_not_found'
               ? 'Užsakymas nerastas.'
-              : error?.message ?? 'Nepavyko pridėti prekės.'
+              : reason === 'order_terminal'
+                ? 'Užsakymas atšauktas/grąžintas — prekių pridėti nebegalima.'
+                : reason === 'rep_order'
+                  ? 'Vadybininkės užsakymo pildyti čia negalima.'
+                  : error?.message ?? 'Nepavyko pridėti prekės.'
     console.error('[admin/uzsakymai] addOrderItem:', error?.message ?? reason)
     return { error: msg }
   }

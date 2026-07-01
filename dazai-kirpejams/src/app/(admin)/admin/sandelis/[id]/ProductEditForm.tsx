@@ -296,6 +296,14 @@ export function ProductEditForm({ product }: Props) {
             >
               Likutis (vnt.) *
             </label>
+            {/* Likutis formos atidarymo momentu — server action pagal jį
+                atskiria „admin'as pakeitė" nuo „forma atidaryta su pasenusia
+                reikšme" ir neliečia likučio, jei jis nekeistas. */}
+            <input
+              type="hidden"
+              name="initial_stock"
+              value={String(product.stockQuantity ?? 0)}
+            />
             <input
               type="number"
               id="stock_quantity"
