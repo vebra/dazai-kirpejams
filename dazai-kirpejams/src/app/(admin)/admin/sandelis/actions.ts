@@ -89,6 +89,12 @@ export async function updateProductAction(
   if (stockQuantity === null) {
     return { error: 'Likutis turi būti sveikas skaičius ≥ 0.' }
   }
+  // Likutis formos atidarymo momentu — pagal jį sprendžiam, ar admin'as
+  // likutį apskritai keitė. Jei nekeitė, jo NELIEČIAM: formoje matyta
+  // reikšmė gali būti pasenusi (tarpe įvyko pardavimų), o besąlyginis
+  // perrašymas grąžintų likutį atgal ir leistų oversell'ą.
+  const initialStockRaw = formData.get('initial_stock') as string | null
+  const initialStock = initialStockRaw === null ? null : toInt(initialStockRaw)
 
   const volumeRaw = (formData.get('volume_ml') as string) ?? ''
   const volumeMl = volumeRaw.trim() === '' ? null : toInt(volumeRaw)
@@ -134,8 +140,6 @@ export async function updateProductAction(
       info_mixing_ratio: infoMixingRatio,
       info_shelf_life: infoShelfLife,
       info_country: infoCountry,
-      stock_quantity: stockQuantity,
-      is_in_stock: stockQuantity > 0,
       is_active: isActive,
       is_featured: isFeatured,
       sku,
@@ -147,6 +151,34 @@ export async function updateProductAction(
   if (error) {
     console.error('[admin/sandelis/actions] updateProduct:', error.message)
     return { error: `Nepavyko išsaugoti: ${error.message}` }
+  }
+
+  // Likutis — TIK per set_product_stock RPC (atominis FOR UPDATE + įrašas į
+  // judėjimo žurnalą 'correction', kaip quickUpdateStockAction), ir tik kai
+  // admin'as reikšmę formoje realiai pakeitė.
+  if (initialStock === null || stockQuantity !== initialStock) {
+    const { data: stockData, error: stockError } = await supabase.rpc(
+      'set_product_stock',
+      {
+        p_product_id: id,
+        p_new_stock: stockQuantity,
+        p_source: 'admin',
+        p_note: 'Prekės redagavimo forma',
+      }
+    )
+    if (
+      stockError ||
+      (stockData as { ok?: boolean } | null)?.ok === false
+    ) {
+      console.error(
+        '[admin/sandelis/actions] updateProduct stock:',
+        stockError?.message ?? JSON.stringify(stockData)
+      )
+      return {
+        error:
+          'Prekės laukai išsaugoti, bet likučio atnaujinti nepavyko. Pabandykite dar kartą.',
+      }
+    }
   }
 
   // Variantų (dydžių) sinchronizacija — jei prekė priklauso variantų grupei,

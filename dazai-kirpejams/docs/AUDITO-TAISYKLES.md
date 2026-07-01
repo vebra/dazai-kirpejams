@@ -160,6 +160,21 @@ nauju įrodymu, kodėl ankstesnis sprendimas nebegalioja).
 - **OG pagrindinė kortelė — statinis JPG** (ne dinaminis). ImageMagick Windows'e
   NĖRA; vaizdų procesingui — `sharp`.
 
+### Patvirtinta 2026-07 audite
+- **banner-stats be autentifikacijos — best-effort dizainas.** Validacija yra
+  (KEY_RE + type whitelist + DB char_length check), komentaras kode dokumentuoja:
+  „sufalsinti load'ai sugadintų statistiką, ne duomenis". Neflaginti kaip
+  saugumo skylės; galima siūlyti tik retention/WAF higieną.
+- **`getCompanyInfo` fallback į tuščius rekvizitus — tyčia.** Komentaras
+  order-actions.ts dokumentuoja principą „checkout'as niekada neužstringa";
+  tuščias vatCode → vatRate=0 yra sąmoningas graceful degradation. Likutinė
+  pastaba tik dėl Sentry signalo nebuvimo.
+- **`trackCalculatorUsed` dedup'intas per sesiją** (`dedupeOncePerSession`
+  analytics.ts) — „nėra debounce" yra klaidingas radinys, event'as išeina 1×/sesiją.
+- **deleteOrderAction visada atstato sandėlį** — UI tekstas prie mygtuko tai
+  eksplicitiškai dokumentuoja („prekės automatiškai grąžinamos į sandėlį").
+  Diskusinis tik delivered/shipped atvejis, ne pats atstatymas.
+
 > Kai patvirtinamas naujas tyčinis sprendimas — jį reikia įrašyti čia, kad
 > kitas auditas jo nekabintų.
 

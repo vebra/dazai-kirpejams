@@ -121,7 +121,9 @@ export default async function AdminOrderDetailPage({
             ? 'Sąskaita dar neišrašyta.'
             : errorParam === 'signed-url-failed'
               ? 'Nepavyko sugeneruoti parsisiuntimo nuorodos.'
-              : null
+              : errorParam === 'reactivate-failed'
+                ? `Nepavyko grąžinti užsakymo į aktyvų statusą${invoiceReason ? `: ${invoiceReason}` : '.'}`
+                : null
 
   const currentStatusIndex = STATUS_FLOW.indexOf(order.status)
   const isTerminal =
@@ -352,8 +354,12 @@ export default async function AdminOrderDetailPage({
         </div>
       </section>
 
-      {/* Pridėti prekę prie užsakymo */}
-      <AddOrderItemForm orderId={order.id} products={products} />
+      {/* Pridėti prekę prie užsakymo. Atšauktam/grąžintam nerodoma (nurašymas
+          nebebūtų grąžinamas), rep užsakymui nerodoma (prekės — vadybininkės
+          atsargose). RPC šiuos atvejus blokuoja ir per tiesioginį kvietimą. */}
+      {!isTerminal && order.approvalStatus === null && (
+        <AddOrderItemForm orderId={order.id} products={products} />
+      )}
 
       {/* Klientas + pristatymas — 2 stulpeliai */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

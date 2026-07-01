@@ -798,6 +798,8 @@ export type AdminOrderDetail = {
   // Metadata
   locale: string | null
   notes: string | null
+  // Rep (vadybininkės) užsakymo patvirtinimo būsena; null — paprastas užsakymas.
+  approvalStatus: 'pending' | 'approved' | 'rejected' | null
 
   items: AdminOrderItem[]
 }
@@ -817,7 +819,7 @@ export async function getAdminOrderById(
        payment_method, payment_status, payment_reference,
        subtotal_cents, vat_cents, total_cents,
        tracking_number, tracking_carrier,
-       locale, notes,
+       locale, notes, approval_status,
        order_items(id, product_id, product_name, product_sku, quantity, unit_price_cents, total_cents)`
     )
     .eq('id', id)
@@ -867,6 +869,8 @@ export async function getAdminOrderById(
 
     locale: data.locale ?? null,
     notes: data.notes ?? null,
+    approvalStatus:
+      (data.approval_status as AdminOrderDetail['approvalStatus']) ?? null,
 
     items: items.map((it: {
       id: string
