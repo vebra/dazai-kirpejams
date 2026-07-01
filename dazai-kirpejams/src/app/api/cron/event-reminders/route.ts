@@ -10,7 +10,8 @@ export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 /**
- * Vercel Cron endpoint — siunčia priminimą likus ≤24h iki renginio pradžios.
+ * Vercel Cron endpoint — siunčia priminimą likus ~parai (12–36h) iki
+ * renginio pradžios.
  *
  * Saugumas: Vercel Cron'as prideda `Authorization: Bearer $CRON_SECRET` header'į.
  * Be jo request'as atmetamas — kad niekas iš interneto negalėtų trigger'inti
@@ -28,9 +29,12 @@ export const runtime = 'nodejs'
  * paleidžiamas du kartus per valandą — antras paleidimas tiesiog neras ką
  * siųsti.
  *
- * Laiko langas: nuo 20h iki 28h prieš `startsAt` — 8h plokščias langas, kad
- * nesirištume į tikslias vienos dienos valandas. Cron scheduling'as
- * (vercel.json) paleis endpoint'ą kasdien ~10:00 UTC.
+ * Laiko langas: nuo 12h iki 36h prieš `startsAt`. Cron'as (vercel.json)
+ * suksis kasdien 08:00 UTC — kad KIEKVIENAS renginys garantuotai pakliūtų
+ * į langą lygiai viename paleidime, langas turi būti ≥24h pločio (buvęs
+ * 20–28h 8h langas dengė tik 07:00–15:00 LT prasidedančius renginius —
+ * vakariniams priminimas neišeidavo niekada). Dublikatus saugo
+ * `reminder_sent_at` idempotencija.
  */
 
 export async function GET(request: Request) {
@@ -59,7 +63,7 @@ export async function GET(request: Request) {
       (EVENT.startsAt.getTime() - now.getTime()) / (60 * 60 * 1000)
 
     // Už priminimo lango — šiam renginiui nieko nesiųsim.
-    if (hoursUntil < 20 || hoursUntil > 28) {
+    if (hoursUntil < 12 || hoursUntil > 36) {
       results.push({
         eventSlug: EVENT.slug,
         hoursUntilEvent: Math.round(hoursUntil),

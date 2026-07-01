@@ -52,6 +52,8 @@ export type SendEmailInput = {
   text?: string
   replyTo?: string
   attachments?: EmailAttachment[]
+  /** Papildomi SMTP header'iai (pvz. List-Unsubscribe marketingo laiškams). */
+  headers?: Record<string, string>
 }
 
 export type SendEmailResult =
@@ -76,6 +78,7 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
       html: input.html,
       text: input.text,
       replyTo: input.replyTo,
+      headers: input.headers,
       attachments: input.attachments?.map((a) => ({
         filename: a.filename,
         content: a.content,

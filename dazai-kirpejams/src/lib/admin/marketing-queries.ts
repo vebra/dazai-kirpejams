@@ -108,10 +108,13 @@ export type ApprovedUserRow = {
 export async function getApprovedUsersWithNotes(): Promise<ApprovedUserRow[]> {
   const supabase = createServerClient()
 
+  // marketing_opt_out=true (atsisakę per unsubscribe nuorodą) nerodomi —
+  // jų pažymėti negalima; siuntimo action'as juos filtruoja papildomai.
   const { data: profiles, error } = await supabase
     .from('user_profiles')
     .select('id, first_name, last_name, salon_name, admin_notes')
     .eq('verification_status', 'approved')
+    .eq('marketing_opt_out', false)
     .order('created_at', { ascending: false })
 
   if (error || !profiles) {

@@ -6,13 +6,16 @@ import { requireAdmin } from '@/lib/admin/auth'
 import { createServerClient } from '@/lib/supabase/server'
 import { sendEmail, getAdminNotificationEmail } from '@/lib/email/resend'
 import { buildCampaignEmail } from '@/lib/email/campaign-template'
+import { createUnsubscribeToken } from '@/lib/email/unsubscribe-token'
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, '') ||
   'https://www.dazaikirpejams.lt'
 
-// Tarp siuntimų — kad nesusidurtume su Resend rate-limit (10/sec free).
-const SEND_DELAY_MS = 250
+// Tarp siuntimų — Resend default rate-limit yra 2 req/s (ne 10/s!), tad
+// 600 ms (~1.6/s) palieka atsargą. Per greitas siuntimas grąžina 429, kuris
+// žurnale būtų pažymėtas 'failed'.
+const SEND_DELAY_MS = 600
 
 function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms))
@@ -251,22 +254,24 @@ export async function sendTestCampaignAction(formData: FormData): Promise<void> 
     redirect(`/admin/kampanijos/${id}?error=no-admin-email`)
   }
 
-  try {
-    const payload = buildCampaignEmail({
-      subject: `[TESTAS] ${campaign.subject}`,
-      body: campaign.body,
-      imageUrl: campaign.image_url,
-      firstName: 'admin',
-      siteUrl: SITE_URL,
-    })
-    await sendEmail({
-      to: testEmail,
-      subject: payload.subject,
-      html: payload.html,
-      text: payload.text,
-    })
-  } catch (err) {
-    console.error('[admin/kampanijos] sendTest failed:', err)
+  const payload = buildCampaignEmail({
+    subject: `[TESTAS] ${campaign.subject}`,
+    body: campaign.body,
+    imageUrl: campaign.image_url,
+    firstName: 'admin',
+    siteUrl: SITE_URL,
+  })
+  // sendEmail niekada nemeta — klaidas grąžina per { ok: false }, todėl
+  // rezultatą PRIVALOMA tikrinti (kitaip „test-sent" rodytųsi net kai
+  // Resend nesukonfigūruotas ar siuntimas nepavyko).
+  const result = await sendEmail({
+    to: testEmail,
+    subject: payload.subject,
+    html: payload.html,
+    text: payload.text,
+  })
+  if (!result.ok) {
+    console.error('[admin/kampanijos] sendTest failed:', result.reason)
     redirect(`/admin/kampanijos/${id}?error=test-failed`)
   }
 
@@ -342,11 +347,14 @@ export async function sendCampaignAction(formData: FormData): Promise<void> {
     .update({ status: 'sending', updated_at: new Date().toISOString() })
     .eq('id', id)
 
-  // 2) Surenkam patvirtintus vartotojus (arba pasirinktą poaibį) + email
+  // 2) Surenkam patvirtintus vartotojus (arba pasirinktą poaibį) + email.
+  // marketing_opt_out=true (atsisakę per unsubscribe nuorodą) praleidžiami
+  // net jei admin'as juos pažymėjo picker'yje — opt-out yra galutinis.
   let profilesQuery = supabase
     .from('user_profiles')
     .select('id, first_name')
     .eq('verification_status', 'approved')
+    .eq('marketing_opt_out', false)
 
   if (selectedRecipientIds.length > 0) {
     profilesQuery = profilesQuery.in('id', selectedRecipientIds)
@@ -404,6 +412,14 @@ export async function sendCampaignAction(formData: FormData): Promise<void> {
       .single()
 
     try {
+      // Atsisakymo nuoroda — privaloma kiekviename marketingo laiške
+      // (GDPR/ePrivacy) + List-Unsubscribe header'iai (Gmail/Yahoo bulk-sender
+      // reikalavimas; be jų krenta deliverability).
+      const unsubToken = createUnsubscribeToken(r.userId)
+      const unsubscribeUrl = unsubToken
+        ? `${SITE_URL}/api/marketing/atsisakyti?u=${r.userId}&t=${encodeURIComponent(unsubToken)}`
+        : null
+
       const payload = buildCampaignEmail({
         subject: campaign.subject,
         body: campaign.body,
@@ -415,24 +431,53 @@ export async function sendCampaignAction(formData: FormData): Promise<void> {
         trackingPixelUrl: recRow
           ? `${SITE_URL}/api/track/open/${recRow.id}`
           : null,
+        unsubscribeUrl,
       })
-      await sendEmail({
+
+      // SVARBU: sendEmail niekada nemeta klaidos — visos klaidos (Resend 429,
+      // blogas adresas, nesukonfigūruotas raktas) grąžinamos per { ok: false }.
+      // Netikrinant rezultato nepavykę laiškai žurnale būtų žymimi 'sent'.
+      const result = await sendEmail({
         to: r.email,
         subject: payload.subject,
         html: payload.html,
         text: payload.text,
+        headers: unsubscribeUrl
+          ? {
+              'List-Unsubscribe': `<${unsubscribeUrl}>`,
+              'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+            }
+          : undefined,
       })
-      sentCount++
-      if (recRow) {
-        await supabase
-          .from('marketing_campaign_recipients')
-          .update({ status: 'sent', sent_at: new Date().toISOString() })
-          .eq('id', recRow.id)
+
+      if (result.ok) {
+        sentCount++
+        if (recRow) {
+          await supabase
+            .from('marketing_campaign_recipients')
+            .update({ status: 'sent', sent_at: new Date().toISOString() })
+            .eq('id', recRow.id)
+        }
+      } else {
+        failedCount++
+        const errMsg =
+          result.reason === 'not-configured'
+            ? 'Resend nesukonfigūruotas'
+            : (result.error ?? 'send-failed')
+        console.error(`[admin/kampanijos] send to ${r.email} failed:`, errMsg)
+        if (recRow) {
+          await supabase
+            .from('marketing_campaign_recipients')
+            .update({ status: 'failed', error_message: errMsg.slice(0, 500) })
+            .eq('id', recRow.id)
+        }
       }
     } catch (err) {
+      // Netikėta išimtis (ne sendEmail — jis nemeta) neturi nutraukti ciklo:
+      // nutrūkus vidury, kampanija amžinai liktų 'sending' be atstatymo kelio.
       failedCount++
       const errMsg = err instanceof Error ? err.message : String(err)
-      console.error(`[admin/kampanijos] send to ${r.email} failed:`, errMsg)
+      console.error(`[admin/kampanijos] send to ${r.email} threw:`, errMsg)
       if (recRow) {
         await supabase
           .from('marketing_campaign_recipients')
@@ -441,7 +486,7 @@ export async function sendCampaignAction(formData: FormData): Promise<void> {
       }
     }
 
-    // Rate-limit apsauga (Resend free ~10/sec)
+    // Rate-limit apsauga (Resend default 2 req/s)
     await sleep(SEND_DELAY_MS)
   }
 
