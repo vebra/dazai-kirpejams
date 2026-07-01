@@ -187,6 +187,11 @@ export function CheckoutForm({
       }
       setAppliedDiscount({ code: result.code, cents: result.discountCents })
       setDiscountInput('')
+    } catch {
+      // Netikėta serverio/tinklo klaida — parodom bendrą žinutę, kad
+      // vartotojas neliktų su besisukančiu spineriu be jokio atsako.
+      setDiscountError(dict.checkout.errors.couponApplyFailed)
+      setAppliedDiscount(null)
     } finally {
       setDiscountValidating(false)
     }

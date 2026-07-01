@@ -23,6 +23,13 @@ export type CartItem = {
   quantity: number
 }
 
+/**
+ * Maksimalus vienos prekės kiekis krepšelyje. UI apsauga nuo netyčinio ar
+ * tyčinio (localStorage redagavimas) milžiniško kiekio, kuris iškreiptų sumą.
+ * Realų likutį galutinai tikrina serveris checkout metu.
+ */
+const MAX_ITEM_QTY = 99
+
 type CartState = {
   items: CartItem[]
   addItem: (item: Omit<CartItem, 'quantity'>, quantity?: number) => void
@@ -50,12 +57,20 @@ export const useCartStore = create<CartState>()(
             return {
               items: state.items.map((i) =>
                 i.productId === item.productId
-                  ? { ...i, quantity: i.quantity + quantity }
+                  ? {
+                      ...i,
+                      quantity: Math.min(i.quantity + quantity, MAX_ITEM_QTY),
+                    }
                   : i
               ),
             }
           }
-          return { items: [...state.items, { ...item, quantity }] }
+          return {
+            items: [
+              ...state.items,
+              { ...item, quantity: Math.min(quantity, MAX_ITEM_QTY) },
+            ],
+          }
         })
       },
 
@@ -70,9 +85,10 @@ export const useCartStore = create<CartState>()(
           get().removeItem(productId)
           return
         }
+        const clamped = Math.min(quantity, MAX_ITEM_QTY)
         set((state) => ({
           items: state.items.map((i) =>
-            i.productId === productId ? { ...i, quantity } : i
+            i.productId === productId ? { ...i, quantity: clamped } : i
           ),
         }))
       },
@@ -102,6 +118,18 @@ export const useCartStore = create<CartState>()(
       storage: createJSONStorage(() => localStorage),
       // Tik `items` persistuojame — funkcijos pačios pridedamos iš create
       partialize: (state) => ({ items: state.items }),
+      // Klampinam kiekius ir įkeliant iš localStorage — apsauga, jei saugoma
+      // reikšmė buvo rankiniu būdu pakeista į netikroviškai didelį skaičių.
+      merge: (persisted, current) => {
+        const p = persisted as { items?: CartItem[] } | undefined
+        const items = Array.isArray(p?.items)
+          ? p.items.map((i) => ({
+              ...i,
+              quantity: Math.min(Math.max(1, i.quantity), MAX_ITEM_QTY),
+            }))
+          : []
+        return { ...current, items }
+      },
     }
   )
 )
