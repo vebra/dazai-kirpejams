@@ -8,7 +8,7 @@ import { Calculator } from '@/components/calculator/Calculator'
 import { buildPageMetadata, buildCanonicalUrl, SITE_URL } from '@/lib/seo'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { breadcrumbSchema } from '@/lib/schema'
-import { langPrefix } from '@/lib/utils'
+import { langPrefix, formatEurByLang } from '@/lib/utils'
 
 export const revalidate = 300
 
@@ -117,11 +117,15 @@ export default async function CalculatorPage({
                 <tbody>
                   {[
                     { label: t.rowVolume, std: '60 ml', ours: '180 ml' },
-                    { label: t.rowPrice, std: '~€11,00', ours: '€7,90' },
+                    {
+                      label: t.rowPrice,
+                      std: `~${formatEurByLang(11, lang)}`,
+                      ours: formatEurByLang(7.9, lang),
+                    },
                     {
                       label: t.rowPriceMl,
-                      std: '~€0,183',
-                      ours: '€0,044',
+                      std: `~${formatEurByLang(0.183, lang, 3)}`,
+                      ours: formatEurByLang(0.044, lang, 3),
                     },
                     {
                       label: t.rowPackages,

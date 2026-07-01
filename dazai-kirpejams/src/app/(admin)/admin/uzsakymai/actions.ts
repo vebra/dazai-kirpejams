@@ -172,18 +172,25 @@ export async function updateOrderStatusAction(
     vat_cents: number
     tracking_number: string | null
     tracking_carrier: string | null
+    locale: string | null
   } | null = null
 
   if (shouldEmail) {
     const { data } = await supabase
       .from('orders')
       .select(
-        'order_number, email, first_name, total_cents, vat_cents, tracking_number, tracking_carrier'
+        'order_number, email, first_name, total_cents, vat_cents, tracking_number, tracking_carrier, locale'
       )
       .eq('id', id)
       .maybeSingle()
     orderData = data
   }
+
+  // Kliento laiškų kalba — kokia kalba klientas pirko (orders.locale).
+  const emailLang: 'lt' | 'en' | 'ru' =
+    orderData?.locale === 'en' || orderData?.locale === 'ru'
+      ? orderData.locale
+      : 'lt'
 
   // Automatinis payment_status sinchronizavimas pagal užsakymo statusą.
   // Logika: bet kuris „toliau nei pending" statusas implikuoja, kad
@@ -284,7 +291,8 @@ export async function updateOrderStatusAction(
             totalCents: orderData.total_cents,
             isVatInvoice: orderData.vat_cents > 0,
             siteUrl,
-            accountUrl: `${siteUrl}/lt/paskyra`,
+            accountUrl: `${siteUrl}/${emailLang}/paskyra`,
+            lang: emailLang,
           })
 
           await sendEmail({
@@ -326,6 +334,7 @@ export async function updateOrderStatusAction(
         trackingNumber: orderData.tracking_number ?? null,
         trackingCarrier: orderData.tracking_carrier ?? null,
         siteUrl,
+        lang: emailLang,
       })
 
       await sendEmail({

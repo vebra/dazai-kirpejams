@@ -780,6 +780,8 @@ type StatusChangeEmailInput = {
   trackingNumber: string | null
   trackingCarrier: string | null
   siteUrl: string
+  /** Kliento kalba iš orders.locale. Default 'lt' (atgalinis suderinamumas). */
+  lang?: EmailLang
 }
 
 const CARRIER_LABELS: Record<string, string> = {
@@ -793,6 +795,180 @@ const CARRIER_TRACKING_URLS: Record<string, (tn: string) => string> = {
   omniva: (tn) => `https://www.omniva.lt/private_customer/tracking?barcode=${tn}`,
   dpd: (tn) => `https://www.dpd.lt/tracking?parcelnumber=${tn}`,
   lp_express: (tn) => `https://www.lpexpress.lt/tracking/${tn}`,
+}
+
+/** Lokalizuota vidinė nuoroda — visos kalbos (įskaitant lt) turi /[lang]/
+ * prefiksą, kaip ir route'uose (žr. /${input.locale}/uzsakymas/... checkout'e). */
+function langUrl(siteUrl: string, lang: EmailLang, path: string): string {
+  return `${siteUrl}/${lang}${path}`
+}
+
+// Statuso laiškų kopijos. `intro` gauna jau paruoštus name/nr — HTML kelias
+// paduoda escaped + <strong>, text kelias paduoda plain. Taip viena funkcija
+// aptarnauja abu variantus nepaisant skirtingos žodžių tvarkos kalbose.
+const SHIPPED_COPY: Record<
+  EmailLang,
+  {
+    subject: (nr: string) => string
+    preheader: (nr: string) => string
+    h1: string
+    intro: (name: string, nr: string) => string
+    trackingLabel: string
+    trackCta: string
+    footerQuestions: string
+    textTrackingLabel: string
+    textTrackLine: (url: string) => string
+  }
+> = {
+  lt: {
+    subject: (nr) => `Jūsų užsakymas ${nr} išsiųstas`,
+    preheader: (nr) => `Jūsų užsakymas ${nr} jau pakeliui!`,
+    h1: 'Jūsų užsakymas išsiųstas!',
+    intro: (name, nr) =>
+      `Sveiki, ${name}. Jūsų užsakymas ${nr} jau pakeliui pas Jus.`,
+    trackingLabel: 'Siuntimo sekimo numeris',
+    trackCta: 'Sekti siuntą →',
+    footerQuestions: 'Jei turite klausimų — tiesiog atsakykite į šį laišką.',
+    textTrackingLabel: 'Siuntimo sekimo nr.',
+    textTrackLine: (url) => `Sekti siuntą: ${url}`,
+  },
+  en: {
+    subject: (nr) => `Your order ${nr} has been shipped`,
+    preheader: (nr) => `Your order ${nr} is on its way!`,
+    h1: 'Your order has been shipped!',
+    intro: (name, nr) =>
+      `Hello, ${name}. Your order ${nr} is on its way to you.`,
+    trackingLabel: 'Tracking number',
+    trackCta: 'Track shipment →',
+    footerQuestions:
+      'If you have any questions, just reply to this email.',
+    textTrackingLabel: 'Tracking number',
+    textTrackLine: (url) => `Track shipment: ${url}`,
+  },
+  ru: {
+    subject: (nr) => `Ваш заказ ${nr} отправлен`,
+    preheader: (nr) => `Ваш заказ ${nr} уже в пути!`,
+    h1: 'Ваш заказ отправлен!',
+    intro: (name, nr) =>
+      `Здравствуйте, ${name}. Ваш заказ ${nr} уже в пути к вам.`,
+    trackingLabel: 'Номер для отслеживания',
+    trackCta: 'Отследить посылку →',
+    footerQuestions:
+      'Если есть вопросы — просто ответьте на это письмо.',
+    textTrackingLabel: 'Номер для отслеживания',
+    textTrackLine: (url) => `Отследить посылку: ${url}`,
+  },
+}
+
+const DELIVERED_COPY: Record<
+  EmailLang,
+  {
+    subject: (nr: string) => string
+    preheader: (nr: string) => string
+    h1: (name: string) => string
+    intro: (nr: string) => string
+    help: string
+    reorderTitle: string
+    reorderBody: string
+    catalogCta: string
+    accountPrefix: string
+    accountLinkText: string
+    accountSuffix: string
+    textReorder: string
+    textAccount: string
+  }
+> = {
+  lt: {
+    subject: (nr) => `Užsakymas ${nr} pristatytas — ačiū, kad pirkote!`,
+    preheader: (nr) =>
+      `Užsakymas ${nr} pristatytas. Ačiū, kad pasirinkote Dažai Kirpėjams.`,
+    h1: (name) => `Ačiū, ${name}!`,
+    intro: (nr) =>
+      `Jūsų užsakymas ${nr} pristatytas. Tikimės, kad Color SHOCK pateisins lūkesčius.`,
+    help: 'Jei kažkas su preke ne taip — tiesiog atsakykite į šį laišką, padėsime. Pakuotė pažeista, trūksta prekės ar atrodo netinkamos kokybės — viską išspręsime.',
+    reorderTitle: 'Vėl reikia dažų?',
+    reorderBody:
+      'Mes laikomės sandėlyje pilnos Color SHOCK paletės. Užsisakykite anksčiau — pristatysime per 1–2 darbo dienas.',
+    catalogCta: 'Atidaryti katalogą →',
+    accountPrefix: 'Užsakymo istoriją ir sąskaitas rasite savo ',
+    accountLinkText: 'paskyroje',
+    accountSuffix: '.',
+    textReorder: 'Vėl reikia dažų? Atidaryti katalogą:',
+    textAccount: 'Užsakymo istoriją ir sąskaitas rasite savo paskyroje:',
+  },
+  en: {
+    subject: (nr) => `Order ${nr} delivered — thank you for your purchase!`,
+    preheader: (nr) =>
+      `Order ${nr} has been delivered. Thank you for choosing Dažai Kirpėjams.`,
+    h1: (name) => `Thank you, ${name}!`,
+    intro: (nr) =>
+      `Your order ${nr} has been delivered. We hope Color SHOCK lives up to your expectations.`,
+    help: 'If anything is wrong with your order, just reply to this email and we will help. Damaged packaging, a missing item or a quality concern — we will sort it out.',
+    reorderTitle: 'Need colour again?',
+    reorderBody:
+      'We keep the full Color SHOCK palette in stock. Order ahead — we deliver within 1–2 business days.',
+    catalogCta: 'Open the catalogue →',
+    accountPrefix: 'You can find your order history and invoices in your ',
+    accountLinkText: 'account',
+    accountSuffix: '.',
+    textReorder: 'Need colour again? Open the catalogue:',
+    textAccount:
+      'Your order history and invoices are available in your account:',
+  },
+  ru: {
+    subject: (nr) => `Заказ ${nr} доставлен — спасибо за покупку!`,
+    preheader: (nr) =>
+      `Заказ ${nr} доставлен. Спасибо, что выбрали Dažai Kirpėjams.`,
+    h1: (name) => `Спасибо, ${name}!`,
+    intro: (nr) =>
+      `Ваш заказ ${nr} доставлен. Надеемся, Color SHOCK оправдает ваши ожидания.`,
+    help: 'Если с заказом что-то не так — просто ответьте на это письмо, мы поможем. Повреждена упаковка, не хватает товара или есть сомнения в качестве — всё решим.',
+    reorderTitle: 'Снова нужна краска?',
+    reorderBody:
+      'Мы держим на складе полную палитру Color SHOCK. Закажите заранее — доставим за 1–2 рабочих дня.',
+    catalogCta: 'Открыть каталог →',
+    accountPrefix: 'Историю заказов и счета вы найдёте в своём ',
+    accountLinkText: 'аккаунте',
+    accountSuffix: '.',
+    textReorder: 'Снова нужна краска? Открыть каталог:',
+    textAccount: 'Историю заказов и счета вы найдёте в своём аккаунте:',
+  },
+}
+
+const CANCELLED_COPY: Record<
+  EmailLang,
+  {
+    subject: (nr: string) => string
+    h1: string
+    intro: (name: string, nr: string) => string
+    body: string
+    backCta: string
+  }
+> = {
+  lt: {
+    subject: (nr) => `Jūsų užsakymas ${nr} atšauktas`,
+    h1: 'Užsakymas atšauktas',
+    intro: (name, nr) =>
+      `Sveiki, ${name}. Jūsų užsakymas ${nr} buvo atšauktas. Jei mokėjimas jau buvo atliktas, pinigai bus grąžinti per 5 darbo dienas.`,
+    body: 'Jei manote, kad tai klaida, arba norite užsakyti iš naujo — susisiekite su mumis atsakydami į šį laišką.',
+    backCta: 'Grįžti į parduotuvę →',
+  },
+  en: {
+    subject: (nr) => `Your order ${nr} has been cancelled`,
+    h1: 'Order cancelled',
+    intro: (name, nr) =>
+      `Hello, ${name}. Your order ${nr} has been cancelled. If you have already paid, the money will be refunded within 5 business days.`,
+    body: 'If you believe this is a mistake, or you would like to order again, please contact us by replying to this email.',
+    backCta: 'Back to the shop →',
+  },
+  ru: {
+    subject: (nr) => `Ваш заказ ${nr} отменён`,
+    h1: 'Заказ отменён',
+    intro: (name, nr) =>
+      `Здравствуйте, ${name}. Ваш заказ ${nr} был отменён. Если оплата уже была произведена, деньги вернём в течение 5 рабочих дней.`,
+    body: 'Если вы считаете, что это ошибка, или хотите оформить заказ заново — свяжитесь с нами, ответив на это письмо.',
+    backCta: 'Вернуться в магазин →',
+  },
 }
 
 export function buildStatusChangeEmail(input: StatusChangeEmailInput): {
@@ -814,15 +990,17 @@ function buildDeliveredEmail(input: StatusChangeEmailInput): {
   html: string
   text: string
 } {
-  const subject = `Užsakymas ${input.orderNumber} pristatytas — ačiū, kad pirkote!`
-  const accountUrl = `${input.siteUrl}/lt/paskyra`
-  const catalogUrl = `${input.siteUrl}/lt/produktai`
+  const lang: EmailLang = input.lang ?? 'lt'
+  const c = DELIVERED_COPY[lang]
+  const subject = c.subject(input.orderNumber)
+  const accountUrl = langUrl(input.siteUrl, lang, '/paskyra')
+  const catalogUrl = langUrl(input.siteUrl, lang, '/produktai')
   const html = `<!doctype html>
-<html lang="lt">
+<html lang="${lang}">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(subject)}</title></head>
 <body style="margin:0;padding:0;background:${GRAY_50};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:${GRAY_900};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
-  Užsakymas ${escapeHtml(input.orderNumber)} pristatytas. Ačiū, kad pasirinkote Dažai Kirpėjams.
+  ${escapeHtml(c.preheader(input.orderNumber))}
 </div>
 <table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};padding:32px 16px;">
   <tr><td align="center">
@@ -831,17 +1009,17 @@ function buildDeliveredEmail(input: StatusChangeEmailInput): {
         <td style="padding:32px;border-bottom:1px solid ${BORDER};">
           <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:${BRAND_MAGENTA};">Dažai Kirpėjams</div>
           <h1 style="margin:8px 0 0;font-size:24px;font-weight:700;color:${GRAY_900};line-height:1.25;">
-            Ačiū, ${escapeHtml(input.firstName)}!
+            ${c.h1(escapeHtml(input.firstName))}
           </h1>
           <p style="margin:8px 0 0;font-size:14px;color:${GRAY_500};line-height:1.5;">
-            Jūsų užsakymas <strong>${escapeHtml(input.orderNumber)}</strong> pristatytas. Tikimės, kad Color SHOCK pateisins lūkesčius.
+            ${c.intro(`<strong>${escapeHtml(input.orderNumber)}</strong>`)}
           </p>
         </td>
       </tr>
       <tr>
         <td style="padding:24px 32px 0;">
           <p style="margin:0;font-size:14px;color:${GRAY_900};line-height:1.7;">
-            Jei kažkas su preke ne taip — tiesiog atsakykite į šį laišką, padėsime. Pakuotė pažeista, trūksta prekės ar atrodo netinkamos kokybės — viską išspręsime.
+            ${escapeHtml(c.help)}
           </p>
         </td>
       </tr>
@@ -849,13 +1027,13 @@ function buildDeliveredEmail(input: StatusChangeEmailInput): {
         <td style="padding:24px 32px 0;">
           <div style="background:${GRAY_50};border-radius:12px;padding:20px;">
             <div style="font-size:13px;font-weight:700;color:${GRAY_900};margin-bottom:6px;">
-              Vėl reikia dažų?
+              ${escapeHtml(c.reorderTitle)}
             </div>
             <p style="margin:0 0 14px;font-size:13px;color:${GRAY_500};line-height:1.6;">
-              Mes laikomės sandėlyje pilnos Color SHOCK paletės. Užsisakykite anksčiau — pristatysime per 1–2 darbo dienas.
+              ${escapeHtml(c.reorderBody)}
             </p>
             <a href="${catalogUrl}" style="display:inline-block;padding:11px 22px;background:${BRAND_MAGENTA};color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;border-radius:8px;">
-              Atidaryti katalogą →
+              ${escapeHtml(c.catalogCta)}
             </a>
           </div>
         </td>
@@ -863,7 +1041,7 @@ function buildDeliveredEmail(input: StatusChangeEmailInput): {
       <tr>
         <td style="padding:32px;border-top:1px solid ${BORDER};margin-top:24px;">
           <p style="margin:0 0 8px;font-size:13px;color:${GRAY_500};line-height:1.6;">
-            Užsakymo istoriją ir sąskaitas rasite savo <a href="${accountUrl}" style="color:${BRAND_MAGENTA};text-decoration:none;font-weight:600;">paskyroje</a>.
+            ${escapeHtml(c.accountPrefix)}<a href="${accountUrl}" style="color:${BRAND_MAGENTA};text-decoration:none;font-weight:600;">${escapeHtml(c.accountLinkText)}</a>${escapeHtml(c.accountSuffix)}
           </p>
           <p style="margin:18px 0 0;font-size:12px;color:${GRAY_500};">
             <strong style="color:${GRAY_900};">Dažai Kirpėjams</strong><br>
@@ -877,15 +1055,15 @@ function buildDeliveredEmail(input: StatusChangeEmailInput): {
 </body></html>`
 
   const text = `
-Ačiū, ${input.firstName}!
+${c.h1(input.firstName)}
 
-Jūsų užsakymas ${input.orderNumber} pristatytas. Tikimės, kad Color SHOCK pateisins lūkesčius.
+${c.intro(input.orderNumber)}
 
-Jei kažkas su preke ne taip — tiesiog atsakykite į šį laišką, padėsime.
+${c.help}
 
-Vėl reikia dažų? Atidaryti katalogą: ${catalogUrl}
+${c.textReorder} ${catalogUrl}
 
-Užsakymo istoriją ir sąskaitas rasite savo paskyroje:
+${c.textAccount}
 ${accountUrl}
 
 Dažai Kirpėjams
@@ -900,7 +1078,9 @@ function buildShippedEmail(input: StatusChangeEmailInput): {
   html: string
   text: string
 } {
-  const subject = `Jūsų užsakymas ${input.orderNumber} išsiųstas`
+  const lang: EmailLang = input.lang ?? 'lt'
+  const c = SHIPPED_COPY[lang]
+  const subject = c.subject(input.orderNumber)
   const carrierLabel = input.trackingCarrier
     ? CARRIER_LABELS[input.trackingCarrier] ?? input.trackingCarrier
     : null
@@ -916,14 +1096,14 @@ function buildShippedEmail(input: StatusChangeEmailInput): {
         <td style="padding:0 20px;">
           <div style="background:${GRAY_50};border-radius:12px;padding:20px;margin:24px 0;">
             <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:${GRAY_500};">
-              Siuntimo sekimo numeris${carrierLabel ? ` (${escapeHtml(carrierLabel)})` : ''}
+              ${escapeHtml(c.trackingLabel)}${carrierLabel ? ` (${escapeHtml(carrierLabel)})` : ''}
             </div>
             <div style="font-size:18px;font-weight:700;color:${GRAY_900};font-family:monospace;margin-top:8px;">
               ${escapeHtml(input.trackingNumber)}
             </div>
             ${
               trackingUrl
-                ? `<a href="${trackingUrl}" style="display:inline-block;margin-top:12px;padding:10px 20px;background:${BRAND_MAGENTA};color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;font-size:13px;">Sekti siuntą →</a>`
+                ? `<a href="${trackingUrl}" style="display:inline-block;margin-top:12px;padding:10px 20px;background:${BRAND_MAGENTA};color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;font-size:13px;">${escapeHtml(c.trackCta)}</a>`
                 : ''
             }
           </div>
@@ -932,11 +1112,11 @@ function buildShippedEmail(input: StatusChangeEmailInput): {
     : ''
 
   const html = `<!doctype html>
-<html lang="lt">
+<html lang="${lang}">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(subject)}</title></head>
 <body style="margin:0;padding:0;background:${GRAY_50};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:${GRAY_900};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
-  Jūsų užsakymas ${escapeHtml(input.orderNumber)} jau pakeliui!
+  ${escapeHtml(c.preheader(input.orderNumber))}
 </div>
 <table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};padding:32px 16px;">
   <tr><td align="center">
@@ -944,9 +1124,9 @@ function buildShippedEmail(input: StatusChangeEmailInput): {
       <tr>
         <td style="padding:32px;border-bottom:1px solid ${BORDER};">
           <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:${BRAND_MAGENTA};">Dažai Kirpėjams</div>
-          <h1 style="margin:8px 0 0;font-size:24px;font-weight:700;color:${GRAY_900};">Jūsų užsakymas išsiųstas!</h1>
+          <h1 style="margin:8px 0 0;font-size:24px;font-weight:700;color:${GRAY_900};">${escapeHtml(c.h1)}</h1>
           <p style="margin:8px 0 0;font-size:14px;color:${GRAY_500};line-height:1.5;">
-            Sveiki, ${escapeHtml(input.firstName)}. Jūsų užsakymas <strong>${escapeHtml(input.orderNumber)}</strong> jau pakeliui pas Jus.
+            ${c.intro(escapeHtml(input.firstName), `<strong>${escapeHtml(input.orderNumber)}</strong>`)}
           </p>
         </td>
       </tr>
@@ -954,7 +1134,7 @@ function buildShippedEmail(input: StatusChangeEmailInput): {
       <tr>
         <td style="padding:32px;border-top:1px solid ${BORDER};">
           <p style="margin:0;font-size:13px;color:${GRAY_500};line-height:1.6;">
-            Jei turite klausimų — tiesiog atsakykite į šį laišką.
+            ${escapeHtml(c.footerQuestions)}
           </p>
           <p style="margin:12px 0 0;font-size:12px;color:${GRAY_500};">
             <strong style="color:${GRAY_900};">Dažai Kirpėjams</strong><br>
@@ -968,15 +1148,13 @@ function buildShippedEmail(input: StatusChangeEmailInput): {
 </body></html>`
 
   const text = `
-Jūsų užsakymas ${input.orderNumber} išsiųstas — Dažai Kirpėjams
+${c.subject(input.orderNumber)} — Dažai Kirpėjams
 
-Sveiki, ${input.firstName}.
+${c.intro(input.firstName, input.orderNumber)}
+${input.trackingNumber ? `\n${c.textTrackingLabel}: ${input.trackingNumber}${carrierLabel ? ` (${carrierLabel})` : ''}` : ''}
+${trackingUrl ? c.textTrackLine(trackingUrl) : ''}
 
-Jūsų užsakymas ${input.orderNumber} jau pakeliui pas Jus.
-${input.trackingNumber ? `\nSiuntimo sekimo nr.: ${input.trackingNumber}${carrierLabel ? ` (${carrierLabel})` : ''}` : ''}
-${trackingUrl ? `Sekti siuntą: ${trackingUrl}` : ''}
-
-Jei turite klausimų — tiesiog atsakykite į šį laišką.
+${c.footerQuestions}
 
 Dažai Kirpėjams
 ${input.siteUrl}
@@ -998,6 +1176,107 @@ type InvoicePaidEmailInput = {
   isVatInvoice: boolean
   siteUrl: string
   accountUrl: string
+  /** Kliento kalba iš orders.locale. Default 'lt' (atgalinis suderinamumas). */
+  lang?: EmailLang
+}
+
+// Sąskaitos laiško kopijos. Dokumento pavadinimai laikomi pilnomis frazėmis
+// (docVat/doc, h1Vat/h1) — kalbose skiriasi giminė ir žodžių tvarka, todėl
+// nekonstruojame jų iš dalių.
+const INVOICE_COPY: Record<
+  EmailLang,
+  {
+    docVat: string
+    doc: string
+    docLowerVat: string
+    docLower: string
+    h1Vat: string
+    h1: string
+    preheader: (inv: string, sum: string) => string
+    intro: (name: string) => string
+    invoiceNumberLabel: string
+    amountLabel: string
+    orderLabel: string
+    accountText: string
+    accountCta: string
+    footerQuestions: string
+    textBody: (doc: string, inv: string, order: string) => string
+    textAmount: string
+    textAccount: string
+    textGreeting: (name: string) => string
+  }
+> = {
+  lt: {
+    docVat: 'PVM sąskaita faktūra',
+    doc: 'Sąskaita faktūra',
+    docLowerVat: 'PVM sąskaita faktūra',
+    docLower: 'sąskaita faktūra',
+    h1Vat: 'Jūsų PVM sąskaita faktūra',
+    h1: 'Jūsų sąskaita faktūra',
+    preheader: (inv, sum) => `Sąskaita ${inv} priede. Suma ${sum}.`,
+    intro: (name) =>
+      `Sveiki, ${name}. Ačiū už apmokėjimą — sąskaitą rasite šio laiško priede (PDF).`,
+    invoiceNumberLabel: 'Sąskaitos numeris',
+    amountLabel: 'Suma',
+    orderLabel: 'Užsakymas',
+    accountText:
+      'Sąskaitą taip pat galite peržiūrėti ir parsisiųsti savo paskyroje:',
+    accountCta: 'Mano sąskaitos →',
+    footerQuestions: 'Jei turite klausimų — tiesiog atsakykite į šį laišką.',
+    textBody: (doc, inv, order) =>
+      `Ačiū už apmokėjimą. Jūsų ${doc} ${inv} (užsakymas ${order}) pridėta prie šio laiško kaip PDF.`,
+    textAmount: 'Suma',
+    textAccount: 'Sąskaitą taip pat galite parsisiųsti savo paskyroje:',
+    textGreeting: (name) => `Sveiki, ${name}.`,
+  },
+  en: {
+    docVat: 'VAT invoice',
+    doc: 'Invoice',
+    docLowerVat: 'VAT invoice',
+    docLower: 'invoice',
+    h1Vat: 'Your VAT invoice',
+    h1: 'Your invoice',
+    preheader: (inv, sum) => `Invoice ${inv} attached. Amount ${sum}.`,
+    intro: (name) =>
+      `Hello, ${name}. Thank you for your payment — the invoice is attached to this email (PDF).`,
+    invoiceNumberLabel: 'Invoice number',
+    amountLabel: 'Amount',
+    orderLabel: 'Order',
+    accountText:
+      'You can also view and download the invoice in your account:',
+    accountCta: 'My invoices →',
+    footerQuestions:
+      'If you have any questions, just reply to this email.',
+    textBody: (doc, inv, order) =>
+      `Thank you for your payment. Your ${doc} ${inv} (order ${order}) is attached to this email as a PDF.`,
+    textAmount: 'Amount',
+    textAccount: 'You can also download the invoice in your account:',
+    textGreeting: (name) => `Hello, ${name}.`,
+  },
+  ru: {
+    docVat: 'Счёт-фактура с НДС',
+    doc: 'Счёт-фактура',
+    docLowerVat: 'счёт-фактура с НДС',
+    docLower: 'счёт-фактура',
+    h1Vat: 'Ваш счёт-фактура с НДС',
+    h1: 'Ваш счёт-фактура',
+    preheader: (inv, sum) => `Счёт ${inv} во вложении. Сумма ${sum}.`,
+    intro: (name) =>
+      `Здравствуйте, ${name}. Спасибо за оплату — счёт вы найдёте во вложении к этому письму (PDF).`,
+    invoiceNumberLabel: 'Номер счёта',
+    amountLabel: 'Сумма',
+    orderLabel: 'Заказ',
+    accountText:
+      'Счёт также можно посмотреть и скачать в вашем аккаунте:',
+    accountCta: 'Мои счета →',
+    footerQuestions:
+      'Если есть вопросы — просто ответьте на это письмо.',
+    textBody: (doc, inv, order) =>
+      `Спасибо за оплату. Ваш ${doc} ${inv} (заказ ${order}) приложен к этому письму в формате PDF.`,
+    textAmount: 'Сумма',
+    textAccount: 'Счёт также можно скачать в вашем аккаунте:',
+    textGreeting: (name) => `Здравствуйте, ${name}.`,
+  },
 }
 
 export function buildInvoicePaidEmail(input: InvoicePaidEmailInput): {
@@ -1005,20 +1284,19 @@ export function buildInvoicePaidEmail(input: InvoicePaidEmailInput): {
   html: string
   text: string
 } {
-  const docLabel = input.isVatInvoice
-    ? 'PVM sąskaita faktūra'
-    : 'Sąskaita faktūra'
-  const docLabelLower = input.isVatInvoice
-    ? 'PVM sąskaita faktūra'
-    : 'sąskaita faktūra'
+  const lang: EmailLang = input.lang ?? 'lt'
+  const c = INVOICE_COPY[lang]
+  const docLabel = input.isVatInvoice ? c.docVat : c.doc
+  const docLabelLower = input.isVatInvoice ? c.docLowerVat : c.docLower
+  const h1 = input.isVatInvoice ? c.h1Vat : c.h1
   const subject = `${docLabel} ${input.invoiceNumber} — Dažai Kirpėjams`
 
   const html = `<!doctype html>
-<html lang="lt">
+<html lang="${lang}">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(subject)}</title></head>
 <body style="margin:0;padding:0;background:${GRAY_50};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:${GRAY_900};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
-  Sąskaita ${escapeHtml(input.invoiceNumber)} priede. Suma ${formatEur(input.totalCents)}.
+  ${escapeHtml(c.preheader(input.invoiceNumber, formatEur(input.totalCents)))}
 </div>
 <table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};padding:32px 16px;">
   <tr><td align="center">
@@ -1026,9 +1304,9 @@ export function buildInvoicePaidEmail(input: InvoicePaidEmailInput): {
       <tr>
         <td style="padding:32px;border-bottom:1px solid ${BORDER};">
           <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:${BRAND_MAGENTA};">Dažai Kirpėjams</div>
-          <h1 style="margin:8px 0 0;font-size:24px;font-weight:700;color:${GRAY_900};">Jūsų ${docLabelLower}</h1>
+          <h1 style="margin:8px 0 0;font-size:24px;font-weight:700;color:${GRAY_900};">${escapeHtml(h1)}</h1>
           <p style="margin:8px 0 0;font-size:14px;color:${GRAY_500};line-height:1.5;">
-            Sveiki, ${escapeHtml(input.firstName)}. Ačiū už apmokėjimą — sąskaitą rasite šio laiško priede (PDF).
+            ${escapeHtml(c.intro(input.firstName))}
           </p>
         </td>
       </tr>
@@ -1037,17 +1315,17 @@ export function buildInvoicePaidEmail(input: InvoicePaidEmailInput): {
           <table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};border-radius:12px;">
             <tr>
               <td style="padding:16px 20px;">
-                <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:${GRAY_500};">Sąskaitos numeris</div>
+                <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:${GRAY_500};">${escapeHtml(c.invoiceNumberLabel)}</div>
                 <div style="font-size:18px;font-weight:700;color:${GRAY_900};font-family:monospace;margin-top:4px;">${escapeHtml(input.invoiceNumber)}</div>
               </td>
               <td style="padding:16px 20px;text-align:right;">
-                <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:${GRAY_500};">Suma</div>
+                <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:${GRAY_500};">${escapeHtml(c.amountLabel)}</div>
                 <div style="font-size:18px;font-weight:700;color:${GRAY_900};margin-top:4px;">${formatEur(input.totalCents)}</div>
               </td>
             </tr>
             <tr>
               <td colspan="2" style="padding:0 20px 16px;">
-                <div style="font-size:12px;color:${GRAY_500};">Užsakymas <span style="font-family:monospace;color:${GRAY_900};">${escapeHtml(input.orderNumber)}</span></div>
+                <div style="font-size:12px;color:${GRAY_500};">${escapeHtml(c.orderLabel)} <span style="font-family:monospace;color:${GRAY_900};">${escapeHtml(input.orderNumber)}</span></div>
               </td>
             </tr>
           </table>
@@ -1056,17 +1334,17 @@ export function buildInvoicePaidEmail(input: InvoicePaidEmailInput): {
       <tr>
         <td style="padding:24px 32px;">
           <p style="margin:0 0 16px;font-size:14px;color:${GRAY_900};line-height:1.6;">
-            Sąskaitą taip pat galite peržiūrėti ir parsisiųsti savo paskyroje:
+            ${escapeHtml(c.accountText)}
           </p>
           <a href="${input.accountUrl}" style="display:inline-block;padding:12px 24px;background:${BRAND_MAGENTA};color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">
-            Mano sąskaitos →
+            ${escapeHtml(c.accountCta)}
           </a>
         </td>
       </tr>
       <tr>
         <td style="padding:0 32px 32px;border-top:1px solid ${BORDER};padding-top:24px;">
           <p style="margin:0;font-size:13px;color:${GRAY_500};line-height:1.6;">
-            Jei turite klausimų — tiesiog atsakykite į šį laišką.
+            ${escapeHtml(c.footerQuestions)}
           </p>
           <p style="margin:12px 0 0;font-size:12px;color:${GRAY_500};">
             <strong style="color:${GRAY_900};">Dažai Kirpėjams</strong><br>
@@ -1082,16 +1360,16 @@ export function buildInvoicePaidEmail(input: InvoicePaidEmailInput): {
   const text = `
 ${docLabel} ${input.invoiceNumber} — Dažai Kirpėjams
 
-Sveiki, ${input.firstName}.
+${c.textGreeting(input.firstName)}
 
-Ačiū už apmokėjimą. Jūsų ${docLabelLower} ${input.invoiceNumber} (užsakymas ${input.orderNumber}) pridėta prie šio laiško kaip PDF.
+${c.textBody(docLabelLower, input.invoiceNumber, input.orderNumber)}
 
-Suma: ${formatEur(input.totalCents)}
+${c.textAmount}: ${formatEur(input.totalCents)}
 
-Sąskaitą taip pat galite parsisiųsti savo paskyroje:
+${c.textAccount}
 ${input.accountUrl}
 
-Jei turite klausimų — tiesiog atsakykite į šį laišką.
+${c.footerQuestions}
 
 Dažai Kirpėjams
 ${input.siteUrl}
@@ -1350,10 +1628,12 @@ function buildCancelledEmail(input: StatusChangeEmailInput): {
   html: string
   text: string
 } {
-  const subject = `Jūsų užsakymas ${input.orderNumber} atšauktas`
+  const lang: EmailLang = input.lang ?? 'lt'
+  const c = CANCELLED_COPY[lang]
+  const subject = c.subject(input.orderNumber)
 
   const html = `<!doctype html>
-<html lang="lt">
+<html lang="${lang}">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(subject)}</title></head>
 <body style="margin:0;padding:0;background:${GRAY_50};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:${GRAY_900};">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:${GRAY_50};padding:32px 16px;">
@@ -1362,22 +1642,20 @@ function buildCancelledEmail(input: StatusChangeEmailInput): {
       <tr>
         <td style="padding:32px;border-bottom:1px solid ${BORDER};">
           <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:${BRAND_MAGENTA};">Dažai Kirpėjams</div>
-          <h1 style="margin:8px 0 0;font-size:24px;font-weight:700;color:${GRAY_900};">Užsakymas atšauktas</h1>
+          <h1 style="margin:8px 0 0;font-size:24px;font-weight:700;color:${GRAY_900};">${escapeHtml(c.h1)}</h1>
           <p style="margin:8px 0 0;font-size:14px;color:${GRAY_500};line-height:1.5;">
-            Sveiki, ${escapeHtml(input.firstName)}. Jūsų užsakymas <strong>${escapeHtml(input.orderNumber)}</strong> buvo atšauktas.
-            Jei mokėjimas jau buvo atliktas, pinigai bus grąžinti per 5 darbo dienas.
+            ${c.intro(escapeHtml(input.firstName), `<strong>${escapeHtml(input.orderNumber)}</strong>`)}
           </p>
         </td>
       </tr>
       <tr>
         <td style="padding:32px;">
           <p style="margin:0;font-size:14px;color:${GRAY_900};line-height:1.6;">
-            Jei manote, kad tai klaida, arba norite užsakyti iš naujo — susisiekite
-            su mumis atsakydami į šį laišką.
+            ${escapeHtml(c.body)}
           </p>
           <p style="margin:16px 0 0;">
             <a href="${input.siteUrl}" style="display:inline-block;padding:12px 24px;background:${BRAND_MAGENTA};color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;font-size:14px;">
-              Grįžti į parduotuvę →
+              ${escapeHtml(c.backCta)}
             </a>
           </p>
           <p style="margin:24px 0 0;font-size:12px;color:${GRAY_500};">
@@ -1392,14 +1670,11 @@ function buildCancelledEmail(input: StatusChangeEmailInput): {
 </body></html>`
 
   const text = `
-Jūsų užsakymas ${input.orderNumber} atšauktas — Dažai Kirpėjams
+${c.subject(input.orderNumber)} — Dažai Kirpėjams
 
-Sveiki, ${input.firstName}.
+${c.intro(input.firstName, input.orderNumber)}
 
-Jūsų užsakymas ${input.orderNumber} buvo atšauktas.
-Jei mokėjimas jau buvo atliktas, pinigai bus grąžinti per 5 darbo dienas.
-
-Jei manote, kad tai klaida — susisiekite su mumis atsakydami į šį laišką.
+${c.body}
 
 Dažai Kirpėjams
 ${input.siteUrl}

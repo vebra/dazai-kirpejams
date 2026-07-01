@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { buildCustomerOrderEmail } from './templates'
+import {
+  buildCustomerOrderEmail,
+  buildStatusChangeEmail,
+  buildInvoicePaidEmail,
+} from './templates'
 
 type Input = Parameters<typeof buildCustomerOrderEmail>[0]
 
@@ -176,5 +180,161 @@ describe('buildCustomerOrderEmail — magic-link „Peržiūrėti užsakymą"', 
   it('paslėptas kai viewOrderUrl neperduotas', () => {
     const r = buildCustomerOrderEmail(makeInput({}))
     expect(r.html).not.toContain('Peržiūrėti užsakymą')
+  })
+})
+
+// ============================================
+// Statuso laiškų lokalizacija (LT/EN/RU)
+// ============================================
+
+type StatusInput = Parameters<typeof buildStatusChangeEmail>[0]
+
+function makeStatusInput(overrides: Partial<StatusInput> = {}): StatusInput {
+  return {
+    orderNumber: 'DK-260520-160345',
+    firstName: 'Marius',
+    status: 'shipped',
+    trackingNumber: 'LP123456789LT',
+    trackingCarrier: 'lp_express',
+    siteUrl: 'https://www.dazaikirpejams.lt',
+    ...overrides,
+  }
+}
+
+describe('buildStatusChangeEmail — lokalizacija', () => {
+  it('be lang — lietuviškas (atgalinis suderinamumas)', () => {
+    const r = buildStatusChangeEmail(makeStatusInput())
+    expect(r.subject).toContain('išsiųstas')
+    expect(r.html).toContain('<html lang="lt">')
+  })
+
+  it('shipped EN — angliškas subject, tracking blokas ir lang atributas', () => {
+    const r = buildStatusChangeEmail(makeStatusInput({ lang: 'en' }))
+    expect(r.subject).toBe('Your order DK-260520-160345 has been shipped')
+    expect(r.subject).not.toContain('išsiųstas')
+    expect(r.html).toContain('<html lang="en">')
+    expect(r.html).toContain('Tracking number')
+    expect(r.html).toContain('LP123456789LT')
+    expect(r.text).toContain('Track shipment:')
+  })
+
+  it('shipped RU — rusiškas subject ir tracking etiketė', () => {
+    const r = buildStatusChangeEmail(makeStatusInput({ lang: 'ru' }))
+    expect(r.subject).toBe('Ваш заказ DK-260520-160345 отправлен')
+    expect(r.html).toContain('<html lang="ru">')
+    expect(r.html).toContain('Номер для отслеживания')
+  })
+
+  it('delivered EN — nuorodos su /en/ prefiksu', () => {
+    const r = buildStatusChangeEmail(
+      makeStatusInput({ status: 'delivered', lang: 'en' })
+    )
+    expect(r.subject).toContain('delivered')
+    expect(r.html).toContain('https://www.dazaikirpejams.lt/en/paskyra')
+    expect(r.html).toContain('https://www.dazaikirpejams.lt/en/produktai')
+    expect(r.html).not.toContain('/lt/paskyra')
+  })
+
+  it('delivered RU — nuorodos su /ru/ prefiksu', () => {
+    const r = buildStatusChangeEmail(
+      makeStatusInput({ status: 'delivered', lang: 'ru' })
+    )
+    expect(r.subject).toContain('доставлен')
+    expect(r.html).toContain('https://www.dazaikirpejams.lt/ru/paskyra')
+    expect(r.text).toContain('https://www.dazaikirpejams.lt/ru/produktai')
+  })
+
+  it('delivered be lang — /lt/ nuorodos kaip anksčiau', () => {
+    const r = buildStatusChangeEmail(makeStatusInput({ status: 'delivered' }))
+    expect(r.subject).toContain('pristatytas')
+    expect(r.html).toContain('https://www.dazaikirpejams.lt/lt/paskyra')
+    expect(r.html).toContain('https://www.dazaikirpejams.lt/lt/produktai')
+  })
+
+  it('cancelled EN/RU — lokalizuotas subject ir grąžinimo terminas', () => {
+    const en = buildStatusChangeEmail(
+      makeStatusInput({ status: 'cancelled', lang: 'en' })
+    )
+    expect(en.subject).toBe('Your order DK-260520-160345 has been cancelled')
+    expect(en.html).toContain('5 business days')
+
+    const ru = buildStatusChangeEmail(
+      makeStatusInput({ status: 'cancelled', lang: 'ru' })
+    )
+    expect(ru.subject).toBe('Ваш заказ DK-260520-160345 отменён')
+    expect(ru.html).toContain('5 рабочих дней')
+  })
+
+  it('apsaugo (escape) pavojingą firstName visose kalbose', () => {
+    for (const lang of ['lt', 'en', 'ru'] as const) {
+      const r = buildStatusChangeEmail(
+        makeStatusInput({ firstName: '<script>alert(1)</script>', lang })
+      )
+      expect(r.html).not.toContain('<script>alert(1)</script>')
+    }
+  })
+})
+
+// ============================================
+// Sąskaitos laiško lokalizacija (LT/EN/RU)
+// ============================================
+
+type InvoiceInput = Parameters<typeof buildInvoicePaidEmail>[0]
+
+function makeInvoiceInput(overrides: Partial<InvoiceInput> = {}): InvoiceInput {
+  return {
+    orderNumber: 'DK-260520-160345',
+    invoiceNumber: 'DK-INV-0042',
+    firstName: 'Marius',
+    totalCents: 2296,
+    isVatInvoice: true,
+    siteUrl: 'https://www.dazaikirpejams.lt',
+    accountUrl: 'https://www.dazaikirpejams.lt/lt/paskyra',
+    ...overrides,
+  }
+}
+
+describe('buildInvoicePaidEmail — lokalizacija', () => {
+  it('be lang — lietuviškas (atgalinis suderinamumas)', () => {
+    const r = buildInvoicePaidEmail(makeInvoiceInput())
+    expect(r.subject).toBe('PVM sąskaita faktūra DK-INV-0042 — Dažai Kirpėjams')
+    expect(r.html).toContain('<html lang="lt">')
+    expect(r.html).toContain('Sąskaitos numeris')
+  })
+
+  it('EN — angliškas subject, VAT invoice ir accountUrl', () => {
+    const r = buildInvoicePaidEmail(
+      makeInvoiceInput({
+        lang: 'en',
+        accountUrl: 'https://www.dazaikirpejams.lt/en/paskyra',
+      })
+    )
+    expect(r.subject).toBe('VAT invoice DK-INV-0042 — Dažai Kirpėjams')
+    expect(r.subject).not.toContain('sąskaita')
+    expect(r.html).toContain('<html lang="en">')
+    expect(r.html).toContain('https://www.dazaikirpejams.lt/en/paskyra')
+    expect(r.html).toContain('Invoice number')
+    expect(r.text).toContain('Thank you for your payment')
+  })
+
+  it('EN — ne PVM variantas be „VAT"', () => {
+    const r = buildInvoicePaidEmail(
+      makeInvoiceInput({ lang: 'en', isVatInvoice: false })
+    )
+    expect(r.subject).toBe('Invoice DK-INV-0042 — Dažai Kirpėjams')
+  })
+
+  it('RU — rusiškas subject ir turinys', () => {
+    const r = buildInvoicePaidEmail(
+      makeInvoiceInput({
+        lang: 'ru',
+        accountUrl: 'https://www.dazaikirpejams.lt/ru/paskyra',
+      })
+    )
+    expect(r.subject).toBe('Счёт-фактура с НДС DK-INV-0042 — Dažai Kirpėjams')
+    expect(r.html).toContain('<html lang="ru">')
+    expect(r.html).toContain('https://www.dazaikirpejams.lt/ru/paskyra')
+    expect(r.html).toContain('Номер счёта')
+    expect(r.text).toContain('Спасибо за оплату')
   })
 })

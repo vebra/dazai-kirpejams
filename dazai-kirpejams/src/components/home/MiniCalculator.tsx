@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import type { Locale } from '@/i18n/config'
-import { langPrefix } from '@/lib/utils'
+import { langPrefix, formatEurByLang } from '@/lib/utils'
 
 // Tos pačios prielaidos kaip pilnoje /skaiciuokle: 60 ml vidutinis dažymo
 // kiekis, standartinė konkurento 60 ml pakuotė €11, mūsų 180 ml €7.90.
@@ -48,8 +48,7 @@ export function MiniCalculator({
     }
   }, [dyeings])
 
-  const formatEur = (v: number) =>
-    '€' + v.toFixed(2).replace('.', ',')
+  const formatEur = (v: number) => formatEurByLang(v, lang)
 
   return (
     <section className="py-16 lg:py-20 bg-brand-gray-900 text-white">

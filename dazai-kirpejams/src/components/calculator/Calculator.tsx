@@ -3,17 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Locale } from '@/i18n/config'
 import { trackCalculatorUsed } from '@/lib/analytics'
+import { formatEurByLang } from '@/lib/utils'
 
 const OUR_PRICE = 7.9
 const OUR_VOLUME = 180
-
-function formatEur(value: number): string {
-  return '€' + value.toFixed(2).replace('.', ',')
-}
-
-function formatPerMl(value: number): string {
-  return '€' + value.toFixed(3).replace('.', ',')
-}
 
 type CalculatorDict = {
   calcTitle: string
@@ -162,7 +155,7 @@ export function Calculator({
             <div className="mt-1 text-[0.95rem] text-brand-gray-900">
               <strong>Color SHOCK 180 ml</strong> —{' '}
               <span className="text-brand-magenta font-extrabold text-[1.15rem]">
-                €7,90
+                {formatEurByLang(OUR_PRICE, lang)}
               </span>
             </div>
           </div>
@@ -177,11 +170,11 @@ export function Calculator({
           <div className="space-y-4">
             <ResultRow
               label={dict.calcCompetitorPerMl}
-              value={formatPerMl(results.competitorPerMl)}
+              value={formatEurByLang(results.competitorPerMl, lang, 3)}
             />
             <ResultRow
               label={dict.calcOurPerMl}
-              value={formatPerMl(results.ourPerMl)}
+              value={formatEurByLang(results.ourPerMl, lang, 3)}
               highlight
             />
 
@@ -189,13 +182,13 @@ export function Calculator({
 
             <ResultRow
               label={dict.calcSavingsMonth}
-              value={formatEur(results.savingsPerMonth)}
+              value={formatEurByLang(results.savingsPerMonth, lang)}
               highlight
               big
             />
             <ResultRow
               label={dict.calcSavingsYear}
-              value={formatEur(results.savingsPerYear)}
+              value={formatEurByLang(results.savingsPerYear, lang)}
               highlight
               big
             />
