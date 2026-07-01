@@ -92,7 +92,7 @@ export default async function CampaignsPage({
       <section className="bg-white rounded-xl border border-[#eee] shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
         {campaigns.length === 0 ? (
           <div className="px-6 py-12 text-center text-sm text-brand-gray-500">
-            Kol kas nei vienos kampanijos. Sukurkite pirmąją per „+ Nauja kampanija".
+            Kol kas nei vienos kampanijos. Sukurkite pirmąją per „+ Nauja kampanija&quot;.
           </div>
         ) : (
           <div className="overflow-x-auto">

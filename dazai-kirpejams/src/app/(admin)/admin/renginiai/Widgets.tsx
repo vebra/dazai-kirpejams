@@ -99,6 +99,7 @@ export function ReminderStatus({
     .pop()
 
   const startsAt = new Date(startsAtIso).getTime()
+  // eslint-disable-next-line react-hooks/purity -- server komponentas (be 'use client'): Date.now() tyčia skaičiuojamas request'o metu, ne kliento re-renderiuose
   const hoursUntil = Math.round((startsAt - Date.now()) / (60 * 60 * 1000))
 
   // Langas turi sutapti su /api/cron/event-reminders (12–36h prieš startą).

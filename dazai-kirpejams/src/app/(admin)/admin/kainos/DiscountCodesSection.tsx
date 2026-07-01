@@ -76,6 +76,7 @@ export function DiscountCodesSection({
   useEffect(() => {
     if (state.success) {
       formRef.current?.reset()
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- tyčinis post-submit reset pattern'as: po sėkmingo server action'o forma išvaloma vieną kartą
       setScope('all')
       setSelProducts(new Set())
       setSelCategories(new Set())

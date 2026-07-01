@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useActionState, useEffect } from 'react'
 import {
   registerForEventAction,
@@ -174,14 +175,14 @@ export function EventRegistrationForm({ eventSlug }: { eventSlug: string }) {
       </button>
 
       <p className="text-xs text-brand-gray-500 text-center leading-relaxed">
-        Spausdami „Registruotis" sutinkate, kad Jūsų duomenys bus naudojami
+        Spausdami „Registruotis&quot; sutinkate, kad Jūsų duomenys bus naudojami
         renginio organizavimui. Daugiau informacijos{' '}
-        <a
+        <Link
           href="/lt/privatumo-politika"
           className="underline hover:text-brand-magenta"
         >
           Privatumo politikoje
-        </a>
+        </Link>
         .
       </p>
     </form>

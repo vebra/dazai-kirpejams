@@ -53,6 +53,7 @@ export function CookieConsent({ lang, dict }: { lang: Locale; dict: Dict }) {
     try {
       const existing = localStorage.getItem(STORAGE_KEY)
       if (existing !== 'accepted' && existing !== 'rejected') {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- SSR hydration pattern'as: localStorage pasiekiamas tik kliente, banner'io fazė tyčia nustatoma efekte
         setPhase('entering')
         raf = requestAnimationFrame(() => setPhase('visible'))
       }

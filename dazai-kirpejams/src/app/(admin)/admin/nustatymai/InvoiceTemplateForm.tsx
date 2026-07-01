@@ -86,7 +86,7 @@ export function InvoiceTemplateForm({
               />
             </div>
             <p className="mt-1 text-[11px] text-brand-gray-500">
-              Naudojama sąskaitos antraštei, „Mokėti" sumos spalvai ir
+              Naudojama sąskaitos antraštei, „Mokėti&quot; sumos spalvai ir
               mokėjimo bloko kraštui.
             </p>
           </div>
@@ -143,7 +143,7 @@ export function InvoiceTemplateForm({
             />
             <p className="mt-1 text-[11px] text-brand-gray-500">
               0 — mokėtina iš karto. Paprastai B2B — 14 arba 30 d.
-              Reikšmė pridedama prie išrašymo datos ir rodoma kaip „Apmokėti iki".
+              Reikšmė pridedama prie išrašymo datos ir rodoma kaip „Apmokėti iki&quot;.
             </p>
           </div>
         </div>

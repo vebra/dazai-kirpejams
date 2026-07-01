@@ -197,7 +197,7 @@ export default async function IssueInvoicePage({
               className="w-full px-3.5 py-2.5 bg-[#F5F5F7] border border-[#ddd] rounded-lg text-sm focus:outline-none focus:border-brand-magenta focus:bg-white resize-y"
             />
             <p className="mt-1 text-[11px] text-brand-gray-500">
-              Default'iniai tekstai paimti iš šablono ir užsakymo. Galite juos
+              Default&apos;iniai tekstai paimti iš šablono ir užsakymo. Galite juos
               pakeisti ar palikti tuščią.
             </p>
           </div>

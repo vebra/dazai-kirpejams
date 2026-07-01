@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { hasLocale } from '@/i18n/dictionaries'
 import { JsonLd } from '@/components/seo/JsonLd'
@@ -300,12 +301,12 @@ function EventFinishedBlock() {
         Dėkojame visiems, kurie dalyvavo. Sekite mūsų naujienas — netrukus
         paskelbsime sekantį renginį.
       </p>
-      <a
+      <Link
         href="/lt/produktai"
         className="mt-6 inline-block px-6 py-3 btn-shine bg-brand-gradient text-white rounded-lg font-semibold hover:brightness-110 transition-colors"
       >
         Peržiūrėti Color SHOCK produktus
-      </a>
+      </Link>
     </div>
   )
 }

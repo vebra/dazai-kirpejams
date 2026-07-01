@@ -42,6 +42,7 @@ export default function GlobalError({
   useEffect(() => {
     Sentry.captureException(error)
     console.error('[global-error]', error)
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- SSR hydration pattern'as: window.location pasiekiamas tik kliente; kalba tyčia nustatoma efekte, kad SSR ('lt') ir pirmas kliento renderis sutaptų
     setLang(detectLang())
   }, [error])
 

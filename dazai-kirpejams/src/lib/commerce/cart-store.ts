@@ -145,6 +145,7 @@ export function useCartCount(): number {
   const items = useCartStore((s) => s.items)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- SSR hydration pattern'as: mounted vėliavėlė tyčia nustatoma efekte, kad serveris ir pirmas kliento renderis grąžintų 0 (be hydration mismatch)
     setMounted(true)
   }, [])
 
@@ -157,6 +158,7 @@ export function useCartSubtotalCents(): number {
   const items = useCartStore((s) => s.items)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- SSR hydration pattern'as: mounted vėliavėlė tyčia nustatoma efekte, kad serveris ir pirmas kliento renderis grąžintų 0 (be hydration mismatch)
     setMounted(true)
   }, [])
 

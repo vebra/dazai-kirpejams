@@ -59,6 +59,7 @@ export default async function PrintAttendeesPage() {
 
       <div className="print-page max-w-4xl mx-auto bg-white">
         <div className="print-hide mb-4 flex items-center justify-between">
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- spausdinimo puslapis: tyčia paprastas <a> (pilnas page reload), kad prieš spausdinant nebūtų client-side navigacijos artefaktų */}
           <a
             href="/admin/renginiai"
             className="px-3 py-1.5 bg-[#F5F5F7] hover:bg-[#eee] text-brand-gray-900 rounded-lg text-[12px] font-semibold transition-colors"

@@ -266,7 +266,7 @@ export default async function CampaignDetailPage({
                 Pasirinkite gavėjus
               </h4>
               <p className="text-[12px] text-brand-gray-500 mt-0.5">
-                Default'iškai pažymėti visi. Filtruokite arba atžymėkite tuos,
+                Default&apos;iškai pažymėti visi. Filtruokite arba atžymėkite tuos,
                 kuriems šios kampanijos nesiųsti. Pastaba prie kiekvieno
                 vartotojo lieka profilyje ir matosi vėliau.
               </p>
@@ -295,7 +295,7 @@ export default async function CampaignDetailPage({
             Naudoti šitą tekstą iš naujo
           </h3>
           <p className="text-sm text-brand-gray-500">
-            Sukuria naują juodraštį su tuo pačiu pavadinimu (su „(kopija)"
+            Sukuria naują juodraštį su tuo pačiu pavadinimu (su „(kopija)&quot;
             priesaga), tema ir tekstu. Galėsite jį redaguoti, pasirinkti
             naujus gavėjus ir siųsti.
           </p>
@@ -340,9 +340,9 @@ export default async function CampaignDetailPage({
               Gavėjai ({recipients.length})
             </h3>
             <p className="text-[11px] text-brand-gray-500 mt-1.5 leading-relaxed">
-              „Atidaryta" — pixel beacon load'as. Gmail/Outlook paveikslus
-              proxy'ina iškart gavus laišką, todėl Gmail vartotojams reikšmė
-              dažniausiai reiškia „pristatyta į pašto dėžę", ne tikrą atidarymą.
+              „Atidaryta&quot; — pixel beacon load&apos;as. Gmail/Outlook paveikslus
+              proxy&apos;ina iškart gavus laišką, todėl Gmail vartotojams reikšmė
+              dažniausiai reiškia „pristatyta į pašto dėžę&quot;, ne tikrą atidarymą.
             </p>
           </div>
           <div className="overflow-x-auto">

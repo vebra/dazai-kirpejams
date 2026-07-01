@@ -36,6 +36,7 @@ export function AdminsManager({
   useEffect(() => {
     if (state.success) {
       formRef.current?.reset()
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- tyčinis post-submit reset pattern'as: po sėkmingo server action'o forma uždaroma vieną kartą
       setShowForm(false)
     }
   }, [state.success])
