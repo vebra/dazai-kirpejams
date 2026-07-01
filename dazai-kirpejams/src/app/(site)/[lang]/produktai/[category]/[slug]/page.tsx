@@ -65,6 +65,11 @@ export async function generateMetadata({
   const fallbackDesc = c.seoProductDescFallback.replace('{name}', name)
   const metaDescription = description || fallbackDesc
 
+  // Socialiniam share'ui naudojam pačios prekės nuotrauką (jei yra) —
+  // konkreti prekė kortelėje traukia geriau nei bendras /og-image.jpg.
+  const productImage = product.image_urls?.[0]
+  const ogImages = productImage ? [{ url: productImage }] : undefined
+
   return {
     title,
     description: metaDescription,
@@ -77,11 +82,13 @@ export async function generateMetadata({
       description: metaDescription,
       url: canonical,
       type: 'article',
+      ...(ogImages ? { images: ogImages } : {}),
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description: metaDescription,
+      ...(productImage ? { images: [productImage] } : {}),
     },
   }
 }

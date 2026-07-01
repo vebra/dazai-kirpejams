@@ -39,6 +39,8 @@ export async function generateMetadata({
   )
   const description = `${firstParagraph} Nemokamas įėjimas, būtina registracija. ${EVENT.venueName}, ${EVENT.venueCity}.`
   const canonical = buildCanonicalUrl(lang, `/renginys/${slug}`)
+  // Renginio hero nuotrauka social share'ui (fallback — statinis /event-hero.jpg).
+  const ogImage = EVENT.heroImageUrl ?? '/event-hero.jpg'
 
   return {
     title,
@@ -49,6 +51,13 @@ export async function generateMetadata({
       description,
       url: canonical,
       type: 'website',
+      images: [{ url: ogImage }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
     },
   }
 }
