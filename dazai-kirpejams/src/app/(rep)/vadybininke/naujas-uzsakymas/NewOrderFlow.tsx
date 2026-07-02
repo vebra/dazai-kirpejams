@@ -25,6 +25,7 @@ export function NewOrderFlow({
   heldByProduct = {},
   initialClientId = null,
   initialCart,
+  initialNotice = null,
 }: {
   clients: RepClient[]
   products: RepProduct[]
@@ -34,6 +35,7 @@ export function NewOrderFlow({
   heldByProduct?: Record<string, number>
   initialClientId?: string | null
   initialCart?: Record<string, number>
+  initialNotice?: string | null
 }) {
   const [clients, setClients] = useState<RepClient[]>(initialClients)
   const [client, setClient] = useState<RepClient | null>(
@@ -168,6 +170,12 @@ export function NewOrderFlow({
 
   return (
     <div className="space-y-5">
+      {initialNotice && (
+        <div className="px-4 py-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg text-[13px]">
+          {initialNotice}
+        </div>
+      )}
+
       {/* 1. Klientas */}
       <ClientStep
         clients={clients}
@@ -545,7 +553,7 @@ function ProductStep({
   availableOf: (p: RepProduct) => number
 }) {
   const [search, setSearch] = useState('')
-  const filtered = useMemo(() => {
+  const { filtered, hiddenCount } = useMemo(() => {
     const q = search.trim().toLowerCase()
     const base = q
       ? products.filter(
@@ -555,7 +563,10 @@ function ProductStep({
             (p.colorNumber ?? '').toLowerCase().includes(q)
         )
       : products
-    return base.slice(0, 100)
+    return {
+      filtered: base.slice(0, 100),
+      hiddenCount: Math.max(0, base.length - 100),
+    }
   }, [products, search])
 
   return (
@@ -623,6 +634,12 @@ function ProductStep({
         })}
         {filtered.length === 0 && (
           <div className="px-3 py-4 text-[13px] text-brand-gray-400">Prekių nerasta.</div>
+        )}
+        {hiddenCount > 0 && (
+          <div className="px-3 py-2.5 text-[12px] text-brand-gray-500 bg-[#F9F9FB]">
+            Rodoma {filtered.length} iš {filtered.length + hiddenCount} — patikslinkite
+            paiešką, kad rastumėte likusias.
+          </div>
         )}
       </div>
     </div>
