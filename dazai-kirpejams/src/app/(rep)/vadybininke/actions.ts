@@ -197,8 +197,8 @@ export async function cancelMyPendingOrder(
 
   // Auditas B7: apmokėto (grynais/kortele) užsakymo rep atšaukti negali —
   // trynimas paliktų apskaitą be pėdsako. Admin atšaukia per savo srautą,
-  // kuris žymi `cancelled` (įrašas lieka), o ne trina. Rep turi SELECT
-  // policy ant orders, tad patikra veikia per sesijos klientą.
+  // kuris žymi `cancelled` (įrašas lieka), o ne trina. Autoritetinga patikra —
+  // pačioje RPC (migr 079); šis pre-check lieka draugiškesnei žinutei.
   const { data: ord } = await supabase
     .from('orders')
     .select('payment_status')
@@ -221,11 +221,13 @@ export async function cancelMyPendingOrder(
     const msg =
       reason === 'not_pending'
         ? 'Užsakymą galima atšaukti tik kol jis laukia patvirtinimo.'
-        : reason === 'forbidden'
-          ? 'Tai ne jūsų užsakymas.'
-          : reason === 'not_found'
-            ? 'Užsakymas nerastas.'
-            : error?.message ?? 'Nepavyko atšaukti.'
+        : reason === 'paid'
+          ? 'Apmokėto užsakymo atšaukti negalima — kreipkitės į administratorių.'
+          : reason === 'forbidden'
+            ? 'Tai ne jūsų užsakymas.'
+            : reason === 'not_found'
+              ? 'Užsakymas nerastas.'
+              : error?.message ?? 'Nepavyko atšaukti.'
     console.error('[rep/actions] cancelMyPendingOrder:', error?.message ?? reason)
     return { ok: false, error: msg }
   }
