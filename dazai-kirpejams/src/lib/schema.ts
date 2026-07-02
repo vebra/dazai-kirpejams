@@ -81,8 +81,10 @@ export function localBusinessSchema(): Record<string, unknown> {
     },
     geo: {
       '@type': 'GeoCoordinates',
-      latitude: 54.8985,
-      longitude: 23.9036,
+      // Taikos pr. 32, Kaunas (OSM/Nominatim, savininkės patvirtinta
+      // 2026-07-02) — anksčiau buvo Kauno centro placeholder'is ~3 km šalia.
+      latitude: 54.91097,
+      longitude: 23.94441,
     },
     openingHoursSpecification: {
       '@type': 'OpeningHoursSpecification',
