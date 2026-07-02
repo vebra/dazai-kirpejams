@@ -43,7 +43,7 @@ export function IssueRequestFlow({
   )
   const totalUnits = lines.reduce((s, l) => s + l.qty, 0)
 
-  const filtered = useMemo(() => {
+  const { filtered, hiddenCount } = useMemo(() => {
     const q = search.trim().toLowerCase()
     const base = q
       ? products.filter(
@@ -53,7 +53,10 @@ export function IssueRequestFlow({
             (p.colorNumber ?? '').toLowerCase().includes(q)
         )
       : products
-    return base.slice(0, 50)
+    return {
+      filtered: base.slice(0, 50),
+      hiddenCount: Math.max(0, base.length - 50),
+    }
   }, [products, search])
 
   function setQty(pid: string, q: number) {
@@ -118,6 +121,12 @@ export function IssueRequestFlow({
                 </span>
               </button>
             ))}
+            {hiddenCount > 0 && (
+              <div className="px-3 py-2 text-[12px] text-brand-gray-500 bg-[#F9F9FB]">
+                Rodoma {filtered.length} iš {filtered.length + hiddenCount} — patikslinkite
+                paiešką, kad rastumėte likusias.
+              </div>
+            )}
           </div>
         )}
 

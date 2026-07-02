@@ -47,13 +47,24 @@ export default async function NewRepOrderPage({
   const repeatId = typeof sp.repeat === 'string' ? sp.repeat : null
   let initialClientId: string | null = null
   let initialCart: Record<string, number> | undefined
+  let initialNotice: string | null = null
   if (repeatId) {
     const det = await getMyRepOrderDetail(repeatId)
     if (det) {
       initialClientId = det.clientId
       initialCart = {}
+      // Prekės, kurių nebėra kataloge (deaktyvuotos/ištrintos), į krepšelį
+      // nededamos — bet ne tyliai: vadybininkė mato, ko trūksta.
+      const skipped: string[] = []
       for (const it of det.items) {
-        if (it.productId) initialCart[it.productId] = (initialCart[it.productId] ?? 0) + it.quantity
+        if (it.productId && products.some((p) => p.id === it.productId)) {
+          initialCart[it.productId] = (initialCart[it.productId] ?? 0) + it.quantity
+        } else {
+          skipped.push(it.name)
+        }
+      }
+      if (skipped.length) {
+        initialNotice = `Šios užsakymo ${det.orderNumber} prekės nebeparduodamos ir į krepšelį neįdėtos: ${skipped.join(', ')}.`
       }
     }
   }
@@ -90,6 +101,7 @@ export default async function NewRepOrderPage({
         heldByProduct={heldByProduct}
         initialClientId={initialClientId}
         initialCart={initialCart}
+        initialNotice={initialNotice}
       />
     </div>
   )

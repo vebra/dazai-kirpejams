@@ -203,16 +203,23 @@ export async function getMyRepStats(): Promise<RepStats> {
     approval_status: string | null
     created_at: string
   }>
-  const now = new Date()
-  const ym = now.getFullYear() * 12 + now.getMonth()
+  // Mėnesio riba pagal Lietuvos laiką — serveris (Vercel) sukasi UTC, tad
+  // getMonth() mėnesių sandūroje 2–3 val. „pavėluotų". sv-SE formatas su
+  // timeZone duoda stabilų 'YYYY-MM' raktą.
+  const MONTH = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Europe/Vilnius',
+    year: 'numeric',
+    month: '2-digit',
+  })
+  const thisMonth = MONTH.format(new Date())
   const stats = { ...empty, clientCount: clientsRes.count ?? 0 }
   for (const o of list) {
     if (o.approval_status === 'pending') stats.pendingCount++
     if (o.approval_status === 'approved') {
       stats.approvedCount++
       stats.totalApprovedCents += o.total_cents
-      const d = new Date(o.created_at)
-      if (d.getFullYear() * 12 + d.getMonth() === ym) stats.thisMonthCents += o.total_cents
+      if (MONTH.format(new Date(o.created_at)) === thisMonth)
+        stats.thisMonthCents += o.total_cents
     }
   }
   return stats
