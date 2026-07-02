@@ -97,7 +97,11 @@ export async function Hero({ lang, dict }: HeroProps) {
           </div>
 
           {/* DEŠINĖ — 180 ml produkto nuotrauka */}
-          <div className="relative flex flex-col items-center">
+          <div className="relative flex justify-center">
+            <div
+              aria-hidden
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[520px] h-[80%] rounded-full bg-[linear-gradient(135deg,rgba(233,30,140,0.28)_0%,rgba(43,53,175,0.22)_100%)] blur-3xl"
+            />
             <div className="relative w-full max-w-[280px] sm:max-w-[420px] lg:max-w-[480px] aspect-[3/4] rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.2)]">
               <Image
                 src={heroImageSrc}
@@ -107,10 +111,9 @@ export async function Hero({ lang, dict }: HeroProps) {
                 className="object-cover"
                 priority
               />
-            </div>
-
-            <div className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-brand-magenta/10 border border-brand-magenta/25 text-brand-magenta rounded-full text-[0.88rem] font-bold">
-              <span aria-hidden>↑</span> {hero.compareBadge}
+              <div className="absolute top-4 left-4 inline-flex items-center px-4 py-2 bg-white/90 backdrop-blur-sm text-brand-gray-900 rounded-full text-[0.82rem] font-bold shadow-[0_2px_8px_rgba(0,0,0,0.25)]">
+                {hero.compareBadge}
+              </div>
             </div>
           </div>
         </div>
