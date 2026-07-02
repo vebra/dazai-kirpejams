@@ -2,11 +2,11 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react'
 import { useCartStore, type CartItem } from '@/lib/commerce/cart-store'
 import { useRefreshCartPrices } from '@/lib/commerce/useRefreshCartPrices'
-import { useVerifiedUser } from '@/lib/auth/useVerifiedUser'
+import { useVerification } from '@/components/auth/VerificationProvider'
 import {
   meetsMinimumOrder,
   DEFAULT_SHIPPING_SETTINGS,
@@ -39,7 +39,11 @@ export function CartView({
   const removeItem = useCartStore((s) => s.removeItem)
   const updateQuantity = useCartStore((s) => s.updateQuantity)
   const clear = useCartStore((s) => s.clear)
-  const { isVerified, isLoading: authLoading, user, status } = useVerifiedUser()
+  // Verifikacija iš layout'o konteksto (auditas B33) — anksčiau čia buvo
+  // tiesioginis useVerifiedUser(), kuris dubliavo get_my_verification_status
+  // RPC šalia provider'io ir galėjo trumpam nesutapti su kainų refresh'u.
+  const { isVerified, isLoggedIn, isLoading: authLoading, status } =
+    useVerification()
 
   // Atnaujinam krepšelio kainas iš serverio (kad nebūtų price_mismatch dėl
   // pasenusios išsaugotos kainos). Tik patvirtintiems.
@@ -49,9 +53,15 @@ export function CartView({
     setMounted(true)
   }, [])
 
-  // ViewCart — kartą per sesiją, kai vartotojas pasiekia krepšelį su prekėmis
+  // ViewCart — vieną kartą, kai vartotojas pasiekia krepšelį su prekėmis.
+  // Laukiam verifikacijos pabaigos (auditas B29): anksčiau event'as išeidavo
+  // iškart po mount, kai isVerified dar false — patvirtinti profesionalai
+  // sistemingai būdavo žymimi 'guest'.
+  const viewCartSent = useRef(false)
   useEffect(() => {
-    if (!mounted || items.length === 0) return
+    if (!mounted || authLoading || items.length === 0 || viewCartSent.current)
+      return
+    viewCartSent.current = true
     const value = items.reduce((s, i) => s + (i.priceCents * i.quantity) / 100, 0)
     trackViewCart({
       items: items.map(mapCartItem),
@@ -60,11 +70,9 @@ export function CartView({
       locale: lang,
       userType: isVerified ? 'professional' : 'guest',
     })
-    // Tik pirma mount'u su prekėmis — user'iui keičiant kiekius event'o
-    // nebeshootinam (dedupe per sesiją nereikia, nes efektas vien nuo
-    // `mounted` flag'o)
+    // Ref guard — user'iui keičiant kiekius event'o nebeshootinam.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mounted])
+  }, [mounted, authLoading])
 
   if (!mounted) {
     return <CartSkeleton />
@@ -284,7 +292,7 @@ export function CartView({
           {/* Auth/verification gate */}
           {!authLoading && !isVerified && (
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
-              {!user ? (
+              {!isLoggedIn ? (
                 <>
                   {dict.cart.authGateLoginPrefix}{' '}
                   <Link

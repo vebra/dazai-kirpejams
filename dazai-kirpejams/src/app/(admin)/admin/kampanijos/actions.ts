@@ -166,7 +166,7 @@ export async function duplicateCampaignAction(
   const supabase = createServerClient()
   const { data: source } = await supabase
     .from('marketing_campaigns')
-    .select('name, subject, body')
+    .select('name, subject, body, image_url')
     .eq('id', sourceId)
     .maybeSingle()
 
@@ -178,6 +178,7 @@ export async function duplicateCampaignAction(
       name: `${source.name} (kopija)`,
       subject: source.subject,
       body: source.body,
+      image_url: source.image_url,
       status: 'draft',
       created_by: admin.id,
     })

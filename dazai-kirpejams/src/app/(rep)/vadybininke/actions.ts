@@ -194,6 +194,23 @@ export async function cancelMyPendingOrder(
   if (!orderId) return { ok: false, error: 'Trūksta užsakymo.' }
 
   const supabase = await createServerSupabase()
+
+  // Auditas B7: apmokėto (grynais/kortele) užsakymo rep atšaukti negali —
+  // trynimas paliktų apskaitą be pėdsako. Admin atšaukia per savo srautą,
+  // kuris žymi `cancelled` (įrašas lieka), o ne trina. Rep turi SELECT
+  // policy ant orders, tad patikra veikia per sesijos klientą.
+  const { data: ord } = await supabase
+    .from('orders')
+    .select('payment_status')
+    .eq('id', orderId)
+    .maybeSingle()
+  if (ord?.payment_status === 'paid') {
+    return {
+      ok: false,
+      error: 'Apmokėto užsakymo atšaukti negalima — kreipkitės į administratorių.',
+    }
+  }
+
   const { data, error } = await supabase.rpc('cancel_rep_pending_order', {
     p_order_id: orderId,
   })

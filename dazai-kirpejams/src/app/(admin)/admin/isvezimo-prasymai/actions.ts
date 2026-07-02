@@ -36,6 +36,24 @@ export async function approveIssueRequest(id: string): Promise<IssueReqResult> {
   if (req.status !== 'pending')
     return { ok: false, error: 'Prašymas jau apdorotas. Atnaujinkite sąrašą.' }
 
+  const items = (Array.isArray(req.items) ? req.items : [])
+    .filter((i) => i && i.product_id && Number.isInteger(i.qty) && i.qty > 0)
+    .map((i) => ({ product_id: i.product_id, qty: i.qty }))
+  if (!items.length) return { ok: false, error: 'Prašymas be prekių.' }
+
+  // Auditas B10: atominis claim PRIEŠ RPC (compare-and-swap) — du lygiagretūs
+  // patvirtinimai (dvi kortelės / dvigubas klikas) anksčiau abu praeidavo
+  // status patikrą ir prekės būtų išduotos dukart. Update sąlygotas
+  // .eq('status','pending') — antrasis nepakeis nė vienos eilutės.
+  const { data: claimed } = await sb
+    .from('rep_issue_requests')
+    .update({ status: 'approved', decided_at: new Date().toISOString() })
+    .eq('id', id)
+    .eq('status', 'pending')
+    .select('id')
+  if (!claimed || claimed.length === 0)
+    return { ok: false, error: 'Prašymas jau apdorotas. Atnaujinkite sąrašą.' }
+
   const { data: prof } = await sb
     .from('user_profiles')
     .select('first_name, last_name')
@@ -43,11 +61,6 @@ export async function approveIssueRequest(id: string): Promise<IssueReqResult> {
     .maybeSingle<{ first_name: string | null; last_name: string | null }>()
   const repName =
     `${prof?.first_name ?? ''} ${prof?.last_name ?? ''}`.trim() || 'Vadybininkė'
-
-  const items = (Array.isArray(req.items) ? req.items : [])
-    .filter((i) => i && i.product_id && Number.isInteger(i.qty) && i.qty > 0)
-    .map((i) => ({ product_id: i.product_id, qty: i.qty }))
-  if (!items.length) return { ok: false, error: 'Prašymas be prekių.' }
 
   const { data: res, error: rErr } = await sb.rpc('issue_stock_to_rep_batch', {
     p_items: items,
@@ -67,13 +80,20 @@ export async function approveIssueRequest(id: string): Promise<IssueReqResult> {
         ? `Nepakanka „${r?.name ?? 'prekės'}" likučio (yra ${r?.stock ?? 0}). Niekas neišduota — sumažinkite kiekį arba papildykite sandėlį.`
         : rErr?.message ?? 'Nepavyko išduoti.'
     console.error('[admin/isvezimo-prasymai] approve:', rErr?.message ?? r?.reason)
+    // RPC nepavyko (pvz. nepakanka likučio) — best-effort grąžinam claim'ą
+    // atgal į 'pending', kad prašymą būtų galima patvirtinti vėliau.
+    const { error: revertErr } = await sb
+      .from('rep_issue_requests')
+      .update({ status: 'pending', decided_at: null })
+      .eq('id', id)
+    if (revertErr) {
+      console.error(
+        '[admin/isvezimo-prasymai] approve revert failed:',
+        revertErr.message
+      )
+    }
     return { ok: false, error: msg }
   }
-
-  await sb
-    .from('rep_issue_requests')
-    .update({ status: 'approved', decided_at: new Date().toISOString() })
-    .eq('id', id)
 
   revalidatePath('/admin/isvezimo-prasymai')
   revalidatePath('/admin/sandelis', 'layout')
@@ -107,7 +127,10 @@ export async function rejectIssueRequest(
   if (req.status !== 'pending')
     return { ok: false, error: 'Prašymas jau apdorotas.' }
 
-  await sb
+  // Auditas B10 (analogiškai approve): atominis CAS — jei tarp patikros ir
+  // update prašymą spėjo apdoroti kitas admin'as, nepakeičiam nė vienos
+  // eilutės ir grąžinam klaidą, o ne tyliai perrašom sprendimą.
+  const { data: claimed } = await sb
     .from('rep_issue_requests')
     .update({
       status: 'rejected',
@@ -115,6 +138,10 @@ export async function rejectIssueRequest(
       decided_at: new Date().toISOString(),
     })
     .eq('id', id)
+    .eq('status', 'pending')
+    .select('id')
+  if (!claimed || claimed.length === 0)
+    return { ok: false, error: 'Prašymas jau apdorotas.' }
 
   revalidatePath('/admin/isvezimo-prasymai')
   return { ok: true }

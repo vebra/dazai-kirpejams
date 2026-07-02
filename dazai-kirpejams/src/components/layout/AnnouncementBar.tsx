@@ -17,6 +17,17 @@ export async function AnnouncementBar({ lang }: { lang: Locale }) {
   const banners = await getActiveBanners('announcement', lang)
   const b = banners[0]
 
+  // Client'o UI tekstai — lokalizuojami čia (server), kad AnnouncementBarClient
+  // neturėtų hardcoded LT (auditas B23).
+  const closeLabel =
+    lang === 'en'
+      ? 'Close notification'
+      : lang === 'ru'
+        ? 'Закрыть уведомление'
+        : 'Uždaryti pranešimą'
+  const ctaFallback =
+    lang === 'en' ? 'Learn more' : lang === 'ru' ? 'Подробнее' : 'Plačiau'
+
   if (b) {
     const href = b.ctaUrl ? `${langPrefix(lang)}${b.ctaUrl}` : null
     return (
@@ -26,6 +37,8 @@ export async function AnnouncementBar({ lang }: { lang: Locale }) {
         ctaText={b.ctaText}
         href={href}
         bg={b.backgroundColor}
+        closeLabel={closeLabel}
+        ctaFallback={ctaFallback}
       />
     )
   }
@@ -56,6 +69,8 @@ export async function AnnouncementBar({ lang }: { lang: Locale }) {
       ctaText={ctaText}
       href={`${langPrefix(lang)}/renginys/${event.slug}`}
       bg={null}
+      closeLabel={closeLabel}
+      ctaFallback={ctaFallback}
     />
   )
 }
