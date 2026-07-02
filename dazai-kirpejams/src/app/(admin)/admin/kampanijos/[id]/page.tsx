@@ -18,6 +18,12 @@ import { CampaignImagePicker } from '../CampaignImagePicker'
 
 export const metadata = { title: 'Kampanija' }
 export const dynamic = 'force-dynamic'
+// Kampanijos siuntimo Server Action (sendCampaignAction) — ilgas ciklas
+// (~0.7 s vienam gavėjui dėl Resend rate-limit delay). Default funkcijos
+// limitas nutrauktų siuntimą vidury ir kampanija amžinai liktų 'sending'.
+// 60 s — max leidžiamas Hobby plano laikas; Server Action'ai paveldi
+// puslapio, iš kurio kviečiami, segmento konfigūraciją.
+export const maxDuration = 60
 
 const STATUS_LABELS: Record<string, string> = {
   draft: 'Juodraštis',

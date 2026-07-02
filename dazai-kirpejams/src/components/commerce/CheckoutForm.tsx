@@ -210,7 +210,10 @@ export function CheckoutForm({
     email.trim() &&
     phone.trim() &&
     (deliveryMethod === 'pickup' ||
-      (deliveryMethod === 'courier' && address && city && postalCode) ||
+      (deliveryMethod === 'courier' &&
+        address.trim() &&
+        city.trim() &&
+        postalCode.trim()) ||
       (deliveryMethod === 'parcel_locker' && parcelLocker))
 
   const handleSubmit = (e: React.FormEvent) => {

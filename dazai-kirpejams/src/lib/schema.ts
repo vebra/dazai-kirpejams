@@ -103,6 +103,8 @@ const LOCALE_MAP: Record<string, string> = {
 }
 
 export function websiteSchema(lang = 'lt'): Record<string, unknown> {
+  // potentialAction/SearchAction TYČIA nėra (auditas B20): svetainė ?q=
+  // paieškos endpoint'o neturi, o Google sitelinks searchbox deprecated.
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
@@ -111,14 +113,6 @@ export function websiteSchema(lang = 'lt'): Record<string, unknown> {
     name: SITE_NAME,
     inLanguage: LOCALE_MAP[lang] ?? lang,
     publisher: { '@id': `${SITE_URL}/#organization` },
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: `${SITE_URL}${langPrefix(lang)}/produktai?q={search_term_string}`,
-      },
-      'query-input': 'required name=search_term_string',
-    },
   }
 }
 

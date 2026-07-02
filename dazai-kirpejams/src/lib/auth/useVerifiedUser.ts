@@ -78,7 +78,15 @@ export function useVerifiedUser(
       )
     }
 
+    // Konkuruojančių check() sekos guard'as (auditas B30): pradinis check ir
+    // auth-change check gali bėgti lygiagrečiai — lėčiau baigęs SENAS
+    // kvietimas neturi perrašyti naujesnio rezultato (pvz. po SIGNED_OUT
+    // grąžinti pasenusio 'approved'). setState atlieka tik naujausias.
+    let checkSeq = 0
+
     async function check() {
+      const seq = ++checkSeq
+
       // getSession() skaito sesiją LOKALIAI (iš slapukų), be tinklo užklausos —
       // patikima net silpnu mobiliu ryšiu / in-app naršyklėje. getUser() darydavo
       // tinklo validaciją, kuri mobiliajame neretai neįvyksta → kainos nedingdavo.
@@ -89,7 +97,7 @@ export function useVerifiedUser(
       } = await supabase.auth.getSession()
       const user = session?.user ?? null
 
-      if (controller.signal.aborted) return
+      if (controller.signal.aborted || seq !== checkSeq) return
 
       if (userErr || !user) {
         setState({
@@ -102,7 +110,7 @@ export function useVerifiedUser(
       }
 
       const status = await fetchVerificationWithRetry(supabase, controller.signal)
-      if (controller.signal.aborted) return
+      if (controller.signal.aborted || seq !== checkSeq) return
 
       setState({
         isLoading: false,

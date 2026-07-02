@@ -9,6 +9,10 @@ type Props = {
   ctaText: string | null
   href: string | null
   bg: string | null
+  /** Lokalizuotas × mygtuko aria-label (paduoda server komponentas). */
+  closeLabel: string
+  /** Lokalizuotas CTA fallback tekstas, kai baneris be ctaText. */
+  ctaFallback: string
 }
 
 /**
@@ -35,7 +39,15 @@ function track(key: string, type: 'impression' | 'click') {
  * uždarymas įsimenamas per localStorage pagal banerio id, tad NAUJAS pranešimas
  * (kitas id) vėl pasirodys.
  */
-export function AnnouncementBarClient({ id, text, ctaText, href, bg }: Props) {
+export function AnnouncementBarClient({
+  id,
+  text,
+  ctaText,
+  href,
+  bg,
+  closeLabel,
+  ctaFallback,
+}: Props) {
   const [hidden, setHidden] = useState(false)
 
   useEffect(() => {
@@ -86,14 +98,14 @@ export function AnnouncementBarClient({ id, text, ctaText, href, bg }: Props) {
             onClick={() => track(id, 'click')}
             className="underline font-semibold ml-1.5 hover:opacity-90"
           >
-            {ctaText || 'Plačiau'}
+            {ctaText || ctaFallback}
           </Link>
         )}
       </span>
       <button
         type="button"
         onClick={dismiss}
-        aria-label="Uždaryti pranešimą"
+        aria-label={closeLabel}
         className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/15 text-white/90 text-lg leading-none"
       >
         ×

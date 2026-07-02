@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -30,6 +30,8 @@ export function MobileMenu({ lang, links, labels }: MobileMenuProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
+  const drawerRef = useRef<HTMLDivElement | null>(null)
+  const burgerRef = useRef<HTMLButtonElement | null>(null)
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- SSR hydration pattern'as: mounted vėliavėlė tyčia nustatoma efekte, kad serverio ir pirmo kliento renderio output'as sutaptų
@@ -70,14 +72,58 @@ export function MobileMenu({ lang, links, labels }: MobileMenuProps) {
     return () => subscription.unsubscribe()
   }, [])
 
-  // ESC klavišas uždarinimui
+  // ESC uždarymui + focus valdymas (auditas B31): role="dialog" aria-modal
+  // reikalauja, kad fokusas atsidarius PERSIKELTŲ į drawer'į, Tab suktųsi jo
+  // viduje (focus trap), o uždarius grįžtų į burger mygtuką — kitaip
+  // klaviatūros/ekrano skaitytuvo vartotojas lieka „už" modalo ir vaikšto
+  // po nematomą puslapį.
   useEffect(() => {
     if (!open) return
+
+    const drawer = drawerRef.current
+    const focusables = () =>
+      Array.from(
+        drawer?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        ) ?? []
+      ).filter((el) => el.offsetParent !== null)
+
+    // Fokusas į pirmą elementą drawer'yje (uždarymo mygtuką) po atidarymo
+    // animacijos kadro
+    const raf = requestAnimationFrame(() => focusables()[0]?.focus())
+
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false)
+      if (e.key === 'Escape') {
+        setOpen(false)
+        return
+      }
+      if (e.key !== 'Tab') return
+      const items = focusables()
+      if (items.length === 0) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      const active = document.activeElement as HTMLElement | null
+      // Trap: iš paskutinio Tab → į pirmą; iš pirmo Shift+Tab → į paskutinį;
+      // jei fokusas apskritai už drawer'io — grąžinam į pirmą.
+      if (!active || !drawer?.contains(active)) {
+        e.preventDefault()
+        first.focus()
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault()
+        first.focus()
+      } else if (e.shiftKey && active === first) {
+        e.preventDefault()
+        last.focus()
+      }
     }
+
     window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('keydown', handleKey)
+      // Uždarius fokusas grįžta į burger mygtuką
+      burgerRef.current?.focus()
+    }
   }, [open])
 
   const overlay = (
@@ -91,12 +137,15 @@ export function MobileMenu({ lang, links, labels }: MobileMenuProps) {
         aria-hidden="true"
       />
 
-      {/* Drawer */}
+      {/* Drawer. `inert` kai uždarytas — jis lieka DOM'e (transform'u
+          nustumtas už ekrano), tad be inert jo nuorodos būtų Tab'inamos. */}
       <div
+        ref={drawerRef}
         id="mobile-menu"
         role="dialog"
         aria-modal="true"
         aria-label={labels.mainMenu}
+        inert={!open}
         className={`lg:hidden fixed top-0 right-0 bottom-0 z-[70] w-[85%] max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-out flex flex-col ${
           open ? 'translate-x-0' : 'translate-x-full'
         }`}
@@ -187,6 +236,7 @@ export function MobileMenu({ lang, links, labels }: MobileMenuProps) {
   return (
     <>
       <button
+        ref={burgerRef}
         type="button"
         onClick={() => setOpen(true)}
         className="lg:hidden flex items-center justify-center min-w-[44px] min-h-[44px] p-2.5 text-brand-gray-900 hover:text-brand-magenta transition-colors"

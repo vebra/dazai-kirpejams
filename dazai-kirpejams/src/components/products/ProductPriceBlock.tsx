@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useVerification } from '@/components/auth/VerificationProvider'
 import { useProductPrice } from '@/components/products/ProductPricesProvider'
@@ -122,7 +122,19 @@ export function ProductPriceBlock({
   // ViewContent — visada, nepriklausomai nuo user type. Meta optimizuoja
   // reklamą ant peržiūrų, todėl svarbu siųsti ir guest'ams (be price) ir
   // profesionalams (su tikra kaina).
+  //
+  // VIENĄ kartą per peržiūrą (auditas B28): anksčiau efektas šaudavo 2–3×
+  // (mount kaip guest → verifikacijos flip → kainos load) ir dubliavo
+  // event'us analitikoje. Laukiam, kol verifikacija išsispręs, o
+  // patvirtintam — kol ateis kaina, kad event'as išeitų su galutiniu
+  // userType ir tikra kaina.
+  const viewContentSentFor = useRef<string | null>(null)
   useEffect(() => {
+    if (verifLoading) return
+    if (isVerified && hasProvider && !priceReady && priceFetchLoading) return
+    if (viewContentSentFor.current === cartItem.productId) return
+    viewContentSentFor.current = cartItem.productId
+
     trackViewContent({
       productId: cartItem.productId,
       name: cartItem.name,
@@ -153,6 +165,10 @@ export function ProductPriceBlock({
     lang,
     price,
     volumeMl,
+    verifLoading,
+    hasProvider,
+    priceReady,
+    priceFetchLoading,
   ])
 
   const handlePriceUnlock = (source: 'login' | 'register') => {
